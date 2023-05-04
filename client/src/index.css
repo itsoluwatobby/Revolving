@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font_style{
+  font-family: 'Roboto', sans-serif;
+}
+
+/* CUSTOM FONTS */
+.open_sans{
+  font-family: 'Open Sans', sans-serif;
+}
+.poppins_style{
+  font-family: 'Poppins', sans-serif;
+}
+.inter_style{
+  font-family: 'Inter', sans-serif;
+}
+.dancing_style{
+  font-family: 'Dancing Script', cursive;
+}
+.dosis_style{
+  font-family: 'Dosis', sans-serif;
+}
+
