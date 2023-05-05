@@ -7,7 +7,7 @@ export type ChildrenProp = {
 
 export type CommentType = {
   postId: string,
-  id : string,
+  commentId : string,
   date: string,
   body?: string,
   likes?: number,
@@ -15,9 +15,10 @@ export type CommentType = {
 }
 
 export type PostType = {
-  id : string,
+  postId: string,
   title: string,
   date: string,
+  editDate?: string,
   body: string,
   likes?: number,
   fontFamily?: string | 'sans',
@@ -29,11 +30,17 @@ export type PostType = {
 
 
 export type PostContextType = {
+  search: string,
   posts: PostType[],
-  getPosts: () => void,
-  addPost: () => void,
-  updatePost: (id: number) => void,
-  deletePost: (id: number) => void,
+  postData: Partial<PostType>,
+  isLoading: boolean,
+  error: { message: string },
+  setSearch: React.Dispatch<React.SetStateAction<string>>
+  setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
+  // getPosts: () => void,
+  addPost: () => boolean,
+  updatedPost: (postId: number) => void,
+  deletePosts: (postId: number) => void,
 }
 
 export type Theme = 'light' | 'dark';
@@ -43,8 +50,11 @@ export type ThemeContextType = {
   theme: Theme,
   fontFamily: FontStyle,
   fontOption: boolean,
+  canPost: boolean, 
+  //setCanPost: React.Dispatch<React.SetStateAction<boolean>>
   changeTheme: (mode: string) => void,
   changeFontFamily: (font: string) => void,
+  // canPublish: (...args: string[]) => void,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>
 }
 
