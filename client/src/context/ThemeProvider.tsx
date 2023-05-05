@@ -9,6 +9,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     localStorage.getItem('fontFamily') || 'font_style'
     );
   const [fontOption, setFontOption] = useState<boolean>(false);
+  const [canPost, setCanPost] = useState<boolean>(false);
 
   const changeTheme = (mode: string) => {
     setTheme(prev => {
@@ -18,12 +19,16 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const changeFontFamily = (font: string) => {
-    setFontFamily(prev => prev = font)
+    setFontFamily(font)
     localStorage.setItem('fontFamily', font);
   }
 
+  // const canPublish = (...args: []) => {
+  //   setCanPost([...args].every(Boolean))
+  // }
+
   const values = {
-    theme, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption
+    theme, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption, canPost
   }
   return (
     <ThemeContext.Provider value={ values }>

@@ -13,7 +13,7 @@ export const useWordCount = (post: string) => {
       if (+prev > 1 && +prev < 60) {
         const hours = Math.floor(+prev);
         prev = ((+prev * 3600) - hours * 3600).toString();
-        const minutes = Math.floor(+prev / 60).toString();
+        const minutes = Math .floor(+prev / 60).toString();
         prev = minutes.padStart(2, '0')
         return prev == '1' ? prev + ' minute' : prev + ' minutes'
       }

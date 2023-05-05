@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FiEdit } from 'react-icons/fi'
 import { BsBell, BsBellFill, BsMoonStars, BsMoonStarsFill } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
 import { IoIosArrowDown, IoIosMore } from 'react-icons/io'
 import WedgeLoad from '../assets/Wedges-14.3s-44px.svg'
 import { usePostContext } from '../hooks/usePostContext'
-import { PostType, ThemeContextType } from '../posts'
+import { PostContextType, PostType, ThemeContextType } from '../posts'
 import { useThemeContext } from '../hooks/useThemeContext'
 import profileImage from "../images/bg_image3.jpg"
 import { custom_fonts } from '../fonts.js'
@@ -23,10 +23,6 @@ const headings = [
   'You matter and you will always do'
 ]
 
-type ObjectProp = {
-  [key: string]: string,
-}
-
 const bell_class= "text-xl cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.95] duration-200 ease-in-out text-gray-500";
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
@@ -35,21 +31,25 @@ const select_styles = 'border border-t-0 border-l-0 border-r-0 border-b-1 cursor
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
-const button_class= "text-[13px] bg-green-400 rounded-2xl p-0.5 shadow-lg hover:scale-[1.02] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out pl-1.5 pr-1.5"
+// const button_class= "text-[13px] rounded-2xl p-0.5 shadow-lg hover:scale-[1.02] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out pl-1.5 pr-1.5"
 
-const TIMEOUT = 3500
+// const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate()
   const [display, setDisplay] = useState<boolean>(false);
   // const [fontOption, setFontOption] = useState<boolean>(false);
   const [image, setImage] = useState<boolean>(false);
   const [spec, setSpec] = useState<number>(1);
-  const {search, setSearch} = usePostContext()
+  const {search, setSearch, addPost} = usePostContext() as PostContextType
   const currentMode = localStorage.getItem('theme');
-  const {theme, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption} = useThemeContext() as ThemeContextType
-console.log(pathname)
+  const {theme, canPost, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption} = useThemeContext() as ThemeContextType
   const onNotify = () => setDisplay(prev => !prev);
 
+  const add = () => {
+    const success = addPost()
+    success && navigate('/')
+  }
   return(
     <nav className={`${pathname == '/new_story' ? 'sticky top-0 pr-5 pl-5 md:pr-16 md:pl-16' : ''} p-4 w-full h-16 flex items-center justify-between`}>
       <div className='flex-none flex items-center gap-2 mobile:relative mobile:gap-0'>
@@ -92,7 +92,9 @@ console.log(pathname)
         }
           {pathname == '/new_story' ? 
             <button
-              className={button_class}
+              className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+              onClick={add}
+              // disabled = {!canPost}
               >Publish</button>
           :
             <Link to={pathname == '/new_story' ? '' : 'new_story'} >

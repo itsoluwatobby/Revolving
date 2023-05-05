@@ -1,16 +1,11 @@
-import { Home } from "./page/Home"
+import { Home } from "./pages/Home"
 import backgroundImage from "../images/bg_image2.jpg"
 import { useThemeContext } from "./hooks/useThemeContext"
 import { ThemeContextType } from "./posts";
-import { Navbar } from "./components/Navbar";
 import { Routes, Route } from 'react-router-dom';
 import { BlogLayout } from "./components/BlogLayout";
 import { NewStory } from "./components/NewStory";
  
-//data-theme = {'light'}
-// const color: {"dark": string} = {
-//   "dark": "bg-slate-800"
-// }
 export const App = () => {
   const {theme} = useThemeContext() as ThemeContextType;
 
@@ -20,6 +15,7 @@ export const App = () => {
         <Route path='/' element={<BlogLayout />}>
           <Route index element={<Home />} />
           <Route path="new_story" element={<NewStory />} />
+          <Route path="edit_story/:postId" element={<NewStory />} />
         </Route>
       </Routes>
     </main>
