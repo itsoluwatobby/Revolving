@@ -1,18 +1,23 @@
 import express, { Request, Response } from 'express'
-const app = express()
 import http from 'http';
 import cors from 'cors';
+
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import { corsOptions } from '../config/corsOption.js';
-import dbConfig from '../config/mongoConfig.js'
+dotenv.config() 
 import mongoose from 'mongoose';
+
+import morgan from 'morgan';
+import helmet from 'helmet';
+import { corsOptions } from './config/corsOption.js';
+
 import { cpus } from 'os';
 import cluster from 'cluster';
-dotenv.config()
-//dbConfig()
+import { dbConfig } from './config/mongoConfig.js';
+// import { errorLog, logEvents } from './middleware/logger.js';
+dbConfig(null, null, null);
+const app = express()
+
 const PORT = process.env.PORT || 3000
 
 app.use(cors(corsOptions))
@@ -46,8 +51,21 @@ if (numberOfCores > 4){
       res.status(200).json({ status: true, message: 'server up and running' })
     })
 
-    server.listen(PORT, () => {
-      console.log(`Server up and running on port ${PORT}`)
+    //app.use(errorLog);
+    app.all('*', (req: Request, res: Response) => {
+      res.status(404).json({status: false, message: 'NOT FOUND'})
+    })
+    
+    mongoose.connection.once('open', () => {
+      console.log('Revolving DB connected')
+      server.listen(PORT, () => {
+        console.log(`Server up and running on port ${PORT}`)
+      })
+    })
+
+    mongoose.connection.on('error', () => {
+      console.log('Error connection to DB')
+      process.exit(1)
     })
   }
 }
@@ -56,7 +74,15 @@ else{
     res.status(200).json({ status: true, message: 'server up and running' })
   })
   
-  server.listen(PORT, () => {
-    console.log(`Server up and running on port ${PORT}`)
+  mongoose.connection.once('open', () => {
+    console.log('Revolving DB connected')
+    server.listen(PORT, () => {
+      console.log(`Server up and running on port ${PORT}`)
+    })
+  })
+
+  mongoose.connection.on('error', () => {
+    console.log('Error connection to DB')
+    process.exit(1)
   })
 }
