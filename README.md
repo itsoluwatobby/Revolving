@@ -1,2 +1,2 @@
 # REVOLVING.
-### Let your world always about you
+### Let your world always be about you
