@@ -6,6 +6,7 @@ export type ChildrenProp = {
 }
 
 export type CommentType = {
+  id?: string,
   postId: string,
   commentId : string,
   date: string,
@@ -15,6 +16,7 @@ export type CommentType = {
 }
 
 export type PostType = {
+  id?: string,
   postId: string,
   title: string,
   date: string,
@@ -35,12 +37,14 @@ export type PostContextType = {
   postData: Partial<PostType>,
   isLoading: boolean,
   error: { message: string },
+  // editPost: Partial<PostType>, 
+  setEditPost: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
   // getPosts: () => void,
-  addPost: () => boolean,
-  updatedPost: (postId: number) => void,
-  deletePosts: (postId: number) => void,
+  addPost: () => void,
+  updatedPost: () => void,
+  deletePosts: (id: string) => void,
 }
 
 export type Theme = 'light' | 'dark';

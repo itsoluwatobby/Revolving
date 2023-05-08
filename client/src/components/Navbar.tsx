@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { FiEdit } from 'react-icons/fi'
 import { BsBell, BsBellFill, BsMoonStars, BsMoonStarsFill } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
@@ -41,17 +41,32 @@ export const Navbar = () => {
   // const [fontOption, setFontOption] = useState<boolean>(false);
   const [image, setImage] = useState<boolean>(false);
   const [spec, setSpec] = useState<number>(1);
-  const {search, setSearch, addPost} = usePostContext() as PostContextType
+  const {search, setSearch, addPost, posts, updatedPost} = usePostContext() as PostContextType
   const currentMode = localStorage.getItem('theme');
   const {theme, canPost, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption} = useThemeContext() as ThemeContextType
+  const { postId } = useParams()
+  
+  const address = ['/new_story', `/edit_story/${postId}`]
+
+  const targetPost = posts?.find(pos => pos?.postId == postId)
   const onNotify = () => setDisplay(prev => !prev);
 
+  useEffect(() => {
+    changeFontFamily(targetPost?.fontFamily as string)
+  }, [targetPost])
+
   const add = () => {
-    const success = addPost()
-    success && navigate('/')
+    addPost()
+    navigate('/')
   }
+
+  const update = () => {
+    updatedPost()
+    navigate('/')
+  }
+
   return(
-    <nav className={`${pathname == '/new_story' ? 'sticky top-0 pr-5 pl-5 md:pr-16 md:pl-16' : ''} p-4 w-full h-16 flex items-center justify-between`}>
+    <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-5 pl-5 md:pr-16 md:pl-16' : ''} p-4 w-full h-16 flex items-center justify-between`}>
       <div className='flex-none flex items-center gap-2 mobile:relative mobile:gap-0'>
         <Link to='/'>
           <img 
@@ -61,7 +76,7 @@ export const Navbar = () => {
           />
         </Link>
       {
-        pathname != '/new_story' ?
+        !address.includes(pathname) ?
           <div className={`flex gap-0.5 justify-around items-center rounded-md w-52 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-8`}>  
               <CiSearch className='text-gray-700 text-xl w-8'/>
               <input 
@@ -90,14 +105,24 @@ export const Navbar = () => {
               onClick={() => changeTheme('dark')}
                 className={mode_class+'text-gray-700'} />
         }
-          {pathname == '/new_story' ? 
-            <button
-              className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
-              onClick={add}
-              // disabled = {!canPost}
-              >Publish</button>
+          {address.includes(pathname) ? 
+            (pathname == '/new_story' ?
+              <button
+                className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                onClick={add}
+                // disabled = {!canPost}
+                >Publish
+              </button>
+              :
+              <button
+                className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                onClick={update}
+                // disabled = {!canPost}
+                >Republish
+              </button>
+            )
           :
-            <Link to={pathname == '/new_story' ? '' : 'new_story'} >
+            <Link to={address.includes(pathname) ? '' : 'new_story'} >
               <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-700 duration-200 ease-linear font-normal ml-2'>
                 <FiEdit className='text-xl' />
                 <span className=''>Post</span>
@@ -105,7 +130,7 @@ export const Navbar = () => {
             </Link>
           }
         {
-          pathname == '/new_story' ? 
+          address.includes(pathname) ? 
           <IoIosMore title='Change font'
             onClick={() => setFontOption(prev => !prev)}
             className='relative cursor-pointer text-xl hover:text-gray-500 duration-200 ease-in' /> 
@@ -127,10 +152,10 @@ export const Navbar = () => {
             </div>
           }
         </div>
-        {pathname != '/new_story' ? <IoIosArrowDown className={`sm:-ml-6 -ml-4 font-thin ${arrow_class}`} /> : null}
+        {!address.includes(pathname) ? <IoIosArrowDown className={`sm:-ml-6 -ml-4 font-thin ${arrow_class}`} /> : null}
       </div>
       <ul className={`${currentMode == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 p-2 top-12 bg-slate-500 border rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out`}>
-          {pathname == '/new_story' && (
+          {address.includes(pathname) && (
             Object.entries(custom_fonts).map(([key, options]) => (
               
               <li

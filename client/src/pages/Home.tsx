@@ -1,8 +1,8 @@
-import { Footer } from "../components/Footer"
-import { Navbar } from "../components/Navbar"
-import { } from 'react-icons/io'
+import { Footer } from "../components/Footer";
+import { } from 'react-icons/io';
 import { Posts } from "../components/Posts"
 import { TopHome } from "../components/TopHome"
+import { Toaster } from 'react-hot-toast';
 
 
 
@@ -17,6 +17,7 @@ export const Home = () => {
         <aside className="flex-none hidden md:flex w-1/4 h-full border border-l-slate-300">
         </aside>
       </div>
+      <Toaster />
     </main>
   )
 }

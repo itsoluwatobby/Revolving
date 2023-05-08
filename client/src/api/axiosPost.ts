@@ -14,18 +14,17 @@ export const getPosts = async(): Promise<PostType[]> => {
 }
 
 export const createPost = async(newPost: PostType): Promise<PostType[]> => {
-  const {postId, ...rest} = newPost
-  const res = await postAxios.post(`${posts_endPoint}`, rest)
+  const res = await postAxios.post(`${posts_endPoint}`, newPost)
   return res?.data
 }
 
 export const updatePost = async(updatedPost: PostType): Promise<PostType[]> => {
-  const res = await postAxios.put(`${posts_endPoint}/${updatedPost?.postId}`, updatePost)
+  const res = await postAxios.put(`${posts_endPoint}/${updatedPost?.id}`, {...updatePost})
   return res?.data
 }
 
-export const deletePost = async(postId: string): Promise<PostType[]> => {
-  const res = await postAxios.put(`${posts_endPoint}/${postId}`)
+export const deletePost = async(id: string): Promise<PostType[]> => {
+  const res = await postAxios.delete(`${posts_endPoint}/${id}`)
   return res?.data
 }
 

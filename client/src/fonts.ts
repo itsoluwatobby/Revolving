@@ -18,9 +18,9 @@ export const custom_fonts: FontProp = {
 export const TextRules: TextProp = {
   boldText: '*' || '**', // text bold
   italics: '_', // italize wordds
-  functions: '()', // watchees for functions
+  functions: '()', // watches out for functions
   highlight: '++',
-  keywords: ['null', 'undefined', 'typeof', 'error', 'var', 'let', 'const', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'enum', 'constructor'], 
+  keywords: ['null', 'let', 'undefined', 'typeof', 'error', 'var', 'const', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'enum', 'constructor', 'Pick', 'instanceof', 'prototype', 'Partial', 'boolean', 'booleans', 'number', 'string', 'function'] as string[], 
   codeBlock: { // code block rules
     backStrokes: '```',
     operators: ['!', '{', '}', '(', ')', '=', '==', '!=', '<', '>', '[', ']', ':', ';', '+', '-', '/', '?', '^', '*', '%', '$', '`', '&', '||','+=', '-=', '/=', '++', '=>', '--'],
