@@ -20,6 +20,7 @@ export default {
 
       '2xl': '1536px',
       // => @media (min-width: 1536px) { ... }
+      maxscreen: {'max': '640px'},
       mobile: {'max': '480px'},
       midmobile: {'max': '380px'},
     }

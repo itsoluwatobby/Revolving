@@ -1,22 +1,26 @@
 import { Home } from "./pages/Home"
-import backgroundImage from "../images/bg_image2.jpg"
 import { useThemeContext } from "./hooks/useThemeContext"
 import { ThemeContextType } from "./posts";
 import { Routes, Route } from 'react-router-dom';
 import { BlogLayout } from "./components/BlogLayout";
-import { NewStory } from "./components/NewStory";
+import { NewStory } from "./pages/NewStory";
+import { EditStory } from "./pages/EditStory";
+import NotFound from "./pages/NotFound";
+import SingleStoryPage from "./pages/SingleStoryPage";
  
 export const App = () => {
   const {theme} = useThemeContext() as ThemeContextType;
 
   return (
-    <main className={`${theme == 'light' ? '' : 'dark:bg-slate-800 text-white'} h-screen w-full font-sans overflow-x-hidden`}>
+    <main className={`${theme == 'light' ? '' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
         <Route path='/' element={<BlogLayout />}>
           <Route index element={<Home />} />
           <Route path="new_story" element={<NewStory />} />
-          <Route path="edit_story/:postId" element={<NewStory />} />
+          <Route path="edit_story/:postId" element={<EditStory />} />
+          <Route path="story/:postId" element={<SingleStoryPage />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </main>
   )
