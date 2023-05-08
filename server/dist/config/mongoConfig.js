@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { connect } from "mongoose";
 import asyncHandler from 'express-async-handler';
-const dbConfig = asyncHandler(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield connect(process.env.STORY_DB);
+export const dbConfig = asyncHandler(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield connect(process.env.REVOLVING_DB, {
+        useNewUrlParser: true, useUnifiedTopology: true
+    });
 }));
-export default dbConfig;
 //# sourceMappingURL=mongoConfig.js.map

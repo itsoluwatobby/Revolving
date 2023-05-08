@@ -1,21 +1,6 @@
-import mongoose from 'mongoose';
-import { getStoryById } from './Story';
-import { dateTime } from '../helpers/helper';
-
-const SharedStorySchema = new mongoose.Schema(
-   {
-      sharerId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-      storyId: { type: mongoose.Schema.Types.ObjectId, ref: 'story', required: true },
-      sharedDate: { type: String, required: true, default: '' },
-      sharedStory: { type: Object, required: true, default: {} },
-   },
-   {
-      minimize: false,
-      timestamps: true
-   }
-)
-
-export const SharedStoryModel = mongoose.model('sharedStories', SharedStorySchema);
+import { SharedStoryModel } from "../models/SharedStory.js";
+import { dateTime } from "./helper.js";
+import { getStoryById } from "./storyHelpers.js";
 
 export const getSharedStoryById = async(sharedId: string) => await SharedStoryModel.findById(sharedId).exec();
 

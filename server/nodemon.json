@@ -1,5 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": ".ts,.js",
-  "exec": "tsc && nodemon dist/revolving.js"
-}
