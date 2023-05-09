@@ -10,16 +10,18 @@ import { Document, ObjectId } from "mongoose"
 
 // }
 // // declare namespace NodeJS{
+  // -------------------------------
 // declare global{
 //   namespace NodeJS{
 //     interface ProcessEnv extends Environment_Env{}
 //   }
 // }
 
+type USERROLES = number[]
 type AllOWEDROLES = Record<string, number>
 
 interface ClaimProps extends JwtPayload{
-  username: string,
+  roles: USERROLES[],
   email: string
 }
 
@@ -43,8 +45,6 @@ interface StoryProps extends Document{
   editDate: string
 }
 
-type USERROLES = 'USER' | 'ADMIN'
-
 interface UserProps extends Document{
   username: string,
   email: string,
@@ -59,7 +59,7 @@ interface UserProps extends Document{
   isAccountActive: boolean,
   isAccountLocked: boolean,
   isResetPassword: boolean,
-  verificationLink: string,
+  verificationToken: string,
   dateLocked: string,
   followers?: string[],
   followings?: string[],

@@ -4,8 +4,10 @@ import { UserModel } from "../models/User.js";
 export const getAllUsers = async() => await UserModel.find().lean();
 
 export const getUserById = async(id: string) => await UserModel.findById(id).exec();
+export const getUserByEmail = async(email: string) => await UserModel.findOne({email}).exec();
+export const getUserByToken = async(token: string) => await UserModel.findOne({verificationToken: token}).exec();
 
-export const createUser = async(user: UserProps) => await UserModel.create({ ...user })
+export const createUser = async(user: Partial<UserProps>) => await UserModel.create(user)
 
 export const updateUser = async(userId: string, updatedUser: UserProps) => await UserModel.findByIdAndUpdate({ _id: userId }, {...updatedUser})
 

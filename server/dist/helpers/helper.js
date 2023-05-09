@@ -8,38 +8,58 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { sub } from 'date-fns';
-import { sign, verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+import { createTransport } from 'nodemailer';
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 export const signToken = (claim, expires, secret) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = sign({
+    const token = jwt.sign({
         "userInfo": {
-            username: claim === null || claim === void 0 ? void 0 : claim.username, email: claim === null || claim === void 0 ? void 0 : claim.email
+            roles: claim === null || claim === void 0 ? void 0 : claim.roles, email: claim === null || claim === void 0 ? void 0 : claim.email
         }
-    }, secret, { algorithm: 'RS512', expiresIn: expires });
+    }, secret, { expiresIn: expires });
     return token;
 });
 export const verifyToken = (token, secret) => __awaiter(void 0, void 0, void 0, function* () {
     let response;
-    verify(token, secret, (err, decoded) => {
+    jwt.verify(token, secret, (err, decoded) => {
+        var _a, _b;
         if ((err === null || err === void 0 ? void 0 : err.name) == 'TokenExpiredError')
             response = 'Expired Token';
         else if ((err === null || err === void 0 ? void 0 : err.name) == 'JsonWebTokenError')
             response = 'Bad Token';
         else {
             response = {
-                username: decoded === null || decoded === void 0 ? void 0 : decoded.username,
-                email: decoded === null || decoded === void 0 ? void 0 : decoded.email
+                roles: (_a = decoded === null || decoded === void 0 ? void 0 : decoded.userInfo) === null || _a === void 0 ? void 0 : _a.roles,
+                email: (_b = decoded === null || decoded === void 0 ? void 0 : decoded.userInfo) === null || _b === void 0 ? void 0 : _b.email
             };
         }
     });
     return response;
 });
-export const mailOptions = (receiver, sender, subject) => {
+export const transporter = createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    secure: true,
+    auth: {
+        user: process.env.REVOLVING_MAIL,
+        pass: process.env.REVOLVING_PASS,
+    }
+});
+export const mailOptions = (receiver, username, verificationLink) => {
     return {
         to: receiver,
-        from: sender,
-        subject,
-        html: ``
+        from: process.env.REVOLVING_MAIL,
+        subject: `ACCOUNT CONFIRMATION FOR ${username}`,
+        html: `<h2>Tap the Link below To Activate Your Account</h2><br/>
+                <p>Link expires in 30 minutes, please confirm now!!</p>
+                <a href=${verificationLink} target=_blank style='text-decoration:none;'>
+                   <button style='padding:1rem; padding-left:2rem; padding-right:2rem; cursor:pointer; background-color: teal; border:none; border-radius:10px; font-size: 18px'>
+                      Account Verification
+                   </button>
+                </a>
+                <p>Or copy the link below to your browser</p>
+                <p>${verificationLink}</p><br/>
+                <span>Please keep link private, it contains some sensitive information about you.</span>`
     };
 };
 //# sourceMappingURL=helper.js.map

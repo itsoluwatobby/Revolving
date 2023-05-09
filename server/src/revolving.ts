@@ -17,7 +17,9 @@ import { dbConfig } from './config/mongoConfig.js';
 
 import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
 import SlowDown from 'express-slow-down';
+import authRouter from './routes/authRoutes.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
+
 dbConfig(null, null, null);
 const app = express()
 
@@ -31,7 +33,7 @@ const requestLimiter: RateLimitRequestHandler = rateLimit({
 
 const speedLimiter = SlowDown({
   windowMs: 30 * 1000, // 30 seconds
-  delayAfter: 5, //starts slowing down after 5 requests
+  delayAfter: 5, //starts slowing down after 5 consecutive requests
   delayMs: 500, // adds a 500ms delay per request after delay limit is reached
   maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
 })
@@ -68,6 +70,9 @@ if (numberOfCores > 4){
       res.status(200).json({ status: true, message: 'server up and running' })
     })
 
+    // ROUTES
+    app.use('/revolving_api', authRouter)
+
     //app.use(errorLog);
     app.all('*', (req: Request, res: Response) => {
       res.status(404).json({status: false, message: 'NOT FOUND'})
@@ -81,7 +86,7 @@ if (numberOfCores > 4){
     })
 
     mongoose.connection.on('error', () => {
-      console.log('Error connection to DB')
+      console.log('Error connecting to DB')
       process.exit(1)
     })
   }
