@@ -12,6 +12,11 @@ const STORYSCHEMA: Schema = new Schema(
     body: { type: String, required: true },
     storyDate: { type: String, required: true, default: '' },
     commentIds: { type: Array, default: [] },
+    category: { 
+      type: String, required: true, 
+      default: 'General',
+      enum: ['General', 'Web Development', 'React', 'Node', 'Bash scripting']
+    },
     isShared: { type: Array, default: [] },
     likes: { type: Array, default: [] },
     edited: { type: Boolean, default: false },

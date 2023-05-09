@@ -10,7 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { UserModel } from "../models/User.js";
 export const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.find().lean(); });
 export const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findById(id).exec(); });
-export const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.create(Object.assign({}, user)); });
+export const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ email }).exec(); });
+export const getUserByToken = (token) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ verificationToken: token }).exec(); });
+export const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.create(user); });
 export const updateUser = (userId, updatedUser) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findByIdAndUpdate({ _id: userId }, Object.assign({}, updatedUser)); });
 export const followOrUnFollow = (followerId, followingId) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
