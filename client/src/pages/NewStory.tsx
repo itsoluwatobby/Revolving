@@ -29,10 +29,10 @@ export const NewStory = () => {
 
   const { savedTitle, savedBody, savedFontFamily } = savedStory
 
-  // useEffect(() => {
-  //   setTitle(savedTitle)
-  //   setBody(savedBody)
-  // }, [savedTitle, savedBody])
+  useEffect(() => {
+    setTitle(savedTitle)
+    //setBody(savedBody)
+  }, [savedTitle])
 
   useEffect(() => {
     !debounceValue?.typing && (

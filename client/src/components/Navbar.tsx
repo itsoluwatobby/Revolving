@@ -48,7 +48,7 @@ export const Navbar = () => {
   const { postId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
   
-  const address = ['/new_story', `/edit_story/${postId}`]
+  const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
 
   const targetPost = posts?.find(pos => pos?.postId == postId)
   const onNotify = () => setDisplay(prev => !prev);
@@ -77,7 +77,8 @@ export const Navbar = () => {
   }, [typingEvent])
 
   return(
-    <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-5 pl-5 md:pr-16 md:pl-16' : ''} p-4 w-full h-16 flex items-center justify-between`}>
+    <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-0 pl-5 md:pr-16 md:pl-16' : ''} p-4 w-full h-16 flex justify-between
+     `}>
       <div className='flex-none flex items-center gap-2 mobile:relative mobile:gap-0'>
         <Link to='/'>
           <img 
@@ -100,14 +101,14 @@ export const Navbar = () => {
                 />
             </div>
             : 
-            <div className='flex gap-2'>
+            <div className='flex gap-2 mobile:ml-2'>
               <p>{delayedSaving ? 'saving...' : 'saved'}</p>
               <p className='text-gray-500'>Draft</p>
             </div>
           }
       </div>
       <div className='flex-auto mobile:hidden'></div>
-      <div className='mobile:-translate-x-[80px] midmobile:-translate-x-24 flex-none flex items-center justify-between w-44 sm:w-52 z-50'>
+      <div className='mobile:-translate-x-[25px] midmobile:-translate-x-24 flex-none flex items-center justify-between w-44 sm:w-52 z-50'>
         {
           theme == 'dark' ? 
             <BsMoonStarsFill 
