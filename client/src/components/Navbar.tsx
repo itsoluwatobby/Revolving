@@ -10,6 +10,7 @@ import { PostContextType, PostType, ThemeContextType } from '../posts'
 import { useThemeContext } from '../hooks/useThemeContext'
 import profileImage from "../images/bg_image3.jpg"
 import { custom_fonts } from '../fonts.js'
+import { delayedPromise } from '../hooks/useDebounceHook.js';
 // import headings from '../assets/headings.js'
 
 const headings = [
@@ -41,10 +42,11 @@ export const Navbar = () => {
   // const [fontOption, setFontOption] = useState<boolean>(false);
   const [image, setImage] = useState<boolean>(false);
   const [spec, setSpec] = useState<number>(1);
-  const {search, setSearch, addPost, posts, updatedPost} = usePostContext() as PostContextType
+  const {search, setSearch, addPost, posts, updatedPost, typingEvent} = usePostContext() as PostContextType
   const currentMode = localStorage.getItem('theme');
   const {theme, canPost, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption} = useThemeContext() as ThemeContextType
   const { postId } = useParams()
+  const [delayedSaving, setDelayedSaving] = useState(false)
   
   const address = ['/new_story', `/edit_story/${postId}`]
 
@@ -57,13 +59,22 @@ export const Navbar = () => {
 
   const add = () => {
     addPost()
+    localStorage.removeItem('new_story')
     navigate('/')
   }
 
   const update = () => {
     updatedPost()
+    //localStorage.removeItem('new_story')
     navigate('/')
   }
+
+  useEffect(() => {
+    const responseTime = setTimeout(() => {
+      setDelayedSaving(typingEvent)
+    }, 1000)
+    return () => clearTimeout(responseTime)
+  }, [typingEvent])
 
   return(
     <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-5 pl-5 md:pr-16 md:pl-16' : ''} p-4 w-full h-16 flex items-center justify-between`}>
@@ -90,7 +101,7 @@ export const Navbar = () => {
             </div>
             : 
             <div className='flex gap-2'>
-              <p>{'saving...' || 'saved'}</p>
+              <p>{delayedSaving ? 'saving...' : 'saved'}</p>
               <p className='text-gray-500'>Draft</p>
             </div>
           }

@@ -14,12 +14,29 @@ import { corsOptions } from './config/corsOption.js';
 import { cpus } from 'os';
 import cluster from 'cluster';
 import { dbConfig } from './config/mongoConfig.js';
+
+import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
+import SlowDown from 'express-slow-down';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express()
 
 const PORT = process.env.PORT || 3000
 
+const requestLimiter: RateLimitRequestHandler = rateLimit({
+  windowMs: 60 * 1000, //remembers req for a minute
+  max: 10, // maximum of 10 requests per minute
+  message: `<p style='font-size: 18px; font-family: mono;'>Too many requests from this IP, please try again after a minute</>`
+})
+
+const speedLimiter = SlowDown({
+  windowMs: 30 * 1000, // 30 seconds
+  delayAfter: 5, //starts slowing down after 5 requests
+  delayMs: 500, // adds a 500ms delay per request after delay limit is reached
+  maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
+})
+
+app.use(requestLimiter, speedLimiter)
 app.use(cors(corsOptions))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

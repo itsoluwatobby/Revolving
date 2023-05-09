@@ -36,10 +36,12 @@ export type PostContextType = {
   posts: PostType[],
   postData: Partial<PostType>,
   isLoading: boolean,
+  typingEvent: boolean,
   error: { message: string },
   // editPost: Partial<PostType>, 
   setEditPost: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
   setSearch: React.Dispatch<React.SetStateAction<string>>
+  setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
   setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
   // getPosts: () => void,
   addPost: () => void,
@@ -55,7 +57,7 @@ export type ThemeContextType = {
   fontFamily: FontStyle,
   fontOption: boolean,
   canPost: boolean, 
-  //setCanPost: React.Dispatch<React.SetStateAction<boolean>>
+  setCanPost: React.Dispatch<React.SetStateAction<boolean>>
   changeTheme: (mode: string) => void,
   changeFontFamily: (font: string) => void,
   // canPublish: (...args: string[]) => void,

@@ -1,3 +1,4 @@
+import { DebounceProps, delayedPromise, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { PostContextType, ThemeContextType } from '../posts';
@@ -5,19 +6,44 @@ import { useState, useEffect, ChangeEvent } from 'react';
 
 export const NewStory = () => {
   const { fontFamily } = useThemeContext() as ThemeContextType;
-  const { setPostData } = usePostContext() as PostContextType;
+  const { setPostData, setTypingEvent } = usePostContext() as PostContextType;
   const currentMode = localStorage.getItem('theme');
   const [title, setTitle] = useState<string>('');
   const [body, setBody] = useState<string>('');
-  
-  const handleTitle = (event: ChangeEvent<HTMLInputElement>) => setTitle(event.target.value);
-  const handleBody = (event: ChangeEvent<HTMLTextAreaElement>) => setBody(event.target.value);
+  const debounceValue = useDebounceHook(
+    {savedTitle: title, savedBody: body, savedFontFamily: fontFamily}, 
+    1000) as DebounceProps 
+  const savedStory = JSON.parse(localStorage.getItem('new_story') as string) as DebounceProps
+
+  const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  }
+  const handleBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setBody(event.target.value);
+  }
 
   useEffect(() => {
+    localStorage.setItem('new_story', JSON.stringify(debounceValue))
+    setTypingEvent(debounceValue?.typing )
+  }, [debounceValue])
+
+  const { savedTitle, savedBody, savedFontFamily } = savedStory
+
+  // useEffect(() => {
+  //   setTitle(savedTitle)
+  //   setBody(savedBody)
+  // }, [savedTitle, savedBody])
+
+  useEffect(() => {
+    !debounceValue?.typing && (
     setPostData(prev => {
-      return {...prev, title, body, fontFamily}
-    })
-  }, [title, body])
+      return {...prev, 
+        title: savedTitle, 
+        body: savedBody, 
+        fontFamily: savedFontFamily
+      }
+    }))
+  }, [savedTitle, savedBody, savedFontFamily, debounceValue?.typing])
   
   return (
     <section className={`${fontFamily} p-3 h-full flex flex-col gap-2 sm:items-center mt-2`}>
