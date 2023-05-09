@@ -18,7 +18,6 @@ export const EditStory = () => {
 
   const targetPost = posts?.find(pos => pos?.postId == postId) as PostType;
 
-  // const dateTime = sub(new Date, { minutes: 0 }).toISOString();
   useEffect(() => {
     setEditTitle(targetPost?.title)
     setEditBody(targetPost?.body)

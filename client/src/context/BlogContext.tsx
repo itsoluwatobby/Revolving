@@ -33,6 +33,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   })
   const [editPost, setEditPost] = useState<PostType | object>({})
   const [search, setSearch] = useState<string>('');
+  const [typingEvent, setTypingEvent] = useState<boolean>(false);
 
   const addPost = async () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
@@ -106,7 +107,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const value = {
-    postData, setPostData, search, setSearch, posts, isLoading, error, addPost, deletePosts, updatedPost, setEditPost
+    postData, setPostData, search, setSearch, posts, isLoading, error, addPost, deletePosts, updatedPost, setEditPost, typingEvent, setTypingEvent
   }
 
   return (
