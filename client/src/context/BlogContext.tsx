@@ -26,7 +26,12 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     error,
     mutate
   } = useSwr<PostType[], boolean>(cacheKey, getPosts, {
-    onSuccess: data => data?.sort((a, b) => b?.date.localeCompare(a?.date)),
+    onSuccess: data => data?.sort((a, b) => {
+      //const timeDiffrence = b?.date.localeCompare(a?.date);
+      const likes = b?.likes - a?.likes;
+      //const dayDifference = timeDiffrence / (1000 * 3000 * 24);
+      return likes
+    }),
   })
   const [postData, setPostData] = useState<Partial<PostType>>({
     title: undefined, body: undefined, author: 'anonymous'
