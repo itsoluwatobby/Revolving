@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-// import asyncHandler from "express-async-handler";
-// import { UserModel } from "../models/User.js";
-import { createUser, getUserByEmail, getUserByToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { ClaimProps, UserProps } from "../../types.js";
 import { sub } from "date-fns";
@@ -20,7 +18,10 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     if (!username || !email || !password) return res.sendStatus(400);
 
     const duplicateEmail = await getUserByEmail(email);
-    if(duplicateEmail) return res.status(409).json('Email taken')
+    if(duplicateEmail) {
+      if (duplicateEmail?.isAccountActivated) return res.status(409).json('Email taken')
+      else return res.status(200).json('Please check your email to activate your account')
+    }
     const hashedPassword = await brcypt.hash(password, 10);
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
     const user = {
@@ -29,10 +30,11 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
       registrationDate: dateTime
     } as Partial<UserProps>
     const newUser = await createUser({...user})
-    const token = await signToken({roles: newUser?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
+    const roles = Object.values(newUser?.roles)
+    const token = await signToken({roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
     const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
     const options = mailOptions(email, username, verificationLink)
-    await user.updateOne({$set: {verificationToken: token}});
+    await newUser.updateOne({$set: {verificationToken: token}});
   
     transporter.sendMail(options, (err) => {
       if (err) return res.status(400).json('unable to send mail')
@@ -49,13 +51,19 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
   try{
     const { token } = req.query
     if(!token) return res.sendStatus(400)
-    const user = await getUserByToken(token as string)
-    if(!user) return res.sendStatus(400)
+    const user = await getUserByVerificationToken(token as string)
+    if(!user) {
+      const verify = await verifyToken(token as string, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
+      if (!verify?.email) return res.sendStatus(400)
+      const user = await getUserByEmail(verify?.email);
+      if(user.isAccountActivated) return res.status(200).json('Your has already been activated')
+    }
 
     const verify = await verifyToken(token as string, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
     if (!verify?.email) return res.sendStatus(400)
     if (verify?.email != user?.email) return res.sendStatus(400)
 
+    if(user.isAccountActivated) return res.status(200).json('Your has already been activated')
     await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
     return res.status(302).redirect(`${process.env.ROUTELINK}/revolving_api/login`)
   }
@@ -77,21 +85,25 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
 
     if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
     if (!user?.isAccountActivated) {
-      const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
-      const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
-      const options = mailOptions(email, user?.username, verificationLink)
-      await user.updateOne({$set: {verificationToken: token}});
+      const verify = await verifyToken(user?.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
+      if (!verify?.email) {
+        const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
+        const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
+        const options = mailOptions(email, user?.username, verificationLink)
+        await user.updateOne({$set: {verificationToken: token}});
 
-      transporter.sendMail(options, (err) => {
-        if (err) return res.status(400).json('unable to send mail')
-      })
-      return res.status(201).json('Please check your email')
+        transporter.sendMail(options, (err) => {
+          if (err) return res.status(400).json('unable to send mail')
+        })
+        return res.status(201).json('Please check your email')
+      }
+      else if (verify?.email) return res.status(200).json('Please check your email to activate your account')
     }
     const roles = Object.values(user?.roles);
     const accessToken = await signToken({roles, email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
     const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
 
-    user.updateOne({$set: {status: 'online', refreshToken }})
+    await user.updateOne({$set: { status: 'online', refreshToken }})
     //authentication: { sessionID: req?.sessionID },
     
     res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 })//secure: true
@@ -125,3 +137,4 @@ export const logoutHandler = async(req: NewUserProp, res: Response) => {
     return res.sendStatus(500);
   }
 }
+

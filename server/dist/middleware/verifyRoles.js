@@ -5,7 +5,7 @@ export const verifyRoles = (roles) => {
         const userRole = req.roles;
         const allowedRoles = roles.map(role => userRole.includes(role)).find(res => res == true);
         if (!allowedRoles)
-            return res.sendStatus(401).json('unauthorised');
+            return res.sendStatus(403);
         next();
     };
 };
