@@ -1,6 +1,6 @@
-import { AllOWEDROLES } from "../../types.js";
+import { ALLOWEDROLES } from "../../types.js";
 
-export const ROLES: AllOWEDROLES = {
+export const ROLES: ALLOWEDROLES = {
   "USER": 1120,
   "ADMIN": 1159
 }

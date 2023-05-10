@@ -19,6 +19,9 @@ import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
 import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
 import { verifyAccessToken } from './middleware/verifyTokens.js';
+import { getAllStories } from './helpers/storyHelpers.js';
+import storyRouter from './routes/storyRoutes.js';
+import { getStory } from './controller/storyController.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 
 dbConfig(null, null, null);
@@ -68,14 +71,20 @@ if (numberOfCores > 4){
     console.log(`Worker with PID: ${process.pid} is running`)
 
     app.get('/', (req: Request, res: Response) => {
-      res.status(200).json({ status: true, message: 'server up and running' })
+      res.status(200).json({ status: true, message: 'server up and running' });
     })
 
     // ROUTES
-    app.use('/revolving_api', authRouter)
+    app.use('/revolving_api', authRouter);
+    
+    app.get('/story', getAllStories);
+    app.get('/story/:storyId', getStory);
 
     // checks for accesstoken
-    app.use(verifyAccessToken)
+    app.use(verifyAccessToken);
+
+    // story router
+    app.use('/story', storyRouter);
 
     //app.use(errorLog);
     app.all('*', (req: Request, res: Response) => {

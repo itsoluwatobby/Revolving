@@ -17,8 +17,8 @@ import { Document, ObjectId } from "mongoose"
 //   }
 // }
 
-type USERROLES = number[]
-type AllOWEDROLES = Record<string, number>
+type USERROLES = number
+type ALLOWEDROLES = Record<string, USERROLES>
 
 interface ClaimProps extends JwtPayload{
   roles: USERROLES[],
@@ -38,6 +38,7 @@ interface StoryProps extends Document{
   picture: string
   body: string
   storyDate: string
+  category: 'General' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
   commentIds?: string[]
   isShared?: string[]
   likes: string[]
@@ -69,3 +70,4 @@ interface UserProps extends Document{
   refreshToken: string,
   editDate: string
 }
+
