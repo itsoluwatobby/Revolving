@@ -14,6 +14,10 @@ import { dbConfig } from './config/mongoConfig.js';
 import { rateLimit } from 'express-rate-limit';
 import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
+import { verifyAccessToken } from './middleware/verifyTokens.js';
+import { getAllStories } from './helpers/storyHelpers.js';
+import storyRouter from './routes/storyRoutes.js';
+import { getStory } from './controller/storyController.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
@@ -56,6 +60,12 @@ if (numberOfCores > 4) {
         });
         // ROUTES
         app.use('/revolving_api', authRouter);
+        app.get('/story', getAllStories);
+        app.get('/story/:storyId', getStory);
+        // checks for accesstoken
+        app.use(verifyAccessToken);
+        // story router
+        app.use('/story', storyRouter);
         //app.use(errorLog);
         app.all('*', (req, res) => {
             res.status(404).json({ status: false, message: 'NOT FOUND' });

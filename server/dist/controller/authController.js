@@ -7,9 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// import asyncHandler from "express-async-handler";
-// import { UserModel } from "../models/User.js";
-import { createUser, getUserByEmail, getUserByToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
 import { mailOptions, signToken, transporter, verifyToken } from "../helpers/helper.js";
@@ -20,8 +18,12 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!username || !email || !password)
             return res.sendStatus(400);
         const duplicateEmail = yield getUserByEmail(email);
-        if (duplicateEmail)
-            return res.status(409).json('Email taken');
+        if (duplicateEmail) {
+            if (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountActivated)
+                return res.status(409).json('Email taken');
+            else
+                return res.status(200).json('Please check your email to activate your account');
+        }
         const hashedPassword = yield brcypt.hash(password, 10);
         const dateTime = sub(new Date, { minutes: 0 }).toISOString();
         const user = {
@@ -30,17 +32,16 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
             registrationDate: dateTime
         };
         const newUser = yield createUser(Object.assign({}, user));
-        const token = yield signToken({ roles: newUser === null || newUser === void 0 ? void 0 : newUser.roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
+        const roles = Object.values(newUser === null || newUser === void 0 ? void 0 : newUser.roles);
+        const token = yield signToken({ roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`;
         const options = mailOptions(email, username, verificationLink);
-        yield user.updateOne({ $set: { verificationToken: token } });
-        console.log(verificationLink);
-        transporter.sendMail(options, (err, success) => {
+        yield newUser.updateOne({ $set: { verificationToken: token } });
+        transporter.sendMail(options, (err) => {
             if (err)
                 return res.status(400).json('unable to send mail');
-            else
-                return res.status(201).json('Please check your email');
         });
+        return res.status(201).json('Please check your email to activate your account');
     }
     catch (error) {
         console.log(error);
@@ -52,15 +53,23 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
         const { token } = req.query;
         if (!token)
             return res.sendStatus(400);
-        const user = yield getUserByToken(token);
-        if (!user)
-            return res.sendStatus(400);
+        const user = yield getUserByVerificationToken(token);
+        if (!user) {
+            const verify = yield verifyToken(token, process.env.ACCOUNT_VERIFICATION_SECRET);
+            if (!(verify === null || verify === void 0 ? void 0 : verify.email))
+                return res.sendStatus(400);
+            const user = yield getUserByEmail(verify === null || verify === void 0 ? void 0 : verify.email);
+            if (user.isAccountActivated)
+                return res.status(200).json('Your has already been activated');
+        }
         const verify = yield verifyToken(token, process.env.ACCOUNT_VERIFICATION_SECRET);
         if (!(verify === null || verify === void 0 ? void 0 : verify.email))
             return res.sendStatus(400);
         if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
             return res.sendStatus(400);
-        yield user.updateOne({ $set: { isAccountActive: true, verificationToken: '' } });
+        if (user.isAccountActivated)
+            return res.status(200).json('Your has already been activated');
+        yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: '' } });
         return res.status(302).redirect(`${process.env.ROUTELINK}/revolving_api/login`);
     }
     catch (error) {
@@ -82,23 +91,26 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
             return res === null || res === void 0 ? void 0 : res.status(401).json('Incorrect password');
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return res === null || res === void 0 ? void 0 : res.status(403).json('Your account is locked');
-        if (!(user === null || user === void 0 ? void 0 : user.isAccountActive)) {
-            const token = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
-            const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`;
-            const options = mailOptions(email, user === null || user === void 0 ? void 0 : user.username, verificationLink);
-            yield user.updateOne({ $set: { verificationToken: token } });
-            console.log(verificationLink);
-            transporter.sendMail(options, (err) => {
-                if (err)
-                    return res.status(400).json('unable to send mail');
-                // else return res.status(201).json('Please check your email')
-            });
-            return res.status(201).json('Please check your email');
+        if (!(user === null || user === void 0 ? void 0 : user.isAccountActivated)) {
+            const verify = yield verifyToken(user === null || user === void 0 ? void 0 : user.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET);
+            if (!(verify === null || verify === void 0 ? void 0 : verify.email)) {
+                const token = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
+                const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`;
+                const options = mailOptions(email, user === null || user === void 0 ? void 0 : user.username, verificationLink);
+                yield user.updateOne({ $set: { verificationToken: token } });
+                transporter.sendMail(options, (err) => {
+                    if (err)
+                        return res.status(400).json('unable to send mail');
+                });
+                return res.status(201).json('Please check your email');
+            }
+            else if (verify === null || verify === void 0 ? void 0 : verify.email)
+                return res.status(200).json('Please check your email to activate your account');
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
         const accessToken = yield signToken({ roles, email }, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
-        const refreshToken = yield signToken({ roles, email }, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
-        user.updateOne({ $set: { status: 'online', refreshToken } });
+        const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
+        yield user.updateOne({ $set: { status: 'online', refreshToken } });
         //authentication: { sessionID: req?.sessionID },
         res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 }); //secure: true
         return res.status(200).json({ roles, accessToken });
