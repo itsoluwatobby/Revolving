@@ -22,7 +22,7 @@ export type PostType = {
   date: string,
   editDate?: string,
   body: string,
-  likes?: number,
+  likes: number,
   fontFamily?: string | 'sans',
   // search?: string,
   // setSearch?: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
