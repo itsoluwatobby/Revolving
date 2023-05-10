@@ -14,7 +14,7 @@ interface CookieProp extends Request{
   }
 }
 
-export const verifyAccessTokens = async(req: TokenProp, res: Response, next: NextFunction) => {
+export const verifyAccessToken = async(req: TokenProp, res: Response, next: NextFunction) => {
   const auth = req.headers['authorization']
   if(!auth || !auth.startsWith('Bearer ')) return res.sendStatus(403)
   const token = auth?.split(' ')[1]

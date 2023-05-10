@@ -18,6 +18,7 @@ import { dbConfig } from './config/mongoConfig.js';
 import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
 import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
+import { verifyAccessToken } from './middleware/verifyTokens.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 
 dbConfig(null, null, null);
@@ -72,6 +73,9 @@ if (numberOfCores > 4){
 
     // ROUTES
     app.use('/revolving_api', authRouter)
+
+    // checks for accesstoken
+    app.use(verifyAccessToken)
 
     //app.use(errorLog);
     app.all('*', (req: Request, res: Response) => {
