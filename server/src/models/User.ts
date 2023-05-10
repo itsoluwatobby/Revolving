@@ -16,7 +16,7 @@ const USERSCHEMA: Schema = new Schema(
     },
     registrationDate: { type: String, default: '' },
     displayPicture: { type: String, default: '' },
-    isAccountActive: { type: Boolean, default: false },
+    isAccountActivated: { type: Boolean, default: false },
     isAccountLocked: { type: Boolean, default: false },
     dateLocked: { type: String, default: '' },
     isResetPassword: { type: Boolean, default: false },

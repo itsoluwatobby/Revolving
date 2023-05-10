@@ -56,7 +56,7 @@ interface UserProps extends Document{
   roles: USERROLES[],
   registrationDate: string,
   displayPicture: string,
-  isAccountActive: boolean,
+  isAccountActivated: boolean,
   isAccountLocked: boolean,
   isResetPassword: boolean,
   verificationToken: string,
