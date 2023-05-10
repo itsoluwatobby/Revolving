@@ -33,11 +33,11 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
     const options = mailOptions(email, username, verificationLink)
     await user.updateOne({$set: {verificationToken: token}});
-    console.log(verificationLink)
-    transporter.sendMail(options, (err, success) => {
+  
+    transporter.sendMail(options, (err) => {
       if (err) return res.status(400).json('unable to send mail')
-      else return res.status(201).json('Please check your email')
     })
+    return res.status(201).json('Please check your email to activate your account')
   }
   catch(error){
     console.log(error)
@@ -56,7 +56,7 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
     if (!verify?.email) return res.sendStatus(400)
     if (verify?.email != user?.email) return res.sendStatus(400)
 
-    await user.updateOne({$set: { isAccountActive: true, verificationToken: '' }})
+    await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
     return res.status(302).redirect(`${process.env.ROUTELINK}/revolving_api/login`)
   }
   catch(error){
@@ -76,21 +76,20 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     if (!matchingPassword) return res?.status(401).json('Incorrect password')
 
     if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
-    if (!user?.isAccountActive) {
+    if (!user?.isAccountActivated) {
       const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
       const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
       const options = mailOptions(email, user?.username, verificationLink)
       await user.updateOne({$set: {verificationToken: token}});
-  console.log(verificationLink)
+
       transporter.sendMail(options, (err) => {
         if (err) return res.status(400).json('unable to send mail')
-        // else return res.status(201).json('Please check your email')
       })
       return res.status(201).json('Please check your email')
     }
     const roles = Object.values(user?.roles);
     const accessToken = await signToken({roles, email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
-    const refreshToken = await signToken({roles, email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
+    const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
 
     user.updateOne({$set: {status: 'online', refreshToken }})
     //authentication: { sessionID: req?.sessionID },
