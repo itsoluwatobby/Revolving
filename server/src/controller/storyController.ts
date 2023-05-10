@@ -12,6 +12,7 @@ export const createNewStory = async(req: StoryProps, res: Response) => {
     if (!userId || !newStory?.title || !newStory?.body) return res.sendStatus(400)
     const user = await getUserById(userId);
     if(!user) return res.status(403).json('You do not have an account')
+    if(user?.isAccountLocked) return res.sendStatus(401);
     const story = await createUserStory({...newStory, userId});
     return res.status(200).json(story)
   }
@@ -77,6 +78,7 @@ export const getUserStory = async(req: Request, res: Response) => {
     const {userId} = req.params
     if(!userId) return res.sendStatus(400);
     if(!getUserById(userId)) return res.sendStatus(401)
+    // if(user?.isAccountLocked) return res.sendStatus(401)
     const userStories = await getUserStories(userId);
     if(!userStories?.length) return res.status(400).json('You have no story');
     return res.status(200).json(userStories)
