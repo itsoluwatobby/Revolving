@@ -13,14 +13,19 @@ import { sub } from "date-fns";
 import { mailOptions, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const { username, email, password } = req.body;
         if (!username || !email || !password)
             return res.sendStatus(400);
-        const duplicateEmail = yield getUserByEmail(email);
+        const duplicateEmail = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (duplicateEmail) {
-            if (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountActivated)
-                return res.status(409).json('Email taken');
+            if (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountActivated) {
+                const matchingPassword = yield brcypt.compare(password, (_a = duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.authentication) === null || _a === void 0 ? void 0 : _a.password);
+                if (!matchingPassword)
+                    return res.status(409).json('Email taken');
+                return res.status(200).json('You already have an account, Please login');
+            }
             else
                 return res.status(200).json('Please check your email to activate your account');
         }
@@ -70,7 +75,7 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
         if (user.isAccountActivated)
             return res.status(200).json('Your has already been activated');
         yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: '' } });
-        return res.status(302).redirect(`${process.env.ROUTELINK}/revolving_api/login`);
+        return res.status(307).redirect(`${process.env.ROUTELINK}/revolving_api/login`);
     }
     catch (error) {
         console.log(error);
@@ -78,7 +83,7 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
     }
 });
 export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _b;
     try {
         const { email, password } = req.body;
         if (!email || !password)
@@ -86,7 +91,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (!user)
             return res.status(401).json('You do not have an account');
-        const matchingPassword = yield brcypt.compare(password, (_a = user === null || user === void 0 ? void 0 : user.authentication) === null || _a === void 0 ? void 0 : _a.password);
+        const matchingPassword = yield brcypt.compare(password, (_b = user === null || user === void 0 ? void 0 : user.authentication) === null || _b === void 0 ? void 0 : _b.password);
         if (!matchingPassword)
             return res === null || res === void 0 ? void 0 : res.status(401).json('Incorrect password');
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)

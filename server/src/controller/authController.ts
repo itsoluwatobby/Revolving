@@ -17,9 +17,13 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     const {username, email, password} = req.body
     if (!username || !email || !password) return res.sendStatus(400);
 
-    const duplicateEmail = await getUserByEmail(email);
+    const duplicateEmail = await UserModel.findOne({email}).select('+authentication.password').exec();
     if(duplicateEmail) {
-      if (duplicateEmail?.isAccountActivated) return res.status(409).json('Email taken')
+      if (duplicateEmail?.isAccountActivated) {
+        const matchingPassword = await brcypt.compare(password, duplicateEmail?.authentication?.password);
+        if (!matchingPassword) return res.status(409).json('Email taken')
+        return res.status(200).json('You already have an account, Please login')
+      }
       else return res.status(200).json('Please check your email to activate your account')
     }
     const hashedPassword = await brcypt.hash(password, 10);
@@ -65,7 +69,7 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
 
     if(user.isAccountActivated) return res.status(200).json('Your has already been activated')
     await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
-    return res.status(302).redirect(`${process.env.ROUTELINK}/revolving_api/login`)
+    return res.status(307).redirect(`${process.env.ROUTELINK}/revolving_api/login`)
   }
   catch(error){
     console.log(error)
