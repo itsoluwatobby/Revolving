@@ -24,12 +24,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const requestLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 10,
+    max: 30,
     message: `<p style='font-size: 18px; font-family: mono;'>Too many requests from this IP, please try again after a minute</>`
 });
 const speedLimiter = SlowDown({
-    windowMs: 30 * 1000,
-    delayAfter: 5,
+    windowMs: 60 * 1000,
+    delayAfter: 15,
     delayMs: 500,
     maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
 });
