@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getUserById } from "../helpers/userHelpers.js";
-import { createUserStory, getStoryById, getUserStories } from "../helpers/storyHelpers.js";
+import { createUserStory, getAllStories, getStoryById, getUserStories } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 ;
 export const createNewStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -19,7 +19,7 @@ export const createNewStory = (req, res) => __awaiter(void 0, void 0, void 0, fu
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         if (!user)
-            return res.status(403).json('You do not have an account');
+            return res.status(401).json('You do not have an account');
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return res.sendStatus(401);
         const story = yield createUserStory(Object.assign(Object.assign({}, newStory), { userId }));
@@ -42,8 +42,8 @@ export const updateStory = (req, res) => __awaiter(void 0, void 0, void 0, funct
             return res.sendStatus(401);
         const story = yield getStoryById(storyId);
         if (!story)
-            return res.sendStatus(400);
-        yield story.updateOne({ $set: Object.assign({}, editedStory) });
+            return res.sendStatus(404);
+        yield story.updateOne({ $set: Object.assign(Object.assign({}, editedStory), { edited: true }) });
         const edited = yield getStoryById(storyId);
         return res.status(200).json(edited);
     }
@@ -58,13 +58,17 @@ export const deleteStory = (req, res) => __awaiter(void 0, void 0, void 0, funct
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         if (!user)
-            return res.status(403).json('You do not have an account');
+            return res.status(401).json('You do not have an account');
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return res.sendStatus(401);
         const story = yield getStoryById(storyId);
         if (!story)
-            return res.sendStatus(400);
-        if (!(story === null || story === void 0 ? void 0 : story.userId) != (user === null || user === void 0 ? void 0 : user._id) || !(user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)))
+            return res.status(404).json('story not found');
+        if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
+            yield story.deleteOne();
+            return res.sendStatus(204);
+        }
+        if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
             return res.sendStatus(401);
         yield story.deleteOne();
         return res.sendStatus(204);
@@ -80,7 +84,7 @@ export const getStory = (req, res) => __awaiter(void 0, void 0, void 0, function
             return res.sendStatus(400);
         const userStory = yield getStoryById(storyId);
         if (!userStory)
-            return res.status(400).json('You have no story');
+            return res.status(404).json('story not found');
         return res.status(200).json(userStory);
     }
     catch (error) {
@@ -97,8 +101,19 @@ export const getUserStory = (req, res) => __awaiter(void 0, void 0, void 0, func
         // if(user?.isAccountLocked) return res.sendStatus(401)
         const userStories = yield getUserStories(userId);
         if (!(userStories === null || userStories === void 0 ? void 0 : userStories.length))
-            return res.status(400).json('You have no story');
+            return res.status(404).json('You have no story');
         return res.status(200).json(userStories);
+    }
+    catch (error) {
+        return res.sendStatus(500);
+    }
+});
+export const getStories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const stories = yield getAllStories();
+        if (!(stories === null || stories === void 0 ? void 0 : stories.length))
+            return res.status(404).json('No stories available');
+        return res.status(200).json(stories);
     }
     catch (error) {
         return res.sendStatus(500);

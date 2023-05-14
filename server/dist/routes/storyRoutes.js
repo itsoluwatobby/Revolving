@@ -3,7 +3,7 @@ import { createNewStory, deleteStory, getUserStory, updateStory } from "../contr
 import { verifyRoles } from "../middleware/verifyRoles.js";
 import { ROLES } from "../config/allowedRoles.js";
 const storyRouter = Router();
-storyRouter.route('/:userId')
+storyRouter.route('/user/:userId')
     .post(verifyRoles([ROLES.USER]), createNewStory)
     .get(verifyRoles([ROLES.USER]), getUserStory);
 storyRouter.put('/:userId/:storyId', verifyRoles([ROLES.USER]), updateStory);

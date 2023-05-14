@@ -19,8 +19,8 @@ export const signToken = async(claim: ClaimProps, expires: string, secret: strin
   return token
 }
 
-export const verifyToken = async(token: string, secret: string) => {
-  let response: string | object;  
+export const verifyToken = async(token: string, secret: string): Promise<string | ClaimProps> => {
+  let response: string | ClaimProps;  
   jwt.verify(
       token,
       secret,

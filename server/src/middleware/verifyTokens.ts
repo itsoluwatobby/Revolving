@@ -16,28 +16,42 @@ interface CookieProp extends Request{
 
 export const verifyAccessToken = async(req: TokenProp, res: Response, next: NextFunction) => {
   const auth = req.headers['authorization']
-  if(!auth || !auth.startsWith('Bearer ')) return res.sendStatus(403)
+  if(!auth || !auth.startsWith('Bearer ')) return res.sendStatus(401)
   const token = auth?.split(' ')[1]
 
-  const verify = await verifyToken(token, process.env.ACCESSTOKEN_STORY_SECRET) as ClaimProps
-  if(!verify?.email) return res.sendStatus(403)
-  req.email = verify?.email
-  req.roles = verify?.roles
-  next()
+  const verify = await verifyToken(token, process.env.ACCESSTOKEN_STORY_SECRET) as ClaimProps | string
+  console.log(verify)
+  if(typeof verify == 'string'){ 
+    if(verify == 'Bad Token') return res.sendStatus(401)
+    else if(verify == 'Expired Token') return res.sendStatus(403)
+  }
+  else if(typeof verify == 'object'){
+    req.email = verify?.email
+    req.roles = verify?.roles
+    next()
+  }
 }
 
 export const getNewTokens = async(req: CookieProp, res: Response) => {
   const cookie = req.cookies;
-  if(!cookie?.revolving) return res.sendStatus(403)
+  if(!cookie?.revolving) return res.sendStatus(401)
   const token = cookie?.revolving
   const user = await getUserByToken(token)
-  if(!user) return res.sendStatus(403)
+  if(!user) return res.sendStatus(401)
 
-  const verify = await verifyToken(user?.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET) as ClaimProps
-  if(!verify?.email){
-    res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })// secure: true
-    user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
-    return res.sendStatus(403)
+  const verify = await verifyToken(user?.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET) as ClaimProps | string
+  if(typeof verify == 'string'){
+    if(verify == 'Bad Token') {
+      // TODO: account hacked, send email to user
+      res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })// secure: true
+      user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
+      return res.sendStatus(401);
+    }
+    else if(verify == 'Expired Token') {
+      res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })// secure: true
+      user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
+      return res.sendStatus(403)
+    }
   }
   const roles = Object.values(user?.roles);
   const newAccessToken = await signToken({roles, email: user?.email}, '2h', process.env.ACCESSTOKEN_STORY_SECRET);

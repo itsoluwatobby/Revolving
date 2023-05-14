@@ -104,14 +104,16 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
       else if (verify?.email) return res.status(200).json('Please check your email to activate your account')
     }
     const roles = Object.values(user?.roles);
-    const accessToken = await signToken({roles, email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
+    const accessToken = await signToken({roles, email}, '10m', process.env.ACCESSTOKEN_STORY_SECRET);
     const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
+
+    const { _id, ...rest } = user
 
     await user.updateOne({$set: { status: 'online', refreshToken }})
     //authentication: { sessionID: req?.sessionID },
     
     res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 })//secure: true
-    return res.status(200).json({roles, accessToken})
+    return res.status(200).json({_id, roles, accessToken})
   }
   catch(error){
     console.log(error)
