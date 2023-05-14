@@ -4,7 +4,6 @@ import { ThemeContextType } from "./posts";
 import { Routes, Route } from 'react-router-dom';
 import { BlogLayout } from "./components/BlogLayout";
 import { NewStory } from "./pages/NewStory";
-import { EditStory } from "./pages/EditStory";
 import NotFound from "./pages/NotFound";
 import SingleStoryPage from "./pages/SingleStoryPage";
  
@@ -17,7 +16,7 @@ export const App = () => {
         <Route path='/' element={<BlogLayout />}>
           <Route index element={<Home />} />
           <Route path="new_story" element={<NewStory />} />
-          <Route path="edit_story/:postId" element={<EditStory />} />
+          <Route path="edit_story/:postId" element={<NewStory />} />
           <Route path="story/:postId" element={<SingleStoryPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />

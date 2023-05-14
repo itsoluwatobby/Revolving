@@ -17,7 +17,7 @@ textarea::-webkit-scrollbar{
   height: calc(100vh - 64px);
 }
 
-.sidebar::-webkit-scrollbar{
+.sidebars::-webkit-scrollbar{
   width: 1px;
 }
 
@@ -41,4 +41,5 @@ textarea::-webkit-scrollbar{
 .dosis_style{
   font-family: 'Dosis', sans-serif;
 }
+
 

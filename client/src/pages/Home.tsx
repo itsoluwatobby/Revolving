@@ -5,7 +5,6 @@ import { TopHome } from "../components/TopHome"
 import { Toaster } from 'react-hot-toast';
 
 
-
 export const Home = () => {
   return (
     <main className="relative h-full">

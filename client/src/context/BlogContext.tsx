@@ -36,9 +36,9 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [postData, setPostData] = useState<Partial<PostType>>({
     title: undefined, body: undefined, author: 'anonymous'
   })
-  const [editPost, setEditPost] = useState<PostType | object>({})
   const [search, setSearch] = useState<string>('');
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
+  const [canPost, setCanPost] = useState<boolean>(false);
 
   const addPost = async () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
@@ -47,6 +47,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
       date: dateTime,
       ...postData,
     } as PostType
+  
     try{
         await mutate(
           createPost(newPost),
@@ -66,8 +67,10 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
       })
     }
   }
+
   const updatedPost = async () => {
-    const postUpdated = {...editPost} as PostType;
+    const postUpdated = {...postData} as PostType;
+    console.log(postUpdated)
     try{
         await mutate(
           updatePost(postUpdated),
@@ -112,7 +115,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const value = {
-    postData, setPostData, search, setSearch, posts, isLoading, error, addPost, deletePosts, updatedPost, setEditPost, typingEvent, setTypingEvent
+    postData, setPostData, search, setSearch, posts, isLoading, error, addPost, deletePosts, updatedPost, typingEvent, setTypingEvent, canPost, setCanPost
   }
 
   return (
