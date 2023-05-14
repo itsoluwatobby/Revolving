@@ -6,12 +6,14 @@ import { CiEdit } from 'react-icons/ci';
 import { format } from 'timeago.js';
 import { useState } from 'react';
 import { usePostContext } from '../hooks/usePostContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { TextRules } from '../fonts';
 
 type Props = {
   post: PostType
 }
+
+//const font = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
 export const Post = ({ post }: Props) => {
   const [open, setOpen] = useState<boolean>(false)

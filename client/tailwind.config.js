@@ -25,5 +25,8 @@ export default {
       midmobile: {'max': '380px'},
     }
   },
-  plugins: [],
+  plugins: [
+   
+    // ...
+  ],
 }

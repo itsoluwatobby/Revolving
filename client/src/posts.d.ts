@@ -33,11 +33,11 @@ export type PostType = {
 
 export type PostContextType = {
   search: string,
-  posts: PostType[],
+  posts?: PostType[],
   postData: Partial<PostType>,
   isLoading: boolean,
   typingEvent: boolean,
-  error: { message: string },
+  error?: {message: string, name: string, code: string},
   // editPost: Partial<PostType>, 
   canPost: boolean, 
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>

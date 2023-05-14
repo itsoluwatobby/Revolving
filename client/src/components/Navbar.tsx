@@ -1,32 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { FiEdit } from 'react-icons/fi'
-import { BsBell, BsBellFill, BsMoonStars, BsMoonStarsFill } from 'react-icons/bs'
+import { BsMoonStars, BsMoonStarsFill } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
 import { IoIosArrowDown, IoIosMore } from 'react-icons/io'
 import WedgeLoad from '../assets/Wedges-14.3s-44px.svg'
 import { usePostContext } from '../hooks/usePostContext'
-import { PostContextType, PostType, ThemeContextType } from '../posts'
+import { PostContextType, ThemeContextType } from '../posts'
 import { useThemeContext } from '../hooks/useThemeContext'
 import profileImage from "../images/bg_image3.jpg"
 import { custom_fonts } from '../fonts.js'
-import { delayedPromise } from '../hooks/useDebounceHook.js';
 // import headings from '../assets/headings.js'
 
-const headings = [
-  'We rise and never fall',
-  'Doing hard things isn\'t an easy task to accomplish',
-  'It will only get better',
-  'In all you do, always believe in yourself',
-  'It will only get better',
-  'Life is never easy, you just have to find a way to live',
-  'Always try to wear a smile',
-  'You matter and you will always do'
-]
+// const headings = [
+//   'We rise and never fall',
+//   'Doing hard things isn\'t an easy task to accomplish',
+//   'It will only get better',
+//   'In all you do, always believe in yourself',
+//   'It will only get better',
+//   'Life is never easy, you just have to find a way to live',
+//   'Always try to wear a smile',
+//   'You matter and you will always do'
+// ]
 
 const postOptions = ['home', 'save as pdf', 'edit', 'delete', 'logout']
 
-const bell_class= "text-xl cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.95] duration-200 ease-in-out text-gray-500";
+// const bell_class= "text-xl cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.95] duration-200 ease-in-out text-gray-500";
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -42,10 +41,9 @@ const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:sca
 export const Navbar = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate()
-  const [display, setDisplay] = useState<boolean>(false);
+  // const [display, setDisplay] = useState<boolean>(false);
   // const [fontOption, setFontOption] = useState<boolean>(false);
   const [image, setImage] = useState<boolean>(false);
-  const [spec, setSpec] = useState<number>(1);
   const {postData, search, setSearch, addPost, posts, updatedPost, typingEvent, canPost} = usePostContext() as PostContextType
   const currentMode = localStorage.getItem('theme');
   const {theme, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption} = useThemeContext() as ThemeContextType
@@ -53,7 +51,6 @@ export const Navbar = () => {
   const [delayedSaving, setDelayedSaving] = useState(false)
   
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
-  const fontAddress = ['/new_story', `/edit_story/${postId}`]
 
   const targetPost = posts?.find(pos => pos?.postId == postId)
   //const onNotify = () => setDisplay(prev => !prev);
@@ -84,7 +81,7 @@ export const Navbar = () => {
   }, [typingEvent])
 
   return(
-    <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-0 pl-5 md:ml-16 mr-16' : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
+    <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-0 pl-5 md:pl-16 md:pr-16' : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
      `}>
       {/* <div className='flex items-center gap-2 mobile:gap-0 border'> */}
         <Link to='/'>

@@ -9,7 +9,7 @@ import { usePostContext } from '../hooks/usePostContext';
 
 export const Posts = () => {
   const { isLoading, error, posts } = usePostContext() as PostContextType
-
+  
   let content;
 
   isLoading ? content = (

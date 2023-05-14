@@ -22,6 +22,8 @@ export default function SingleStoryPage() {
     return sum
   }
 
+  //FaFilePdf
+
   const bodyContent = post?.body ? post?.body.split(' ').map((word, index) => {
     return (
       <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600 bg-gray-600 rounded-sm' : ''}`}>{word}{' '}</span>
