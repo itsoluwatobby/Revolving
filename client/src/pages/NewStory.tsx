@@ -1,9 +1,9 @@
 import { useLocation } from 'react-router-dom';
-import { DebounceProps, delayedPromise, useDebounceHook } from '../hooks/useDebounceHook';
+import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { PostContextType, PostType, ThemeContextType } from '../posts';
-import { useState, useEffect, ChangeEvent, useCallback } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 
 export const NewStory = () => {
   const { fontFamily } = useThemeContext() as ThemeContextType;

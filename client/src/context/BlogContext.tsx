@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useState } from 'react';
 import useSwr from 'swr';
 import { PostType, ChildrenProp, PostContextType } from '../posts';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,7 +25,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     isLoading,
     error,
     mutate
-  } = useSwr<PostType[], boolean>(cacheKey, getPosts, {
+  } = useSwr<PostType[]>(cacheKey, getPosts, {
     onSuccess: data => data?.sort((a, b) => {
       //const timeDiffrence = b?.date.localeCompare(a?.date);
       const likes = b?.likes - a?.likes;
@@ -119,7 +119,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }
 
   return (
-    <PostContext.Provider value = {value}>
+    <PostContext.Provider value={value}>
       {children}
     </PostContext.Provider>
   )

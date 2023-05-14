@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { IoIosArrowForward, IoIosArrowBack} from 'react-icons/io'
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
@@ -15,20 +15,20 @@ export const TopHome = () => {
   const {theme} = useThemeContext() as ThemeContextType;
   
 
-  const scrollLeftHandler = () => {
-    scrollContainerRef.current.scrollLeft -= 100
-  }
+  // const scrollLeftHandler = () => {
+  //   scrollContainerRef.current.scrollLeft -= 100
+  // }
 
-  const scrollRightHandler = () => {
-    scrollContainerRef.current.scrollRight += 100
-  }
+  // const scrollRightHandler = () => {
+  //   scrollContainerRef.current.scrollRight += 100
+  // }
 // ${theme == 'light' ? null : 'bg-slate-800'}
   const content = (
     <header 
       className={`sticky top-0 z-50 max-w-full overflow-hidden flex-none flex items-center bg-opacity-95 mt-4 border $ border-l-0 border-r-0 border-t-1 border-b-1 pr-2 ${theme == 'dark' ? 'border-gray-700 bg-slate-800' : 'border-gray-300 bg-white'}`}>
       <div className={`md:hidden h-14 w-10 grid place-content-center z-50`}>
         <IoIosArrowBack 
-          onClick={scrollLeftHandler}
+          // onClick={scrollLeftHandler}
           className={arrow_class} />
       </div>
       <ul ref={scrollContainerRef} className={`p-4 w-full md:justify-between text-gray-700 flex items-center sm:justify-between gap-3 mobile:overflow-x-scroll}`}>
@@ -43,7 +43,7 @@ export const TopHome = () => {
       <div 
         className={`h-14 w-10 md:hidden grid place-content-center z-50`}>
         <IoIosArrowForward 
-          onClick={scrollRightHandler}
+          // onClick={scrollRightHandler}
           className={arrow_class} /> 
       </div>
     </header>
