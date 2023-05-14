@@ -29,7 +29,7 @@ export const Post = ({ post }: Props) => {
   const watchWords = TextRules.keywords as string[]
   const bodyContent = post?.body ? tooLong().split(' ').map((word, index) => {
     return (
-      <span key={index} className={`${watchWords.includes(word) ? 'text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600' : ''}`}>{word}{' '}</span>
+      <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'bg-gray-600 rounded-sm text-red-600' : ''}`}>{word}{' '}</span>
     )
   }) : 'No content'
 
@@ -52,7 +52,7 @@ export const Post = ({ post }: Props) => {
         <FiMoreVertical
           onClick={() => setOpen(prev => !prev)}
           title='Options'
-          className={`absolute right-2 text-lg cursor-pointer hover:text-gray-600`}
+          className={`absolute right-2 text-lg cursor-pointer opacity-75 hover:text-gray-600`}
         />
         {open &&
           <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${currentMode == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>

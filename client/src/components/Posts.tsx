@@ -10,12 +10,6 @@ import { usePostContext } from '../hooks/usePostContext';
 export const Posts = () => {
   const { isLoading, error, posts } = usePostContext() as PostContextType
 
-  // const postAlgorithm = posts?.sort((postA, postB) => {
-  //   return (
-  //     postA?.likes - postB?.likes
-  //   )
-  // })
-
   let content;
 
   isLoading ? content = (
@@ -27,7 +21,7 @@ export const Posts = () => {
   : error ? content = <p>{error?.message}</p> 
   :(  posts?.length ? content = (
         posts?.map(post => (
-          <Post key={post?.postId} post={post} />
+          <Post key={post?.id} post={post} />
         )
       )
     ) 

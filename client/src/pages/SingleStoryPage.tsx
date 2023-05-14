@@ -24,19 +24,19 @@ export default function SingleStoryPage() {
 
   const bodyContent = post?.body ? post?.body.split(' ').map((word, index) => {
     return (
-      <span key={index} className={`${watchWords.includes(word) ? 'text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600' : ''}`}>{word}{' '}</span>
+      <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600 bg-gray-600 rounded-sm' : ''}`}>{word}{' '}</span>
     )
   }) : 'No content'
-
+//
   return (
     <main className='single_page box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl'>
       <div className="flex h-full">
-        <aside className={`sidebar flex-none sm:w-1/4 w-4/12 transition-all overflow-y-scroll h-full ${sidebar ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'} ${themeMode == 'light' ? 'bg-gray-50' : 'bg-slate-700'} rounded-tr-lg z-50`}>
+        <aside className={`sidebars md:block flex-none sm:w-1/4 w-4/12 transition-all overflow-y-scroll h-full ${sidebar ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'} ${themeMode == 'light' ? 'bg-gray-50' : 'bg-slate-700'}  rounded-tr-lg z-50`}>
           <div className="sticky top-0 w-full z-50 opacity-80 bg-slate-800 flex justify-center items-center">
             <p>Your recent Posts</p>
             <FaTimes 
               onClick={() => setSidebar(false)}
-              className={`absolute md:hidden right-0 rounded-md text-xl cursor-pointer transition-all duration-300 hover:opacity-60 active:scale-[0.9] shadow-xl ${themeMode == 'light' ? 'bg-red-200' : 'bg-slate-600'}`} />
+              className={`absolute sm:hidden block right-0 rounded-md text-xl cursor-pointer transition-all duration-300 hover:opacity-60 active:scale-[0.9] shadow-xl ${themeMode == 'light' ? 'bg-red-200' : 'bg-slate-600'}`} />
           </div>
           {
             posts?.length ? (
@@ -78,7 +78,7 @@ export default function SingleStoryPage() {
       </div>
       <BsArrowBarRight 
         onClick={() => setSidebar(true)}
-        className={`fixed sm:hidden left-0 top-[40%] opacity-70 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:bg-slate-200 p-1 text-[30px]`} />
+        className={`fixed md:hidden left-0 top-[40%] opacity-30 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:opacity-80 p-1 text-[30px]`} />
     </main>
   )
 }
