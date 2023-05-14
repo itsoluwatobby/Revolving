@@ -19,9 +19,8 @@ import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
 import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
 import { verifyAccessToken } from './middleware/verifyTokens.js';
-import { getAllStories } from './helpers/storyHelpers.js';
 import storyRouter from './routes/storyRoutes.js';
-import { getStory } from './controller/storyController.js';
+import { getStories, getStory } from './controller/storyController.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 
 dbConfig(null, null, null);
@@ -75,16 +74,16 @@ if (numberOfCores > 4){
     })
 
     // ROUTES
-    app.use('/revolving_api', authRouter);
+    app.use('/revolving/auth', authRouter);
     
-    app.get('/story', getAllStories);
-    app.get('/story/:storyId', getStory);
+    app.get('/revolving/story', getStories);
+    app.get('/revolving/story/:storyId', getStory);
 
     // checks for accesstoken
     app.use(verifyAccessToken);
 
     // story router
-    app.use('/story', storyRouter);
+    app.use('/revolving/story', storyRouter);
 
     //app.use(errorLog);
     app.all('*', (req: Request, res: Response) => {

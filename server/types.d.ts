@@ -1,5 +1,5 @@
 import { VerifyOptions } from "jsonwebtoken"
-import { Document, ObjectId } from "mongoose"
+import { Document, ObjectId, Types } from "mongoose"
 
 // interface Environment_Env{
 //   REVOLVING_DB: string,
@@ -26,14 +26,14 @@ interface ClaimProps extends JwtPayload{
 }
 
 interface SharedProps extends Document{
-  sharerId: ObjectId | string,
-  storyId: ObjectId | string,
+  sharerId: Types.ObjectId,
+  storyId: Types.ObjectId,
   sharedDate: string,
   sharedStory: object
 }
 
 interface StoryProps extends Document{
-  userId: object | string
+  userId: Types.ObjectId
   title: string
   picture: string
   body: string
