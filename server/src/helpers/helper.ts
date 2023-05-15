@@ -1,8 +1,8 @@
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken'
 import { ClaimProps, USERROLES } from '../../types.js';
-import { createTransport } from 'nodemailer';
-import { userInfo } from 'os';
+import { Transporter, createTransport } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
 
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
@@ -38,7 +38,7 @@ export const verifyToken = async(token: string, secret: string): Promise<string 
   return response;
 }
 
-export const transporter = createTransport({
+export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
   secure: true,
