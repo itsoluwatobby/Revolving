@@ -55,7 +55,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
         )
         toast.success('Success!! Post added', {
           duration: 1000, icon: '🔥', style: {
-            background: '#2EFF2E'
+            background: '#32CD32'
           }
         })
     }
@@ -79,7 +79,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
 
         toast.success('Success!! Post editted', {
           duration: 1000, icon: '🔥', style: {
-            background: '#2EFF2E'
+            background: '#32CD32'
           }
         })
     }
@@ -101,7 +101,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
 
         toast.success('Success!! Post deleted', {
           duration: 1000, icon: '🔥',  style: {
-            background: '#2EFF2E'
+            background: '#32CD32'
           }
         })
     }

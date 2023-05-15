@@ -16,7 +16,7 @@ export const Home = () => {
         <aside className="flex-none hidden md:flex w-1/4 h-full border border-l-slate-300">
         </aside>
       </div>
-      <Toaster />
+      {/* <Toaster /> */}
     </main>
   )
 }
