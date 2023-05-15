@@ -37,7 +37,7 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
   if(!cookie?.revolving) return res.sendStatus(401)
   const token = cookie?.revolving
   const user = await getUserByToken(token)
-  if(!user) return res.sendStatus(401)
+  if(!user) return res.sendStatus(404)
 
   const verify = await verifyToken(user?.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET) as ClaimProps | string
   if(typeof verify == 'string'){
@@ -60,7 +60,7 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
   user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
     //authentication: { sessionID: req?.sessionID },
     
-  res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 })//secure: true
+  res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
   return res.status(200).json({roles, accessToken: newAccessToken})
 }
 

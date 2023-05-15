@@ -55,7 +55,7 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
     const newRefreshToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
     user.updateOne({ $set: { status: 'online', refreshToken: newRefreshToken } });
     //authentication: { sessionID: req?.sessionID },
-    res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 }); //secure: true
+    res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
     return res.status(200).json({ roles, accessToken: newAccessToken });
 });
 // TODO: add secure option to cookies
