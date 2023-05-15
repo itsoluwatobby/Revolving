@@ -12,6 +12,12 @@ interface NewUserProp extends Request{
   password: string
 }
 
+interface QueryProps extends Request{token: string}
+interface EmailProps extends Request{
+  email: string,
+  resetPass: string
+}
+
 export const registerUser = async(req: NewUserProp, res: Response) => {
   try{
     const {username, email, password} = req.body
@@ -36,12 +42,12 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     const newUser = await createUser({...user})
     const roles = Object.values(newUser?.roles)
     const token = await signToken({roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
-    const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
+    const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
     const options = mailOptions(email, username, verificationLink)
     await newUser.updateOne({$set: {verificationToken: token}});
   
     transporter.sendMail(options, (err) => {
-      if (err) return res.status(400).json('unable to send mail')
+      if (err) return res.status(400).json('unable to send mail, please retry')
     })
     return res.status(201).json('Please check your email to activate your account')
   }
@@ -69,7 +75,7 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
 
     if(user.isAccountActivated) return res.status(200).json('Your has already been activated')
     await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
-    return res.status(307).redirect(`${process.env.ROUTELINK}/revolving_api/login`)
+    return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
   }
   catch(error){
     console.log(error)
@@ -85,19 +91,19 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
     if(!user) return res.status(401).json('You do not have an account')
     const matchingPassword = await brcypt.compare(password, user?.authentication?.password);
-    if (!matchingPassword) return res?.status(401).json('Incorrect password')
+    if (!matchingPassword) return res?.status(401).json('bad credentials')
 
     if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
     if (!user?.isAccountActivated) {
       const verify = await verifyToken(user?.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
       if (!verify?.email) {
         const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
-        const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`
+        const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
         const options = mailOptions(email, user?.username, verificationLink)
         await user.updateOne({$set: {verificationToken: token}});
 
         transporter.sendMail(options, (err) => {
-          if (err) return res.status(400).json('unable to send mail')
+          if (err) return res.status(400).json('unable to send mail, please retry')
         })
         return res.status(201).json('Please check your email')
       }
@@ -140,6 +146,70 @@ export const logoutHandler = async(req: NewUserProp, res: Response) => {
   }
   catch(error){
     res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })//secure: true
+    return res.sendStatus(500);
+  }
+}
+
+export const forgetPassword = async(req: Request, res: Response) => {
+  try{
+    const { email } = req.query
+    if(!email) return res.sendStatus(400);
+    const user = await getUserByEmail(email as string);
+    if(!user) return res.status(401).json('You do not have an account, please sign up')
+    if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
+
+    const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
+    const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`
+    const options = mailOptions(email as string, user.username, verificationLink)
+    await transporter.sendMail(options, (err) => {
+      if (err) return res.status(400).json('unable to send mail, please retry')
+    })
+    await user.updateOne({$set: { isResetPassword: true, verificationToken: passwordResetToken }})
+    return res.status(201).json('Please check your email')
+  }
+  catch(error){
+    return res.sendStatus(500);
+  }
+}
+
+export const passwordResetRedirectLink = async(req: QueryProps, res: Response) => {
+  try{
+    const { token } = req.query
+    if(!token) return res.sendStatus(400)
+    const user = await getUserByVerificationToken(token as string)
+    if(!user) return res.sendStatus(401)
+    if(!user.isResetPassword) return res.sendStatus(401)
+
+    const verify = await verifyToken(token as string, process.env.PASSWORD_RESET_TOKEN_SECRET) as ClaimProps
+    if (!verify?.email) return res.sendStatus(400)
+    if (verify?.email != user?.email) return res.sendStatus(400)
+
+    await user.updateOne({$set: { verificationToken: '' }})
+    res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`)
+  }
+  catch(error){
+    res.sendStatus(500)
+  }
+}
+
+export const passwordReset = async(req: EmailProps, res: Response) => {
+  try{
+    const {resetPass, email} = req.body
+    if(!email || !resetPass) return res.sendStatus(400)
+    const user = await UserModel.findOne({email}).select('+authentication.password').exec();
+    if(!user) return res.status(401).json('bad credentials')
+
+    const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
+    if(conflictingPassword) return res.status(409).json('same as old password')
+    if(user.isResetPassword){
+      const hashedPassword = await brcypt.hash(resetPass, 10);
+      await user.updateOne({$set: { authentication: { password: hashedPassword }, resetPassword: false}})
+        .then(() => res.status(201).json('password reset successful'))
+        .catch(() => res.sendStatus(500));
+    }
+    else res.status(401).json('unauthorized')
+  }
+  catch(error){
     return res.sendStatus(500);
   }
 }
