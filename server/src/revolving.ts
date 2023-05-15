@@ -26,7 +26,7 @@ import { getStories, getStory } from './controller/storyController.js';
 dbConfig(null, null, null);
 const app = express()
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 4000
 
 const requestLimiter: RateLimitRequestHandler = rateLimit({
   windowMs: 60 * 1000, //remembers req for a minute

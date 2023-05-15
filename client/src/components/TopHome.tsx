@@ -25,7 +25,7 @@ export const TopHome = () => {
 // ${theme == 'light' ? null : 'bg-slate-800'}
   const content = (
     <header 
-      className={`sticky top-0 z-50 max-w-full overflow-hidden flex-none flex items-center bg-opacity-95 mt-4 border $ border-l-0 border-r-0 border-t-1 border-b-1 pr-2 ${theme == 'dark' ? 'border-gray-700 bg-slate-800' : 'border-gray-300 bg-white'}`}>
+      className={`sticky top-0 z-30 max-w-full overflow-hidden flex-none flex items-center bg-opacity-95 mt-4 border $ border-l-0 border-r-0 border-t-1 border-b-1 pr-2 ${theme == 'dark' ? 'border-gray-700 bg-slate-800' : 'border-gray-300 bg-white'}`}>
       <div className={`md:hidden h-14 w-10 grid place-content-center z-50`}>
         <IoIosArrowBack 
           // onClick={scrollLeftHandler}

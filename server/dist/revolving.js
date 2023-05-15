@@ -20,7 +20,7 @@ import { getStories, getStory } from './controller/storyController.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const requestLimiter = rateLimit({
     windowMs: 60 * 1000,
     max: 30,

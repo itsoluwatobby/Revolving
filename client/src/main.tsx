@@ -9,19 +9,22 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { preload } from 'swr'
 import { posts_endPoint as cacheKey, getPosts } from './api/axiosPost.ts'
 import { ThemeDataProvider } from './context/ThemeProvider.tsx'
+import AuthenticationContext from './context/AuthenticationContext.tsx'
 
 preload(cacheKey, getPosts)
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ThemeDataProvider>  
-      <PostDataProvider>
-        <Router>
-          <Routes>
-            <Route path='/*' element={<App />} />
-          </Routes>
-        </Router>
-      </PostDataProvider>
+    <ThemeDataProvider>
+      <AuthenticationContext>
+        <PostDataProvider>
+          <Router>
+            <Routes>
+              <Route path='/*' element={<App />} />
+            </Routes>
+          </Router>
+        </PostDataProvider>
+      </AuthenticationContext>
     </ThemeDataProvider>
   </React.StrictMode>,
 )

@@ -13,11 +13,11 @@ type LoginProps={
   revealPassword: boolean,
   setRevealPassword: React.Dispatch<React.SetStateAction<boolean>>,
   setForgot: React.Dispatch<React.SetStateAction<boolean>>,
-  rememberMe: boolean
+  persistLogin: boolean
 }
 
 export default function LoginComponent({ 
-  handleSubmit, handleEmail, handlePassword, handleChecked, canSubmit, email, password, revealPassword, setRevealPassword, setForgot, rememberMe
+  handleSubmit, handleEmail, handlePassword, handleChecked, canSubmit, email, password, revealPassword, setRevealPassword, setForgot, persistLogin
  }: LoginProps) {
   const themeMode = localStorage.getItem('theme')
 
@@ -69,15 +69,15 @@ export default function LoginComponent({
                             className={`absolute cursor-pointer hover:opacity-90 text-slate-700 right-2 duration-100 bottom-2 text-2xl`} />
               }
             </label>
-            <label htmlFor="remember-me" className='pl-2 flex items-center gap-2'>
+            <label htmlFor="persist-login" className='pl-2 flex items-center gap-2'>
               <input 
                 type="checkbox" 
-                checked={rememberMe}
-                id='remember-me'
+                checked={persistLogin}
+                id='persist-login'
                 onChange={handleChecked}
                 className='focus:outline-none h-4 w-4 border-none cursor-pointer'
               />
-            <span>remember me</span>
+            <span className="text-sm">Trust Device</span>
             </label>
             <button 
               type='submit'

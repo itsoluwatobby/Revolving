@@ -10,6 +10,7 @@ import Welcome from "./components/layouts/Welcome";
 import LoginModal from "./components/modals/LoginModal";
 import RegisterModal from "./components/modals/RegisterModel";
 import NewPassword from "./pages/NewPassword";
+import { Toaster } from "react-hot-toast";
 
  
 export const App = () => {
@@ -31,6 +32,7 @@ export const App = () => {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Toaster />
     </main>
   )
 }

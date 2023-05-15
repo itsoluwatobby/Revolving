@@ -12,7 +12,7 @@ authRouter.get('/verify_account', accountConfirmation);
 
 authRouter.get('/new_access_token', getNewTokens);
 // verifyRoles([ROLES.USER])
-authRouter.get('/logout', logoutHandler);
+authRouter.get('/logout/:userId', logoutHandler);
 
 // RESET PASSWORD
 authRouter.post('/forgot_password', forgetPassword);

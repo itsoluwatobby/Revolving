@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUser, getUserByEmail, getUserByVerificationToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { ClaimProps, UserProps } from "../../types.js";
 import { sub } from "date-fns";
@@ -89,7 +89,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     if (!email || !password) return res.sendStatus(400);
 
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
-    if(!user) return res.status(401).json('You do not have an account')
+    if(!user) return res.status(404).json('You do not have an account')
     const matchingPassword = await brcypt.compare(password, user?.authentication?.password);
     if (!matchingPassword) return res?.status(401).json('bad credentials')
 
@@ -118,7 +118,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     await user.updateOne({$set: { status: 'online', refreshToken }})
     //authentication: { sessionID: req?.sessionID },
     
-    res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 })//secure: true
+    res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
     return res.status(200).json({_id, roles, accessToken})
   }
   catch(error){
@@ -129,23 +129,23 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
 
 export const logoutHandler = async(req: NewUserProp, res: Response) => {
   try{
-    const {email} = req.body
-    if (!email) {
-      res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })//secure: true
+    const {userId} = req.params
+    if (!userId) {
+      res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
       return res.sendStatus(204);
     }
-    const user = await getUserByEmail(email);
+    const user = await getUserById(userId);
     if (!user) {
-      res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })//secure: true
+      res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
       return res.sendStatus(204);
     }
     user.updateOne({$set: {status: 'offline', authentication: { sessionID: '' }, refreshToken: '' }})
 
-    res.clearCookie('revolving', { httpOnly: true, sameSite: "none" })//secure: true
+    res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
     return res.sendStatus(204)
   }
   catch(error){
-    res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' })//secure: true
+    res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
     return res.sendStatus(500);
   }
 }

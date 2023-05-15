@@ -28,3 +28,10 @@ export const TextRules: TextProp = {
   }
  // creates a code-like background
 }
+
+export const modal = {
+  signIn: 'sign In', 
+  settings: 'settings', 
+  signout: 'sign out', 
+  signUp: 'sign Up'
+}

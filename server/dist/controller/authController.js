@@ -18,7 +18,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { createUser, getUserByEmail, getUserByVerificationToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
 import { mailOptions, signToken, transporter, verifyToken } from "../helpers/helper.js";
@@ -50,12 +50,12 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         const newUser = yield createUser(Object.assign({}, user));
         const roles = Object.values(newUser === null || newUser === void 0 ? void 0 : newUser.roles);
         const token = yield signToken({ roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
-        const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`;
+        const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;
         const options = mailOptions(email, username, verificationLink);
         yield newUser.updateOne({ $set: { verificationToken: token } });
         transporter.sendMail(options, (err) => {
             if (err)
-                return res.status(400).json('unable to send mail');
+                return res.status(400).json('unable to send mail, please retry');
         });
         return res.status(201).json('Please check your email to activate your account');
     }
@@ -86,7 +86,7 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
         if (user.isAccountActivated)
             return res.status(200).json('Your has already been activated');
         yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: '' } });
-        return res.status(307).redirect(`${process.env.ROUTELINK}/revolving_api/login`);
+        return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`);
     }
     catch (error) {
         console.log(error);
@@ -101,22 +101,22 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
             return res.sendStatus(400);
         const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (!user)
-            return res.status(401).json('You do not have an account');
+            return res.status(404).json('You do not have an account');
         const matchingPassword = yield brcypt.compare(password, (_b = user === null || user === void 0 ? void 0 : user.authentication) === null || _b === void 0 ? void 0 : _b.password);
         if (!matchingPassword)
-            return res === null || res === void 0 ? void 0 : res.status(401).json('Incorrect password');
+            return res === null || res === void 0 ? void 0 : res.status(401).json('bad credentials');
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return res === null || res === void 0 ? void 0 : res.status(403).json('Your account is locked');
         if (!(user === null || user === void 0 ? void 0 : user.isAccountActivated)) {
             const verify = yield verifyToken(user === null || user === void 0 ? void 0 : user.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET);
             if (!(verify === null || verify === void 0 ? void 0 : verify.email)) {
                 const token = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
-                const verificationLink = `${process.env.ROUTELINK}/revolving_api/verify_account?token=${token}`;
+                const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;
                 const options = mailOptions(email, user === null || user === void 0 ? void 0 : user.username, verificationLink);
                 yield user.updateOne({ $set: { verificationToken: token } });
                 transporter.sendMail(options, (err) => {
                     if (err)
-                        return res.status(400).json('unable to send mail');
+                        return res.status(400).json('unable to send mail, please retry');
                 });
                 return res.status(201).json('Please check your email');
             }
@@ -129,7 +129,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         const { _id } = user, rest = __rest(user, ["_id"]);
         yield user.updateOne({ $set: { status: 'online', refreshToken } });
         //authentication: { sessionID: req?.sessionID },
-        res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000 }); //secure: true
+        res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
         return res.status(200).json({ _id, roles, accessToken });
     }
     catch (error) {
@@ -139,22 +139,93 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email } = req.body;
-        if (!email) {
-            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' }); //secure: true
+        const { userId } = req.params;
+        if (!userId) {
+            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
             return res.sendStatus(204);
         }
-        const user = yield getUserByEmail(email);
+        const user = yield getUserById(userId);
         if (!user) {
-            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' }); //secure: true
+            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
             return res.sendStatus(204);
         }
         user.updateOne({ $set: { status: 'offline', authentication: { sessionID: '' }, refreshToken: '' } });
-        res.clearCookie('revolving', { httpOnly: true, sameSite: "none" }); //secure: true
+        res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true }); //secure: true
         return res.sendStatus(204);
     }
     catch (error) {
-        res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' }); //secure: true
+        res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
+        return res.sendStatus(500);
+    }
+});
+export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.query;
+        if (!email)
+            return res.sendStatus(400);
+        const user = yield getUserByEmail(email);
+        if (!user)
+            return res.status(401).json('You do not have an account, please sign up');
+        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
+            return res === null || res === void 0 ? void 0 : res.status(403).json('Your account is locked');
+        const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
+        const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`;
+        const options = mailOptions(email, user.username, verificationLink);
+        yield transporter.sendMail(options, (err) => {
+            if (err)
+                return res.status(400).json('unable to send mail, please retry');
+        });
+        yield user.updateOne({ $set: { isResetPassword: true, verificationToken: passwordResetToken } });
+        return res.status(201).json('Please check your email');
+    }
+    catch (error) {
+        return res.sendStatus(500);
+    }
+});
+export const passwordResetRedirectLink = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { token } = req.query;
+        if (!token)
+            return res.sendStatus(400);
+        const user = yield getUserByVerificationToken(token);
+        if (!user)
+            return res.sendStatus(401);
+        if (!user.isResetPassword)
+            return res.sendStatus(401);
+        const verify = yield verifyToken(token, process.env.PASSWORD_RESET_TOKEN_SECRET);
+        if (!(verify === null || verify === void 0 ? void 0 : verify.email))
+            return res.sendStatus(400);
+        if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
+            return res.sendStatus(400);
+        yield user.updateOne({ $set: { verificationToken: '' } });
+        res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`);
+    }
+    catch (error) {
+        res.sendStatus(500);
+    }
+});
+export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    try {
+        const { resetPass, email } = req.body;
+        if (!email || !resetPass)
+            return res.sendStatus(400);
+        const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
+        if (!user)
+            return res.status(401).json('bad credentials');
+        const conflictingPassword = yield brcypt.compare(resetPass, (_c = user === null || user === void 0 ? void 0 : user.authentication) === null || _c === void 0 ? void 0 : _c.password);
+        if (conflictingPassword)
+            return res.status(409).json('same as old password');
+        if (user.isResetPassword) {
+            const hashedPassword = yield brcypt.hash(resetPass, 10);
+            yield user.updateOne({ $set: { authentication: { password: hashedPassword }, resetPassword: false } })
+                .then(() => res.status(201).json('password reset successful'))
+                .catch(() => res.sendStatus(500));
+        }
+        else
+            res.status(401).json('unauthorized');
+    }
+    catch (error) {
         return res.sendStatus(500);
     }
 });
