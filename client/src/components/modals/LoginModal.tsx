@@ -2,21 +2,24 @@ import { ChangeEvent, FormEvent, useState } from 'react'
 import ForgotPassword from './ForgotPassword'
 import LoginComponent from './LoginComponent'
 import useAuthenticationContext from '../../hooks/useAuthenticationContext';
-import { axiosAuth } from '../../api/axiosPost';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { ThemeContextType } from '../../posts';
+import useSWRMutation from "swr/mutation"
+import { auth_endPoint } from '../../api/axiosPost';
+import useSignIn from '../../hooks/useSignIn';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { auth, setAuth, persistLogin, setPersistLogin } = useAuthenticationContext() as AuthenticationContextType
+  const { setAuth, persistLogin, setPersistLogin } = useAuthenticationContext() as AuthenticationContextType
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [forgot, setForgot] = useState<boolean>(false)
-  const { theme } = useThemeContext() as ThemeContextType
+  const { theme } = useThemeContext() as ThemeContextType;
   const navigate = useNavigate()
+  const signUserIn = useSignIn({email, password})
+  const { trigger, error } = useSWRMutation(auth_endPoint, signUserIn)
 
   const handleEmail = (event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)
   const handlePassword = (event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)
@@ -29,21 +32,22 @@ export default function Login() {
   const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
-      setIsLoading(true)
-      const res = await axiosAuth.post('/login', {
-        email, password
-      })
-      setAuth(res?.data)
-      toast.success('Success!, You are in', {
-        duration: 2000, icon: '🔥', style: {
-          background: '#2EFF2E'
+      const userAuth = await trigger() as AuthType
+      toast.promise(trigger(), { 
+        loading: 'signing you in 🚀', success: 'welcome', error: 'error occurred' 
+      },{
+          success:{
+            duration: 2000, icon: '🔥'
+          },
+          style: { background: '#3CB371'}
         }
-      })
+      )
+      setAuth(prev => ({...prev, ...userAuth}))
       navigate('/')
     }
     catch(err: unknown){
       let errorMessage;
-      const errors = err as ErrorResponse
+      const errors = error as ErrorResponse
       errors?.response?.status === 201 ? errorMessage = 'Please check your mail to verify your account' 
         : errors?.response?.status === 400 ? errorMessage = 'Bad request' 
           : errors?.response?.status === 401 ? errorMessage = 'Bad credentials' 
@@ -57,11 +61,8 @@ export default function Login() {
         }
       })
     }
-    finally{
-      setIsLoading(false)
-    }
   }
-console.log(auth)
+
   const canSubmit = [email, password].every(Boolean)
 
   return (

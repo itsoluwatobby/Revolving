@@ -1,9 +1,10 @@
 import axios, { AxiosInstance } from 'axios';
 import { PostType } from '../posts';
 
-export const posts_endPoint = '/posts'
+export const posts_endPoint = '/story'
+export const auth_endPoint = '/login'
 
-const BASEURL = 'http://localhost:3000'
+const BASEURL = 'http://localhost:4000/revolving'
 const AUTHURL = 'http://localhost:4000/revolving/auth'
 
 const postAxios: AxiosInstance = axios.create({

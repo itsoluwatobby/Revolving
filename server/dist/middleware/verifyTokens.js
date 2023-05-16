@@ -35,7 +35,7 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
     const token = cookie === null || cookie === void 0 ? void 0 : cookie.revolving;
     const user = yield getUserByToken(token);
     if (!user)
-        return res.sendStatus(401);
+        return res.sendStatus(404);
     const verify = yield verifyToken(user === null || user === void 0 ? void 0 : user.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET);
     if (typeof verify == 'string') {
         if (verify == 'Bad Token') {

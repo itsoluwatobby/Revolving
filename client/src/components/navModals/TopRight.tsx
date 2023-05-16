@@ -1,43 +1,83 @@
 import { BsMoonStars, BsMoonStarsFill } from "react-icons/bs"
 import { useThemeContext } from "../../hooks/useThemeContext"
-import { PostContextType, ThemeContextType } from "../../posts"
+import { PostContextType, PostType, ThemeContextType } from "../../posts"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { FiEdit } from 'react-icons/fi'
 import { IoIosArrowDown, IoIosMore } from 'react-icons/io'
 import profileImage from "../../images/bg_image3.jpg"
 import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
+import { useSWRConfig } from 'swr'
+import { posts_endPoint as cacheKey } from '../../api/axiosPost'
+import { addPostOptions, updatePostOptions } from "../../api/postApiOptions"
+import { toast } from "react-hot-toast";
+import { sub } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
+import useMutatePost from "../../hooks/useMutateHook";
+import useAuthenticationContext from "../../hooks/useAuthenticationContext"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
-type TopRightProps={
-  setRollout: React.Dispatch<React.SetStateAction<boolean>>
-}
-//
-export default function TopRight({ setRollout }: TopRightProps) {
-  const { theme, changeTheme, setFontOption } = useThemeContext() as ThemeContextType
-  const {addPost, updatedPost, canPost} = usePostContext() as PostContextType
+
+export default function TopRight() {
+  const { mutate } = useSWRConfig()
+  const [createPost, updatePost] = useMutatePost()
+  const { theme, setRollout, changeTheme, setFontOption } = useThemeContext() as ThemeContextType
+  const {postData, canPost} = usePostContext() as PostContextType
+  const { auth } = useAuthenticationContext() as AuthenticationContextType
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { postId } = useParams()
 
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
-
-  const add = () => {
-    addPost()
-    localStorage.removeItem('newStoryInputValue')
-    localStorage.removeItem('newStoryTextareaValue')
-    navigate('/')
+  
+  const addPost = async () => {
+    const dateTime = sub(new Date, { minutes: 0 }).toISOString();
+    const newPost = { postId : uuidv4(), date: dateTime, ...postData } as PostType
+    try{
+        await mutate(cacheKey, createPost(newPost), addPostOptions(newPost))
+        toast.success('Success!! Post added', {
+          duration: 1000, icon: '🔥', style: {
+            background: '#32CD32'
+          }
+        })
+        localStorage.removeItem('newStoryInputValue')
+        localStorage.removeItem('newStoryTextareaValue')
+        navigate('/')
+    }
+    catch(error){
+      toast.error('Failed!! to add new post', {
+        duration: 1000, icon: '💀', style: {
+          background: '#FF0000'
+        }
+      })
+    }
   }
 
-  const update = () => {
-    updatedPost()
-    localStorage.removeItem('editStoryInputValue')
-    localStorage.removeItem('editStoryTextareaValue')
-    navigate('/')
+  const updatedPost = async () => {
+    const postUpdated = {...postData} as PostType;
+    try{
+        await mutate(cacheKey, updatePost(postUpdated), updatePostOptions(postUpdated))
+
+        toast.success('Success!! Post editted', {
+          duration: 1000, icon: '🔥', style: {
+            background: '#32CD32'
+          }
+        })
+        localStorage.removeItem('editStoryInputValue')
+        localStorage.removeItem('editStoryTextareaValue')
+        navigate('/')
+    }
+    catch(err){
+      toast.error('Failed!! to update post', {
+        duration: 1000, icon: '💀', style: {
+          background: '#FF0000'
+        }
+      })
+    }
   }
 
   return (
@@ -51,21 +91,23 @@ export default function TopRight({ setRollout }: TopRightProps) {
                 className={mode_class+'text-gray-700'} />
         }
           {address.includes(pathname) ? 
-            (pathname == '/new_story' ?
+            (
+              pathname == '/new_story' ?
               <button
                 className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
-                onClick={add}
+                onClick={addPost}
                 disabled = {!canPost}
                 >Publish
               </button>
               :
-              (pathname != `/story/${postId}` &&
-                <button
-                  className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
-                    onClick={update}
-                    disabled = {!canPost}
-                  >Republish
-                </button>
+              (
+                pathname != `/story/${postId}` &&
+                  <button
+                    className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                      onClick={updatedPost}
+                      disabled = {!canPost}
+                    >Republish
+                  </button>
               )
             )
           :

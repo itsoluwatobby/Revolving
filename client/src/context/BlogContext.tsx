@@ -1,20 +1,14 @@
 import { createContext, useState } from 'react';
 import useSwr from 'swr';
 import { PostType, ChildrenProp, PostContextType } from '../posts';
-import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-hot-toast';
 import { posts_endPoint as cacheKey } from '../api/axiosPost'
-import { sub } from 'date-fns';
 
-import { 
-  createPost, 
-  getPosts, 
-  updatePost, 
+import {  
+  getPosts,  
   deletePost } from '../api/axiosPost';
-import { 
-  addPostOptions, 
+import {  
   deletePostOptions, 
-  updatePostOptions 
 } from '../api/postApiOptions';
 
 export const PostContext = createContext<PostContextType | null>(null)
@@ -40,58 +34,6 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
   const [canPost, setCanPost] = useState<boolean>(false);
 
-  const addPost = async () => {
-    const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const newPost = {
-      postId : uuidv4(),
-      date: dateTime,
-      ...postData,
-    } as PostType
-  
-    try{
-        await mutate(
-          createPost(newPost),
-          addPostOptions(newPost)
-        )
-        toast.success('Success!! Post added', {
-          duration: 1000, icon: '🔥', style: {
-            background: '#32CD32'
-          }
-        })
-    }
-    catch(err){
-      toast.error('Failed!! to add new post', {
-        duration: 1000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
-  }
-
-  const updatedPost = async () => {
-    const postUpdated = {...postData} as PostType;
-    console.log(postUpdated)
-    try{
-        await mutate(
-          updatePost(postUpdated),
-          updatePostOptions(postUpdated)
-        )
-
-        toast.success('Success!! Post editted', {
-          duration: 1000, icon: '🔥', style: {
-            background: '#32CD32'
-          }
-        })
-    }
-    catch(err){
-      toast.error('Failed!! to update post', {
-        duration: 1000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
-  }
-
   const deletePosts = async (id: string) => {
     try{
         await mutate(
@@ -115,7 +57,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const value = {
-    postData, setPostData, search, setSearch, posts, isLoading, error, addPost, deletePosts, updatedPost, typingEvent, setTypingEvent, canPost, setCanPost
+    postData, setPostData, search, setSearch, posts, isLoading, error, deletePosts, typingEvent, setTypingEvent, canPost, setCanPost
   }
 
   return (

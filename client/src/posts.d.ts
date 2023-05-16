@@ -44,9 +44,6 @@ export type PostContextType = {
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
   setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
-  // getPosts: () => void,
-  addPost: () => void,
-  updatedPost: () => void,
   deletePosts: (id: string) => void,
 }
 
@@ -57,9 +54,10 @@ export type ThemeContextType = {
   theme: Theme,
   fontFamily: FontStyle,
   fontOption: boolean,
+  rollout: boolean,
   changeTheme: (mode: string) => void,
   changeFontFamily: (font: string) => void,
-  // canPublish: (...args: string[]) => void,
-  setFontOption: React.Dispatch<React.SetStateAction<boolean>>
+  setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
+  setRollout: React.Dispatch<React.SetStateAction<boolean>>
 }
 

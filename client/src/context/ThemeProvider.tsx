@@ -9,6 +9,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     localStorage.getItem('fontFamily') || 'font_style'
     );
   const [fontOption, setFontOption] = useState<boolean>(false);
+  const [rollout, setRollout] = useState<boolean>(false);
 
   const changeTheme = (mode: string) => {
     setTheme(prev => {
@@ -23,7 +24,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, changeTheme, changeFontFamily, fontOption, setFontOption
+    theme, fontFamily, changeTheme, rollout, setRollout, changeFontFamily, fontOption, setFontOption
   }
   return (
     <ThemeContext.Provider value={ values }>
