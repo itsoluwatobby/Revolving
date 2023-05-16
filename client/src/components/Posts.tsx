@@ -21,7 +21,7 @@ export const Posts = () => {
   : error ? content = <p>{error?.message}</p> 
   :(  posts?.length ? content = (
         posts?.map(post => (
-          <Post key={post?.id} post={post} />
+          <Post key={post?._id} post={post} />
         )
       )
     ) 

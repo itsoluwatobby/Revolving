@@ -24,7 +24,7 @@ export const Navbar = () => {
   
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
 
-  const targetPost = posts?.find(pos => pos?.postId == postId)
+  const targetPost = posts?.find(pos => pos?._id == postId)
 
   useEffect(() => {
     changeFontFamily(targetPost?.fontFamily as string)
