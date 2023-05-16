@@ -2,9 +2,12 @@ import { toast } from "react-hot-toast"
 import { axiosAuth } from "../api/axiosPost"
 import useAuthenticationContext from "./useAuthenticationContext"
 import { useNavigate } from "react-router-dom"
+import { useThemeContext } from "./useThemeContext"
+import { ThemeContextType } from "../posts"
 
 export default function useLogout() {
   const { auth, setAuth } = useAuthenticationContext() as AuthenticationContextType
+  const { setRollout } = useThemeContext() as ThemeContextType
   const navigate = useNavigate()
 
   const signOut = async() => {
@@ -16,6 +19,7 @@ export default function useLogout() {
           background: '#8FBC8F'
         }
       })
+      setRollout(false)
       navigate('/signIn', { replace: true })
     }catch(err){
       setAuth({_id: '', accessToken: '', roles: []})
@@ -24,7 +28,7 @@ export default function useLogout() {
           background: '#8FBC8F'
         }
       })
-      navigate('/signIn')
+      navigate('/signIn', {replace: true})
     }
   }
 

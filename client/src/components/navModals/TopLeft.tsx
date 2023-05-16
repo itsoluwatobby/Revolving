@@ -11,7 +11,7 @@ type TopLeftProp={
 
 export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const {postData, search, setSearch} = usePostContext() as PostContextType
-  const {theme, setFontOption} = useThemeContext() as ThemeContextType
+  const {theme, setFontOption, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
   const { postId } = useParams()
 
@@ -24,7 +24,10 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
           <img 
             src={WedgeLoad} 
             alt='Logo' className='h-full object-cover rounded-full mr-2'
-            onClick={() => setFontOption(false)}
+            onClick={() => {
+              setRollout(false)
+              setFontOption(false)
+            }}
           />
         </Link>
       {

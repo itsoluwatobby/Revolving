@@ -17,16 +17,14 @@ const option_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 b
 // const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
-  const [rollout, setRollout] = useState<boolean>(false);
   const {posts, typingEvent} = usePostContext() as PostContextType
-  const {theme, fontFamily, changeFontFamily, fontOption} = useThemeContext() as ThemeContextType
+  const {theme, rollout, setRollout, fontFamily, changeFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { postId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
   
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
 
   const targetPost = posts?.find(pos => pos?.postId == postId)
-  //const onNotify = () => setDisplay(prev => !prev);
 
   useEffect(() => {
     changeFontFamily(targetPost?.fontFamily as string)
@@ -48,7 +46,7 @@ export const Navbar = () => {
       <div className='flex-auto mobile:hidden'></div>
 
       <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 mobile:w-40 ${pathname != `/story/${postId}` ? 'w-44' : 'w-32'}`}>
-        <TopRight setRollout={setRollout} />
+        <TopRight />
       </div>
       <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${postId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
           {
