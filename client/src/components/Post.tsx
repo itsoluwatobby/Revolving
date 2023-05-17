@@ -13,7 +13,7 @@ type Props = {
   post: PostType
 }
 
-//const font = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
+//const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
 export const Post = ({ post }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
@@ -48,9 +48,9 @@ export const Post = ({ post }: Props) => {
     <article 
       className={`${post?.fontFamily} p-2 pl-3 text-sm sm:w-full min-w-[58%]`}>
       <div className='relative flex items-center gap-3'>
-        <p className='capitalize'>{post?.author}</p>
+        <p className='capitalize'>{post?.author || 'anonymous'}</p>
         <span>.</span>
-        <p>{format(post?.date, 'en-US')}</p>
+        <p>{format(post?.storyDate, 'en-US')}</p>
         <FiMoreVertical
           onClick={() => setOpen(prev => !prev)}
           title='Options'
@@ -58,14 +58,14 @@ export const Post = ({ post }: Props) => {
         />
         {open &&
           <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${currentMode == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
-            <Link to={`/edit_story/${post?.postId}`} >  
+            <Link to={`/edit_story/${post?._id}`} >  
               <CiEdit 
                 title='Edit post'
                 className={`cursor-pointer hover:opacity-70 shadow-lg transition-all ${currentMode == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
               />
             </Link>
             <FaTrash
-              onClick={() => deleted(post?.id)}
+              onClick={() => deleted(post?._id)}
               title='Delete post'
               className={`cursor-pointer hover:opacity-70 text-xl shadow-lg transition-all ${currentMode == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
             />
@@ -73,7 +73,7 @@ export const Post = ({ post }: Props) => {
         }
       </div>
         <p className='whitespace-pre-wrap font-bold capitalize text-xl'>{post?.title}</p>
-      <Link to={`/story/${post?.postId}`} >
+      <Link to={`/story/${post?._id}`} >
         <p 
           onClick={openText}
           className='whitespace-pre-wrap'>

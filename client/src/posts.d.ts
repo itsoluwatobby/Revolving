@@ -1,37 +1,40 @@
 // @types.posts.ts
 import React from 'react';
 
-export type ChildrenProp = {
+type ChildrenProp = {
   children: React.ReactNode
 }
 
-export type CommentType = {
-  id?: string,
+type CommentType = {
+  _id?: string,
   postId: string,
-  commentId : string,
+  //commentId : string,
   date: string,
   body?: string,
   likes?: number,
   author: string | 'anonymous'
 }
+  
 
-export type PostType = {
-  id?: string,
-  postId: string,
+type PostType = {
+  _id: string,
+  userId: string,
   title: string,
-  date: string,
-  editDate?: string,
+  picture: string,
   body: string,
-  likes: number,
+  author: string | 'anonymous',
+  storyDate: string,
+  likes: string[],
+  isShared?: string[],
+  category: 'General' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
   fontFamily?: string | 'sans',
-  // search?: string,
-  // setSearch?: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
-  comment?: CommentType,
-  author: string | 'anonymous'
+  commentIds?: string[],
+  edited: false,
+  editDate: string
 }
 
 
-export type PostContextType = {
+type PostContextType = {
   search: string,
   posts?: PostType[],
   postData: Partial<PostType>,
@@ -47,10 +50,10 @@ export type PostContextType = {
   deletePosts: (id: string) => void,
 }
 
-export type Theme = 'light' | 'dark';
-export type FontStyle = string | 'font_style';
+type Theme = 'light' | 'dark';
+type FontStyle = string | 'font_style';
 
-export type ThemeContextType = {
+type ThemeContextType = {
   theme: Theme,
   fontFamily: FontStyle,
   fontOption: boolean,

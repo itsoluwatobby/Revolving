@@ -22,7 +22,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   } = useSwr<PostType[]>(cacheKey, getPosts, {
     onSuccess: data => data?.sort((a, b) => {
       //const timeDiffrence = b?.date.localeCompare(a?.date);
-      const likes = b?.likes - a?.likes;
+      const likes = +b?.likes - +a?.likes;
       //const dayDifference = timeDiffrence / (1000 * 3000 * 24);
       return likes
     }),

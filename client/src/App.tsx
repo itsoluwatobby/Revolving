@@ -11,6 +11,7 @@ import LoginModal from "./components/modals/LoginModal";
 import RegisterModal from "./components/modals/RegisterModel";
 import NewPassword from "./pages/NewPassword";
 import { Toaster } from "react-hot-toast";
+import { PersistedLogin } from "./components/layouts/PersistedLogin";
 
  
 export const App = () => {
@@ -26,8 +27,10 @@ export const App = () => {
             <Route path="new_password" element={<NewPassword />} />
           </Route>
           <Route index element={<Home />} />
-          <Route path="new_story" element={<NewStory />} />
-          <Route path="edit_story/:postId" element={<NewStory />} />
+          <Route element={<PersistedLogin />}>
+            <Route path="new_story" element={<NewStory />} />
+            <Route path="edit_story/:postId" element={<NewStory />} />
+          </Route>
           <Route path="story/:postId" element={<SingleStoryPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
