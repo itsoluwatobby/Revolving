@@ -1,14 +1,11 @@
 //import { useState, useEffect } from 'react';
-import { PostContextType } from '../posts'
+import { PostContextType, PostType } from '../posts'
 import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
 import { usePostContext } from '../hooks/usePostContext';
-//import { EditPost } from './EditPost';
-
-//import { usePostContext } from '../hooks/usePostContext'
 
 export const Posts = () => {
-  const { isLoading, error, posts } = usePostContext() as PostContextType
+  const { isLoading, error, filteredStories: posts } = usePostContext() as PostContextType
   
   let content;
 
@@ -21,7 +18,7 @@ export const Posts = () => {
   : error ? content = <p>{error?.message}</p> 
   :(  posts?.length ? content = (
         posts?.map(post => (
-          <Post key={post?._id} post={post} />
+          <Post key={post?._id} post={post as PostType} />
         )
       )
     ) 

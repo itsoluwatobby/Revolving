@@ -10,9 +10,12 @@ export default function Drawdown() {
   const { auth } = useAuthenticationContext() as AuthenticationContextType
   const signOut = useLogout()
   const {pathname} = useLocation()
+  const home = '/'
   const { theme, setRollout } = useThemeContext() as ThemeContextType
+  const excludeRoute = ['/new_story', `/edit_story`, `/story`]
 
   return (
+    !excludeRoute.includes(home) ? (
     <ul className={`absolute rounded-md tracking-widest right-6 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-gray-50' : 'bg-gray-600'} last:border-0 p-2`}>
     {
       !auth?._id && 
@@ -60,5 +63,6 @@ export default function Drawdown() {
       </li>
       <li className={modalClass}>contact</li>                                
   </ul>
+  ) : <p></p>
   )
 }

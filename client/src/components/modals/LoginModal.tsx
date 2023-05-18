@@ -33,6 +33,9 @@ export default function Login() {
     event.preventDefault()
     try{
       const userAuth = await trigger() as AuthType
+      
+      setAuth(prev => ({...prev, ...userAuth}))
+      navigate('/')
       toast.promise(trigger(), { 
         loading: 'signing you in 🚀', success: 'welcome', error: 'error occurred' 
       },{
@@ -42,8 +45,6 @@ export default function Login() {
           style: { background: '#3CB371'}
         }
       )
-      setAuth(prev => ({...prev, ...userAuth}))
-      navigate('/')
     }
     catch(err: unknown){
       let errorMessage;

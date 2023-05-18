@@ -8,7 +8,7 @@ export const PersistedLogin = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { auth, persistLogin } = useAuthenticationContext() as AuthenticationContextType
   const getRefreshToken = useRefreshToken()
-console.log(auth)
+//console.log(auth)
   useEffect(() => {
     let isMounted = true
     const persistUserLogin = async() => {

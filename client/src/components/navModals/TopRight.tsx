@@ -12,7 +12,7 @@ import { useSWRConfig } from 'swr'
 import { posts_endPoint as cacheKey } from '../../api/axiosPost'
 import { addPostOptions, updatePostOptions } from "../../api/postApiOptions"
 import { toast } from "react-hot-toast";
-import useMutatePost from "../../hooks/useMutateHook";
+import useStoryMutation from "../../hooks/useStoryMutation";
 import useAuthenticationContext from "../../hooks/useAuthenticationContext"
 import { sub } from "date-fns"
 
@@ -20,10 +20,9 @@ const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
-
 export default function TopRight() {
   const { mutate } = useSWRConfig()
-  const [createPost, updatePost] = useMutatePost()
+  const [createPost, updatePost] = useStoryMutation()
   const { theme, setRollout, changeTheme, setFontOption } = useThemeContext() as ThemeContextType
   const {postData, canPost} = usePostContext() as PostContextType
   const { auth } = useAuthenticationContext() as AuthenticationContextType
@@ -36,19 +35,24 @@ export default function TopRight() {
   
   const addPost = async () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const newPost = { category : 'General', storyDate: dateTime, ...postData } as PostType
+    const newPost = { storyDate: dateTime, ...postData } as PostType
     try{
         await mutate(cacheKey, createPost(newPost), addPostOptions(newPost))
-        // navigate('/')
-        toast.success('Success!! Post added', {
-          duration: 1000, icon: '🔥', style: {
-            background: '#32CD32'
-          }
-        })
+        
         localStorage.removeItem('newStoryInputValue')
         localStorage.removeItem('newStoryTextareaValue')
+        navigate('/')
+        // toast.promise(createPost(newPost), { 
+        //   loading: 'updating post 🚀', success: 'Success!! Post added', error: 'error occurred' 
+        //   },{
+        //     success:{
+        //       duration: 2000, icon: '🔥'
+        //     },
+        //     style: { background: '#3CB371'}
+        //   }
+        // )
     }
-    catch(error){
+    catch(err){
       toast.error('Failed!! to add new post', {
         duration: 1000, icon: '💀', style: {
           background: '#FF0000'
@@ -59,19 +63,23 @@ export default function TopRight() {
 
   const updatedPost = async () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const postUpdated = {...postData, editDate: dateTime} as PostType;
-
+    const postUpdated = {...postData, _id: postId, editDate: dateTime} as PostType;
     try{
         await mutate(cacheKey, updatePost(postUpdated), updatePostOptions(postUpdated))
 
-        toast.success('Success!! Post editted', {
-          duration: 1000, icon: '🔥', style: {
-            background: '#32CD32'
-          }
-        })
         localStorage.removeItem('editStoryInputValue')
         localStorage.removeItem('editStoryTextareaValue')
         navigate('/')
+        toast.promise(updatePost(postUpdated), { 
+            loading: 'updating post 🚀', success: 'Success!! Post editted', error: 'error occurred' 
+          },{
+            success:{
+              duration: 2000, icon: '🔥'
+            },
+            style: { background: '#3CB371'}
+          }
+        ) 
+        
     }
     catch(err){
       toast.error('Failed!! to update post', {

@@ -95,19 +95,6 @@ body {
   }
 }
 
-/* .boxModel{
-  text-align: center;
-  transform-origin: center center;
-  transform-style: preserve-3d;
-  animation: rotateAnimation 5s infinite linear;
-} */
-
-/* @keyframes rotateAnimation {
-  0% {
-    transform: rotateX(0deg);
-  }
-  100% {
-    transform: rotateX(360deg);
-    transform: rotateX(25deg) rotateY(5deg);
-  }
-} */
+.app::-webkit-scrollbar{
+  width: 1px;
+}

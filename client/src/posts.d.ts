@@ -33,11 +33,16 @@ type PostType = {
   editDate: string
 }
 
+interface WindowContextType{
+  Xscroll: number, Yscroll: number
+}
+
 
 type PostContextType = {
   search: string,
   posts?: PostType[],
   postData: Partial<PostType>,
+  filteredStories: Partial<PostType[]>,
   isLoading: boolean,
   typingEvent: boolean,
   error?: {message: string, name: string, code: string},
@@ -47,7 +52,6 @@ type PostContextType = {
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
   setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
-  deletePosts: (id: string) => void,
 }
 
 type Theme = 'light' | 'dark';
