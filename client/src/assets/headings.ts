@@ -1,4 +1,4 @@
-const headings = [
+const headings: string[] = [
   'We rise and never fall',
   'Doing hard things isn\'t an easy taks to accomplish',
   'It will only get better',

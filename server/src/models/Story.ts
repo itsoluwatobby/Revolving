@@ -19,6 +19,7 @@ const STORYSCHEMA: Schema = new Schema(
     },
     isShared: { type: Array, default: [] },
     likes: { type: Array, default: [] },
+    fontFamily: { type: String, default: 'open_sans' },
     edited: { type: Boolean, default: false },
     editDate: { type: String, default: '' },
   },

@@ -38,6 +38,7 @@ interface StoryProps extends Document{
   title: string
   picture: string
   body: string
+  fontFamily: string
   storyDate: string
   category: 'General' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
   commentIds?: string[]

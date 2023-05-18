@@ -38,7 +38,7 @@ export const Navbar = () => {
   }, [typingEvent])
 
   return(
-    <nav className={`${address.includes(pathname) ? 'sticky top-0 pr-0 pl-5 md:pl-16 md:pr-16' : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
+    <nav className={`${address.includes(pathname) ? `sticky top-0 pr-0 pl-5 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />

@@ -11,7 +11,6 @@ export const Home = () => {
   const { auth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
 
-  console.log(auth)
   return (
     <main className="relative h-full">
       <div className="md:max-w-full flex pr-3 pl-3 h-full">

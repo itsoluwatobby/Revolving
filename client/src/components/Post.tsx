@@ -8,6 +8,11 @@ import { useState } from 'react';
 import { usePostContext } from '../hooks/usePostContext';
 import { Link } from 'react-router-dom';
 import { TextRules } from '../fonts';
+import { useSWRConfig } from 'swr';
+import { axiosPrivate, posts_endPoint } from '../api/axiosPost';
+import useAuthenticationContext from '../hooks/useAuthenticationContext';
+import { deletePostOptions } from '../api/postApiOptions';
+import { toast } from 'react-hot-toast';
 
 type Props = {
   post: PostType
@@ -17,11 +22,13 @@ type Props = {
 
 export const Post = ({ post }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
-  const wordsPerPost = useWordCount(post?.body) as string;
-  const { deletePosts } = usePostContext() as PostContextType
+  let averageReadingTime = useWordCount(post?.body) as string;
+  const {mutate} = useSWRConfig()
+  const {auth} = useAuthenticationContext() as AuthenticationContextType
+  //const { deletePosts } = usePostContext() as PostContextType
   const currentMode = localStorage.getItem('theme');
-  // const {  } = usePostContext();
-
+  const end = averageReadingTime.split(' ')[1]
+  averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
   const tooLong = (): string => {
     const wordLength = post?.body?.split(' ').length
     const words = wordLength >= 100 ? post?.body?.substring(0, 400)+'...' : post?.body
@@ -38,12 +45,30 @@ export const Post = ({ post }: Props) => {
   const openText = () => {
     setOpen(false)
   }
-
-  const deleted = (id: string | undefined) => {
-    const postId = id as string
-    deletePosts(postId)
-  }
   
+  const deleted = async(id: string) => {
+    try{
+      await mutate(posts_endPoint, async () => await axiosPrivate.delete(`${posts_endPoint}/${auth?._id}/${id}`), deletePostOptions(id)) as unknown as PostType[];
+
+      toast.success('Success!! Post deleted', {
+        duration: 200, icon: '💀', style: { background: '#FF0000'}
+      })
+
+      // toast.promise(res?.length, { 
+      //     loading: 'deleting post 🚀', success: 'Success!! Post deleted', error: 'error occurred' 
+      //   },{
+      //     success:{
+      //       duration: 2000, icon: '💀'
+      //     },
+      //     style: { background: '#FF0000'}
+      //   }
+      // ) 
+    }
+    catch(error){
+      console.log('')
+    }
+  }
+
   return (
     <article 
       className={`${post?.fontFamily} p-2 pl-3 text-sm sm:w-full min-w-[58%]`}>
@@ -81,7 +106,7 @@ export const Post = ({ post }: Props) => {
         </p>
       </Link>
       <div className='mt-2 opacity-90 flex items-center gap-4 text-green-600 text-sm font-sans'>
-        <p>{post?.body ? wordsPerPost + ' read' : ''}</p>
+        <p>{post?.body ? averageReadingTime + ' read' : ''}</p>
         <p>{post?.likes}</p>
         {post?.body ? 
           post?.body.split(' ').length >= 100 &&

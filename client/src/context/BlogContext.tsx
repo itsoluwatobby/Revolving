@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import useSwr from 'swr';
 import { PostType, ChildrenProp, PostContextType } from '../posts';
 import { toast } from 'react-hot-toast';
@@ -17,8 +17,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const {
     data: posts,
     isLoading,
-    error,
-    mutate
+    error
   } = useSwr<PostType[]>(cacheKey, getPosts, {
     onSuccess: data => data?.sort((a, b) => {
       const timeDiffrence = b?.storyDate.localeCompare(a?.storyDate);
@@ -31,33 +30,21 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     title: undefined, body: undefined, author: 'anonymous'
   })
   const [search, setSearch] = useState<string>('');
+  const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
   const [canPost, setCanPost] = useState<boolean>(false);
 
-  const deletePosts = async (id: string) => {
-    try{
-        await mutate(
-          deletePost(id),
-          deletePostOptions(id)
-        )
-
-        toast.success('Success!! Post deleted', {
-          duration: 1000, icon: '🔥',  style: {
-            background: '#32CD32'
-          }
-        })
-    }
-    catch(error){
-      toast.error('Failed!! to delete', {
-        duration: 1000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
-  }
+  useEffect(() => {
+    const filtered = posts?.filter(post => {
+      return (
+        post.title.toLowerCase().includes(search.toLowerCase()) || post.body.toLowerCase().includes(search.toLowerCase())
+      )
+    }) as PostType[]
+    setFilterStories(filtered)
+  }, [search, posts])
 
   const value = {
-    postData, setPostData, search, setSearch, posts, isLoading, error, deletePosts, typingEvent, setTypingEvent, canPost, setCanPost
+    postData, filteredStories, setPostData, search, setSearch, posts, isLoading, error, typingEvent, setTypingEvent, canPost, setCanPost
   }
 
   return (
