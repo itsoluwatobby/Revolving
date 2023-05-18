@@ -8,14 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getUserByToken } from "../helpers/userHelpers.js";
-import { signToken, verifyToken } from "../helpers/helper.js";
+import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const auth = req.headers['authorization'];
     if (!auth || !auth.startsWith('Bearer '))
         return res.sendStatus(401);
     const token = auth === null || auth === void 0 ? void 0 : auth.split(' ')[1];
     const verify = yield verifyToken(token, process.env.ACCESSTOKEN_STORY_SECRET);
-    console.log(verify);
     if (typeof verify == 'string') {
         if (verify == 'Bad Token')
             return res.sendStatus(401);
@@ -40,23 +39,23 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
     if (typeof verify == 'string') {
         if (verify == 'Bad Token') {
             // TODO: account hacked, send email to user
-            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' }); // secure: true
+            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); // secure: true
             user.updateOne({ $set: { refreshToken: '', authentication: { sessionID: '' } } });
             return res.sendStatus(401);
         }
         else if (verify == 'Expired Token') {
-            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none' }); // secure: true
+            res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); // secure: true
             user.updateOne({ $set: { refreshToken: '', authentication: { sessionID: '' } } });
             return res.sendStatus(403);
         }
     }
     const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-    const newAccessToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '2h', process.env.ACCESSTOKEN_STORY_SECRET);
+    const newAccessToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '5m', process.env.ACCESSTOKEN_STORY_SECRET);
     const newRefreshToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
-    user.updateOne({ $set: { status: 'online', refreshToken: newRefreshToken } });
+    yield user.updateOne({ $set: { status: 'online', refreshToken: newRefreshToken } });
     //authentication: { sessionID: req?.sessionID },
     res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
-    return res.status(200).json({ roles, accessToken: newAccessToken });
+    return responseType({ res, status: 200, data: { _id: user === null || user === void 0 ? void 0 : user._id, roles, accessToken: newAccessToken } });
 });
 // TODO: add secure option to cookies
 //# sourceMappingURL=verifyTokens.js.map

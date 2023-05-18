@@ -1,3 +1,4 @@
+import { Response } from "express"
 import { VerifyOptions } from "jsonwebtoken"
 import { Document, ObjectId, Types } from "mongoose"
 
@@ -71,3 +72,10 @@ interface UserProps extends Document{
   editDate: string
 }
 
+interface ResponseType extends Response{
+  meta: {
+    status: number,
+    message?: string
+  },
+  data?: object | undefined
+}

@@ -21,10 +21,10 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     mutate
   } = useSwr<PostType[]>(cacheKey, getPosts, {
     onSuccess: data => data?.sort((a, b) => {
-      //const timeDiffrence = b?.date.localeCompare(a?.date);
-      const likes = +b?.likes - +a?.likes;
+      const timeDiffrence = b?.storyDate.localeCompare(a?.storyDate);
+      // const likes = +b?.likes - +a?.likes;
       //const dayDifference = timeDiffrence / (1000 * 3000 * 24);
-      return likes
+      return timeDiffrence
     }),
   })
   const [postData, setPostData] = useState<Partial<PostType>>({

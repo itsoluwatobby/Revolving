@@ -18,7 +18,7 @@ const option_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 b
 export const Navbar = () => {
   const { pathname } = useLocation();
   const {posts, typingEvent} = usePostContext() as PostContextType
-  const {theme, rollout, setRollout, fontFamily, changeFontFamily, fontOption} = useThemeContext() as ThemeContextType
+  const {theme, rollout, fontFamily, changeFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { postId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
   

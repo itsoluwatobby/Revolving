@@ -21,7 +21,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
-import { mailOptions, signToken, transporter, verifyToken } from "../helpers/helper.js";
+import { mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -34,11 +34,11 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
             if (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountActivated) {
                 const matchingPassword = yield brcypt.compare(password, (_a = duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.authentication) === null || _a === void 0 ? void 0 : _a.password);
                 if (!matchingPassword)
-                    return res.status(409).json('Email taken');
-                return res.status(200).json('You already have an account, Please login');
+                    return responseType({ res, status: 409, message: 'Email taken' });
+                return responseType({ res, status: 200, message: 'You already have an account, Please login' });
             }
             else
-                return res.status(200).json('Please check your email to activate your account');
+                return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
         }
         const hashedPassword = yield brcypt.hash(password, 10);
         const dateTime = sub(new Date, { minutes: 0 }).toISOString();
@@ -55,9 +55,9 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         yield newUser.updateOne({ $set: { verificationToken: token } });
         transporter.sendMail(options, (err) => {
             if (err)
-                return res.status(400).json('unable to send mail, please retry');
+                return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
         });
-        return res.status(201).json('Please check your email to activate your account');
+        return responseType({ res, status: 201, message: 'Please check your email to activate your account' });
     }
     catch (error) {
         console.log(error);
@@ -76,7 +76,7 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
                 return res.sendStatus(400);
             const user = yield getUserByEmail(verify === null || verify === void 0 ? void 0 : verify.email);
             if (user.isAccountActivated)
-                return res.status(200).json('Your has already been activated');
+                return responseType({ res, status: 200, message: 'Your account has already been activated' });
         }
         const verify = yield verifyToken(token, process.env.ACCOUNT_VERIFICATION_SECRET);
         if (!(verify === null || verify === void 0 ? void 0 : verify.email))
@@ -84,7 +84,7 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
         if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
             return res.sendStatus(400);
         if (user.isAccountActivated)
-            return res.status(200).json('Your has already been activated');
+            return responseType({ res, status: 200, message: 'Your has already been activated' });
         yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: '' } });
         return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`);
     }
@@ -101,10 +101,10 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
             return res.sendStatus(400);
         const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (!user)
-            return res.status(404).json('You do not have an account');
+            return responseType({ res, status: 404, message: 'You do not have an account' });
         const matchingPassword = yield brcypt.compare(password, (_b = user === null || user === void 0 ? void 0 : user.authentication) === null || _b === void 0 ? void 0 : _b.password);
         if (!matchingPassword)
-            return res === null || res === void 0 ? void 0 : res.status(401).json('bad credentials');
+            return responseType({ res, status: 401, message: 'Bad credentials' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return res === null || res === void 0 ? void 0 : res.status(403).json('Your account is locked');
         if (!(user === null || user === void 0 ? void 0 : user.isAccountActivated)) {
@@ -116,12 +116,12 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                 yield user.updateOne({ $set: { verificationToken: token } });
                 transporter.sendMail(options, (err) => {
                     if (err)
-                        return res.status(400).json('unable to send mail, please retry');
+                        return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
                 });
-                return res.status(201).json('Please check your email');
+                return responseType({ res, status: 201, message: 'Please check your email' });
             }
             else if (verify === null || verify === void 0 ? void 0 : verify.email)
-                return res.status(200).json('Please check your email to activate your account');
+                return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
         const accessToken = yield signToken({ roles, email }, '10m', process.env.ACCESSTOKEN_STORY_SECRET);
@@ -130,7 +130,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         yield user.updateOne({ $set: { status: 'online', refreshToken } });
         //authentication: { sessionID: req?.sessionID },
         res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
-        return res.status(200).json({ _id, roles, accessToken });
+        return responseType({ res, status: 200, data: { _id, roles, accessToken } });
     }
     catch (error) {
         console.log(error);
@@ -165,18 +165,18 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
             return res.sendStatus(400);
         const user = yield getUserByEmail(email);
         if (!user)
-            return res.status(401).json('You do not have an account, please sign up');
+            return responseType({ res, status: 401, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return res === null || res === void 0 ? void 0 : res.status(403).json('Your account is locked');
+            return responseType({ res, status: 403, message: 'Your account is locked' });
         const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`;
         const options = mailOptions(email, user.username, verificationLink);
         yield transporter.sendMail(options, (err) => {
             if (err)
-                return res.status(400).json('unable to send mail, please retry');
+                return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
         });
         yield user.updateOne({ $set: { isResetPassword: true, verificationToken: passwordResetToken } });
-        return res.status(201).json('Please check your email');
+        return responseType({ res, status: 201, message: 'Please check your email' });
     }
     catch (error) {
         return res.sendStatus(500);
@@ -212,18 +212,18 @@ export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, fun
             return res.sendStatus(400);
         const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (!user)
-            return res.status(401).json('bad credentials');
+            return responseType({ res, status: 401, message: 'Bad credentials' });
         const conflictingPassword = yield brcypt.compare(resetPass, (_c = user === null || user === void 0 ? void 0 : user.authentication) === null || _c === void 0 ? void 0 : _c.password);
         if (conflictingPassword)
-            return res.status(409).json('same as old password');
+            return responseType({ res, status: 409, message: 'same as old password' });
         if (user.isResetPassword) {
             const hashedPassword = yield brcypt.hash(resetPass, 10);
             yield user.updateOne({ $set: { authentication: { password: hashedPassword }, resetPassword: false } })
-                .then(() => res.status(201).json('password reset successful'))
+                .then(() => responseType({ res, status: 201, message: 'password reset successful, please login' }))
                 .catch(() => res.sendStatus(500));
         }
         else
-            res.status(401).json('unauthorized');
+            responseType({ res, status: 401, message: 'unauthorised' });
     }
     catch (error) {
         return res.sendStatus(500);

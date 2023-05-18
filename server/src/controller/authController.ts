@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
-import { ClaimProps, UserProps } from "../../types.js";
+import { ClaimProps, ResponseType, UserProps } from "../../types.js";
 import { sub } from "date-fns";
-import { mailOptions, signToken, transporter, verifyToken } from "../helpers/helper.js";
+import { mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 
 interface NewUserProp extends Request{
@@ -27,10 +27,10 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     if(duplicateEmail) {
       if (duplicateEmail?.isAccountActivated) {
         const matchingPassword = await brcypt.compare(password, duplicateEmail?.authentication?.password);
-        if (!matchingPassword) return res.status(409).json('Email taken')
-        return res.status(200).json('You already have an account, Please login')
+        if (!matchingPassword) return responseType({res, status: 409, message: 'Email taken'})
+        return responseType({res, status: 200, message: 'You already have an account, Please login'})
       }
-      else return res.status(200).json('Please check your email to activate your account')
+      else return responseType({res, status: 200, message: 'Please check your email to activate your account'})
     }
     const hashedPassword = await brcypt.hash(password, 10);
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
@@ -47,9 +47,9 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     await newUser.updateOne({$set: {verificationToken: token}});
   
     transporter.sendMail(options, (err) => {
-      if (err) return res.status(400).json('unable to send mail, please retry')
+      if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
     })
-    return res.status(201).json('Please check your email to activate your account')
+    return responseType({res, status: 201, message: 'Please check your email to activate your account'})
   }
   catch(error){
     console.log(error)
@@ -66,14 +66,14 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
       const verify = await verifyToken(token as string, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
       if (!verify?.email) return res.sendStatus(400)
       const user = await getUserByEmail(verify?.email);
-      if(user.isAccountActivated) return res.status(200).json('Your has already been activated')
+      if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
     }
 
     const verify = await verifyToken(token as string, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
     if (!verify?.email) return res.sendStatus(400)
     if (verify?.email != user?.email) return res.sendStatus(400)
 
-    if(user.isAccountActivated) return res.status(200).json('Your has already been activated')
+    if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your has already been activated'})
     await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
     return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
   }
@@ -89,10 +89,11 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     if (!email || !password) return res.sendStatus(400);
 
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
-    if(!user) return res.status(404).json('You do not have an account')
-    const matchingPassword = await brcypt.compare(password, user?.authentication?.password);
-    if (!matchingPassword) return res?.status(401).json('bad credentials')
+    if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
 
+    const matchingPassword = await brcypt.compare(password, user?.authentication?.password);
+    if (!matchingPassword) return responseType({res, status: 401, message: 'Bad credentials'})
+    
     if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
     if (!user?.isAccountActivated) {
       const verify = await verifyToken(user?.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
@@ -103,11 +104,11 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
         await user.updateOne({$set: {verificationToken: token}});
 
         transporter.sendMail(options, (err) => {
-          if (err) return res.status(400).json('unable to send mail, please retry')
+          if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
         })
-        return res.status(201).json('Please check your email')
+        return responseType({res, status: 201, message: 'Please check your email'})
       }
-      else if (verify?.email) return res.status(200).json('Please check your email to activate your account')
+      else if (verify?.email) return responseType({res, status: 200, message: 'Please check your email to activate your account'})
     }
     const roles = Object.values(user?.roles);
     const accessToken = await signToken({roles, email}, '10m', process.env.ACCESSTOKEN_STORY_SECRET);
@@ -119,7 +120,8 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     //authentication: { sessionID: req?.sessionID },
     
     res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
-    return res.status(200).json({_id, roles, accessToken})
+
+    return responseType({res, status: 200, data:{_id, roles, accessToken}})
   }
   catch(error){
     console.log(error)
@@ -155,17 +157,17 @@ export const forgetPassword = async(req: Request, res: Response) => {
     const { email } = req.query
     if(!email) return res.sendStatus(400);
     const user = await getUserByEmail(email as string);
-    if(!user) return res.status(401).json('You do not have an account, please sign up')
-    if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
+    if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
+    if (user?.isAccountLocked) return responseType({res, status: 403, message:'Your account is locked'})
 
     const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
     const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`
     const options = mailOptions(email as string, user.username, verificationLink)
     await transporter.sendMail(options, (err) => {
-      if (err) return res.status(400).json('unable to send mail, please retry')
+      if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
     })
     await user.updateOne({$set: { isResetPassword: true, verificationToken: passwordResetToken }})
-    return res.status(201).json('Please check your email')
+    return responseType({res, status:201, message:'Please check your email'})
   }
   catch(error){
     return res.sendStatus(500);
@@ -197,17 +199,17 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
     const {resetPass, email} = req.body
     if(!email || !resetPass) return res.sendStatus(400)
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
-    if(!user) return res.status(401).json('bad credentials')
+    if(!user) return responseType({res, status: 401, message:'Bad credentials'})
 
     const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
-    if(conflictingPassword) return res.status(409).json('same as old password')
+    if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
     if(user.isResetPassword){
       const hashedPassword = await brcypt.hash(resetPass, 10);
       await user.updateOne({$set: { authentication: { password: hashedPassword }, resetPassword: false}})
-        .then(() => res.status(201).json('password reset successful'))
+        .then(() => responseType({res, status:201, message:'password reset successful, please login'}))
         .catch(() => res.sendStatus(500));
     }
-    else res.status(401).json('unauthorized')
+    else responseType({res, status:401, message:'unauthorised'})
   }
   catch(error){
     return res.sendStatus(500);

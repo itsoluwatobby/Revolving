@@ -1,17 +1,14 @@
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import useAuthenticationContext from '../../hooks/useAuthenticationContext';
 import { useEffect, useState } from 'react';
 import useRefreshToken from '../../hooks/useRefreshToken';
 
-type RolesProps={
-  roles: number[]
-}
 
 export const PersistedLogin = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { auth, persistLogin } = useAuthenticationContext() as AuthenticationContextType
   const getRefreshToken = useRefreshToken()
-
+console.log(auth)
   useEffect(() => {
     let isMounted = true
     const persistUserLogin = async() => {
@@ -28,7 +25,9 @@ export const PersistedLogin = () => {
     }
     !auth?.accessToken ? persistUserLogin() : setIsLoading(false)
 
-    return () => isMounted = false
+    return () => {
+      isMounted = false
+    }
   }, [auth, getRefreshToken])
 
   return (
