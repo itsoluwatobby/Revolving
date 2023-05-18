@@ -36,6 +36,15 @@ export const verifyToken = (token, secret) => __awaiter(void 0, void 0, void 0, 
     });
     return response;
 });
+// type ResMessage = {
+//   res: Response,
+//   status: number,
+//   message: string,
+//   data?: object
+// }
+export const responseType = ({ res, status = 200, message = 'success', data = {} }) => {
+    return res.status(status).json({ meta: { status, message }, data });
+};
 export const transporter = createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',

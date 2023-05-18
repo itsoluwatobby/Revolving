@@ -26,11 +26,11 @@ export const axiosPrivate: AxiosInstance = axios.create({
 
 export const getPosts = async(): Promise<PostType[]> => {
   const posts = await postAxios.get(posts_endPoint)
-  return posts?.data
+  return posts?.data?.data
 }
 
 export const deletePost = async(id: string): Promise<PostType[]> => {
-  const res = await postAxios.delete(`${posts_endPoint}/${id}`)
+  const res = await postAxios.delete(`user${posts_endPoint}/${id}`)
   return res?.data
 }
 

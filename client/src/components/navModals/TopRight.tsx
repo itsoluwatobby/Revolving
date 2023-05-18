@@ -1,4 +1,5 @@
-import { BsMoonStars, BsMoonStarsFill } from "react-icons/bs"
+import { BsMoonStars } from "react-icons/bs"
+import { FiSun } from "react-icons/fi"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { PostContextType, PostType, ThemeContextType } from "../../posts"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
@@ -11,10 +12,9 @@ import { useSWRConfig } from 'swr'
 import { posts_endPoint as cacheKey } from '../../api/axiosPost'
 import { addPostOptions, updatePostOptions } from "../../api/postApiOptions"
 import { toast } from "react-hot-toast";
-import { sub } from 'date-fns';
-import { v4 as uuidv4 } from 'uuid';
 import useMutatePost from "../../hooks/useMutateHook";
 import useAuthenticationContext from "../../hooks/useAuthenticationContext"
+import { sub } from "date-fns"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -36,9 +36,10 @@ export default function TopRight() {
   
   const addPost = async () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const newPost = { postId : uuidv4(), date: dateTime, ...postData } as PostType
+    const newPost = { category : 'General', storyDate: dateTime, ...postData } as PostType
     try{
         await mutate(cacheKey, createPost(newPost), addPostOptions(newPost))
+        // navigate('/')
         toast.success('Success!! Post added', {
           duration: 1000, icon: '🔥', style: {
             background: '#32CD32'
@@ -46,7 +47,6 @@ export default function TopRight() {
         })
         localStorage.removeItem('newStoryInputValue')
         localStorage.removeItem('newStoryTextareaValue')
-        navigate('/')
     }
     catch(error){
       toast.error('Failed!! to add new post', {
@@ -58,7 +58,9 @@ export default function TopRight() {
   }
 
   const updatedPost = async () => {
-    const postUpdated = {...postData} as PostType;
+    const dateTime = sub(new Date, { minutes: 0 }).toISOString();
+    const postUpdated = {...postData, editDate: dateTime} as PostType;
+
     try{
         await mutate(cacheKey, updatePost(postUpdated), updatePostOptions(postUpdated))
 
@@ -84,7 +86,7 @@ export default function TopRight() {
     <>
       {
           theme == 'dark' ? 
-            <BsMoonStarsFill 
+            <FiSun 
               onClick={() => changeTheme('light')}
               className={mode_class} /> : <BsMoonStars 
               onClick={() => changeTheme('dark')}

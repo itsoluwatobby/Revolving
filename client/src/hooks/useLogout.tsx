@@ -20,6 +20,11 @@ export default function useLogout() {
         }
       })
       setRollout(false)
+      localStorage.removeItem('newStoryInputValue')
+      localStorage.removeItem('newStoryTextareaValue')
+
+      localStorage.removeItem('editStoryInputValue')
+      localStorage.removeItem('editStoryTextareaValue')
       navigate('/signIn', { replace: true })
     }catch(err){
       setAuth({_id: '', accessToken: '', roles: []})
@@ -28,6 +33,11 @@ export default function useLogout() {
           background: '#8FBC8F'
         }
       })
+      localStorage.removeItem('newStoryInputValue')
+      localStorage.removeItem('newStoryTextareaValue')
+
+      localStorage.removeItem('editStoryInputValue')
+      localStorage.removeItem('editStoryTextareaValue')
       navigate('/signIn', {replace: true})
     }
   }

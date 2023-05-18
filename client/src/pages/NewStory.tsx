@@ -16,7 +16,7 @@ export const NewStory = () => {
     1000) as DebounceProps
   const { pathname } = useLocation()
   const postId = pathname.split('/')[2]
-  const targetPost = posts?.find(pos => pos?.postId == postId) as PostType;
+  const targetPost = posts?.find(pos => pos?._id == postId) as PostType;
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value

@@ -14,7 +14,7 @@ export default function useSignIn(user: UserPropType) {
       email: user?.email, password: user?.password
     })
     setRollout(false)
-    return res?.data 
+    return res?.data?.data
   }
   return signUserIn
 }
