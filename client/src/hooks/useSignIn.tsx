@@ -16,5 +16,7 @@ export default function useSignIn(user: UserPropType) {
     setRollout(false)
     return res?.data?.data
   }
+  //type AuthFetcher = Awaited<ReturnType<typeof signUserIn>>
+  
   return signUserIn
 }

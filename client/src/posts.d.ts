@@ -33,9 +33,9 @@ type PostType = {
   editDate: string
 }
 
-interface WindowContextType{
-  Xscroll: number, Yscroll: number
-}
+// interface WindowScrollType{
+//   Xscroll: number, Yscroll: number
+// }
 
 
 type PostContextType = {

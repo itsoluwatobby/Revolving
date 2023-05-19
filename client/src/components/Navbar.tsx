@@ -8,11 +8,11 @@ import Drawdown from './navModals/Drawdown.js';
 import TopRight from './navModals/TopRight.js';
 import TopLeft from './navModals/TopLeft.js';
 
-const postOptions = ['home', 'save as pdf', 'edit', 'delete', 'logout']
+const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
 const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1 hover:pb-1.5 hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-md';
 
-const option_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1 hover:pb-1.5 hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-md';
+const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase text-center text-xs hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-sm';
 
 // const TIMEOUT = 3500
 export const Navbar = () => {
@@ -21,6 +21,7 @@ export const Navbar = () => {
   const {theme, rollout, fontFamily, changeFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { postId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
+  const [options, setOptions] = useState<string>('')
   
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
 
@@ -36,7 +37,7 @@ export const Navbar = () => {
     }, 1000)
     return () => clearTimeout(responseTime)
   }, [typingEvent])
-
+console.log({fontFamily})
   return(
     <nav className={`${address.includes(pathname) ? `sticky top-0 pr-0 pl-5 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
      `}>
@@ -62,10 +63,10 @@ export const Navbar = () => {
                 )
               ) : 
                 pathname == `/story/${postId}` && (
-                  postOptions.map((option, i) => (
-                    <li
-                      // onClick={() => ''}
-                      className={`${option_styles} ${option === postOptions[i] ? 'bg-gray-400' : null}`} key={option}
+                  postOptions.map(option => (
+                    <li title={`${option == 'pdf' ? 'save as pdf' : option}`}
+                      onClick={() => setOptions(option)}
+                      className={`${option_styles} ${option == options ? 'bg-slate-500' : null}`} key={option}
                       >
                         {option}
                       </li>

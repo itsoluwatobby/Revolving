@@ -1,17 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { IoIosArrowForward, IoIosArrowBack} from 'react-icons/io'
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
 import { Components, NAVIGATE } from '../assets/navigator';
 
+type TopHomeProps={
+  navigationTab: string,
+  setNavigationTab: React.Dispatch<React.SetStateAction<Components>>
+}
+
 const list_style = 'cursor-pointer touch-pan-x whitespace-nowrap text-gray-500 active:text-gray-500 duration-200 ease-in-out';
 
 const arrow_class= "text-xl text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out text-xl z-50";
 
-// const topHeader = ['General', 'Software Development', 'React', 'NodeJS', 'Bash scripting']
-
-export const TopHome = () => {
-  const [navigationTab, setNavigationTab] = useState<Components>(localStorage.getItem('NAVIGATE') as Components || NAVIGATE.GENERAL);
+export const TopHome = ({ navigationTab, setNavigationTab }: TopHomeProps) => {
   const scrollContainerRef = useRef(null)
   const {theme} = useThemeContext() as ThemeContextType;
   
