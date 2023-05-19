@@ -10,9 +10,8 @@ const STORYSCHEMA = new Schema({
     storyDate: { type: String, required: true, default: '' },
     commentIds: { type: Array, default: [] },
     category: {
-        type: String, required: true,
-        default: 'General',
-        enum: ['General', 'Web Development', 'React', 'Node', 'Bash scripting']
+        type: Array, required: true,
+        default: 'General'
     },
     isShared: { type: Array, default: [] },
     likes: { type: Array, default: [] },
@@ -24,4 +23,5 @@ const STORYSCHEMA = new Schema({
     timestamps: true
 });
 export const StoryModel = model('story', STORYSCHEMA);
+//enum: ['General', 'Web Development', 'React', 'Node', 'Bash scripting']
 //# sourceMappingURL=Story.js.map
