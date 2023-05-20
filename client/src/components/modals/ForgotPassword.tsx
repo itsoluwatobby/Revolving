@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import useSWRMutation from 'swr/mutation';
 import { toast } from "react-hot-toast";
+import { axiosAuth } from "../../api/axiosPost";
 
 type ForgotProps={
   setForgot: React.Dispatch<React.SetStateAction<boolean>>,
@@ -17,6 +18,7 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
   const handleResetRequest = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
+      //const reset = await axiosAuth.get(`/forgot_password?email=${}`)
       // const reset = await trigger()
 
       // toast.promise(trigger(), { 
