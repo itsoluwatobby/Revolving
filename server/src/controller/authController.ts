@@ -3,7 +3,7 @@ import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } f
 import brcypt from 'bcrypt';
 import { ClaimProps, ResponseType, UserProps } from "../../types.js";
 import { sub } from "date-fns";
-import { mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
+import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 
 interface NewUserProp extends Request{
@@ -19,7 +19,7 @@ interface EmailProps extends Request{
 }
 
 export const registerUser = async(req: NewUserProp, res: Response) => {
-  try{
+  asyncFunc(res, async () => {
     const {username, email, password} = req.body
     if (!username || !email || !password) return res.sendStatus(400);
 
@@ -45,20 +45,16 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
     const options = mailOptions(email, username, verificationLink)
     await newUser.updateOne({$set: {verificationToken: token}});
-  
+
     transporter.sendMail(options, (err) => {
       if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
     })
     return responseType({res, status: 201, message: 'Please check your email to activate your account'})
-  }
-  catch(error){
-    console.log(error)
-    return res.sendStatus(500);
-  }
+  })
 }
 
 export const accountConfirmation = async(req: NewUserProp, res: Response) => {
-  try{
+  asyncFunc(res, async () => {
     const { token } = req.query
     if(!token) return res.sendStatus(400)
     const user = await getUserByVerificationToken(token as string)
@@ -76,15 +72,11 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
     if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your has already been activated'})
     await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
     return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
-  }
-  catch(error){
-    console.log(error)
-    return res.sendStatus(500)
-  }
+  })
 }
 
 export const loginHandler = async(req: NewUserProp, res: Response) => {
-  try{
+  asyncFunc(res, async () => {
     const {email, password} = req.body
     if (!email || !password) return res.sendStatus(400);
 
@@ -94,7 +86,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     const matchingPassword = await brcypt.compare(password, user?.authentication?.password);
     if (!matchingPassword) return responseType({res, status: 401, message: 'Bad credentials'})
     
-    if (user?.isAccountLocked) return res?.status(403).json('Your account is locked')
+    if (user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     if (!user?.isAccountActivated) {
       const verify = await verifyToken(user?.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
       if (!verify?.email) {
@@ -111,7 +103,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
       else if (verify?.email) return responseType({res, status: 200, message: 'Please check your email to activate your account'})
     }
     const roles = Object.values(user?.roles);
-    const accessToken = await signToken({roles, email}, '10m', process.env.ACCESSTOKEN_STORY_SECRET);
+    const accessToken = await signToken({roles, email}, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
     const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
 
     const { _id, ...rest } = user
@@ -121,12 +113,8 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     
     res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
 
-    return responseType({res, status: 200, data:{_id, roles, accessToken}})
-  }
-  catch(error){
-    console.log(error)
-    res.sendStatus(500);
-  }
+    return responseType({res, status: 200, count:1, data:{_id, roles, accessToken}})
+  })
 }
 
 export const logoutHandler = async(req: NewUserProp, res: Response) => {
@@ -153,12 +141,12 @@ export const logoutHandler = async(req: NewUserProp, res: Response) => {
 }
 
 export const forgetPassword = async(req: Request, res: Response) => {
-  try{
+  asyncFunc(res, async () => {
     const { email } = req.query
     if(!email) return res.sendStatus(400);
     const user = await getUserByEmail(email as string);
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
-    if (user?.isAccountLocked) return responseType({res, status: 403, message:'Your account is locked'})
+    if (user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'})
 
     const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
     const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`
@@ -168,14 +156,11 @@ export const forgetPassword = async(req: Request, res: Response) => {
     })
     await user.updateOne({$set: { isResetPassword: true, verificationToken: passwordResetToken }})
     return responseType({res, status:201, message:'Please check your email'})
-  }
-  catch(error){
-    return res.sendStatus(500);
-  }
+  })
 }
 
 export const passwordResetRedirectLink = async(req: QueryProps, res: Response) => {
-  try{
+  asyncFunc(res, async () => {
     const { token } = req.query
     if(!token) return res.sendStatus(400)
     const user = await getUserByVerificationToken(token as string)
@@ -188,14 +173,11 @@ export const passwordResetRedirectLink = async(req: QueryProps, res: Response) =
 
     await user.updateOne({$set: { verificationToken: '' }})
     res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`)
-  }
-  catch(error){
-    res.sendStatus(500)
-  }
+  })
 }
 
 export const passwordReset = async(req: EmailProps, res: Response) => {
-  try{
+  asyncFunc(res, async () => {
     const {resetPass, email} = req.body
     if(!email || !resetPass) return res.sendStatus(400)
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
@@ -209,10 +191,7 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
         .then(() => responseType({res, status:201, message:'password reset successful, please login'}))
         .catch(() => res.sendStatus(500));
     }
-    else responseType({res, status:401, message:'unauthorised'})
-  }
-  catch(error){
-    return res.sendStatus(500);
-  }
+    else return responseType({res, status:401, message:'unauthorised'})
+  })
 }
 

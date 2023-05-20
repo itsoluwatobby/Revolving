@@ -7,21 +7,30 @@ export const getStoryById = async(id: string) => await StoryModel.findById(id).e
 
 export const getUserStories = async(userId: string) => await StoryModel.find({ userId }).lean()
 
-export const createUserStory = async(story: StoryProps) => await StoryModel.create({ ...story })
+export const createUserStory = async(story: StoryProps) => {
+  const {category, ...rest} = story;
+  const newStory = new StoryModel({ ...rest })
+  await Promise.allSettled(category.map(catVal => {
+    newStory.category.push(catVal)
+  }))
+  await newStory.save();
+  return newStory;
+}
 
 export const updateUserStory = async(userId: string, storyId: string, updateStory: StoryProps) => await StoryModel.findByIdAndUpdate({ userId, _id: storyId }, {...updateStory})
 
-export const LikeAndUnlikeStory = async(userId: string, storyId: string) => {
+export const likeAndUnlikeStory = async(userId: string, storyId: string): Promise<string> => {
   const story = await StoryModel.findById({ _id: storyId }).exec();
   if(!story?.likes.includes(userId)) {
     await story?.updateOne({ $push: {likes: userId} })
-    return 'You like this post'
+    return 'You liked this post'
   }
   else {
     await story?.updateOne({ $pull: {likes: userId} })
     return 'You unliked this post'
   }
 }
+export type Like_Unlike = Awaited<ReturnType<typeof likeAndUnlikeStory>>
 
 export const deleteUserStory = async(storyId: string) => await StoryModel.findByIdAndDelete({ _id: storyId })
 

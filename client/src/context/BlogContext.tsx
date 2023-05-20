@@ -1,15 +1,8 @@
 import { createContext, useEffect, useState } from 'react';
 import useSwr from 'swr';
 import { PostType, ChildrenProp, PostContextType } from '../posts';
-import { toast } from 'react-hot-toast';
 import { posts_endPoint as cacheKey } from '../api/axiosPost'
-
-import {  
-  getPosts,  
-  deletePost } from '../api/axiosPost';
-import {  
-  deletePostOptions, 
-} from '../api/postApiOptions';
+import { getPosts } from '../api/axiosPost';
 
 export const PostContext = createContext<PostContextType | null>(null)
 

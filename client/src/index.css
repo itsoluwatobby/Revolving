@@ -98,3 +98,8 @@ body {
 .app::-webkit-scrollbar{
   width: 1px;
 }
+
+.hidebars::-webkit-scrollbar{
+  width: 1px;
+  height: 0;
+}

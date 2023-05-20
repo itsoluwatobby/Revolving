@@ -17,6 +17,8 @@ import authRouter from './routes/authRoutes.js';
 import { verifyAccessToken } from './middleware/verifyTokens.js';
 import storyRouter from './routes/storyRoutes.js';
 import { getStories, getStory } from './controller/storyController.js';
+import { getUser, getUsers } from './controller/userController.js';
+import userRouter from './routes/usersRoutes.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
@@ -41,49 +43,36 @@ app.use(helmet());
 app.use(cookieParser());
 const server = http.createServer(app);
 let numberOfCores = cpus().length;
-if (numberOfCores > 4) {
-    if (cluster.isPrimary) {
-        console.log(`Primary with PID: ${process.pid} is running`);
-        while ((numberOfCores - 5) != 0) {
-            cluster.fork();
-            numberOfCores--;
-        }
-        cluster.on('exit', (worker, code, signal) => {
-            console.log(`worker ${worker.process.pid} died`);
-        });
+if (cluster.isPrimary) {
+    console.log(`Primary with PID: ${process.pid} is running`);
+    while ((numberOfCores - 5) != 0) {
+        cluster.fork();
+        numberOfCores--;
     }
-    else {
-        console.log(`Worker with PID: ${process.pid} is running`);
-        app.get('/', (req, res) => {
-            res.status(200).json({ status: true, message: 'server up and running' });
-        });
-        // ROUTES
-        app.use('/revolving/auth', authRouter);
-        app.get('/revolving/story', getStories);
-        app.get('/revolving/story/:storyId', getStory);
-        // checks for accesstoken
-        app.use(verifyAccessToken);
-        // story router
-        app.use('/revolving/story', storyRouter);
-        //app.use(errorLog);
-        app.all('*', (req, res) => {
-            res.status(404).json({ status: false, message: 'NOT FOUND' });
-        });
-        mongoose.connection.once('open', () => {
-            console.log('Revolving DB connected');
-            server.listen(PORT, () => {
-                console.log(`Server up and running on port ${PORT}`);
-            });
-        });
-        mongoose.connection.on('error', () => {
-            console.log('Error connecting to DB');
-            process.exit(1);
-        });
-    }
+    cluster.on('exit', (worker, code, signal) => {
+        console.log(`worker ${worker.process.pid} died`);
+    });
 }
 else {
+    console.log(`Worker with PID: ${process.pid} is running`);
     app.get('/', (req, res) => {
         res.status(200).json({ status: true, message: 'server up and running' });
+    });
+    // ROUTES
+    app.use('/revolving/auth', authRouter);
+    app.get('/revolving/users', getUsers);
+    app.get('/revolving/users/:userId', getUser);
+    app.get('/revolving/story', getStories);
+    app.get('/revolving/story/:storyId', getStory);
+    // checks for accesstoken
+    app.use(verifyAccessToken);
+    // story router
+    app.use('/revolving/story', storyRouter);
+    // user router
+    app.use('/revolving/users', userRouter);
+    //app.use(errorLog);
+    app.all('*', (req, res) => {
+        res.status(404).json({ status: false, message: 'NOT FOUND' });
     });
     mongoose.connection.once('open', () => {
         console.log('Revolving DB connected');
@@ -92,7 +81,7 @@ else {
         });
     });
     mongoose.connection.on('error', () => {
-        console.log('Error connection to DB');
+        console.log('Error connecting to DB');
         process.exit(1);
     });
 }

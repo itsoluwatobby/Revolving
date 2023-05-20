@@ -53,7 +53,7 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
     }
   }
   const roles = Object.values(user?.roles);
-  const newAccessToken = await signToken({roles, email: user?.email}, '5m', process.env.ACCESSTOKEN_STORY_SECRET);
+  const newAccessToken = await signToken({roles, email: user?.email}, '35m', process.env.ACCESSTOKEN_STORY_SECRET);
   const newRefreshToken = await signToken({roles, email: user?.email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
 
   await user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})

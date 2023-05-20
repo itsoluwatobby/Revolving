@@ -1,11 +1,10 @@
-import { PostContextType, PostType } from '../posts'
+import { PostType } from '../posts'
 import { useWordCount } from '../hooks/useWordCount'
 import { FiMoreVertical } from 'react-icons/fi';
 import { FaTrash } from 'react-icons/fa';
 import { CiEdit } from 'react-icons/ci';
 import { format } from 'timeago.js';
 import { useState } from 'react';
-import { usePostContext } from '../hooks/usePostContext';
 import { Link } from 'react-router-dom';
 import { TextRules } from '../fonts';
 import { useSWRConfig } from 'swr';
@@ -17,8 +16,6 @@ import { toast } from 'react-hot-toast';
 type Props = {
   post: PostType
 }
-
-//const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
 export const Post = ({ post }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
@@ -81,6 +78,7 @@ export const Post = ({ post }: Props) => {
           title='Options'
           className={`absolute right-2 text-lg cursor-pointer opacity-75 hover:text-gray-600`}
         />
+        {/* MAKE THIS MORE ATTRACTIVE */}
         {open &&
           <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${currentMode == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
             <Link to={`/edit_story/${post?._id}`} >  

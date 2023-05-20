@@ -17,13 +17,18 @@ export const createUser = (user) => __awaiter(void 0, void 0, void 0, function* 
 export const updateUser = (userId, updatedUser) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findByIdAndUpdate({ _id: userId }, Object.assign({}, updatedUser)); });
 export const followOrUnFollow = (followerId, followingId) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const user = yield UserModel.findById({ _id: followingId }).exec();
-    if (!((_a = user === null || user === void 0 ? void 0 : user.followers) === null || _a === void 0 ? void 0 : _a.includes(followerId))) {
-        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $push: { likes: followerId } }));
+    const user = yield UserModel.findById(followerId).exec();
+    const following = yield UserModel.findById(followingId).exec();
+    if (user._id.equals(followingId))
+        return 'duplicate';
+    if (!((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.includes(followerId))) {
+        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $push: { followings: followerId } }));
+        yield (following === null || following === void 0 ? void 0 : following.updateOne({ $push: { followers: followerId } }));
         return 'You followed this user';
     }
     else {
-        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $pull: { likes: followerId } }));
+        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $pull: { followings: followerId } }));
+        yield (following === null || following === void 0 ? void 0 : following.updateOne({ $pull: { followers: followerId } }));
         return 'You unfollowed this user';
     }
 });

@@ -4,6 +4,8 @@ import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent } from 'react';
+import { BiCodeAlt } from 'react-icons/bi'
+import { Components, NAVIGATE } from '../assets/navigator';
 
 export const NewStory = () => {
   const { fontFamily } = useThemeContext() as ThemeContextType;
@@ -11,6 +13,7 @@ export const NewStory = () => {
   const currentMode = localStorage.getItem('theme');
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
+  const [postCategory, setPostCategory] = useState<Components>(NAVIGATE.GENERAL);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
     1000) as DebounceProps
@@ -68,10 +71,26 @@ export const NewStory = () => {
         name="" id=""
         placeholder='Share your story...'
         value={textareaValue}
-        cols={30} rows={12}
+        cols={30} rows={10}
         onChange={handleBody}
         className={`sm:w-3/5 text-xl p-2 ${currentMode == 'light' ? 'focus:outline-slate-300' : ''} ${currentMode == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
       />
+      <div className='bg-slate-500 w-2/5 md:w-1/5 p-1.5 rounded-md gap-2 flex items-center'>
+        <BiCodeAlt title='Code Editor' className='text-3xl cursor-pointer hover:opacity-70 text-gray-300' />
+        <div className='hidebars flex items-center w-full gap-1 h-full overflow-scroll'>
+          {
+            Object.values(NAVIGATE).map(nav => (
+              <p
+                onClick={() => setPostCategory(nav as Components)}
+                className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-70 whitespace-nowrap transition-all ${postCategory == nav ? 'bg-slate-800' : ''}`}
+                key={nav}>
+                {nav}
+              </p>
+            ))
+          }
+        </div>
+      </div>
     </section>
   )
 }
+//BiCodeBlock

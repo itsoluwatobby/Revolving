@@ -50,7 +50,7 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
         }
     }
     const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-    const newAccessToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '5m', process.env.ACCESSTOKEN_STORY_SECRET);
+    const newAccessToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '35m', process.env.ACCESSTOKEN_STORY_SECRET);
     const newRefreshToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
     yield user.updateOne({ $set: { status: 'online', refreshToken: newRefreshToken } });
     //authentication: { sessionID: req?.sessionID },

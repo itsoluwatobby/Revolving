@@ -33,7 +33,7 @@ export default function Login() {
     event.preventDefault()
     try{
       const userAuth = await trigger() as AuthType
-      
+
       setAuth(prev => ({...prev, ...userAuth}))
       navigate('/')
       toast.promise(trigger(), { 
@@ -69,10 +69,7 @@ export default function Login() {
   return (
     <div className={`welcome w-full ${theme == 'light' ? 'bg-slate-100' : ''}`}>
       {forgot ? 
-          <ForgotPassword 
-            handleSubmit={handleSubmit} handleEmail={handleEmail}
-            canSubmit={canSubmit} email={email} setForgot={setForgot}
-          /> 
+          <ForgotPassword setForgot={setForgot}/> 
           : <LoginComponent 
               handleSubmit={handleSubmit} handleEmail={handleEmail}
               canSubmit={canSubmit} email={email} setForgot={setForgot} handlePassword={handlePassword} handleChecked={handleChecked} password={password} revealPassword={revealPassword} setRevealPassword={setRevealPassword} 

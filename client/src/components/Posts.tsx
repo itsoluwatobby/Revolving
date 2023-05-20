@@ -2,10 +2,24 @@
 import { PostContextType, PostType } from '../posts'
 import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
+import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
+import { useEffect, useState } from 'react';
 
-export const Posts = () => {
-  const { isLoading, error, filteredStories: posts } = usePostContext() as PostContextType
+type PostsProps = {
+  navigationTab: string
+}
+
+export const Posts = ({ navigationTab }: PostsProps) => {
+  const { isLoading, error, filteredStories } = usePostContext() as PostContextType
+  const [navPosts, setNavPosts] = useState<PostType[]>([])
+  
+  useEffect(() => {
+    setNavPosts(
+        filteredStories?.filter(post => post?.category == navigationTab) as PostType[]
+      )
+    console.log('changed..')
+  }, [navigationTab, filteredStories])
   
   let content;
 
@@ -15,9 +29,12 @@ export const Posts = () => {
         )
       )
   ) 
-  : error ? content = <p>{error?.message}</p> 
-  :(  posts?.length ? content = (
-        posts?.map(post => (
+  : error ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+    {error?.message}
+    <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
+    </p> 
+  :(  navPosts?.length ? content = (
+        navPosts?.map(post => (
           <Post key={post?._id} post={post as PostType} />
         )
       )
