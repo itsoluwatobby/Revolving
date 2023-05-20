@@ -23,6 +23,7 @@ import storyRouter from './routes/storyRoutes.js';
 import { getStories, getStory } from './controller/storyController.js';
 import { getUser, getUsers } from './controller/userController.js';
 import userRouter from './routes/usersRoutes.js';
+import passwordResetRouter from './routes/resetPassword.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 
 dbConfig(null, null, null);
@@ -79,6 +80,9 @@ else{
   
   app.get('/revolving/users', getUsers);
   app.get('/revolving/users/:userId', getUser);
+
+  //password reset
+  app.use('/revolving/auth', passwordResetRouter);
 
   app.get('/revolving/story', getStories);
   app.get('/revolving/story/:storyId', getStory);

@@ -182,10 +182,12 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
     if(!email || !resetPass) return res.sendStatus(400)
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
     if(!user) return responseType({res, status: 401, message:'Bad credentials'})
+    // if(!user.isResetPassword) return responseType({res, status:409, message:'you need to request for a password reset'})
 
-    const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
-    if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
     if(user.isResetPassword){
+      const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
+      if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
+      
       const hashedPassword = await brcypt.hash(resetPass, 10);
       await user.updateOne({$set: { authentication: { password: hashedPassword }, resetPassword: false}})
         .then(() => responseType({res, status:201, message:'password reset successful, please login'}))

@@ -5,12 +5,12 @@ const STORYSCHEMA: Schema = new Schema(
   {
     userId: { 
       type: Schema.Types.ObjectId, 
-      ref: 'users', required: true 
+      ref: 'users', required: [true, 'you need to provide a user ID'] 
     },
-    title: { type: String, required: true },
+    title: { type: String, required: [true, 'story title is required'], trim: true },
     picture: { type: String, default: '' },
-    body: { type: String, required: true },
-    storyDate: { type: String, required: true, default: '' },
+    body: { type: String, required: [true, 'story body is required'] },
+    storyDate: { type: String, required: [true, 'story date should be added'], default: '' },
     commentIds: { type: Array, default: [] },
     category: { 
       type: Array, required: true, 

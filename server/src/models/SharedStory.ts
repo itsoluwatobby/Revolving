@@ -3,10 +3,10 @@ import { SharedProps } from '../../types.js';
 
 const SharedStorySchema: Schema = new Schema(
    {
-      sharerId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
-      storyId: { type: Schema.Types.ObjectId, ref: 'story', required: true },
-      sharedDate: { type: String, required: true, default: '' },
-      sharedStory: { type: Object, required: true, default: {} },
+      sharerId: { type: Schema.Types.ObjectId, ref: 'users', required: [true, 'user ID required'] },
+      storyId: { type: Schema.Types.ObjectId, ref: 'story', required: [true, 'story ID required'] },
+      sharedDate: { type: String, required: [true, 'date must be added'], default: '' },
+      sharedStory: { type: Object, required: [true, 'target story needs to be added'], default: {} },
    },
    {
       minimize: false,
