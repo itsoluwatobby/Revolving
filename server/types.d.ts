@@ -33,6 +33,23 @@ interface SharedProps extends Document{
   sharedStory: object
 }
 
+type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+
+// interface StoryType{
+//   userId: Types.ObjectId
+//   title: string
+//   picture: string
+//   body: string
+//   fontFamily: string
+//   storyDate: string
+//   category: Categories
+//   commentIds?: string
+//   isShared?: string
+//   likes: string
+//   edited: false
+//   editDate: string
+// }
+
 interface StoryProps extends Document{
   userId: Types.ObjectId
   title: string
@@ -40,7 +57,7 @@ interface StoryProps extends Document{
   body: string
   fontFamily: string
   storyDate: string
-  category: 'General' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+  category: Categories[]
   commentIds?: string[]
   isShared?: string[]
   likes: string[]
@@ -76,6 +93,7 @@ interface UserProps extends Document{
 interface ResponseType extends Response{
   meta: {
     status: number,
+    count?: number,
     message?: string
   },
   data?: object | undefined

@@ -12,14 +12,18 @@ export const createUser = async(user: Partial<UserProps>) => await UserModel.cre
 
 export const updateUser = async(userId: string, updatedUser: UserProps) => await UserModel.findByIdAndUpdate({ _id: userId }, {...updatedUser})
 
-export const followOrUnFollow = async(followerId: string, followingId: string) => {
-  const user = await UserModel.findById({ _id: followingId }).exec();
-  if(!user?.followers?.includes(followerId)) {
-    await user?.updateOne({ $push: {likes: followerId} })
+export const followOrUnFollow = async(followerId: string, followingId: string): Promise<string> => {
+  const user = await UserModel.findById(followerId).exec();
+  const following = await UserModel.findById(followingId).exec();
+  if(user._id.equals(followingId)) return 'duplicate'
+  if(!user?.followings?.includes(followerId)) {
+    await user?.updateOne({ $push: {followings: followerId} })
+    await following?.updateOne({ $push: {followers: followerId} })
     return 'You followed this user'
   }
   else {
-    await user?.updateOne({ $pull: {likes: followerId} })
+    await user?.updateOne({ $pull: {followings: followerId} })
+    await following?.updateOne({ $pull: {followers: followerId} })
     return 'You unfollowed this user'
   }
 }

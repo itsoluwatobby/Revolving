@@ -42,8 +42,10 @@ export const verifyToken = (token, secret) => __awaiter(void 0, void 0, void 0, 
 //   message: string,
 //   data?: object
 // }
-export const responseType = ({ res, status = 200, message = 'success', data = {} }) => {
-    return res.status(status).json({ meta: { status, message }, data });
+export const responseType = ({ res, status = 200, count = 0, message = 'success', data = {} }) => {
+    return (data ?
+        res.status(status).json({ meta: { status, count, message }, data })
+        : res.status(status).json({ meta: { status, message }, data }));
 };
 export const transporter = createTransport({
     service: 'gmail',
@@ -70,5 +72,13 @@ export const mailOptions = (receiver, username, verificationLink) => {
                 <p>${verificationLink}</p><br/>
                 <span>Please keep link private, it contains some sensitive information about you.</span>`
     };
+};
+export const asyncFunc = (res, callback) => {
+    try {
+        callback();
+    }
+    catch (error) {
+        res.sendStatus(500);
+    }
 };
 //# sourceMappingURL=helper.js.map

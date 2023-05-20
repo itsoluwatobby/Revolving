@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import { ClaimProps, ResponseType, USERROLES } from '../../types.js';
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
@@ -44,8 +44,12 @@ export const verifyToken = async(token: string, secret: string): Promise<string 
 //   message: string,
 //   data?: object
 // }
-export const responseType = ({res, status = 200, message = 'success', data = {}}): ResponseType => {
-  return res.status(status).json({meta:{status, message}, data})
+export const responseType = ({res, status=200, count=0, message='success', data={}}): ResponseType => {
+  return (
+    data ? 
+        res.status(status).json({meta:{status, count, message}, data}) 
+            : res.status(status).json({meta:{status, message}, data})
+  )
 }
 
 export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTransport({
@@ -74,5 +78,14 @@ export const mailOptions = (receiver: string, username: string, verificationLink
                 <p>Or copy the link below to your browser</p>
                 <p>${verificationLink}</p><br/>
                 <span>Please keep link private, it contains some sensitive information about you.</span>`
+  }
+}
+
+export const asyncFunc = (res: Response, callback: () => void) => {
+  try{
+    callback()
+  }
+  catch(error){
+    res.sendStatus(500)
   }
 }

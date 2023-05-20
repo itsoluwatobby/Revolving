@@ -21,11 +21,11 @@ var __rest = (this && this.__rest) || function (s, e) {
 import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
-import { mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
+import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         const { username, email, password } = req.body;
         if (!username || !email || !password)
             return res.sendStatus(400);
@@ -58,14 +58,10 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
         });
         return responseType({ res, status: 201, message: 'Please check your email to activate your account' });
-    }
-    catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
+    }));
 });
 export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { token } = req.query;
         if (!token)
             return res.sendStatus(400);
@@ -87,15 +83,11 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
             return responseType({ res, status: 200, message: 'Your has already been activated' });
         yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: '' } });
         return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`);
-    }
-    catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
+    }));
 });
 export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    try {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
         const { email, password } = req.body;
         if (!email || !password)
             return res.sendStatus(400);
@@ -106,7 +98,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!matchingPassword)
             return responseType({ res, status: 401, message: 'Bad credentials' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return res === null || res === void 0 ? void 0 : res.status(403).json('Your account is locked');
+            return responseType({ res, status: 423, message: 'Account locked' });
         if (!(user === null || user === void 0 ? void 0 : user.isAccountActivated)) {
             const verify = yield verifyToken(user === null || user === void 0 ? void 0 : user.verificationToken, process.env.ACCOUNT_VERIFICATION_SECRET);
             if (!(verify === null || verify === void 0 ? void 0 : verify.email)) {
@@ -124,18 +116,14 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-        const accessToken = yield signToken({ roles, email }, '10m', process.env.ACCESSTOKEN_STORY_SECRET);
+        const accessToken = yield signToken({ roles, email }, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
         const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
         const { _id } = user, rest = __rest(user, ["_id"]);
         yield user.updateOne({ $set: { status: 'online', refreshToken } });
         //authentication: { sessionID: req?.sessionID },
         res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
-        return responseType({ res, status: 200, data: { _id, roles, accessToken } });
-    }
-    catch (error) {
-        console.log(error);
-        res.sendStatus(500);
-    }
+        return responseType({ res, status: 200, count: 1, data: { _id, roles, accessToken } });
+    }));
 });
 export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -159,7 +147,7 @@ export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { email } = req.query;
         if (!email)
             return res.sendStatus(400);
@@ -167,7 +155,7 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 403, message: 'Your account is locked' });
+            return responseType({ res, status: 423, message: 'Account locked' });
         const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`;
         const options = mailOptions(email, user.username, verificationLink);
@@ -177,13 +165,10 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
         });
         yield user.updateOne({ $set: { isResetPassword: true, verificationToken: passwordResetToken } });
         return responseType({ res, status: 201, message: 'Please check your email' });
-    }
-    catch (error) {
-        return res.sendStatus(500);
-    }
+    }));
 });
 export const passwordResetRedirectLink = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { token } = req.query;
         if (!token)
             return res.sendStatus(400);
@@ -199,14 +184,11 @@ export const passwordResetRedirectLink = (req, res) => __awaiter(void 0, void 0,
             return res.sendStatus(400);
         yield user.updateOne({ $set: { verificationToken: '' } });
         res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`);
-    }
-    catch (error) {
-        res.sendStatus(500);
-    }
+    }));
 });
 export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    try {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        var _c;
         const { resetPass, email } = req.body;
         if (!email || !resetPass)
             return res.sendStatus(400);
@@ -223,10 +205,7 @@ export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 .catch(() => res.sendStatus(500));
         }
         else
-            responseType({ res, status: 401, message: 'unauthorised' });
-    }
-    catch (error) {
-        return res.sendStatus(500);
-    }
+            return responseType({ res, status: 401, message: 'unauthorised' });
+    }));
 });
 //# sourceMappingURL=authController.js.map
