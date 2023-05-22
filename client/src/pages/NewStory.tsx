@@ -6,14 +6,16 @@ import { PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../assets/navigator';
+import { Categories } from '../data';
 
 export const NewStory = () => {
   const { fontFamily } = useThemeContext() as ThemeContextType;
   const { posts, setPostData, setTypingEvent, setCanPost } = usePostContext() as PostContextType;
   const currentMode = localStorage.getItem('theme');
   const [inputValue, setInputValue] = useState<string>('');
+
   const [textareaValue, setTextareaValue] = useState<string>('');
-  const [postCategory, setPostCategory] = useState<Components>(NAVIGATE.GENERAL);
+  const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
     1000) as DebounceProps
@@ -50,13 +52,25 @@ export const NewStory = () => {
       setPostData(prev => {
         return {...prev, 
           title: inputValue, 
-          body: textareaValue, 
+          body: textareaValue,
+          category: postCategory,
           fontFamily
         }
       })
     )
     setCanPost([inputValue, textareaValue].every(Boolean))
-  }, [setCanPost, setPostData, fontFamily, inputValue, textareaValue, debounceValue?.typing])
+  }, [setCanPost, setPostData, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
+  
+  const addCategory = (category: Categories) => {
+    let categories: Categories[] = [...postCategory];
+    if(!categories.includes(category)){
+      categories.push(category)
+    }
+    else{
+      categories = categories.filter(cat => cat != category)
+    }
+    setPostCategory([...categories])
+  } 
 
   return (
     <section className={`${fontFamily} p-3 h-full flex flex-col gap-2 sm:items-center mt-2`}>
@@ -75,14 +89,14 @@ export const NewStory = () => {
         onChange={handleBody}
         className={`sm:w-3/5 text-xl p-2 ${currentMode == 'light' ? 'focus:outline-slate-300' : ''} ${currentMode == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
       />
-      <div className='bg-slate-500 w-2/5 md:w-1/5 p-1.5 rounded-md gap-2 flex items-center'>
+      <div className='bg-slate-500 w-1/2 md:w-1/5 p-1.5 rounded-md gap-2 flex items-center'>
         <BiCodeAlt title='Code Editor' className='text-3xl cursor-pointer hover:opacity-70 text-gray-300' />
-        <div className='hidebars flex items-center w-full gap-1 h-full overflow-scroll'>
+        <div title='Scroll left/right' className='hidebars flex items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600'>
           {
             Object.values(NAVIGATE).map(nav => (
               <p
-                onClick={() => setPostCategory(nav as Components)}
-                className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-70 whitespace-nowrap transition-all ${postCategory == nav ? 'bg-slate-800' : ''}`}
+                onClick={() => addCategory(nav)}
+                className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-90 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-800' : ''}`}
                 key={nav}>
                 {nav}
               </p>

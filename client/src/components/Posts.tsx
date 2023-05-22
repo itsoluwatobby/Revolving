@@ -5,20 +5,22 @@ import { Post } from './Post';
 import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
 import { useEffect, useState } from 'react';
+import { Categories } from '../data';
 
 type PostsProps = {
-  navigationTab: string
+  navigationTab: Categories
 }
 
 export const Posts = ({ navigationTab }: PostsProps) => {
   const { isLoading, error, filteredStories } = usePostContext() as PostContextType
   const [navPosts, setNavPosts] = useState<PostType[]>([])
-  
+
   useEffect(() => {
-    setNavPosts(
-        filteredStories?.filter(post => post?.category == navigationTab) as PostType[]
-      )
-    console.log('changed..')
+    filteredStories?.length && (
+      setNavPosts(
+          filteredStories?.filter(post => post?.category?.includes(navigationTab)) as PostType[]
+        )
+    )
   }, [navigationTab, filteredStories])
   
   let content;
@@ -34,7 +36,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
   :(  navPosts?.length ? content = (
-        navPosts?.map(post => (
+    navPosts?.map(post => (
           <Post key={post?._id} post={post as PostType} />
         )
       )
@@ -42,7 +44,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     : content = (<p>No posts available</p>)
   )
   return (
-    <div className='box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl'>
+    <div className='box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl pb-5'>
       {content}
     </div>
   )

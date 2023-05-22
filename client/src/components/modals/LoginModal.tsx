@@ -9,6 +9,7 @@ import { ThemeContextType } from '../../posts';
 import useSWRMutation from "swr/mutation"
 import { auth_endPoint } from '../../api/axiosPost';
 import useSignIn from '../../hooks/useSignIn';
+import { AuthType, AuthenticationContextType, ErrorResponse } from '../../data';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('')
@@ -19,7 +20,7 @@ export default function Login() {
   const { theme } = useThemeContext() as ThemeContextType;
   const navigate = useNavigate()
   const signUserIn = useSignIn({email, password})
-  const { trigger, error } = useSWRMutation(auth_endPoint, signUserIn)
+  const { trigger, error, isMutating } = useSWRMutation(auth_endPoint, signUserIn)
 
   const handleEmail = (event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)
   const handlePassword = (event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)
@@ -32,10 +33,9 @@ export default function Login() {
   const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
-      const userAuth = await trigger() as AuthType
-
+      const userAuth = await trigger() as AuthType;
+      localStorage.setItem('revolving_userId', userAuth?._id)
       setAuth(prev => ({...prev, ...userAuth}))
-      navigate('/')
       toast.promise(trigger(), { 
         loading: 'signing you in 🚀', success: 'welcome', error: 'error occurred' 
       },{
@@ -45,6 +45,7 @@ export default function Login() {
           style: { background: '#3CB371'}
         }
       )
+      navigate('/')
     }
     catch(err: unknown){
       let errorMessage;
@@ -53,27 +54,26 @@ export default function Login() {
         : errors?.response?.status === 400 ? errorMessage = 'Bad request' 
           : errors?.response?.status === 401 ? errorMessage = 'Bad credentials' 
             : errors?.response?.status === 404 ? errorMessage = 'You don\'t have an account, Please register' 
-              : errors?.response?.status === 403 ? errorMessage = 'Your account is locked' 
+              : errors?.response?.status === 423 ? errorMessage = 'Your account is locked' 
                 : errors?.response?.status === 500 ? errorMessage = 'Internal server error' : errorMessage = 'No network'
 
       toast.error(`${errorMessage}`, {
-        duration: 3000, icon: '💀', style: {
+        duration: 5000, icon: '💀', style: {
           background: '#FF0000'
         }
       })
     }
   }
 
-  const canSubmit = [email, password].every(Boolean)
-
   return (
     <div className={`welcome w-full ${theme == 'light' ? 'bg-slate-100' : ''}`}>
       {forgot ? 
           <ForgotPassword setForgot={setForgot}/> 
           : <LoginComponent 
-              handleSubmit={handleSubmit} handleEmail={handleEmail}
-              canSubmit={canSubmit} email={email} setForgot={setForgot} handlePassword={handlePassword} handleChecked={handleChecked} password={password} revealPassword={revealPassword} setRevealPassword={setRevealPassword} 
-              persistLogin={persistLogin}
+              handleSubmit={handleSubmit} handleEmail={handleEmail} email={email} 
+              setForgot={setForgot} handlePassword={handlePassword} handleChecked={handleChecked} 
+              password={password} revealPassword={revealPassword} setRevealPassword={setRevealPassword} 
+              persistLogin={persistLogin} loading={isMutating}
             />
           }
     </div>

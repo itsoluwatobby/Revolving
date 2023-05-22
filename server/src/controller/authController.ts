@@ -28,7 +28,10 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
       if (duplicateEmail?.isAccountActivated) {
         const matchingPassword = await brcypt.compare(password, duplicateEmail?.authentication?.password);
         if (!matchingPassword) return responseType({res, status: 409, message: 'Email taken'})
-        return responseType({res, status: 200, message: 'You already have an account, Please login'})
+        
+          return duplicateEmail?.isAccountLocked 
+              ? responseType({res, status: 423, message: 'Account Locked'}) 
+              : responseType({res, status: 200, message: 'You already have an account, Please login'})
       }
       else return responseType({res, status: 200, message: 'Please check your email to activate your account'})
     }
@@ -182,10 +185,11 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
     if(!email || !resetPass) return res.sendStatus(400)
     const user = await UserModel.findOne({email}).select('+authentication.password').exec();
     if(!user) return responseType({res, status: 401, message:'Bad credentials'})
-
-    const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
-    if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
+    
     if(user.isResetPassword){
+      const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
+      if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
+      
       const hashedPassword = await brcypt.hash(resetPass, 10);
       await user.updateOne({$set: { authentication: { password: hashedPassword }, resetPassword: false}})
         .then(() => responseType({res, status:201, message:'password reset successful, please login'}))

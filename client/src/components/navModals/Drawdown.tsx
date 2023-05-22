@@ -3,11 +3,13 @@ import useAuthenticationContext from "../../hooks/useAuthenticationContext"
 import useLogout from "../../hooks/useLogout"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { ThemeContextType } from "../../posts"
+import { AuthenticationContextType } from "../../data"
 
 const modalClass = 'hover:scale-[1.01] hover:border-b-2 transition-all hover:opacity-90 cursor-pointer rounded capitalize flex items-center p-1 drop-shadow-2xl'
 
 export default function Drawdown() {
   const { auth } = useAuthenticationContext() as AuthenticationContextType
+  const userId = localStorage.getItem('revolving_userId')
   const signOut = useLogout()
   const {pathname} = useLocation()
   const home = '/'
@@ -18,7 +20,7 @@ export default function Drawdown() {
     !excludeRoute.includes(home) ? (
     <ul className={`absolute rounded-md tracking-widest right-6 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-gray-50' : 'bg-gray-600'} last:border-0 p-2`}>
     {
-      !auth?._id && 
+      !userId && 
         (pathname != '/signIn' &&
           <li 
             onClick={() => setRollout(false)}
@@ -29,17 +31,17 @@ export default function Drawdown() {
           </li>
         )
     }
-    {auth?._id && 
+    {userId && 
       (
         <li className={modalClass}>
-          <Link to={`/settings`}>
-            settings
+          <Link to={`/profile/${userId}`}>
+            profile
           </Link>
         </li>
       )
     }
     {
-      auth?._id && 
+      userId && 
         <li 
           onClick={signOut}
           className={modalClass}>
@@ -47,7 +49,7 @@ export default function Drawdown() {
         </li>
     }
     {
-      !auth?._id && 
+      !userId && 
         (pathname != '/signUp' &&
           <li className={modalClass}>
             <Link to={`/signUp`}>

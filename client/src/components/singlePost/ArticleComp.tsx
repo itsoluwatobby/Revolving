@@ -2,6 +2,7 @@ import { BsHandThumbsUp } from 'react-icons/bs';
 import { PostType, ThemeContextType } from '../../posts'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { format } from 'timeago.js';
+import { useState } from 'react';
 
 type ArticleProps = {
   post: PostType,
@@ -12,6 +13,7 @@ type ArticleProps = {
 
 export default function ArticleComp({ post, bodyContent, sidebar, averageReadingTime }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
+  const [hoverThis, setHoverThis] = useState<boolean>(false);
 
   return (
     <article 
@@ -20,7 +22,17 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
         <p className='capitalize'>{post?.author || 'anonymous'}</p>
         <span>.</span>
         <p>{format(post?.storyDate, 'en-US')}</p>
-        <button className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">follow</button>
+          {
+            <button className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">
+              follow
+            </button>
+            ||
+            <button 
+              onMouseEnter={() => setHoverThis(true)}
+              onMouseLeave={() => setHoverThis(false)}
+              className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">{hoverThis ? 'unfollow' : 'following'}
+            </button>
+          }
       </div>
         <p className='whitespace-pre-wrap font-bold text-3xl uppercase'>{post?.title}</p>
         <p 
@@ -32,7 +44,7 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
         <div className="flex items-center justify-between w-full text-gray-300">
             <p>{averageReadingTime} read</p>
             <p className="flex items-center text-white gap-1">
-              <BsHandThumbsUp title='like' className='text-lg cursor-pointer' />
+              <BsHandThumbsUp title='like' className='text-lg cursor-pointer hover:scale-[1.1] active:scale-[1] transition-all' />
               <span className="">
                 {post?.likes?.length}
               </span>

@@ -9,12 +9,14 @@ import profileImage from "../../images/bg_image3.jpg"
 import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
 import { useSWRConfig } from 'swr'
-import { posts_endPoint as cacheKey } from '../../api/axiosPost'
+import { axiosPrivate, posts_endPoint as cacheKey } from '../../api/axiosPost'
 import { addPostOptions, updatePostOptions } from "../../api/postApiOptions"
 import { toast } from "react-hot-toast";
 import useStoryMutation from "../../hooks/useStoryMutation";
 import useAuthenticationContext from "../../hooks/useAuthenticationContext"
 import { sub } from "date-fns"
+import { AuthenticationContextType } from "../../data"
+//import useSWRMutation from 'swr/mutation'
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -25,35 +27,34 @@ export default function TopRight() {
   const [createPost, updatePost] = useStoryMutation()
   const { theme, setRollout, changeTheme, setFontOption } = useThemeContext() as ThemeContextType
   const {postData, canPost} = usePostContext() as PostContextType
-  const { auth } = useAuthenticationContext() as AuthenticationContextType
+  const { auth } = useAuthenticationContext() as AuthenticationContextType;
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { postId } = useParams()
 
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
-  
-  const addPost = async () => {
+
+  const addPost = () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
     const newPost = { storyDate: dateTime, ...postData } as PostType
     try{
-        await mutate(cacheKey, createPost(newPost), addPostOptions(newPost))
-        
+        mutate(cacheKey, async () => await axiosPrivate.post(`${cacheKey}/${auth?._id}`, newPost), addPostOptions(newPost))
         localStorage.removeItem('newStoryInputValue')
         localStorage.removeItem('newStoryTextareaValue')
+        toast.promise(createPost(newPost), { 
+            loading: 'updating post 🚀', success: 'Success!! Post added', error: 'error occurred' 
+          },{
+            success:{
+              duration: 4000, icon: '🔥'
+            },
+              style: { background: '#3CB371'}
+            }
+          )
         navigate('/')
-        // toast.promise(createPost(newPost), { 
-        //   loading: 'updating post 🚀', success: 'Success!! Post added', error: 'error occurred' 
-        //   },{
-        //     success:{
-        //       duration: 2000, icon: '🔥'
-        //     },
-        //     style: { background: '#3CB371'}
-        //   }
-        // )
     }
-    catch(err){
-      toast.error('Failed!! to add new post', {
+    catch(error){
+       toast.error('Failed!! to add new post', {
         duration: 1000, icon: '💀', style: {
           background: '#FF0000'
         }
@@ -61,15 +62,15 @@ export default function TopRight() {
     }
   }
 
-  const updatedPost = async () => {
+  const updatedPost = () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
     const postUpdated = {...postData, _id: postId, editDate: dateTime} as PostType;
     try{
-        await mutate(cacheKey, updatePost(postUpdated), updatePostOptions(postUpdated))
+        mutate(cacheKey, async () => await axiosPrivate.put(`${cacheKey}/${auth?._id}/${postUpdated?._id}`, {...postUpdated}), updatePostOptions(postUpdated))
 
         localStorage.removeItem('editStoryInputValue')
         localStorage.removeItem('editStoryTextareaValue')
-        navigate('/')
+    
         toast.promise(updatePost(postUpdated), { 
             loading: 'updating post 🚀', success: 'Success!! Post editted', error: 'error occurred' 
           },{
@@ -79,7 +80,10 @@ export default function TopRight() {
             style: { background: '#3CB371'}
           }
         ) 
-        
+        // toast.success('Success!! Post updated', {
+        //   duration: 5000, icon: '💀', style: { background: '#FA2B50'}
+        // })
+        navigate('/')
     }
     catch(err){
       toast.error('Failed!! to update post', {

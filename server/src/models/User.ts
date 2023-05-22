@@ -3,11 +3,11 @@ import { UserProps } from '../../types.js';
 
 const USERSCHEMA: Schema = new Schema(
   {
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true, min: 5 },
-    description: { type: String, default: '' },
+    username: { type: String, required: [true, 'Username is required'], trim: true },
+    email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
+    description: { type: String, default: '', trim: true },
     authentication: {
-      password: { type: String, required: true, select: false },
+      password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
       sessionID: { type: String, default: '' }
     },
     roles: { 
@@ -28,6 +28,9 @@ const USERSCHEMA: Schema = new Schema(
     status: { type: String, default: 'offline', enum: ['online', 'offline'] },
     refreshToken: { type: String, default: '' },
     editDate: { type: String, default: '' },
+    gender: { type: String, default: '', enum: ['Female', 'Male', 'Others'] },
+    codeName: { type: String, default: '', trim: true },
+    stack: { type: Array, default: [] }
   },
   { 
     minimize: false, 

@@ -4,15 +4,17 @@ import useAuthenticationContext from "./useAuthenticationContext"
 import { useNavigate } from "react-router-dom"
 import { useThemeContext } from "./useThemeContext"
 import { ThemeContextType } from "../posts"
+import { AuthenticationContextType } from "../data"
 
 export default function useLogout() {
   const { auth, setAuth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
+  const userId = localStorage.getItem('revolving_userId')
   const navigate = useNavigate()
 
   const signOut = async() => {
     try{
-      await axiosAuth.get(`/logout/${auth?._id}`)
+      await axiosAuth.get(`/logout/${userId}`)
       setAuth({_id: '', accessToken: '', roles: []})
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
@@ -25,6 +27,7 @@ export default function useLogout() {
 
       localStorage.removeItem('editStoryInputValue')
       localStorage.removeItem('editStoryTextareaValue')
+      localStorage.removeItem('revolving_userId')
       navigate('/signIn', { replace: true })
     }catch(err){
       setAuth({_id: '', accessToken: '', roles: []})
@@ -38,6 +41,7 @@ export default function useLogout() {
 
       localStorage.removeItem('editStoryInputValue')
       localStorage.removeItem('editStoryTextareaValue')
+      localStorage.removeItem('revolving_userId')
       navigate('/signIn', {replace: true})
     }
   }
