@@ -7,6 +7,9 @@ type RolesProps={
 export const ProtectedRoute = () => {
 
   return(
-    <div>Protected routes</div>
+    <div>
+      Protected routes</div>
   )
+
+  // TODO: PROTECT NEWSTORY, EDITSTORY, PERSONAL PROFILE
 }

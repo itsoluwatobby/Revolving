@@ -12,6 +12,8 @@ import RegisterModal from "./components/modals/RegisterModel";
 import NewPassword from "./pages/NewPassword";
 import { Toaster } from "react-hot-toast";
 import { PersistedLogin } from "./components/layouts/PersistedLogin";
+import ProfilePage from "./pages/ProfilePage";
+import About from "./pages/About";
 
  
 export const App = () => {
@@ -21,19 +23,30 @@ export const App = () => {
     <main className={`app ${theme == 'light' ? '' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
         <Route path='/' element={<BlogLayout />}>
+          
           <Route path="/" element={<Welcome />}>
             <Route path="signIn" element={<LoginModal />} />
             <Route path="signUp" element={<RegisterModal />} />
             <Route path="new_password" element={<NewPassword />} />
           </Route>
-          <Route index element={<Home />} />
+          {/* PROTECTED */}
           <Route element={<PersistedLogin />}>
+            
+            <Route index element={<Home />} />
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:postId" element={<NewStory />} />
+
+            <Route path="story/:postId" element={<SingleStoryPage />} />
+            <Route path="profile/:userId" element={<ProfilePage />} />
+          
           </Route>
-          <Route path="story/:postId" element={<SingleStoryPage />} />
+          
+          <Route path="about" element={<About />} />
+        
         </Route>
+      
         <Route path="*" element={<NotFound />} />
+      
       </Routes>
       <Toaster />
     </main>

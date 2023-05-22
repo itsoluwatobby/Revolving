@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { IoIosArrowForward, IoIosArrowBack} from 'react-icons/io'
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
@@ -14,8 +14,11 @@ const list_style = 'cursor-pointer touch-pan-x whitespace-nowrap text-gray-500 a
 const arrow_class= "text-xl text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out text-xl z-50";
 
 export const TopHome = ({ navigationTab, setNavigationTab }: TopHomeProps) => {
-  const scrollContainerRef = useRef(null)
   const {theme} = useThemeContext() as ThemeContextType;
+
+  const scrollNavBar = useCallback((node: any) => {
+    node && node.scrollIntoView({ smooth: true })
+  }, [])
   
   useEffect(() => {
     localStorage.setItem('NAVIGATE', navigationTab)
@@ -29,22 +32,22 @@ export const TopHome = ({ navigationTab, setNavigationTab }: TopHomeProps) => {
           // onClick={scrollLeftHandler}
           className={arrow_class} />
       </div>
-      <ul ref={scrollContainerRef} className={`p-4 w-full md:justify-between text-gray-700 flex items-center sm:justify-between gap-3 mobile:overflow-x-scroll}`}>
+      <ul className={`hidebars p-4 w-full text-gray-700 flex items-center sm:justify-between gap-3 overflow-x-scroll`}>
         {//topHeader
           Object.entries(NAVIGATE).map(([key, value], i) => (
-            <p 
+            <li 
               key={key}
+              ref={scrollNavBar}
               onClick={() => setNavigationTab((Object.values(NAVIGATE)[i]))}
               className={`${list_style} ${theme == 'dark' ? 'hover:text-gray-200' : 'hover:text-gray-900'} ${value === navigationTab && 'font-bold'}`}>
               {value}
-            </p>
+            </li>
           ))
         }
       </ul>
       <div 
         className={`h-14 w-10 md:hidden grid place-content-center z-50`}>
         <IoIosArrowForward 
-          // onClick={scrollRightHandler}
           className={arrow_class} /> 
       </div>
     </header>

@@ -195,12 +195,10 @@ export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (!user)
             return responseType({ res, status: 401, message: 'Bad credentials' });
-        if (!user.isResetPassword)
-            return responseType({ res, status: 409, message: 'you need to request for a password reset' });
-        const conflictingPassword = yield brcypt.compare(resetPass, (_c = user === null || user === void 0 ? void 0 : user.authentication) === null || _c === void 0 ? void 0 : _c.password);
-        if (conflictingPassword)
-            return responseType({ res, status: 409, message: 'same as old password' });
         if (user.isResetPassword) {
+            const conflictingPassword = yield brcypt.compare(resetPass, (_c = user === null || user === void 0 ? void 0 : user.authentication) === null || _c === void 0 ? void 0 : _c.password);
+            if (conflictingPassword)
+                return responseType({ res, status: 409, message: 'same as old password' });
             const hashedPassword = yield brcypt.hash(resetPass, 10);
             yield user.updateOne({ $set: { authentication: { password: hashedPassword }, resetPassword: false } })
                 .then(() => responseType({ res, status: 201, message: 'password reset successful, please login' }))

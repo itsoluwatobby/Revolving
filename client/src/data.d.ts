@@ -1,10 +1,14 @@
+import { ChangeEvent, FormEvent } from "react"
+
+type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+
 type StoryProps = {
   userId: Types.ObjectId
   title: string
   picture: string
   body: string
   storyDate: string
-  category: 'General' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+  category: Categories[]
   commentIds?: string[]
   isShared?: string[]
   likes: string[]
@@ -26,7 +30,6 @@ interface SharedProps{
   sharedDate: string,
   sharedStory: object
 }
-
 
 type UserProps={
   _id: string,
@@ -69,3 +72,31 @@ type AuthenticationContextType={
   setPersistLogin: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+interface UserInfoProps{
+  email: string,
+  password: string,
+  revealPassword: boolean,
+  loading: boolean,
+  handleSubmit: (event: FormEvent<HTMLFormElement>) => void,
+  handleEmail: (event: ChangeEvent<HTMLInputElement>) => void,
+  handlePassword: (event: ChangeEvent<HTMLInputElement>) => void,
+  setRevealPassword: React.Dispatch<React.SetStateAction<boolean>>,
+}
+
+interface LoginProps extends UserInfoProps{
+  persistLogin: boolean,
+  handleChecked: (event: ChangeEvent<HTMLInputElement>) => void,
+  setForgot: React.Dispatch<React.SetStateAction<boolean>>,
+}
+
+interface RegistrationProps extends UserInfoProps{
+  match: boolean,
+  username: string,
+  confirmPassword: string,
+  validEmail: boolean,
+  validPassword: boolean,
+  handleUsername: (event: ChangeEvent<HTMLInputElement>) => void,
+  handleConfirmPassword: (event: ChangeEvent<HTMLInputElement>) => void,
+  setValidEmail: React.Dispatch<React.SetStateAction<boolean>>,
+  setValidPassword: React.Dispatch<React.SetStateAction<boolean>>
+}

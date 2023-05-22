@@ -7,6 +7,7 @@ import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
 import { Components, NAVIGATE } from "../assets/navigator";
 import { useState } from "react";
+import { AuthenticationContextType } from "../data";
 
 
 export const Home = () => {

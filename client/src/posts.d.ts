@@ -15,7 +15,6 @@ type CommentType = {
   author: string | 'anonymous'
 }
   
-
 type PostType = {
   _id: string,
   userId: string,
@@ -26,7 +25,7 @@ type PostType = {
   storyDate: string,
   likes: string[],
   isShared?: string[],
-  category: 'General' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+  category: Categories[] | Categories,
   fontFamily?: string | 'sans',
   commentIds?: string[],
   edited: false,
@@ -42,7 +41,7 @@ type PostContextType = {
   search: string,
   posts?: PostType[],
   postData: Partial<PostType>,
-  filteredStories: Partial<PostType[]>,
+  filteredStories: PostType[],
   isLoading: boolean,
   typingEvent: boolean,
   error?: {message: string, name: string, code: string},

@@ -1,5 +1,4 @@
 import { axiosAuth } from '../api/axiosPost'
-import { AuthType } from '../data'
 import { ThemeContextType } from '../posts'
 import { useThemeContext } from './useThemeContext'
 
@@ -7,17 +6,18 @@ type UserPropType={
   username?: string, email: string, password: string
 }
 
-export default function useSignIn(user: UserPropType) {
+export default function useSignUp(user: UserPropType) {
   const { setRollout } = useThemeContext() as ThemeContextType
 
-  const signUserIn = async(): Promise<AuthType> => {
-    const res = await axiosAuth.post('/login', {
-      email: user?.email, password: user?.password
+  const signUpUser = async(): Promise<void> => {
+    const res = await axiosAuth.post('/registration', {
+      username: user?.username ,email: user?.email, password: user?.password
     })
     setRollout(false)
     return res?.data?.data
   }
-  //type AuthFetcher = Awaited<ReturnType<typeof signUserIn>>
+  //type AuthFetcher = Awaited<ReturnType<typeof signUpUser>>
   
-  return signUserIn
+  return signUpUser
 }
+

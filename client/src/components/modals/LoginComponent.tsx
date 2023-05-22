@@ -1,26 +1,13 @@
 import { Link } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
-import { ChangeEvent, FormEvent } from "react";
-
-type LoginProps={
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => void,
-  handleEmail: (event: ChangeEvent<HTMLInputElement>) => void,
-  handlePassword: (event: ChangeEvent<HTMLInputElement>) => void,
-  handleChecked: (event: ChangeEvent<HTMLInputElement>) => void,
-  canSubmit: boolean,
-  email: string,
-  password: string,
-  revealPassword: boolean,
-  setRevealPassword: React.Dispatch<React.SetStateAction<boolean>>,
-  setForgot: React.Dispatch<React.SetStateAction<boolean>>,
-  persistLogin: boolean
-}
+import { LoginProps } from "../../data";
 
 export default function LoginComponent({ 
-  handleSubmit, handleEmail, handlePassword, handleChecked, canSubmit, email, password, revealPassword, setRevealPassword, setForgot, persistLogin
+  handleSubmit, handleEmail, loading, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot, persistLogin
  }: LoginProps) {
   const themeMode = localStorage.getItem('theme')
 
+  const canSubmit = [email, password].every(Boolean)
   return (
     <article className={`absolute md:w-1/4 w-1/2 border shadow-2xl ${themeMode == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-x-1/2 translate-y-12 z-50 rounded-md`}>
           <form 
@@ -81,10 +68,10 @@ export default function LoginComponent({
             </label>
             <button 
               type='submit'
-              disabled={!canSubmit}
-              className={`w-full rounded-md p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              disabled={!canSubmit && !loading}
+              className={`w-full rounded-md p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
-              Sign In
+              {!loading ? 'Sign In' : 'Signing In...'}
             </button>
             <div className='flex flex-col text-sm gap-2'>
               <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2'
