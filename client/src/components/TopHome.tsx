@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect } from 'react'
 import { IoIosArrowForward, IoIosArrowBack} from 'react-icons/io'
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';

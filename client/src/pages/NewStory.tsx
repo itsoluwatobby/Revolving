@@ -7,14 +7,16 @@ import { useState, useEffect, ChangeEvent } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../assets/navigator';
 import { Categories } from '../data';
+import CodeBlock from '../components/codeBlock/CodeBlock';
 
 export const NewStory = () => {
   const { fontFamily } = useThemeContext() as ThemeContextType;
   const { posts, setPostData, setTypingEvent, setCanPost } = usePostContext() as PostContextType;
-  const currentMode = localStorage.getItem('theme');
+  const { theme } = useThemeContext() as ThemeContextType;
   const [inputValue, setInputValue] = useState<string>('');
 
   const [textareaValue, setTextareaValue] = useState<string>('');
+  const [codeEditor, setCodeEditor] = useState<boolean>(false);
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
@@ -74,23 +76,33 @@ export const NewStory = () => {
 
   return (
     <section className={`${fontFamily} p-3 h-full flex flex-col gap-2 sm:items-center mt-2`}>
-      <input 
-        type="text"
-        placeholder='Title'
-        value={inputValue}
-        onChange={handleTitle}
-        className={`sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${currentMode == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
-      />
-      <textarea 
-        name="" id=""
-        placeholder='Share your story...'
-        value={textareaValue}
-        cols={30} rows={10}
-        onChange={handleBody}
-        className={`sm:w-3/5 text-xl p-2 ${currentMode == 'light' ? 'focus:outline-slate-300' : ''} ${currentMode == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
-      />
+      {
+        codeEditor ? <CodeBlock /> 
+        : (
+            <>
+              <input 
+                type="text"
+                placeholder='Title'
+                value={inputValue}
+                onChange={handleTitle}
+                className={`sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+              />
+              <textarea 
+                name="story" id=""
+                placeholder='Share your story...'
+                value={textareaValue}
+                cols={30} rows={10}
+                onChange={handleBody}
+                className={`sm:w-3/5 text-xl p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+              />
+            </>
+          )
+        }
+      
       <div className='bg-slate-500 w-1/2 md:w-1/5 p-1.5 rounded-md gap-2 flex items-center'>
-        <BiCodeAlt title='Code Editor' className='text-3xl cursor-pointer hover:opacity-70 text-gray-300' />
+        <BiCodeAlt 
+          onClick={() => setCodeEditor(prev => !prev)}
+          title='Code Editor' className={`text-3xl cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-400' : 'text-gray-300 bg-gray-500'}`} />
         <div title='Scroll left/right' className='hidebars flex items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600'>
           {
             Object.values(NAVIGATE).map(nav => (

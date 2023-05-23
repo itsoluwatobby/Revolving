@@ -103,3 +103,10 @@ body {
   width: 1px;
   height: 0;
 }
+
+.stackflow::-webkit-scrollbar{
+  width: 2px;
+  height: 0;
+}
+
+

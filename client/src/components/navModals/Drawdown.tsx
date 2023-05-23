@@ -1,14 +1,11 @@
-import { Link, useLocation } from "react-router-dom"
-import useAuthenticationContext from "../../hooks/useAuthenticationContext"
+import { Link, useLocation } from "react-router-dom";
 import useLogout from "../../hooks/useLogout"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { ThemeContextType } from "../../posts"
-import { AuthenticationContextType } from "../../data"
 
 const modalClass = 'hover:scale-[1.01] hover:border-b-2 transition-all hover:opacity-90 cursor-pointer rounded capitalize flex items-center p-1 drop-shadow-2xl'
 
 export default function Drawdown() {
-  const { auth } = useAuthenticationContext() as AuthenticationContextType
   const userId = localStorage.getItem('revolving_userId')
   const signOut = useLogout()
   const {pathname} = useLocation()
@@ -36,6 +33,15 @@ export default function Drawdown() {
         <li className={modalClass}>
           <Link to={`/profile/${userId}`}>
             profile
+          </Link>
+        </li>
+      )
+    }
+    {userId && 
+      (
+        <li className={modalClass}>
+          <Link to={`/account/${userId}`}>
+            Account
           </Link>
         </li>
       )

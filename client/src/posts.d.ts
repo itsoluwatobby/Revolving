@@ -62,8 +62,8 @@ type ThemeContextType = {
   fontOption: boolean,
   rollout: boolean,
   changeTheme: (mode: string) => void,
-  changeFontFamily: (font: string) => void,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
+  setFontFamily: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>
 }
 

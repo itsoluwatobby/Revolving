@@ -17,7 +17,7 @@ export const PersistedLogin = () => {
   const getRefreshToken = useRefreshToken()
   const userId = localStorage.getItem('revolving_userId')
   const { theme } = useThemeContext() as ThemeContextType
-  const [retries, setRetries] = useState<number>(0);
+  //const [retries, setRetries] = useState<number>(0);
   const signOut = useLogout()
 //console.log(retries)
   useEffect(() => {
