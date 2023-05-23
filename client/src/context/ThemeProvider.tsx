@@ -18,13 +18,8 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     localStorage.setItem('theme', mode);
   }
 
-  const changeFontFamily = (font: string) => {
-    setFontFamily(font)
-    localStorage.setItem('fontFamily', font);
-  }
-
   const values = {
-    theme, fontFamily, changeTheme, rollout, setRollout, changeFontFamily, fontOption, setFontOption
+    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, setFontOption
   }
   return (
     <ThemeContext.Provider value={ values }>

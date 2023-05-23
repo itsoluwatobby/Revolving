@@ -63,11 +63,11 @@ export const Post = ({ post }: Props) => {
  
   return (
     <article 
-      className={`${post?.fontFamily} p-2 pl-3 text-sm sm:w-full min-w-[58%]`}>
+      className={`${post?.fontFamily} p-2 pl-3 text-xs sm:w-full min-w-[58%]`}>
       <div 
         // onClick={openText}
         className='relative flex items-center gap-3'>
-        <p className='capitalize'>{post?.author || 'anonymous'}</p>
+        <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{post?.author || 'anonymous'}</p>
         <span>.</span>
         <p>{format(post?.storyDate, 'en-US')}</p>
         <FiMoreVertical
@@ -93,11 +93,11 @@ export const Post = ({ post }: Props) => {
         }
       </div>
         <p 
-          className='whitespace-pre-wrap font-bold capitalize text-xl'>{post?.title}</p>
+          className='whitespace-pre-wrap font-bold capitalize text-lg'>{post?.title}</p>
       <Link to={`/story/${post?._id}`} >
         <p 
           onClick={openText}
-          className='whitespace-pre-wrap'>
+          className='whitespace-pre-wrap text-sm'>
             {bodyContent}
         </p>
       </Link>

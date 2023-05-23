@@ -7,7 +7,7 @@ import { ThemeContextType } from "../posts"
 import { AuthenticationContextType } from "../data"
 
 export default function useLogout() {
-  const { auth, setAuth } = useAuthenticationContext() as AuthenticationContextType
+  const { setAuth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId')
   const navigate = useNavigate()

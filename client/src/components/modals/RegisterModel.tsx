@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useSWRMutation from "swr/mutation";
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { ThemeContextType } from '../../posts';

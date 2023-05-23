@@ -44,7 +44,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     : content = (<p>No posts available</p>)
   )
   return (
-    <div className='box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl pb-5'>
+    <div className='box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
       {content}
     </div>
   )

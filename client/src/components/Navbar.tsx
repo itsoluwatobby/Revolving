@@ -10,7 +10,7 @@ import TopLeft from './navModals/TopLeft.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
-const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1 hover:pb-1.5 hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-md';
+const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1 hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 duration-200 ease-in-out rounded-md';
 
 const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase text-center text-xs hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-sm';
 
@@ -18,7 +18,7 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 export const Navbar = () => {
   const { pathname } = useLocation();
   const {posts, typingEvent} = usePostContext() as PostContextType
-  const {theme, rollout, fontFamily, changeFontFamily, fontOption} = useThemeContext() as ThemeContextType
+  const {theme, rollout, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { postId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
   const [options, setOptions] = useState<string>('')
@@ -27,9 +27,10 @@ export const Navbar = () => {
 
   const targetPost = posts?.find(pos => pos?._id == postId)
 
-  useEffect(() => {
-    changeFontFamily(targetPost?.fontFamily as string)
-  }, [targetPost, changeFontFamily])
+  const changeFontFamily = (font: string) => {
+    setFontFamily(targetPost?.fontFamily || font)
+    localStorage.setItem('fontFamily', font);
+  }
 
   useEffect(() => {
     const responseTime = setTimeout(() => {
@@ -49,34 +50,60 @@ export const Navbar = () => {
       <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 mobile:w-40 ${pathname != `/story/${postId}` ? 'w-44' : 'w-32'}`}>
         <TopRight />
       </div>
-      <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${postId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
-          {
-            address.slice(0, 2).includes(pathname) ? (
-                Object.entries(custom_fonts).map(([key, options]) => (
-
-                  <li
-                    onClick={() => changeFontFamily(key)}
-                    className={`${select_styles} ${key === fontFamily ? 'bg-gray-200' : null}`} key={key}>
-                      {options as string}
-                  </li>
-                  )
-                )
-              ) : 
-                pathname == `/story/${postId}` && (
-                  postOptions.map(option => (
-                    <li title={`${option == 'pdf' ? 'save as pdf' : option}`}
-                      onClick={() => setOptions(option)}
-                      className={`${option_styles} ${option == options ? 'bg-slate-500' : null}`} key={option}
-                      >
-                        {option}
-                      </li>
-                  )
+     { 
+      address.slice(0, 2).includes(pathname) ? (
+          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${postId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
+            {
+              Object.entries(custom_fonts).map(([key, options]) => (
+                <li
+                  onClick={() => changeFontFamily(key)}
+                  className={`${select_styles} ${key === fontFamily ? 'bg-gray-200' : null}`} key={key}>
+                    {options as string}
+                </li>
                 )
               )
-          }
-      </ul>
+            
+            }
+          </ul>
+        ) : 
+        <ButtonFunc 
+            pathname={pathname} setOptions={setOptions}
+            postId={postId} theme={theme} fontOption={fontOption}
+            options={options}
+        />  
+      }
       {rollout && <Drawdown />}
     </nav>
+  )
+}
+
+type ButtonFuncProps = {
+  pathname: string,
+  postId?: string,
+  theme: string,
+  options: string,
+  fontOption: boolean,
+  setOptions: React.Dispatch<React.SetStateAction<string>>
+}
+
+const ButtonFunc = ({ pathname, setOptions, postId, theme, fontOption, options } : ButtonFuncProps) => {
+
+  return (
+    <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${postId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
+        {
+          pathname == `/story/${postId}` && (
+            postOptions.map(option => (
+                <li title={`${option == 'pdf' ? 'save as pdf' : option}`}
+                  onClick={() => setOptions(option)}
+                  className={`${option_styles} ${option == options ? 'bg-slate-500' : null}`} key={option}
+                  >
+                  {option}
+                </li>
+              )
+            )
+          )
+        }
+    </ul>
   )
 }
 
