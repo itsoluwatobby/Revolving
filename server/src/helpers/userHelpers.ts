@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import { UserProps } from "../../types.js";
 import { UserModel } from "../models/User.js";
 
@@ -12,7 +13,7 @@ export const createUser = async(user: Partial<UserProps>) => await UserModel.cre
 
 export const updateUser = async(userId: string, updatedUser: UserProps) => await UserModel.findByIdAndUpdate({ _id: userId }, {...updatedUser})
 
-export const followOrUnFollow = async(followerId: string, followingId: string): Promise<string> => {
+export const followOrUnFollow = async(followerId: ObjectId, followingId: ObjectId): Promise<string> => {
   const user = await UserModel.findById(followerId).exec();
   const following = await UserModel.findById(followingId).exec();
   if(user._id.equals(followingId)) return 'duplicate'

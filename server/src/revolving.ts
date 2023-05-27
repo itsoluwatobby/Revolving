@@ -20,7 +20,7 @@ import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
 import { verifyAccessToken } from './middleware/verifyTokens.js';
 import storyRouter from './routes/storyRoutes.js';
-import { getStories, getStory } from './controller/storyController.js';
+import { getStories, getStory, getStoryByCategory } from './controller/storyController.js';
 import { getUser, getUsers } from './controller/userController.js';
 import userRouter from './routes/usersRoutes.js';
 import passwordResetRouter from './routes/resetPassword.js';
@@ -85,6 +85,7 @@ else{
   app.use('/revolving/auth', passwordResetRouter);
 
   app.get('/revolving/story', getStories);
+  app.get('/revolving/story', getStoryByCategory);
   app.get('/revolving/story/:storyId', getStory);
 
   // checks for accesstoken

@@ -26,14 +26,16 @@ interface ClaimProps extends JwtPayload{
   email: string
 }
 
+type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+
 interface SharedProps extends Document{
-  sharerId: Types.ObjectId,
-  storyId: Types.ObjectId,
+  sharerId: string,
+  storyId: string,
   sharedDate: string,
-  sharedStory: object
+  likes: string[],
+  sharedStory: object,
 }
 
-type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
 // interface StoryType{
 //   userId: Types.ObjectId
@@ -50,6 +52,11 @@ type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'N
 //   editDate: string
 // }
 
+type SharedInfo = {
+  userId: string,
+  sharedId: string
+}
+
 interface StoryProps extends Document{
   userId: Types.ObjectId
   title: string
@@ -58,8 +65,8 @@ interface StoryProps extends Document{
   fontFamily: string
   storyDate: string
   category: Categories[]
-  commentIds?: string[]
-  isShared?: string[]
+  commentIds?: ObjectId[]
+  isShared?: SharedInfo[]
   likes: string[]
   edited: false
   editDate: string
@@ -81,8 +88,8 @@ interface UserProps extends Document{
   isResetPassword: boolean,
   verificationToken: string,
   dateLocked: string,
-  followers?: string[],
-  followings?: string[],
+  followers?: ObjectId[],
+  followings?: ObjectId[],
   lastSeen: string,
   hobbies: string[],
   status: 'online' | 'offline',
