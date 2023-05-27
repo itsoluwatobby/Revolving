@@ -35,7 +35,9 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
                 const matchingPassword = yield brcypt.compare(password, (_a = duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.authentication) === null || _a === void 0 ? void 0 : _a.password);
                 if (!matchingPassword)
                     return responseType({ res, status: 409, message: 'Email taken' });
-                return responseType({ res, status: 200, message: 'You already have an account, Please login' });
+                return (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountLocked)
+                    ? responseType({ res, status: 423, message: 'Account Locked' })
+                    : responseType({ res, status: 200, message: 'You already have an account, Please login' });
             }
             else
                 return responseType({ res, status: 200, message: 'Please check your email to activate your account' });

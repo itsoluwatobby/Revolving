@@ -5,11 +5,13 @@ import { ClaimProps, ResponseType, UserProps } from "../../types.js";
 import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
+import { ObjectId } from "mongoose";
 
 interface NewUserProp extends Request{
   username: string,
   email: string,
-  password: string
+  password: string,
+  userId: string
 }
 
 interface QueryProps extends Request{token: string}

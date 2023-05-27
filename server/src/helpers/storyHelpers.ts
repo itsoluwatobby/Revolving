@@ -1,4 +1,5 @@
-import { StoryProps } from "../../types.js";
+import { ObjectId } from "mongoose";
+import { Categories, StoryProps } from "../../types.js";
 import { StoryModel } from "../models/Story.js";
 
 export const getAllStories = async() => await StoryModel.find().lean();
@@ -12,7 +13,8 @@ export const createUserStory = async(story: StoryProps) => {
   const newStory = new StoryModel({ ...rest })
   await Promise.allSettled(category.map(catVal => {
     newStory.category.push(catVal)
-  }))
+    }
+  ))
   await newStory.save();
   return newStory;
 }
@@ -20,7 +22,7 @@ export const createUserStory = async(story: StoryProps) => {
 export const updateUserStory = async(userId: string, storyId: string, updateStory: StoryProps) => await StoryModel.findByIdAndUpdate({ userId, _id: storyId }, {...updateStory})
 
 export const likeAndUnlikeStory = async(userId: string, storyId: string): Promise<string> => {
-  const story = await StoryModel.findById({ _id: storyId }).exec();
+  const story = await StoryModel.findById(storyId).exec();
   if(!story?.likes.includes(userId)) {
     await story?.updateOne({ $push: {likes: userId} })
     return 'You liked this post'
