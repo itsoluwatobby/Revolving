@@ -1,7 +1,7 @@
-import { Request, Response, response } from "express";
+import { Request, Response } from "express";
 import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
-import { ClaimProps, ResponseType, UserProps } from "../../types.js";
+import { ClaimProps, UserProps } from "../../types.js";
 import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
@@ -74,7 +74,7 @@ export const accountConfirmation = async(req: NewUserProp, res: Response) => {
     if (!verify?.email) return res.sendStatus(400)
     if (verify?.email != user?.email) return res.sendStatus(400)
 
-    if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your has already been activated'})
+    if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
     await user.updateOne({$set: { isAccountActivated: true, verificationToken: '' }})
     return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
   })

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import { ClaimProps, ResponseType, USERROLES } from '../../types.js';
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 

@@ -33,7 +33,7 @@ export const createUserStory = (story) => __awaiter(void 0, void 0, void 0, func
 });
 export const updateUserStory = (userId, storyId, updateStory) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.findByIdAndUpdate({ userId, _id: storyId }, Object.assign({}, updateStory)); });
 export const likeAndUnlikeStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () {
-    const story = yield StoryModel.findById({ _id: storyId }).exec();
+    const story = yield StoryModel.findById(storyId).exec();
     if (!(story === null || story === void 0 ? void 0 : story.likes.includes(userId))) {
         yield (story === null || story === void 0 ? void 0 : story.updateOne({ $push: { likes: userId } }));
         return 'You liked this post';
