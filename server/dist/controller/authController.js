@@ -23,6 +23,7 @@ import brcypt from 'bcrypt';
 import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
+import { redisClient } from "../helpers/redis.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -51,7 +52,7 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         };
         const newUser = yield createUser(Object.assign({}, user));
         const roles = Object.values(newUser === null || newUser === void 0 ? void 0 : newUser.roles);
-        const token = yield signToken({ roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
+        const token = yield signToken({ roles, email }, '25s', process.env.ACCOUNT_VERIFICATION_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;
         const options = mailOptions(email, username, verificationLink);
         yield newUser.updateOne({ $set: { verificationToken: token } });
@@ -82,7 +83,7 @@ export const accountConfirmation = (req, res) => __awaiter(void 0, void 0, void 
         if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
             return res.sendStatus(400);
         if (user.isAccountActivated)
-            return responseType({ res, status: 200, message: 'Your has already been activated' });
+            return responseType({ res, status: 200, message: 'Your account has already been activated' });
         yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: '' } });
         return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`);
     }));
@@ -118,7 +119,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-        const accessToken = yield signToken({ roles, email }, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
+        const accessToken = yield signToken({ roles, email }, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
         const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
         const { _id } = user, rest = __rest(user, ["_id"]);
         yield user.updateOne({ $set: { status: 'online', refreshToken } });
@@ -132,19 +133,23 @@ export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const { userId } = req.params;
         if (!userId) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
+            redisClient.quit();
             return res.sendStatus(204);
         }
         const user = yield getUserById(userId);
         if (!user) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
+            redisClient.quit();
             return res.sendStatus(204);
         }
         user.updateOne({ $set: { status: 'offline', authentication: { sessionID: '' }, refreshToken: '' } });
+        redisClient.quit();
         res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true }); //secure: true
         return res.sendStatus(204);
     }
     catch (error) {
         res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
+        redisClient.quit();
         return res.sendStatus(500);
     }
 });

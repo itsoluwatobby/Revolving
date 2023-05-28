@@ -5,7 +5,7 @@ import { ClaimProps, UserProps } from "../../types.js";
 import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
-import { ObjectId } from "mongoose";
+import { getCachedValueResponse, redisClient } from "../helpers/redis.js";
 
 interface NewUserProp extends Request{
   username: string,
@@ -97,6 +97,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
       if (!verify?.email) {
         const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
         const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
+
         const options = mailOptions(email, user?.username, verificationLink)
         await user.updateOne({$set: {verificationToken: token}});
 
@@ -108,7 +109,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
       else if (verify?.email) return responseType({res, status: 200, message: 'Please check your email to activate your account'})
     }
     const roles = Object.values(user?.roles);
-    const accessToken = await signToken({roles, email}, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
+    const accessToken = await signToken({roles, email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
     const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
 
     const { _id, ...rest } = user
@@ -127,20 +128,23 @@ export const logoutHandler = async(req: NewUserProp, res: Response) => {
     const {userId} = req.params
     if (!userId) {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
+      redisClient.quit();
       return res.sendStatus(204);
     }
     const user = await getUserById(userId);
     if (!user) {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
+      redisClient.quit();
       return res.sendStatus(204);
     }
     user.updateOne({$set: {status: 'offline', authentication: { sessionID: '' }, refreshToken: '' }})
-
+    redisClient.quit();
     res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
     return res.sendStatus(204)
   }
   catch(error){
     res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
+    redisClient.quit();
     return res.sendStatus(500);
   }
 }

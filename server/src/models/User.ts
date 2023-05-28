@@ -28,9 +28,10 @@ const USERSCHEMA: Schema = new Schema(
     status: { type: String, default: 'offline', enum: ['online', 'offline'] },
     refreshToken: { type: String, default: '' },
     editDate: { type: String, default: '' },
-    gender: { type: String, default: '', enum: ['Female', 'Male', 'Others'] },
+    gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     codeName: { type: String, default: '', trim: true },
-    stack: { type: Array, default: [] }
+    stack: { type: Array, default: [] },
+    country: { type: Array, default: '' },
   },
   { 
     minimize: false, 

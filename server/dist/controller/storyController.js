@@ -78,9 +78,12 @@ export const getStory = (req, res) => {
         const { storyId } = req.params;
         if (!storyId)
             return res.sendStatus(400);
-        const userStory = yield getStoryById(storyId);
-        if (!userStory)
-            return responseType({ res, status: 404, message: 'story not found' });
+        const userStory = yield getCachedResponse({ key: `singleStory:${storyId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const story = yield getStoryById(storyId);
+                if (!story)
+                    return responseType({ res, status: 404, message: 'story not found' });
+                return story;
+            }) });
         responseType({ res, status: 200, count: 1, data: userStory });
     }));
 };
@@ -93,9 +96,12 @@ export const getUserStory = (req, res) => {
         if (!getUserById(userId))
             return res.sendStatus(401);
         // if(user?.isAccountLocked) return res.sendStatus(401)
-        const userStories = yield getUserStories(userId);
-        if (!(userStories === null || userStories === void 0 ? void 0 : userStories.length))
-            return responseType({ res, status: 404, message: 'You have no stories' });
+        const userStories = yield getCachedResponse({ key: `userStory:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const userStory = yield getUserStories(userId);
+                if (!(userStory === null || userStory === void 0 ? void 0 : userStory.length))
+                    return responseType({ res, status: 404, message: 'You have no stories' });
+                return userStory;
+            }) });
         return responseType({ res, status: 200, count: userStories === null || userStories === void 0 ? void 0 : userStories.length, data: userStories });
     }));
 };
@@ -104,22 +110,25 @@ export const getStoryByCategory = (req, res) => {
         const { category } = req.query;
         if (!category)
             return res.sendStatus(400);
-        const storyCategory = yield StoryModel.find({ category: { $in: [category] } });
-        if (!(storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length))
-            return responseType({ res, status: 404, message: 'You have no stories' });
+        const storyCategory = yield getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
+                if (!(categoryStory === null || categoryStory === void 0 ? void 0 : categoryStory.length))
+                    return responseType({ res, status: 404, message: 'You have no stories' });
+                return categoryStory;
+            }) });
         return responseType({ res, status: 200, count: storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length, data: storyCategory });
     }));
 };
 export const getStories = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const allStories = yield getCachedResponse('allStories', 3600, () => __awaiter(void 0, void 0, void 0, function* () {
-            const stories = yield getAllStories();
-            const sharedStories = yield getAllSharedStories();
-            const everyStories = [...stories, ...sharedStories];
-            if (!(everyStories === null || everyStories === void 0 ? void 0 : everyStories.length))
-                return 'empty';
-            return everyStories;
-        }));
+        const allStories = yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const stories = yield getAllStories();
+                const sharedStories = yield getAllSharedStories();
+                const everyStories = [...stories, ...sharedStories];
+                if (!(everyStories === null || everyStories === void 0 ? void 0 : everyStories.length))
+                    return 'empty';
+                return everyStories;
+            }) });
         return typeof allStories == 'string' ? responseType({ res, status: 404, message: 'No stories available' }) : responseType({ res, status: 200, count: allStories === null || allStories === void 0 ? void 0 : allStories.length, data: allStories });
     }));
 };
@@ -143,9 +152,12 @@ export const getSharedStory = (req, res) => {
         const { sharedId } = req.params;
         if (!sharedId)
             return res.sendStatus(400);
-        const sharedStory = yield getSharedStoryById(sharedId);
-        if (!sharedStory)
-            return responseType({ res, status: 404, message: 'story not found' });
+        const sharedStory = yield getCachedResponse({ key: `sharedStory:${sharedId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const shared = yield getSharedStoryById(sharedId);
+                if (!shared)
+                    return responseType({ res, status: 404, message: 'story not found' });
+                return shared;
+            }) });
         responseType({ res, status: 200, count: 1, data: sharedStory });
     }));
 };
@@ -178,9 +190,12 @@ export const getSharedStoriesByUser = (req, res) => {
         const { userId } = req.params;
         if (!userId)
             return res.sendStatus(400);
-        const sharedStories = yield getUserSharedStories(userId);
-        if (!(sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length))
-            return responseType({ res, status: 404, message: 'No shared stories available' });
+        const sharedStories = yield getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const sharedStory = yield getUserSharedStories(userId);
+                if (!(sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.length))
+                    return responseType({ res, status: 404, message: 'No shared stories available' });
+                return sharedStory;
+            }) });
         return responseType({ res, status: 200, count: sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length, data: sharedStories });
     }));
 };
