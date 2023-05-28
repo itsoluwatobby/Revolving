@@ -28,15 +28,6 @@ interface ClaimProps extends JwtPayload{
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
-interface SharedProps extends Document{
-  sharerId: string,
-  storyId: string,
-  sharedDate: string,
-  likes: string[],
-  sharedStory: object,
-}
-
-
 // interface StoryType{
 //   userId: Types.ObjectId
 //   title: string
@@ -72,6 +63,14 @@ interface StoryProps extends Document{
   editDate: string
 }
 
+interface SharedProps extends Document{
+  sharerId: string,
+  storyId: string,
+  sharedDate: string,
+  likes: string[],
+  sharedStory: StoryProps,
+}
+
 interface UserProps extends Document{
   username: string,
   email: string,
@@ -94,7 +93,11 @@ interface UserProps extends Document{
   hobbies: string[],
   status: 'online' | 'offline',
   refreshToken: string,
-  editDate: string
+  editDate: string,
+  gender: 'Female' | 'Male' | 'Others',
+  codeName: string,
+  stack: string[],
+  country: string
 }
 
 interface ResponseType extends Response{

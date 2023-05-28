@@ -1,4 +1,3 @@
-import { ObjectId } from "mongoose";
 import { UserProps } from "../../types.js";
 import { UserModel } from "../models/User.js";
 

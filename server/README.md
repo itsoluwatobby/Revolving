@@ -46,5 +46,4 @@ _BEFORE REDIS_
 ![before redis implementation](./assets/before-redis.png)
 
 _AFTER REDIS_
-
 ![after redis implementation](./assets/after-redis.png)

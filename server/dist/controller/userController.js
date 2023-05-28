@@ -9,20 +9,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { followOrUnFollow, getAllUsers, getUserById } from "../helpers/userHelpers.js";
+import { getCachedResponse } from "../helpers/redis.js";
 export const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const users = yield getAllUsers();
-        if (!(users === null || users === void 0 ? void 0 : users.length))
-            return responseType({ res, status: 404, message: 'No users available' });
+        const users = yield getCachedResponse({ key: `allUsers`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const allUsers = yield getAllUsers();
+                if (!(allUsers === null || allUsers === void 0 ? void 0 : allUsers.length))
+                    return responseType({ res, status: 404, message: 'No users available' });
+                return allUsers;
+            }) });
         return responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users });
     }));
 });
 export const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
-        const user = yield getUserById(userId);
-        if (!user)
-            return responseType({ res, status: 404, message: 'User not found' });
+        const user = yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const current = yield getUserById(userId);
+                if (!current)
+                    return responseType({ res, status: 404, message: 'User not found' });
+                return current;
+            }) });
         return responseType({ res, status: 200, count: 1, data: user });
     }));
 });
