@@ -1,10 +1,13 @@
+import { Types } from "mongoose";
 import { SharedStoryModel } from "../models/SharedStory.js";
 import { dateTime } from "./helper.js";
 import { getStoryById } from "./storyHelpers.js";
 
-export const getSharedStoryById = async(sharedId: string) => await SharedStoryModel.findById(sharedId).exec();
+export const getSharedStoryById = async(sharedId: string) => await SharedStoryModel.findById(sharedId).select('-sharedStory.isShared');
 
 export const getUserSharedStories = async(sharerId: string) => await SharedStoryModel.find({ sharerId }).lean();
+
+export const getAllSharedStories = async() => await SharedStoryModel.find().lean();
 
 export const createShareStory = async(userId: string, storyId: string) => {
   const story = await getStoryById(storyId)
@@ -12,14 +15,17 @@ export const createShareStory = async(userId: string, storyId: string) => {
     sharerId: userId, storyId: story?._id, sharedDate: dateTime, sharedStory: {...story}
   })
   await newSharedStory.save();
-  await story?.updateOne({$push: { isShared: { userId, sharedId: newSharedStory?._id } }});
+  await story?.updateOne({$push: { isShared: { userId, sharedId: newSharedStory?._id.toString() } }});
   return newSharedStory;
 }
 
 export const unShareStory = async(userId: string, sharedId: string) => {
   const sharedStory = await getSharedStoryById(sharedId)
+  if(!sharedStory) return 'not found'
   const story = await getStoryById(sharedStory?.storyId)
-  await sharedStory?.deleteOne();
+  const verifyUser = await story?.isShared.map(targetShare => targetShare?.userId === userId && targetShare?.sharedId === sharedId).find(res => res = true)
+  if(!verifyUser) return 'unauthorized'
+  await sharedStory.deleteOne();
   await story?.updateOne({ $pull: { isShared: { userId, sharedId } } });
 }
 

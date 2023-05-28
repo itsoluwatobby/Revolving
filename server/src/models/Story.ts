@@ -14,7 +14,7 @@ const STORYSCHEMA: Schema = new Schema(
     commentIds: { type: Array, default: [] },
     category: { 
       type: Array, required: true, 
-      default: 'General'
+      default: ['General']
     },
     isShared: { type: Array, default: [] },
     likes: { type: Array, default: [] },

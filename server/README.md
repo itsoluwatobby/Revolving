@@ -10,6 +10,7 @@
 * Nodejs
 * socket.io
 * express.js
+* redis
 ---
 > **Server Traffic**
 
@@ -30,6 +31,20 @@ Accesstoken and user rols to confirm if a user a authorised to perform any task 
 
 RefressToken is used to issue a new accessToken if a user's accesstoken expires while still active. The refreshToken will be sent automatically immediately a user gets a **401 unauthorised response** and this automation will handle on the client.
 
-SessionID 
+---
 
+> ~~SessionID~~ 
 
+---
+
+> Data Caching
+
+Redis is used for data caching which makes the api 10x faster in responding to user requests 
+
+_BEFORE REDIS_
+
+![before redis implementation](./assets/before-redis.png)
+
+_AFTER REDIS_
+
+![after redis implementation](./assets/after-redis.png)

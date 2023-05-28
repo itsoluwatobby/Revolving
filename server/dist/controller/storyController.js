@@ -11,8 +11,11 @@ import { getUserById } from "../helpers/userHelpers.js";
 import { createUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
+import { StoryModel } from "../models/Story.js";
+import { createShareStory, getAllSharedStories, getSharedStoryById, getUserSharedStories, likeAndUnlikeSharedStory, unShareStory } from "../helpers/sharedHelper.js";
+import { getCachedResponse } from "../helpers/redis.js";
 ;
-export const createNewStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const createNewStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         let newStory = req.body;
@@ -27,8 +30,8 @@ export const createNewStory = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const story = yield createUserStory(Object.assign({}, newStory));
         return responseType({ res, status: 201, count: 1, data: story });
     }));
-});
-export const updateStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const updateStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
         const editedStory = req.body;
@@ -46,8 +49,8 @@ export const updateStory = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const edited = yield getStoryById(storyId);
         return responseType({ res, status: 201, count: 1, data: edited });
     }));
-});
-export const deleteStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const deleteStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
         if (!userId || !storyId)
@@ -69,8 +72,8 @@ export const deleteStory = (req, res) => __awaiter(void 0, void 0, void 0, funct
         yield story.deleteOne();
         return res.sendStatus(204);
     }));
-});
-export const getStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const getStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { storyId } = req.params;
         if (!storyId)
@@ -80,9 +83,9 @@ export const getStory = (req, res) => __awaiter(void 0, void 0, void 0, function
             return responseType({ res, status: 404, message: 'story not found' });
         responseType({ res, status: 200, count: 1, data: userStory });
     }));
-});
+};
 // HANDLE GETTING A USER STORIES
-export const getUserStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const getUserStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         if (!userId)
@@ -95,15 +98,31 @@ export const getUserStory = (req, res) => __awaiter(void 0, void 0, void 0, func
             return responseType({ res, status: 404, message: 'You have no stories' });
         return responseType({ res, status: 200, count: userStories === null || userStories === void 0 ? void 0 : userStories.length, data: userStories });
     }));
-});
-export const getStories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const getStoryByCategory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const stories = yield getAllStories();
-        if (!(stories === null || stories === void 0 ? void 0 : stories.length))
-            return responseType({ res, status: 404, message: 'No stories available' });
-        return responseType({ res, status: 200, count: stories === null || stories === void 0 ? void 0 : stories.length, data: stories });
+        const { category } = req.query;
+        if (!category)
+            return res.sendStatus(400);
+        const storyCategory = yield StoryModel.find({ category: { $in: [category] } });
+        if (!(storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length))
+            return responseType({ res, status: 404, message: 'You have no stories' });
+        return responseType({ res, status: 200, count: storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length, data: storyCategory });
     }));
-});
+};
+export const getStories = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const allStories = yield getCachedResponse('allStories', 3600, () => __awaiter(void 0, void 0, void 0, function* () {
+            const stories = yield getAllStories();
+            const sharedStories = yield getAllSharedStories();
+            const everyStories = [...stories, ...sharedStories];
+            if (!(everyStories === null || everyStories === void 0 ? void 0 : everyStories.length))
+                return 'empty';
+            return everyStories;
+        }));
+        return typeof allStories == 'string' ? responseType({ res, status: 404, message: 'No stories available' }) : responseType({ res, status: 200, count: allStories === null || allStories === void 0 ? void 0 : allStories.length, data: allStories });
+    }));
+};
 export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
@@ -115,6 +134,67 @@ export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0,
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const result = yield likeAndUnlikeStory(userId, storyId);
+        responseType({ res, status: 201, message: result });
+    }));
+});
+// SHARED STORIES ROUTE
+export const getSharedStory = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { sharedId } = req.params;
+        if (!sharedId)
+            return res.sendStatus(400);
+        const sharedStory = yield getSharedStoryById(sharedId);
+        if (!sharedStory)
+            return responseType({ res, status: 404, message: 'story not found' });
+        responseType({ res, status: 200, count: 1, data: sharedStory });
+    }));
+};
+export const shareStory = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId, storyId } = req.params;
+        if (!userId || !storyId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
+            return responseType({ res, status: 423, message: 'Account locked' });
+        const newShare = yield createShareStory(userId, storyId);
+        return responseType({ res, status: 201, count: 1, data: newShare });
+    }));
+};
+export const unShareUserStory = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId, sharedId } = req.params;
+        if (!userId || !sharedId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
+            return responseType({ res, status: 423, message: 'Account locked' });
+        const result = yield unShareStory(userId, sharedId);
+        return result == 'not found' ? responseType({ res, status: 404, count: 0, message: result }) : result == 'unauthorized' ? responseType({ res, status: 401, count: 0, message: result }) : responseType({ res, status: 201, count: 1, message: 'story unshared' });
+    }));
+};
+export const getSharedStoriesByUser = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId } = req.params;
+        if (!userId)
+            return res.sendStatus(400);
+        const sharedStories = yield getUserSharedStories(userId);
+        if (!(sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length))
+            return responseType({ res, status: 404, message: 'No shared stories available' });
+        return responseType({ res, status: 200, count: sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length, data: sharedStories });
+    }));
+};
+export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId, sharedId } = req.params;
+        if (!userId || !sharedId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        if (!user)
+            return responseType({ res, status: 403, message: 'You do not have an account' });
+        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
+            return responseType({ res, status: 423, message: 'Account locked' });
+        const result = yield likeAndUnlikeSharedStory(userId, sharedId);
         responseType({ res, status: 201, message: result });
     }));
 });
