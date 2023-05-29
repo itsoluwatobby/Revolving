@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserById, getUserByToken, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { ClaimProps, UserProps } from "../../types.js";
 import { sub } from "date-fns";
-import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
+import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
-import { getCachedValueResponse, redisClient } from "../helpers/redis.js";
+import { redisClient } from "../helpers/redis.js";
 
 interface NewUserProp extends Request{
   username: string,
@@ -125,26 +125,27 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
 
 export const logoutHandler = async(req: NewUserProp, res: Response) => {
   try{
-    const {userId} = req.params
-    if (!userId) {
+    const cookies = req.cookies
+    if(!cookies?.revolving) {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
-      redisClient.quit();
+      redisFunc()
       return res.sendStatus(204);
     }
-    const user = await getUserById(userId);
+    const token = cookies?.revolving;
+    const user = await getUserByToken(token)
     if (!user) {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
-      redisClient.quit();
+      redisFunc()
       return res.sendStatus(204);
     }
     user.updateOne({$set: {status: 'offline', authentication: { sessionID: '' }, refreshToken: '' }})
-    redisClient.quit();
+    redisFunc()
     res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
     return res.sendStatus(204)
   }
   catch(error){
     res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
-    redisClient.quit();
+    redisFunc()
     return res.sendStatus(500);
   }
 }
@@ -205,3 +206,11 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
   })
 }
 
+async function redisFunc(){
+  objInstance.reset();
+  if(redisClient.isOpen){
+    await redisClient.flushAll();
+    await redisClient.quit();
+  }
+  return;
+}

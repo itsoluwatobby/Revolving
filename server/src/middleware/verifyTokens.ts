@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { getUserByToken } from "../helpers/userHelpers.js";
-import { responseType, signToken, verifyToken } from "../helpers/helper.js";
+import { responseType, signToken, verifyToken, objInstance } from "../helpers/helper.js";
 import { ClaimProps, USERROLES } from "../../types.js";
 
 interface TokenProp extends Request{
@@ -13,6 +13,12 @@ interface CookieProp extends Request{
     revolving: string
   }
 }
+
+export const logMethods = (req: Request, res: Response, next: NextFunction) => {
+  objInstance.pushIn({ mtd: req.method, url: req.url })
+  console.log(objInstance.getUrl())
+  next()
+} 
 
 export const verifyAccessToken = async(req: TokenProp, res: Response, next: NextFunction) => {
   const auth = req.headers['authorization']

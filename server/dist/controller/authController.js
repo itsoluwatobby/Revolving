@@ -18,10 +18,10 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserByToken, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
-import { asyncFunc, mailOptions, responseType, signToken, transporter, verifyToken } from "../helpers/helper.js";
+import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 import { redisClient } from "../helpers/redis.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -52,7 +52,7 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         };
         const newUser = yield createUser(Object.assign({}, user));
         const roles = Object.values(newUser === null || newUser === void 0 ? void 0 : newUser.roles);
-        const token = yield signToken({ roles, email }, '25s', process.env.ACCOUNT_VERIFICATION_SECRET);
+        const token = yield signToken({ roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;
         const options = mailOptions(email, username, verificationLink);
         yield newUser.updateOne({ $set: { verificationToken: token } });
@@ -130,26 +130,27 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId } = req.params;
-        if (!userId) {
+        const cookies = req.cookies;
+        if (!(cookies === null || cookies === void 0 ? void 0 : cookies.revolving)) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
-            redisClient.quit();
+            redisFunc();
             return res.sendStatus(204);
         }
-        const user = yield getUserById(userId);
+        const token = cookies === null || cookies === void 0 ? void 0 : cookies.revolving;
+        const user = yield getUserByToken(token);
         if (!user) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
-            redisClient.quit();
+            redisFunc();
             return res.sendStatus(204);
         }
         user.updateOne({ $set: { status: 'offline', authentication: { sessionID: '' }, refreshToken: '' } });
-        redisClient.quit();
+        redisFunc();
         res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true }); //secure: true
         return res.sendStatus(204);
     }
     catch (error) {
         res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
-        redisClient.quit();
+        redisFunc();
         return res.sendStatus(500);
     }
 });
@@ -215,4 +216,14 @@ export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, fun
             return responseType({ res, status: 401, message: 'unauthorised' });
     }));
 });
+function redisFunc() {
+    return __awaiter(this, void 0, void 0, function* () {
+        objInstance.reset();
+        if (redisClient.isOpen) {
+            yield redisClient.flushAll();
+            yield redisClient.quit();
+        }
+        return;
+    });
+}
 //# sourceMappingURL=authController.js.map

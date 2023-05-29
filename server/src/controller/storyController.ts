@@ -6,7 +6,7 @@ import { asyncFunc, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
 import { Like_Unlike_Shared, createShareStory, getAllSharedStories, getSharedStoryById, getUserSharedStories, likeAndUnlikeSharedStory, unShareStory } from "../helpers/sharedHelper.js";
 import { Categories, SharedProps, StoryProps } from "../../types.js";
-import { getCachedResponse } from "../helpers/redis.js";
+import { getCachedResponse, redisClient } from "../helpers/redis.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -72,9 +72,10 @@ export const getStory = (req: RequestProp, res: Response) => {
     if(!storyId) return res.sendStatus(400);
     const userStory = await getCachedResponse({key:`singleStory:${storyId}`, timeTaken: 1800, cb: async() => {
       const story = await getStoryById(storyId)
-      if(!story) return responseType({res, status: 404, message: 'story not found'})
       return story;
-    }}) as StoryProps;
+    }, reqUrl: req.url }) as StoryProps;
+    
+    if(!userStory) return responseType({res, status: 404, message: 'story not found'})
     responseType({res, status: 200, count:1, data: userStory})
   })
 }
@@ -88,9 +89,10 @@ export const getUserStory = (req: Request, res: Response) => {
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const userStories = await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
       const userStory = await getUserStories(userId) 
-      if(!userStory?.length) return responseType({res, status: 404, message: 'You have no stories'})
       return userStory
-    }})  as (StoryProps[] | string);
+    }, reqUrl: req.url })  as (StoryProps[] | string);
+    
+    if(!userStories?.length) return responseType({res, status: 404, message: 'You have no stories'})
     return responseType({res, status: 200, count: userStories?.length, data: userStories})
   })
 }
@@ -101,9 +103,10 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
     if(!category) return res.sendStatus(400);
     const storyCategory = await getCachedResponse({key:`story:${category}`, cb: async() => {
       const categoryStory = await StoryModel.find({category: {$in: [category]}})
-      if(!categoryStory?.length) return responseType({res, status: 404, message: 'You have no stories'});
       return categoryStory
-    }}) as (StoryProps[] | string)
+    }, reqUrl: req.url }) as (StoryProps[] | string)
+    
+    if(!storyCategory?.length) return responseType({res, status: 404, message: 'You have no stories'});
     return responseType({res, status: 200, count: storyCategory?.length, data: storyCategory})
   })
 }
@@ -114,10 +117,11 @@ export const getStories = (req: Request, res: Response) => {
       const stories = await getAllStories();
       const sharedStories = await getAllSharedStories();
       const everyStories = [...stories, ...sharedStories]
-      if(!everyStories?.length) return 'empty'
       return everyStories
-    }}) as (StoryProps[] | string)
-    return typeof allStories == 'string' ? responseType({res, status: 404, message: 'No stories available'}) : responseType({res, status: 200, count: allStories?.length, data: allStories})
+    }, reqUrl: req.url}) as (StoryProps[] | string)
+
+    if(!allStories?.length) return responseType({res, status: 404, message: 'No stories available'})
+    return responseType({res, status: 200, count: allStories?.length, data: allStories})
   })
 }
 
@@ -139,10 +143,11 @@ export const getSharedStory = (req: RequestProp, res: Response) => {
     const {sharedId} = req.params
     if(!sharedId) return res.sendStatus(400);
     const sharedStory = await getCachedResponse({key:`sharedStory:${sharedId}`, cb: async() => {
-      const shared = await getSharedStoryById(sharedId)
-      if(!shared) return responseType({res, status: 404, message: 'story not found'})
+      const shared = await getSharedStoryById(sharedId) as SharedProps
       return shared
-    }}) as SharedProps;
+    }, reqUrl: req.url}) as SharedProps;
+
+    if(!sharedStory) return responseType({res, status: 404, message: 'story not found'})
     responseType({res, status: 200, count:1, data: sharedStory})
   })
 }
@@ -165,6 +170,7 @@ export const unShareUserStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await unShareStory(userId, sharedId)
+    redisClient.DEL(`sharedStory:${sharedId}`)
     return result == 'not found' ? responseType({res, status: 404, count:0, message: result }) : result == 'unauthorized' ? responseType({res, status: 401, count:0, message: result }) : responseType({res, status: 201, count:1, message: 'story unshared'})
   })
 }
@@ -174,10 +180,11 @@ export const getSharedStoriesByUser = (req: RequestProp, res: Response) => {
     const {userId} = req.params
     if (!userId) return res.sendStatus(400);
     const sharedStories = await getCachedResponse({key:`userSharedStories:${userId}`, timeTaken: 1800, cb: async() => {
-      const sharedStory = await getUserSharedStories(userId)
-      if(!sharedStory?.length) return responseType({res, status: 404, message: 'No shared stories available'})
+      const sharedStory = await getUserSharedStories(userId) as SharedProps[]
       return sharedStory;
-    }}) as (SharedProps[] | string);
+    }, reqUrl: req.url}) as (SharedProps[] | string);
+
+    if(!sharedStories?.length) return responseType({res, status: 404, message: 'No shared stories available'})
     return responseType({res, status: 200, count: sharedStories?.length, data: sharedStories})
   })
 }
