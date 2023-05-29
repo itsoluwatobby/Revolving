@@ -47,6 +47,32 @@ export const responseType = ({ res, status = 200, count = 0, message = 'success'
         res.status(status).json({ meta: { status, count, message }, data })
         : res.status(status).json({ meta: { status, message }, data }));
 };
+class UrlsObj {
+    constructor() {
+        this.req = { mtd: '', url: '' };
+        this.urls = [];
+    }
+    isPresent(reqUrl) {
+        const present = this.urls.filter(url => url.url == reqUrl);
+        return present ? true : false;
+    }
+    pushIn(reqs) {
+        this.req = reqs;
+        const conflict = this.urls.filter(url => url.url == this.req.url);
+        !conflict.length ? this.urls.push(this.req) : null;
+    }
+    pullIt(reqUrl) {
+        const otherUrls = this.urls.filter(url => url.url != reqUrl);
+        this.urls = [...otherUrls];
+    }
+    getUrl() {
+        return this.urls;
+    }
+    reset() {
+        this.urls = [];
+    }
+}
+export const objInstance = new UrlsObj();
 export const transporter = createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',

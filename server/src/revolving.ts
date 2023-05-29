@@ -18,12 +18,16 @@ import { dbConfig } from './config/mongoConfig.js';
 import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
 import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
-import { verifyAccessToken } from './middleware/verifyTokens.js';
+
+import { logMethods, verifyAccessToken } from './middleware/verifyTokens.js';
 import storyRouter from './routes/storyRoutes.js';
 import { getSharedStory, getStories, getStory, getStoryByCategory } from './controller/storyController.js';
+
 import { getUser, getUsers } from './controller/userController.js';
 import userRouter from './routes/usersRoutes.js';
 import passwordResetRouter from './routes/resetPassword.js';
+import { logoutHandler } from './controller/authController.js';
+
 // import { errorLog, logEvents } from './middleware/logger.js';
 
 dbConfig(null, null, null);
@@ -75,9 +79,12 @@ else{
     res.status(200).json({ status: true, message: 'server up and running' });
   })
 
+  // CACHING URLS
+  app.use(logMethods)
   // ROUTES
   app.use('/revolving/auth', authRouter);
-  
+  app.get('/revolving/logout', logoutHandler);
+
   app.get('/revolving/users', getUsers);
   app.get('/revolving/users/:userId', getUser);
 
