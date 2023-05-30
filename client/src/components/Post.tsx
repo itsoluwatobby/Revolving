@@ -4,6 +4,7 @@ import { FiMoreVertical } from 'react-icons/fi';
 import { FaTrash } from 'react-icons/fa';
 import { CiEdit } from 'react-icons/ci';
 import { RxShare2 } from 'react-icons/rx';
+import { MdOutlineInsertComment } from 'react-icons/md';
 import { BsHandThumbsUp, BsFillHandThumbsUpFill } from 'react-icons/bs';
 import { format } from 'timeago.js';
 import { useState } from 'react';
@@ -25,9 +26,12 @@ export const Post = ({ post }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
   let averageReadingTime = useWordCount(post?.body) as string;
   const {mutate} = useSWRConfig()
+
   const { theme } = useThemeContext() as ThemeContextType
   const {auth} = useAuthenticationContext() as AuthenticationContextType
   const end = averageReadingTime.split(' ')[1]
+
+  const userId = localStorage.getItem('revolving_userId')
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
   const tooLong = (): string => {
     const wordLength = post?.body?.split(' ').length
@@ -70,11 +74,14 @@ export const Post = ({ post }: Props) => {
         <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{post?.author || 'anonymous'}</p>
         <span>.</span>
         <p>{format(post?.storyDate, 'en-US')}</p>
-        <FiMoreVertical
-          onClick={() => setOpen(prev => !prev)}
-          title='Options'
-          className={`absolute right-2 text-lg cursor-pointer opacity-75 hover:text-gray-600`}
-        />
+        {userId && (
+          <FiMoreVertical
+            onClick={() => setOpen(prev => !prev)}
+            title='Options'
+            className={`absolute right-2 text-lg cursor-pointer opacity-75 hov)er:text-gray-600`}
+          />
+          )
+        }
         {/* MAKE THIS MORE ATTRACTIVE */}
         {open &&
           <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${theme == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
@@ -101,7 +108,7 @@ export const Post = ({ post }: Props) => {
             {bodyContent}
         </p>
       </Link>
-      <div className='mt-2 opacity-90 flex items-center gap-4 text-green-600 text-sm font-sans'>
+      <div className='mt-2 opacity-90 flex items-center gap-5 text-green-600 text-sm font-sans'>
         <p>{post?.body ? averageReadingTime + ' read' : ''}</p>
         {
           (auth?._id && post?.likes?.includes(auth?._id)) 
@@ -120,6 +127,13 @@ export const Post = ({ post }: Props) => {
                   </span>
               </p>
         }
+        {/* {auth?._id && (     */}
+            <MdOutlineInsertComment 
+              title='comments' 
+              className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
+          
+          {/* )
+        } */}
         {post?.body && (
             post?.body.split(' ').length >= 100 &&
             <Link to={`/story/${post?._id}`}>

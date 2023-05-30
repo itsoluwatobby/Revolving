@@ -4,7 +4,7 @@ import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
 import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Categories } from '../data';
 import useSwrMutation from 'swr/mutation'
 import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
