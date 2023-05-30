@@ -10,7 +10,6 @@ import { toast } from 'react-hot-toast';
 import useLogout from '../../hooks/useLogout';
 import { AuthenticationContextType } from '../../data';
 
-
 export const PersistedLogin = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { auth, persistLogin } = useAuthenticationContext() as AuthenticationContextType

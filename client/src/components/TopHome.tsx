@@ -16,9 +16,9 @@ const arrow_class= "text-xl text-gray-400 cursor-pointer shadow-lg hover:scale-[
 export const TopHome = ({ navigationTab, setNavigationTab }: TopHomeProps) => {
   const {theme} = useThemeContext() as ThemeContextType;
 
-  const scrollNavBar = useCallback((node: any) => {
-    node && node.scrollIntoView({ smooth: true })
-  }, [])
+  // const scrollNavBar = useCallback((node: any) => {
+  //   node && node.scrollIntoView({ smooth: true })
+  // }, [])
   
   useEffect(() => {
     localStorage.setItem('NAVIGATE', navigationTab)
@@ -37,7 +37,7 @@ export const TopHome = ({ navigationTab, setNavigationTab }: TopHomeProps) => {
           Object.entries(NAVIGATE).map(([key, value], i) => (
             <li 
               key={key}
-              ref={scrollNavBar}
+              // ref={scrollNavBar}
               onClick={() => setNavigationTab((Object.values(NAVIGATE)[i]))}
               className={`${list_style} ${theme == 'dark' ? 'hover:text-gray-200' : 'hover:text-gray-900'} ${value === navigationTab && 'font-bold'}`}>
               {value}
