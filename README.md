@@ -12,8 +12,14 @@
 * Responsive pages
 * Feature to download any post in pdf format
 ----
+
+![Preview](./client/src/images/preview.png)
+
+---
+
 >> Tech stack
 * Node.js
+* Redis
 * Express.js
 * Reactjs
 * socket.io

@@ -62,7 +62,7 @@ export default function PasswordInput({
             type={revealPassword ? "text" : "password"} 
             value={confirmPassword}
             id='confirm-pwd'
-            name='password'
+            name='confirm password'
             required
             placeholder='*************'
             autoComplete='off'

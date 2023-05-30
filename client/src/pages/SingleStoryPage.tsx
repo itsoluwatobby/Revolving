@@ -14,9 +14,9 @@ import { postAxios, posts_endPoint } from "../api/axiosPost";
 const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
 export default function SingleStoryPage() {
-  const { postId } = useParams()
+  const { storyId } = useParams()
   const { trigger, error, isMutating } = useSWRMutation<PostType>(posts_endPoint, async() => {
-    const res = await postAxios.get(`${posts_endPoint}/${postId}`)
+    const res = await postAxios.get(`${posts_endPoint}/${storyId}`)
     console.log(res?.data?.data)
     return res?.data?.data
   })
@@ -36,7 +36,7 @@ export default function SingleStoryPage() {
     return () => {
       isMounted = false
     }
-  }, [trigger])
+  }, [trigger, storyId])
 
   let averageReadingTime = useWordCount(targetStory?.body as string)
   const watchWords = TextRules.keywords as string

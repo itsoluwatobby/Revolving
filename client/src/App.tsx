@@ -34,9 +34,9 @@ export const App = () => {
             
             <Route index element={<Home />} />
             <Route path="new_story" element={<NewStory />} />
-            <Route path="edit_story/:postId" element={<NewStory />} />
+            <Route path="edit_story/:storyId" element={<NewStory />} />
 
-            <Route path="story/:postId" element={<SingleStoryPage />} />
+            <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
           
           </Route>
