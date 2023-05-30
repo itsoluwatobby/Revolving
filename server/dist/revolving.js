@@ -16,7 +16,7 @@ import SlowDown from 'express-slow-down';
 import authRouter from './routes/authRoutes.js';
 import { logMethods, verifyAccessToken } from './middleware/verifyTokens.js';
 import storyRouter from './routes/storyRoutes.js';
-import { getSharedStory, getStories, getStory, getStoryByCategory } from './controller/storyController.js';
+import { fetchSharedStory, getSharedStory, getStories, getStory, getStoryByCategory } from './controller/storyController.js';
 import { getUser, getUsers } from './controller/userController.js';
 import userRouter from './routes/usersRoutes.js';
 import passwordResetRouter from './routes/resetPassword.js';
@@ -69,14 +69,15 @@ else {
     app.get('/revolving/users/:userId', getUser);
     //password reset
     app.use('/revolving/auth', passwordResetRouter);
+    //public routes
     app.get('/revolving/story', getStories);
     app.get('/revolving/story/category', getStoryByCategory);
     app.get('/revolving/story/:storyId', getStory);
+    app.get('/revolving/story/all/share', fetchSharedStory);
     app.get('/revolving/story/share/:sharedId', getSharedStory);
     // checks for accesstoken
     app.use(verifyAccessToken);
     // story router
-    app.use('/revolving/story', storyRouter);
     app.use('/revolving/story', storyRouter);
     // user router
     app.use('/revolving/users', userRouter);

@@ -81,7 +81,7 @@ export const getStory = (req, res) => {
         const userStory = yield getCachedResponse({ key: `singleStory:${storyId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const story = yield getStoryById(storyId);
                 return story;
-            }), reqUrl: req.url });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!userStory)
             return responseType({ res, status: 404, message: 'story not found' });
         responseType({ res, status: 200, count: 1, data: userStory });
@@ -99,7 +99,7 @@ export const getUserStory = (req, res) => {
         const userStories = yield getCachedResponse({ key: `userStory:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const userStory = yield getUserStories(userId);
                 return userStory;
-            }), reqUrl: req.url });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(userStories === null || userStories === void 0 ? void 0 : userStories.length))
             return responseType({ res, status: 404, message: 'You have no stories' });
         return responseType({ res, status: 200, count: userStories === null || userStories === void 0 ? void 0 : userStories.length, data: userStories });
@@ -113,7 +113,7 @@ export const getStoryByCategory = (req, res) => {
         const storyCategory = yield getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
                 return categoryStory;
-            }), reqUrl: req.url });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length))
             return responseType({ res, status: 404, message: 'You have no stories' });
         return responseType({ res, status: 200, count: storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length, data: storyCategory });
@@ -126,7 +126,7 @@ export const getStories = (req, res) => {
                 const sharedStories = yield getAllSharedStories();
                 const everyStories = [...stories, ...sharedStories];
                 return everyStories;
-            }), reqUrl: req.url });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(allStories === null || allStories === void 0 ? void 0 : allStories.length))
             return responseType({ res, status: 404, message: 'No stories available' });
         return responseType({ res, status: 200, count: allStories === null || allStories === void 0 ? void 0 : allStories.length, data: allStories });
@@ -150,12 +150,13 @@ export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0,
 export const getSharedStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { sharedId } = req.params;
+        console.log('IN HERE');
         if (!sharedId)
             return res.sendStatus(400);
         const sharedStory = yield getCachedResponse({ key: `sharedStory:${sharedId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const shared = yield getSharedStoryById(sharedId);
                 return shared;
-            }), reqUrl: req.url });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!sharedStory)
             return responseType({ res, status: 404, message: 'story not found' });
         responseType({ res, status: 200, count: 1, data: sharedStory });
@@ -183,7 +184,10 @@ export const unShareUserStory = (req, res) => {
             return responseType({ res, status: 423, message: 'Account locked' });
         const result = yield unShareStory(userId, sharedId);
         redisClient.DEL(`sharedStory:${sharedId}`);
-        return result == 'not found' ? responseType({ res, status: 404, count: 0, message: result }) : result == 'unauthorized' ? responseType({ res, status: 401, count: 0, message: result }) : responseType({ res, status: 201, count: 1, message: 'story unshared' });
+        return result == 'not found'
+            ? responseType({ res, status: 404, count: 0, message: result }) : result == 'unauthorized'
+            ? responseType({ res, status: 401, count: 0, message: result })
+            : responseType({ res, status: 201, count: 1, message: 'story unshared' });
     }));
 };
 export const getSharedStoriesByUser = (req, res) => {
@@ -194,7 +198,7 @@ export const getSharedStoriesByUser = (req, res) => {
         const sharedStories = yield getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const sharedStory = yield getUserSharedStories(userId);
                 return sharedStory;
-            }), reqUrl: req.url });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length))
             return responseType({ res, status: 404, message: 'No shared stories available' });
         return responseType({ res, status: 200, count: sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length, data: sharedStories });
@@ -214,4 +218,16 @@ export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, v
         responseType({ res, status: 201, message: result });
     }));
 });
+// Only for admin page
+export const fetchSharedStory = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const allSharedStories = yield getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const sharedStories = yield getAllSharedStories();
+                return sharedStories;
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
+        if (!(allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length))
+            return responseType({ res, status: 404, message: 'No shared stories available' });
+        return responseType({ res, status: 200, count: allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length, data: allSharedStories });
+    }));
+};
 //# sourceMappingURL=storyController.js.map

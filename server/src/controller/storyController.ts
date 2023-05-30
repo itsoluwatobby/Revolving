@@ -73,7 +73,7 @@ export const getStory = (req: RequestProp, res: Response) => {
     const userStory = await getCachedResponse({key:`singleStory:${storyId}`, timeTaken: 1800, cb: async() => {
       const story = await getStoryById(storyId)
       return story;
-    }, reqUrl: req.url }) as StoryProps;
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as StoryProps;
     
     if(!userStory) return responseType({res, status: 404, message: 'story not found'})
     responseType({res, status: 200, count:1, data: userStory})
@@ -90,7 +90,7 @@ export const getUserStory = (req: Request, res: Response) => {
     const userStories = await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
       const userStory = await getUserStories(userId) 
       return userStory
-    }, reqUrl: req.url })  as (StoryProps[] | string);
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (StoryProps[] | string);
     
     if(!userStories?.length) return responseType({res, status: 404, message: 'You have no stories'})
     return responseType({res, status: 200, count: userStories?.length, data: userStories})
@@ -104,7 +104,7 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
     const storyCategory = await getCachedResponse({key:`story:${category}`, cb: async() => {
       const categoryStory = await StoryModel.find({category: {$in: [category]}})
       return categoryStory
-    }, reqUrl: req.url }) as (StoryProps[] | string)
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
     
     if(!storyCategory?.length) return responseType({res, status: 404, message: 'You have no stories'});
     return responseType({res, status: 200, count: storyCategory?.length, data: storyCategory})
@@ -118,7 +118,7 @@ export const getStories = (req: Request, res: Response) => {
       const sharedStories = await getAllSharedStories();
       const everyStories = [...stories, ...sharedStories]
       return everyStories
-    }, reqUrl: req.url}) as (StoryProps[] | string)
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
 
     if(!allStories?.length) return responseType({res, status: 404, message: 'No stories available'})
     return responseType({res, status: 200, count: allStories?.length, data: allStories})
@@ -145,7 +145,7 @@ export const getSharedStory = (req: RequestProp, res: Response) => {
     const sharedStory = await getCachedResponse({key:`sharedStory:${sharedId}`, cb: async() => {
       const shared = await getSharedStoryById(sharedId) as SharedProps
       return shared
-    }, reqUrl: req.url}) as SharedProps;
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as SharedProps;
 
     if(!sharedStory) return responseType({res, status: 404, message: 'story not found'})
     responseType({res, status: 200, count:1, data: sharedStory})
@@ -171,7 +171,10 @@ export const unShareUserStory = (req: RequestProp, res: Response) => {
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await unShareStory(userId, sharedId)
     redisClient.DEL(`sharedStory:${sharedId}`)
-    return result == 'not found' ? responseType({res, status: 404, count:0, message: result }) : result == 'unauthorized' ? responseType({res, status: 401, count:0, message: result }) : responseType({res, status: 201, count:1, message: 'story unshared'})
+    return result == 'not found' 
+        ? responseType({res, status: 404, count:0, message: result }) : result == 'unauthorized' 
+            ? responseType({res, status: 401, count:0, message: result }) 
+                : responseType({res, status: 201, count:1, message: 'story unshared'})
   })
 }
 
@@ -182,7 +185,7 @@ export const getSharedStoriesByUser = (req: RequestProp, res: Response) => {
     const sharedStories = await getCachedResponse({key:`userSharedStories:${userId}`, timeTaken: 1800, cb: async() => {
       const sharedStory = await getUserSharedStories(userId) as SharedProps[]
       return sharedStory;
-    }, reqUrl: req.url}) as (SharedProps[] | string);
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']}) as (SharedProps[] | string);
 
     if(!sharedStories?.length) return responseType({res, status: 404, message: 'No shared stories available'})
     return responseType({res, status: 200, count: sharedStories?.length, data: sharedStories})
@@ -201,5 +204,16 @@ export const like_Unlike_SharedStory = async(req: Request, res: Response) => {
   })
 }
 
+// Only for admin page
+export const fetchSharedStory = (req: Request, res: Response) => {
+  asyncFunc(res, async () => {
+    const allSharedStories = await getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
+      const sharedStories = await getAllSharedStories();
+      return sharedStories
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
 
+    if(!allSharedStories?.length) return responseType({res, status: 404, message: 'No shared stories available'})
+    return responseType({res, status: 200, count: allSharedStories?.length, data: allSharedStories})
+  })
+}
 

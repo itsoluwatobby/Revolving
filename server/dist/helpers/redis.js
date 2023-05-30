@@ -10,24 +10,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { createClient } from 'redis';
 import { objInstance } from './helper.js';
 export const redisClient = createClient();
-export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqUrl = null }) => __awaiter(void 0, void 0, void 0, function* () {
+export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) => __awaiter(void 0, void 0, void 0, function* () {
     redisClient.on('error', err => console.error('Redis client error: ', err));
     if (!redisClient.isOpen)
         yield redisClient.connect();
     try {
-        if (objInstance.isPresent(reqUrl)) {
+        if (objInstance.isPresent(reqMtd)) {
             redisClient.DEL(key);
-            objInstance.pullIt(reqUrl);
+            objInstance.pullIt(reqMtd);
         }
         const data = yield redisClient.get(key);
         if (data)
             return JSON.parse(data);
         const freshData = yield cb();
-        if (freshData != null) {
-            redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
-            return freshData;
-        }
-        return;
+        redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
+        return freshData;
     }
     catch (error) {
         console.error(error);
