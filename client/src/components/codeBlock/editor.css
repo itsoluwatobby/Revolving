@@ -1,0 +1,26 @@
+
+.editor{
+  background-color: rgb(13, 1, 36);
+  color: white;
+  width: 400px;
+  height: 100px;
+  margin: auto;
+  cursor: default;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+.container{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.editorsss{
+  background-color: rgb(13, 1, 36);
+  color: white;
+  width: 400px;
+  height: 300px;
+  margin: auto;
+  cursor: default;
+  padding: 1.5rem;
+  border-radius: 10px;
+}

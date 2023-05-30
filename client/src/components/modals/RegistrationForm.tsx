@@ -29,11 +29,12 @@ export default function RegistrationForm({
                 value={username}
                 required
                 id='name'
+                name='name'
                 min={3}
                 placeholder='iamuser'
                 autoComplete='off'
                 onChange={handleUsername}
-                className='w-full rounded-md p-2 focus:outline-none border-none text-black'
+                className='w-full rounded-md p-1.5 focus:outline-none border-none text-black'
               />
             </label>
             <label htmlFor="email">
@@ -45,12 +46,13 @@ export default function RegistrationForm({
                 type="email" 
                 value={email}
                 required
+                name='email'
                 id='email'
                 min={3}
                 placeholder='iamuser@mail.com'
                 autoComplete='off'
                 onChange={handleEmail}
-                className='w-full rounded-md p-2 focus:outline-none border-none text-black'
+                className='w-full rounded-md p-1.5 focus:outline-none border-none text-black'
               />
             </label>
             

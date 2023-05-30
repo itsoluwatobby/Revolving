@@ -7,7 +7,7 @@ export const auth_endPoint = '/login'
 const BASEURL = 'http://localhost:4000/revolving'
 const AUTHURL = 'http://localhost:4000/revolving/auth'
 
-const postAxios: AxiosInstance = axios.create({
+export const postAxios: AxiosInstance = axios.create({
   baseURL: BASEURL,
   headers: { 'Content-Type ': 'application/json'}
 })

@@ -6,37 +6,54 @@ import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
 import { useEffect, useState } from 'react';
 import { Categories } from '../data';
+import useSwrMutation from 'swr/mutation'
+import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
+import { NAVIGATE } from '../assets/navigator';
 
 type PostsProps = {
   navigationTab: Categories
 }
 
 export const Posts = ({ navigationTab }: PostsProps) => {
-  const { isLoading, error, filteredStories } = usePostContext() as PostContextType
-  const [navPosts, setNavPosts] = useState<PostType[]>([])
-
+  const {
+    trigger,
+    isMutating,
+    error: isError
+  } = useSwrMutation(cacheKey, async(): Promise<PostType[]> => {
+    const res = await postAxios.get(`${cacheKey}/category?category=${navigationTab}`)
+    return res?.data?.data
+  }, {
+    onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate))
+  })
+  const { error, filteredStories, setNavPosts } = usePostContext() as PostContextType
+  
   useEffect(() => {
-    filteredStories?.length && (
-      setNavPosts(
-          filteredStories?.filter(post => post?.category?.includes(navigationTab)) as PostType[]
-        )
-    )
-  }, [navigationTab, filteredStories])
+    let isMounted = true;
+    const triggerCategory = async() =>{
+      const res = await trigger()
+      setNavPosts(res as PostType[])
+    }
+    isMounted && triggerCategory()
+
+    return () => {
+      isMounted = false
+    }
+  }, [navigationTab, trigger, setNavPosts])
   
   let content;
 
-  isLoading ? content = (
+  isMutating ? content = (
     [...Array(10).keys()].map(index => (
         <SkeletonBlog key={index} />
         )
       )
   ) 
-  : error ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+  : (error || isError) ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
     {error?.message}
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
-  :(  navPosts?.length ? content = (
-    navPosts?.map(post => (
+  :(  filteredStories?.length ? content = (
+    filteredStories?.map(post => (
           <Post key={post?._id} post={post as PostType} />
         )
       )

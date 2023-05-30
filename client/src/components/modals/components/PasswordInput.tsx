@@ -32,12 +32,13 @@ export default function PasswordInput({
             type={revealPassword ? "text" : "password"} 
             value={password}
             id='password'
+            name='password'
             required
             min={7}
             placeholder='*************'
-            autoComplete='false'
+            autoComplete='off'
             onChange={handlePassword}
-            className='relative w-full rounded-md p-2 focus:outline-none border-none text-black'
+            className='relative w-full rounded-md p-1.5 focus:outline-none border-none text-black'
           />
           {
             revealPassword ? 
@@ -61,11 +62,12 @@ export default function PasswordInput({
             type={revealPassword ? "text" : "password"} 
             value={confirmPassword}
             id='confirm-pwd'
+            name='password'
             required
             placeholder='*************'
-            autoComplete='false'
+            autoComplete='off'
             onChange={handleConfirmPassword}
-            className='relative w-full rounded-md p-2 focus:outline-none border-none text-black'
+            className='relative w-full rounded-md p-1.5 focus:outline-none border-none text-black'
           />
       </label>
     </>

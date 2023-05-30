@@ -17,7 +17,7 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 // const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
-  const {posts, typingEvent} = usePostContext() as PostContextType
+  const {navPosts, typingEvent} = usePostContext() as PostContextType
   const {theme, rollout, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { postId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
@@ -25,7 +25,7 @@ export const Navbar = () => {
   
   const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
 
-  const targetPost = posts?.find(pos => pos?._id == postId)
+  const targetPost = navPosts?.find(pos => pos?._id == postId)
 
   const changeFontFamily = (font: string) => {
     setFontFamily(targetPost?.fontFamily || font)

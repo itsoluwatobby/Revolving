@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { axiosPrivate } from "../api/axiosPost";
 import useAuthenticationContext from "./useAuthenticationContext";
 import useRefreshToken from "./useRefreshToken";
+import { AuthenticationContextType } from "../data";
 
 
 export default function useAxiosPrivate() {

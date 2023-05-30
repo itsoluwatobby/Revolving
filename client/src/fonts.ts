@@ -4,6 +4,9 @@ type FontProp = {
 
 type TextProp = {
   [index: string]: string | string[] | object
+  codeBlock: {
+    [index: string]: string | string[]
+  }
 }
 
 export const custom_fonts: FontProp = {
@@ -28,7 +31,8 @@ export const TextRules: TextProp = {
   highlight: '++',
   keywords: ['null', 'let', 'undefined', 'typeof', 'error', 'var', 'const', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'enum', 'constructor', 'Pick', 'instanceof', 'prototype', 'Partial', 'boolean', 'booleans', 'number', 'string', 'function'] as string[], 
   codeBlock: { // code block rules
-    backStrokes: '```',
+    backStrokes: '`',
+    quotes: '"' as string,
     operators: ['!', '{', '}', '(', ')', '=', '==', '!=', '<', '>', '[', ']', ':', ';', '+', '-', '/', '?', '^', '*', '%', '$', '`', '&', '||','+=', '-=', '/=', '++', '=>', '--'],
     comments: ['//', '/*', '*\\']
   }

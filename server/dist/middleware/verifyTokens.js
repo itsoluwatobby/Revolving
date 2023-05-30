@@ -8,11 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getUserByToken } from "../helpers/userHelpers.js";
-import { responseType, signToken, verifyToken, objInstance } from "../helpers/helper.js";
-export const logMethods = (req, res, next) => {
-    objInstance.pushIn({ mtd: req.method, url: req.url });
-    next();
-};
+import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const auth = req.headers['authorization'];
     if (!auth || !auth.startsWith('Bearer '))

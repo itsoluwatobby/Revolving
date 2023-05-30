@@ -22,13 +22,15 @@ import authRouter from './routes/authRoutes.js';
 import { verifyAccessToken } from './middleware/verifyTokens.js';
 import storyRouter from './routes/storyRoutes.js';
 
-import { fetchSharedStory, getSharedStory, getStories, getStory, getStoryByCategory } from './controller/storyController.js';
+import { getStories, getStory, getStoryByCategory } from './controller/storyController.js';
 import { getUser, getUsers } from './controller/userController.js';
 import userRouter from './routes/usersRoutes.js';
 
 import passwordResetRouter from './routes/resetPassword.js';
 import { logoutHandler } from './controller/authController.js';
 import { logURLAndMethods } from './middleware/urlLogger.js';
+
+import { fetchSharedStory, getSharedStory } from './controller/sharedStoryController.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 

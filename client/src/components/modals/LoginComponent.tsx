@@ -24,6 +24,7 @@ export default function LoginComponent({
                 value={email}
                 required
                 id='email'
+                name="email"
                 placeholder='iamuser@mail.com'
                 autoComplete='off'
                 onChange={handleEmail}
@@ -38,6 +39,7 @@ export default function LoginComponent({
                 type={revealPassword ? "text" : "password"} 
                 value={password}
                 id='password'
+                name="password"
                 required
                 placeholder='*************'
                 autoComplete='false'

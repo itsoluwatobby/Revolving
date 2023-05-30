@@ -46,7 +46,9 @@ type PostContextType = {
   typingEvent: boolean,
   error?: {message: string, name: string, code: string},
   // editPost: Partial<PostType>, 
-  canPost: boolean, 
+  canPost: boolean,
+  navPosts: PostType[], 
+  setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
