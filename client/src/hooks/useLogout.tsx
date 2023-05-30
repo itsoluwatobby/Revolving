@@ -9,12 +9,11 @@ import { AuthenticationContextType } from "../data"
 export default function useLogout() {
   const { setAuth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
-  const userId = localStorage.getItem('revolving_userId')
   const navigate = useNavigate()
 
   const signOut = async() => {
     try{
-      await axiosAuth.get(`/logout/${userId}`)
+      await axiosAuth.get(`/logout`)
       setAuth({_id: '', accessToken: '', roles: []})
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {

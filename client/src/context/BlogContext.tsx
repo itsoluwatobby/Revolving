@@ -26,18 +26,19 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
   const [canPost, setCanPost] = useState<boolean>(false);
+  const [navPosts, setNavPosts] = useState<PostType[]>([])
 
   useEffect(() => {
-    const filtered = posts?.filter(post => {
+    const filtered = navPosts?.filter(post => {
       return (
-        post.title.toLowerCase().includes(search.toLowerCase()) || post.body.toLowerCase().includes(search.toLowerCase())
+        post?.title?.toLowerCase().includes(search?.toLowerCase()) || post?.body?.toLowerCase().includes(search?.toLowerCase())
       )
     }) as PostType[]
     setFilterStories(filtered)
-  }, [search, posts])
+  }, [search, navPosts])
 
   const value = {
-    postData, filteredStories, setPostData, search, setSearch, posts, isLoading, error, typingEvent, setTypingEvent, canPost, setCanPost
+    postData, filteredStories, setPostData, search, setSearch, posts, isLoading, error, typingEvent, setTypingEvent, canPost, setCanPost, navPosts, setNavPosts
   }
 
   return (

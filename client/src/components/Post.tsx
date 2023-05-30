@@ -3,6 +3,7 @@ import { useWordCount } from '../hooks/useWordCount'
 import { FiMoreVertical } from 'react-icons/fi';
 import { FaTrash } from 'react-icons/fa';
 import { CiEdit } from 'react-icons/ci';
+import { RxShare2 } from 'react-icons/rx';
 import { BsHandThumbsUp, BsFillHandThumbsUpFill } from 'react-icons/bs';
 import { format } from 'timeago.js';
 import { useState } from 'react';
@@ -26,7 +27,6 @@ export const Post = ({ post }: Props) => {
   const {mutate} = useSWRConfig()
   const { theme } = useThemeContext() as ThemeContextType
   const {auth} = useAuthenticationContext() as AuthenticationContextType
-  const currentMode = localStorage.getItem('theme');
   const end = averageReadingTime.split(' ')[1]
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
   const tooLong = (): string => {
@@ -77,17 +77,17 @@ export const Post = ({ post }: Props) => {
         />
         {/* MAKE THIS MORE ATTRACTIVE */}
         {open &&
-          <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${currentMode == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
+          <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${theme == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
             <Link to={`/edit_story/${post?._id}`} >  
               <CiEdit 
                 title='Edit post'
-                className={`cursor-pointer hover:opacity-70 shadow-lg transition-all ${currentMode == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
+                className={`cursor-pointer hover:opacity-70 shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
               />
             </Link>
             <FaTrash
               onClick={() => deleted(post?._id)}
               title='Delete post'
-              className={`cursor-pointer hover:opacity-70 text-xl shadow-lg transition-all ${currentMode == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
+              className={`cursor-pointer hover:opacity-70 text-xl shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
             />
           </div>
         }
@@ -123,7 +123,13 @@ export const Post = ({ post }: Props) => {
         {post?.body && (
             post?.body.split(' ').length >= 100 &&
             <Link to={`/story/${post?._id}`}>
-              <small className={`font-sans cursor-grab ${currentMode == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-blue-800`}>Read more</small>
+              <small className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-blue-800`}>Read more</small>
+            </Link>
+          )
+        }
+        {auth?._id && (
+            <Link to={`/story/${post?._id}`}>
+              <RxShare2 title='share story' className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
             </Link>
           )
         }

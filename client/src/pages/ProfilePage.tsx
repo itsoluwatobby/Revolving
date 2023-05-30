@@ -1,8 +1,7 @@
-import axios from "axios";
-import { useThemeContext } from "../hooks/useThemeContext"
+import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
 import { useEffect, useState } from 'react';
-import { FaTwitterSquare, FaGithub } from 'react-icons/fa'
+import { FaTwitterSquare, FaGithub } from 'react-icons/fa';
 import { MdAttachEmail } from 'react-icons/md'
 
 

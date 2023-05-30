@@ -3,19 +3,29 @@ import { PostType, ThemeContextType } from '../../posts'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { format } from 'timeago.js';
 import { useState } from 'react';
+import { SkeletonBlog } from '../skeletons/SkeletonBlog';
 
 type ArticleProps = {
   post: PostType,
   sidebar: boolean,
   bodyContent: JSX.Element[],
-  averageReadingTime: string
+  averageReadingTime: string,
+  isLoading: boolean,
+  error: string
 }
 
-export default function ArticleComp({ post, bodyContent, sidebar, averageReadingTime }: ArticleProps) {
+export default function ArticleComp({ post, bodyContent, sidebar, averageReadingTime, isLoading, error }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [hoverThis, setHoverThis] = useState<boolean>(false);
 
-  return (
+  let content;
+
+  isLoading ? content = (
+    [...Array(2).keys()].map(index => (
+        <SkeletonBlog key={index} />
+        )
+      )
+  ) : content = (
     <article 
       className={`app flex-grow overflow-y-scroll ${post?.fontFamily} p-2 pl-3 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
       <div className='relative flex items-center gap-3'>
@@ -56,4 +66,6 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
       </div>
     </article>
   )
+
+  return content as JSX.Element
 }

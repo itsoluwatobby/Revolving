@@ -1,7 +1,7 @@
-import { toast } from "react-hot-toast"
 import { axiosAuth } from "../api/axiosPost"
 import useAuthenticationContext from "./useAuthenticationContext"
 import useLogout from "./useLogout"
+import { AuthenticationContextType, ErrorResponse } from "../data"
 
 type ResponseType={
   data: { 

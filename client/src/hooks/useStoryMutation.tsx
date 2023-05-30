@@ -2,6 +2,7 @@ import useAxiosPrivate from './useAxiosPrivate'
 import { PostType } from '../posts'
 import { posts_endPoint } from '../api/axiosPost'
 import useAuthenticationContext from './useAuthenticationContext'
+import { AuthenticationContextType } from '../data'
 
 export default function useStoryMutation() {
   const axiosPrivate = useAxiosPrivate()
