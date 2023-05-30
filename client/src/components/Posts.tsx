@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { Categories } from '../data';
 import useSwrMutation from 'swr/mutation'
 import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
-import { NAVIGATE } from '../assets/navigator';
 
 type PostsProps = {
   navigationTab: Categories
@@ -25,7 +24,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
   }, {
     onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate))
   })
-  const { error, filteredStories, setNavPosts } = usePostContext() as PostContextType
+  const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   
   useEffect(() => {
     let isMounted = true;
@@ -48,8 +47,8 @@ export const Posts = ({ navigationTab }: PostsProps) => {
         )
       )
   ) 
-  : (error || isError) ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-    {error?.message}
+  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+    {isError?.message}
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
   :(  filteredStories?.length ? content = (

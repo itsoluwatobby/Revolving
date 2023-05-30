@@ -3,7 +3,8 @@ import { PostType, ThemeContextType } from '../../posts'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { format } from 'timeago.js';
 import { useState } from 'react';
-import { SkeletonBlog } from '../skeletons/SkeletonBlog';
+import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
+import { RiSignalWifiErrorLine } from 'react-icons/ri';
 
 type ArticleProps = {
   post: PostType,
@@ -20,14 +21,15 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
 
   let content;
 
-  isLoading ? content = (
-    [...Array(2).keys()].map(index => (
-        <SkeletonBlog key={index} />
-        )
-      )
-  ) : content = (
-    <article 
-      className={`app flex-grow overflow-y-scroll ${post?.fontFamily} p-2 pl-3 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
+  isLoading ? 
+      content = <SkeletonSinglePage  />
+  : error ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+  {/* {error?.message as {message: string}} */}
+  Failed to Load Post
+  <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
+  </p> 
+  : content = (
+    <>
       <div className='relative flex items-center gap-3'>
         <p className='capitalize'>{post?.author || 'anonymous'}</p>
         <span>.</span>
@@ -64,8 +66,13 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
           : ''
         }
       </div>
-    </article>
+    </>
   )
 
-  return content as JSX.Element
+  return (
+    <article 
+      className={`app mt-2 flex-grow overflow-y-scroll ${post?.fontFamily} p-2 pl-3 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
+        {content}
+      </article>
+  )
 }

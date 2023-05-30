@@ -13,10 +13,10 @@ type AsideProps = {
 
 export default function Aside({ posts, setSidebar, sidebar, summarized }: AsideProps) {
   const { theme } = useThemeContext() as ThemeContextType
-  const [recentPosts, ssetRecentPosts] = useState<PostType[]>([])
+  const [recentPosts, setRecentPosts] = useState<PostType[]>([])
 
   useEffect(() => {
-    ssetRecentPosts(
+    setRecentPosts(
       posts?.filter(post => +new Date(post.storyDate).getDay() < 3)
     )
   }, [posts])
@@ -38,7 +38,7 @@ export default function Aside({ posts, setSidebar, sidebar, summarized }: AsideP
                   className={`shadow-sm ${theme == 'light' ? 'bg-gray-100' : ''} p-2`}
                 >
                   <Link to={`/story/${post?._id}`}>
-                    <p className="text-center uppercase font-medium underline underline-offset-4">{summarized(50, post?.title)}</p>
+                    <p className="text-center uppercase font-medium underline underline-offset-4">{summarized(15, post?.title)}</p>
                     <p className="cursor-pointer">{summarized(100, post?.body)}</p>
                   </Link>
                 </li>

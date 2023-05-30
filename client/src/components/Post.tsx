@@ -127,10 +127,11 @@ export const Post = ({ post }: Props) => {
             </Link>
           )
         }
-        {auth?._id && (
-            <Link to={`/story/${post?._id}`}>
-              <RxShare2 title='share story' className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
-            </Link>
+        {auth?._id && (    
+            <RxShare2 
+              title='share story' 
+              className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
+          
           )
         }
       </div>

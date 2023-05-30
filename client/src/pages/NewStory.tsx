@@ -1,9 +1,9 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { PostContextType, PostType, ThemeContextType } from '../posts';
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent, useRef, LegacyRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../assets/navigator';
 import { Categories } from '../data';
@@ -13,41 +13,50 @@ export const NewStory = () => {
   const { fontFamily } = useThemeContext() as ThemeContextType;
   const { posts, setPostData, setTypingEvent, setCanPost } = usePostContext() as PostContextType;
   const { theme } = useThemeContext() as ThemeContextType;
-  const [inputValue, setInputValue] = useState<string>('');
 
+  const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const [codeEditor, setCodeEditor] = useState<boolean>(false);
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
     1000) as DebounceProps
-  const { pathname } = useLocation()
-  const postId = pathname.split('/')[2]
-  const targetPost = posts?.find(pos => pos?._id == postId) as PostType;
 
+  const { pathname } = useLocation()
+  const { storyId } = useParams()
+
+  console.log({storyId})
+  const targetPost = posts?.find(story => story?._id == storyId) as PostType;
+console.log({targetPost})
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setInputValue(value);
-    pathname != `/edit_story/${postId}` ? 
+    pathname != `/edit_story/${storyId}` ? 
       localStorage.setItem('newStoryInputValue', value) 
       : localStorage.setItem('editStoryInputValue', value)
   }
   const handleBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value
     setTextareaValue(value);
-    pathname != `/edit_story/${postId}` ? 
+    pathname != `/edit_story/${storyId}` ? 
       localStorage.setItem('newStoryTextareaValue', value)
         : localStorage.setItem('editStoryTextareaValue', value)
   }
 
   useEffect(() => {
-    const savedTitle = (pathname != `/edit_story/${postId}` ? localStorage.getItem('newStoryInputValue') : localStorage.getItem('editStoryInputValue')) || targetPost?.title
-    const savedBody = (pathname != `/edit_story/${postId}` ? localStorage.getItem('newStoryTextareaValue') : localStorage.getItem('editStoryTextareaValue')) || targetPost?.body
+    const savedTitle = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryInputValue') : localStorage.getItem('editStoryInputValue')) || targetPost?.title
+    const savedBody = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryTextareaValue') : localStorage.getItem('editStoryTextareaValue')) || targetPost?.body
 
     setInputValue(savedTitle || '')
     setTextareaValue(savedBody || '')
     setTypingEvent(debounceValue?.typing )
-  }, [setTypingEvent, debounceValue.typing, targetPost, postId, pathname])
+  }, [setTypingEvent, debounceValue.typing, targetPost, storyId, pathname])
+
+  useEffect(() => {
+    if(inputRef.current) inputRef.current.focus()
+  }, [])
 
   useEffect(() => {
     !debounceValue?.typing && (
@@ -82,6 +91,7 @@ export const NewStory = () => {
             <>
               <input 
                 type="text"
+                ref={inputRef}
                 placeholder='Title'
                 value={inputValue}
                 onChange={handleTitle}

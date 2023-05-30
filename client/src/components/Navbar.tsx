@@ -17,15 +17,15 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 // const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
-  const {navPosts, typingEvent} = usePostContext() as PostContextType
+  const {posts, typingEvent} = usePostContext() as PostContextType
   const {theme, rollout, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
-  const { postId } = useParams()
+  const { storyId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
   const [options, setOptions] = useState<string>('')
   
-  const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
+  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
-  const targetPost = navPosts?.find(pos => pos?._id == postId)
+  const targetPost = posts?.find(story => story?._id == storyId)
 
   const changeFontFamily = (font: string) => {
     setFontFamily(targetPost?.fontFamily || font)
@@ -40,19 +40,19 @@ export const Navbar = () => {
   }, [typingEvent])
 //console.log({fontFamily})
   return(
-    <nav className={`${address.includes(pathname) ? `sticky top-0 pr-0 pl-5 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
+    <nav className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />
 
       <div className='flex-auto mobile:hidden'></div>
 
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 mobile:w-40 ${pathname != `/story/${postId}` ? 'w-44' : 'w-32'}`}>
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 mobile:w-40 ${pathname != `/story/${storyId}` ? 'w-44' : 'w-32'}`}>
         <TopRight />
       </div>
      { 
       address.slice(0, 2).includes(pathname) ? (
-          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${postId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
+          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
             {
               Object.entries(custom_fonts).map(([key, options]) => (
                 <li
@@ -68,7 +68,7 @@ export const Navbar = () => {
         ) : 
         <ButtonFunc 
             pathname={pathname} setOptions={setOptions}
-            postId={postId} theme={theme} fontOption={fontOption}
+            storyId={storyId} theme={theme} fontOption={fontOption}
             options={options}
         />  
       }
@@ -79,19 +79,19 @@ export const Navbar = () => {
 
 type ButtonFuncProps = {
   pathname: string,
-  postId?: string,
+  storyId?: string,
   theme: string,
   options: string,
   fontOption: boolean,
   setOptions: React.Dispatch<React.SetStateAction<string>>
 }
 
-const ButtonFunc = ({ pathname, setOptions, postId, theme, fontOption, options } : ButtonFuncProps) => {
+const ButtonFunc = ({ pathname, setOptions, storyId, theme, fontOption, options } : ButtonFuncProps) => {
 
   return (
-    <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${postId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
+    <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
         {
-          pathname == `/story/${postId}` && (
+          pathname == `/story/${storyId}` && (
             postOptions.map(option => (
                 <li title={`${option == 'pdf' ? 'save as pdf' : option}`}
                   onClick={() => setOptions(option)}

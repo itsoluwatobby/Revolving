@@ -14,6 +14,7 @@
 ----
 >> Tech stack
 * Node.js
+* Redis
 * Express.js
 * Reactjs
 * socket.io
