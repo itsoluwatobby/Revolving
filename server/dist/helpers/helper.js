@@ -53,7 +53,7 @@ class UrlsObj {
         this.urls = [];
     }
     isPresent(reqUrl) {
-        const present = this.urls.filter(url => url.url == reqUrl);
+        const present = this.urls.find(url => reqUrl.includes(url.mtd));
         return present ? true : false;
     }
     pushIn(reqs) {
@@ -62,7 +62,7 @@ class UrlsObj {
         !conflict.length ? this.urls.push(this.req) : null;
     }
     pullIt(reqUrl) {
-        const otherUrls = this.urls.filter(url => url.url != reqUrl);
+        const otherUrls = this.urls.filter(url => !reqUrl.includes(url.mtd));
         this.urls = [...otherUrls];
     }
     getUrl() {

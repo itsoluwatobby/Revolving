@@ -75,18 +75,17 @@ class UrlsObj{
     this.urls = [];
   }
 
-  isPresent(reqUrl: string): boolean{
-    const present = this.urls.filter(url => url.url == reqUrl)
+  isPresent(reqUrl: string[]): boolean{
+    const present = this.urls.find(url => reqUrl.includes(url.mtd))
     return present ? true : false
   }
- 
   pushIn(reqs: ReqOpt){
     this.req = reqs
     const conflict = this.urls.filter(url => url.url == this.req.url)
     !conflict.length ? this.urls.push(this.req) : null
   }
-  pullIt(reqUrl: string){
-    const otherUrls = this.urls.filter(url => url.url != reqUrl)
+  pullIt(reqUrl: string[]){
+    const otherUrls = this.urls.filter(url => !reqUrl.includes(url.mtd))
     this.urls = [...otherUrls]
   }
   getUrl(){

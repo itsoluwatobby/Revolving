@@ -11,7 +11,6 @@ import { getUserByToken } from "../helpers/userHelpers.js";
 import { responseType, signToken, verifyToken, objInstance } from "../helpers/helper.js";
 export const logMethods = (req, res, next) => {
     objInstance.pushIn({ mtd: req.method, url: req.url });
-    console.log(objInstance.getUrl());
     next();
 };
 export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
