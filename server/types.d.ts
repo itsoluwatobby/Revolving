@@ -63,11 +63,22 @@ interface StoryProps extends Document{
   editDate: string
 }
 
+interface CommentProps extends Document{
+  _id: string,
+  postId: string,
+  userId: string,
+  commentDate: string,
+  comment: string,
+  likes: string[],
+  edited: boolean,
+  editDate: string
+}
+
 interface SharedProps extends Document{
   sharerId: string,
   storyId: string,
   sharedDate: string,
-  likes: string[],
+  sharedLikes: string[],
   sharedStory: StoryProps,
 }
 
@@ -106,5 +117,5 @@ interface ResponseType extends Response{
     count?: number,
     message?: string
   },
-  data?: object | undefined
+  data?: object
 }

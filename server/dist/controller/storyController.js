@@ -12,7 +12,7 @@ import { createUserStory, getAllStories, getStoryById, getUserStories, likeAndUn
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
-import { getAllSharedStories } from "../helpers/sharedHelper.js";
+import { getAllSharedByCategories, getAllSharedStories } from "../helpers/sharedHelper.js";
 import { getCachedResponse } from "../helpers/redis.js";
 ;
 export const createNewStory = (req, res) => {
@@ -112,7 +112,15 @@ export const getStoryByCategory = (req, res) => {
             return res.sendStatus(400);
         const storyCategory = yield getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
-                return categoryStory;
+                const sharedCategoryStory = yield getAllSharedByCategories(category);
+                console.log(sharedCategoryStory);
+                const reMoulded = sharedCategoryStory.map(share => {
+                    const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.sharedDate });
+                    return object;
+                });
+                console.log(reMoulded);
+                const refactoredModel = [...categoryStory, ...reMoulded];
+                return refactoredModel;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length))
             return responseType({ res, status: 404, message: 'You have no stories' });
@@ -124,7 +132,11 @@ export const getStories = (req, res) => {
         const allStories = yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const stories = yield getAllStories();
                 const sharedStories = yield getAllSharedStories();
-                const everyStories = [...stories, ...sharedStories];
+                const reMoulded = sharedStories.map(share => {
+                    const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.sharedDate });
+                    return object;
+                });
+                const everyStories = [...stories, ...reMoulded];
                 return everyStories;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(allStories === null || allStories === void 0 ? void 0 : allStories.length))
@@ -146,4 +158,9 @@ export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0,
         responseType({ res, status: 201, message: result });
     }));
 });
+// async function runN(){
+//   const sharedCategoryStory = await getAllSharedByCategories('Node')
+//   console.log(sharedCategoryStory)
+// }
+// runN()
 //# sourceMappingURL=storyController.js.map

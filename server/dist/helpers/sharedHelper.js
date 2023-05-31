@@ -13,6 +13,7 @@ import { getStoryById } from "./storyHelpers.js";
 export const getSharedStoryById = (sharedId) => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.findById(sharedId).select('-sharedStory.isShared'); });
 export const getUserSharedStories = (sharerId) => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.find({ sharerId }).lean(); });
 export const getAllSharedStories = () => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.find().lean(); });
+export const getAllSharedByCategories = (category) => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.find({ 'sharedStory.category': [category] }); });
 export const createShareStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () {
     const story = yield getStoryById(storyId);
     const newSharedStory = new SharedStoryModel({
@@ -27,7 +28,7 @@ export const unShareStory = (userId, sharedId) => __awaiter(void 0, void 0, void
     if (!sharedStory)
         return 'not found';
     const story = yield getStoryById(sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.storyId);
-    const verifyUser = yield (story === null || story === void 0 ? void 0 : story.isShared.map(targetShare => (targetShare === null || targetShare === void 0 ? void 0 : targetShare.userId) === userId && (targetShare === null || targetShare === void 0 ? void 0 : targetShare.sharedId) === sharedId).find(res => res = true));
+    const verifyUser = story === null || story === void 0 ? void 0 : story.isShared.map(targetShare => (targetShare === null || targetShare === void 0 ? void 0 : targetShare.userId) === userId && (targetShare === null || targetShare === void 0 ? void 0 : targetShare.sharedId) === sharedId).find(res => res = true);
     if (!verifyUser)
         return 'unauthorized';
     yield sharedStory.deleteOne();
@@ -35,12 +36,12 @@ export const unShareStory = (userId, sharedId) => __awaiter(void 0, void 0, void
 });
 export const likeAndUnlikeSharedStory = (userId, sharedId) => __awaiter(void 0, void 0, void 0, function* () {
     const sharedStory = yield SharedStoryModel.findById(sharedId).exec();
-    if (!(sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.likes.includes(userId))) {
-        yield (sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.updateOne({ $push: { likes: userId } }));
+    if (!(sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.sharedLikes.includes(userId))) {
+        yield (sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.updateOne({ $push: { sharedLikes: userId } }));
         return 'You liked this post';
     }
     else {
-        yield (sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.updateOne({ $pull: { likes: userId } }));
+        yield (sharedStory === null || sharedStory === void 0 ? void 0 : sharedStory.updateOne({ $pull: { sharedLikes: userId } }));
         return 'You unliked this post';
     }
 });

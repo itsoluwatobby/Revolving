@@ -30,7 +30,7 @@ import passwordResetRouter from './routes/resetPassword.js';
 import { logoutHandler } from './controller/authController.js';
 import { logURLAndMethods } from './middleware/urlLogger.js';
 
-import { fetchSharedStory, getSharedStory } from './controller/sharedStoryController.js';
+import { fetchSharedStories, getSingleShared } from './controller/sharedStoryController.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 
@@ -87,21 +87,21 @@ else{
   app.use(logURLAndMethods)
   // ROUTES
   app.use('/revolving/auth', authRouter);
-  app.get('/revolving/logout', logoutHandler);
+  app.get('/revolving/auth/logout', logoutHandler);
 
   app.get('/revolving/users', getUsers);
   app.get('/revolving/users/:userId', getUser);
 
   //password reset
   app.use('/revolving/auth', passwordResetRouter);
+  
+  app.get('/revolving/story/share_getAll', fetchSharedStories)
 
   //public routes
   app.get('/revolving/story', getStories);
   app.get('/revolving/story/category', getStoryByCategory);
   app.get('/revolving/story/:storyId', getStory);
-
-  app.get('/revolving/story/all/share', fetchSharedStory)
-  app.get('/revolving/story/share/:sharedId', getSharedStory)
+  app.get('/revolving/story/share/:sharedId', getSingleShared)
 
   // checks for accesstoken
   app.use(verifyAccessToken);

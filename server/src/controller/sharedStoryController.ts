@@ -11,9 +11,21 @@ interface RequestProp extends Request{
   category: Categories
 };
 
-// SHARED STORIES ROUTE
-export const getSharedStory = (req: RequestProp, res: Response) => {
-  asyncFunc(res, async () => {
+// Only for admin page
+export const fetchSharedStories = (req: Request, res: Response) => {
+  asyncFunc(res, async() => {
+    const allSharedStories = await getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
+      const sharedStories = await getAllSharedStories();
+      return sharedStories
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
+
+    if(!allSharedStories?.length) return responseType({res, status: 404, message: 'No shared stories available'})
+    return responseType({res, status: 200, count: allSharedStories?.length, data: allSharedStories})
+  })
+}
+
+export const getSingleShared = (req: RequestProp, res: Response) => {
+  asyncFunc(res, async() => {
     const {sharedId} = req.params
     if(!sharedId) return res.sendStatus(400);
     const sharedStory = await getCachedResponse({key:`sharedStory:${sharedId}`, cb: async() => {
@@ -75,19 +87,6 @@ export const like_Unlike_SharedStory = async(req: Request, res: Response) => {
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await likeAndUnlikeSharedStory(userId, sharedId) as Like_Unlike_Shared;
     responseType({res, status: 201, message: result})
-  })
-}
-
-// Only for admin page
-export const fetchSharedStory = (req: Request, res: Response) => {
-  asyncFunc(res, async () => {
-    const allSharedStories = await getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
-      const sharedStories = await getAllSharedStories();
-      return sharedStories
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
-
-    if(!allSharedStories?.length) return responseType({res, status: 404, message: 'No shared stories available'})
-    return responseType({res, status: 200, count: allSharedStories?.length, data: allSharedStories})
   })
 }
 

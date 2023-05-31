@@ -12,8 +12,19 @@ import { createShareStory, getAllSharedStories, getSharedStoryById, getUserShare
 import { getCachedResponse, redisClient } from "../helpers/redis.js";
 import { getUserById } from "../helpers/userHelpers.js";
 ;
-// SHARED STORIES ROUTE
-export const getSharedStory = (req, res) => {
+// Only for admin page
+export const fetchSharedStories = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const allSharedStories = yield getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const sharedStories = yield getAllSharedStories();
+                return sharedStories;
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
+        if (!(allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length))
+            return responseType({ res, status: 404, message: 'No shared stories available' });
+        return responseType({ res, status: 200, count: allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length, data: allSharedStories });
+    }));
+};
+export const getSingleShared = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { sharedId } = req.params;
         if (!sharedId)
@@ -83,16 +94,4 @@ export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, v
         responseType({ res, status: 201, message: result });
     }));
 });
-// Only for admin page
-export const fetchSharedStory = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const allSharedStories = yield getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
-                const sharedStories = yield getAllSharedStories();
-                return sharedStories;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!(allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length))
-            return responseType({ res, status: 404, message: 'No shared stories available' });
-        return responseType({ res, status: 200, count: allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length, data: allSharedStories });
-    }));
-};
 //# sourceMappingURL=sharedStoryController.js.map
