@@ -67,7 +67,7 @@ interface SharedProps extends Document{
   sharerId: string,
   storyId: string,
   sharedDate: string,
-  likes: string[],
+  sharedLikes: string[],
   sharedStory: StoryProps,
 }
 
@@ -106,5 +106,5 @@ interface ResponseType extends Response{
     count?: number,
     message?: string
   },
-  data?: object | undefined
+  data?: object
 }

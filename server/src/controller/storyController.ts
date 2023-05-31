@@ -4,9 +4,10 @@ import { Like_Unlike, createUserStory, getAllStories, getStoryById, getUserStori
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
-import { getAllSharedStories } from "../helpers/sharedHelper.js";
-import { Categories, StoryProps } from "../../types.js";
+import { getAllSharedByCategories, getAllSharedStories } from "../helpers/sharedHelper.js";
+import { Categories, SharedProps, StoryProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
+import { SharedStoryModel } from "../models/SharedStory.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -103,7 +104,16 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
     if(!category) return res.sendStatus(400);
     const storyCategory = await getCachedResponse({key:`story:${category}`, cb: async() => {
       const categoryStory = await StoryModel.find({category: {$in: [category]}})
-      return categoryStory
+      const sharedCategoryStory = await getAllSharedByCategories(category as string)
+      const reMoulded = sharedCategoryStory.map(share => {
+        const object = {
+          ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
+          sharerId: share?.sharerId, sharedDate: share?.sharedDate
+        }
+        return object
+      })
+      const refactoredModel = [...categoryStory, ...reMoulded]
+      return refactoredModel
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
     
     if(!storyCategory?.length) return responseType({res, status: 404, message: 'You have no stories'});
@@ -116,7 +126,15 @@ export const getStories = (req: Request, res: Response) => {
     const allStories = await getCachedResponse({key:'allStories', cb: async() => {
       const stories = await getAllStories();
       const sharedStories = await getAllSharedStories();
-      const everyStories = [...stories, ...sharedStories]
+      const reMoulded = sharedStories.map(share => {
+        const object = {
+          ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
+          sharerId: share?.sharerId,
+          sharedDate: share?.sharedDate 
+        }
+        return object
+      })
+      const everyStories = [...stories, ...reMoulded]
       return everyStories
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
 
@@ -137,3 +155,8 @@ export const like_Unlike_Story = async(req: Request, res: Response) => {
   })
 }
 
+// async function runN(){
+//   const sharedCategoryStory = await getAllSharedByCategories('Node')
+//   console.log(sharedCategoryStory)
+// }
+// runN()

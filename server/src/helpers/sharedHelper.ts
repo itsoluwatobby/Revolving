@@ -8,6 +8,8 @@ export const getUserSharedStories = async(sharerId: string) => await SharedStory
 
 export const getAllSharedStories = async() => await SharedStoryModel.find().lean();
 
+export const getAllSharedByCategories = async(category: string) => await SharedStoryModel.find({'sharedStory.category': [category]});
+
 export const createShareStory = async(userId: string, storyId: string) => {
   const story = await getStoryById(storyId)
   const newSharedStory = new SharedStoryModel({
@@ -22,7 +24,7 @@ export const unShareStory = async(userId: string, sharedId: string) => {
   const sharedStory = await getSharedStoryById(sharedId)
   if(!sharedStory) return 'not found'
   const story = await getStoryById(sharedStory?.storyId)
-  const verifyUser = await story?.isShared.map(targetShare => targetShare?.userId === userId && targetShare?.sharedId === sharedId).find(res => res = true)
+  const verifyUser = story?.isShared.map(targetShare => targetShare?.userId === userId && targetShare?.sharedId === sharedId).find(res => res = true)
   if(!verifyUser) return 'unauthorized'
   await sharedStory.deleteOne();
   await story?.updateOne({ $pull: { isShared: { userId, sharedId } } });
@@ -30,12 +32,12 @@ export const unShareStory = async(userId: string, sharedId: string) => {
 
 export const likeAndUnlikeSharedStory = async(userId: string, sharedId: string): Promise<string> => {
   const sharedStory = await SharedStoryModel.findById(sharedId).exec();
-  if(!sharedStory?.likes.includes(userId)) {
-    await sharedStory?.updateOne({ $push: {likes: userId} })
+  if(!sharedStory?.sharedLikes.includes(userId)) {
+    await sharedStory?.updateOne({ $push: {sharedLikes: userId} })
     return 'You liked this post'
   }
   else {
-    await sharedStory?.updateOne({ $pull: {likes: userId} })
+    await sharedStory?.updateOne({ $pull: {sharedLikes: userId} })
     return 'You unliked this post'
   }
 }
