@@ -4,16 +4,6 @@ import React from 'react';
 type ChildrenProp = {
   children: React.ReactNode
 }
-
-type CommentType = {
-  _id?: string,
-  postId: string,
-  //commentId : string,
-  date: string,
-  body?: string,
-  likes?: number,
-  author: string | 'anonymous'
-}
   
 type PostType = {
   _id: string,
@@ -29,7 +19,11 @@ type PostType = {
   fontFamily?: string | 'sans',
   commentIds?: string[],
   edited: false,
-  editDate: string
+  editDate: string,
+  sharedDate: string,
+  sharerId?: string,
+  sharedId?: string,
+  sharedLikes?: string[]
 }
 
 // interface WindowScrollType{
@@ -63,7 +57,13 @@ type ThemeContextType = {
   fontFamily: FontStyle,
   fontOption: boolean,
   rollout: boolean,
+  openComment: boolean,
+  parseId: string,
+  enlarge: boolean,
   changeTheme: (mode: string) => void,
+  setEnlarge: React.Dispatch<React.SetStateAction<boolean>>,
+  setParseId: React.Dispatch<React.SetStateAction<string>>,
+  setOpenComment: React.Dispatch<React.SetStateAction<boolean>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>

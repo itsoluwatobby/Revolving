@@ -10,6 +10,9 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     );
   const [fontOption, setFontOption] = useState<boolean>(false);
   const [rollout, setRollout] = useState<boolean>(false);
+  const [openComment, setOpenComment] = useState<boolean>(false);
+  const [parseId, setParseId] = useState<string>('');
+  const [enlarge, setEnlarge] = useState<boolean>(false);
 
   const changeTheme = (mode: string) => {
     setTheme(prev => {
@@ -19,7 +22,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, setFontOption
+    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge
   }
   return (
     <ThemeContext.Provider value={ values }>

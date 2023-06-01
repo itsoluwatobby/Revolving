@@ -4,10 +4,11 @@ import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
 import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Categories } from '../data';
 import useSwrMutation from 'swr/mutation'
 import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
+import Comments from './comments/Comments';
 
 type PostsProps = {
   navigationTab: Categories
@@ -25,7 +26,9 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate))
   })
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
+  const [switchComment, setSwitchComment] = useState<boolean>(false)
   
+  //(b?.sharedDate.localeCompare(a?.sharedDate))
   useEffect(() => {
     let isMounted = true;
     const triggerCategory = async() =>{
@@ -53,15 +56,16 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     </p> 
   :(  filteredStories?.length ? content = (
     filteredStories?.map(post => (
-          <Post key={post?._id} post={post as PostType} />
+          <Post key={post?.sharedId || post?._id} post={post as PostType} />
         )
       )
     ) 
     : content = (<p>No posts available</p>)
   )
   return (
-    <div className='box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
+    <div className='relative box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
       {content}
+      <Comments />
     </div>
   )
 }
