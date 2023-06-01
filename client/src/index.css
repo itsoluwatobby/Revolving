@@ -22,6 +22,10 @@ textarea::-webkit-scrollbar{
   height: calc(100vh - 64px);
 }
 
+.comment_page{
+  height: calc(100vh - 150px);
+}
+
 .welcome{
   height: calc(100vh - 64px);
 }

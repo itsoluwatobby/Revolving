@@ -17,6 +17,7 @@ import { deletePostOptions } from '../api/postApiOptions';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { AuthenticationContextType } from '../data';
+import { reduceLength } from '../assets/navigator';
 
 type Props = {
   post: PostType
@@ -31,7 +32,7 @@ export const Post = ({ post }: Props) => {
   const {auth} = useAuthenticationContext() as AuthenticationContextType
   const end = averageReadingTime.split(' ')[1]
 
-  const userId = localStorage.getItem('revolving_userId')
+  const userId = localStorage.getItem('revolving_userId') as string
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
   const tooLong = (): string => {
     const wordLength = post?.body?.split(' ').length
@@ -71,9 +72,9 @@ export const Post = ({ post }: Props) => {
       <div 
         // onClick={openText}
         className='relative flex items-center gap-3'>
-        <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{post?.author || 'anonymous'}</p>
+        <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{reduceLength(post?.author, 15) || 'anonymous'}</p>
         <span>.</span>
-        <p>{format(post?.storyDate, 'en-US')}</p>
+        <p>{format(post?.sharedDate || post?.storyDate, 'en-US')}</p>
         {userId && (
           <FiMoreVertical
             onClick={() => setOpen(prev => !prev)}
@@ -111,7 +112,7 @@ export const Post = ({ post }: Props) => {
       <div className='mt-2 opacity-90 flex items-center gap-5 text-green-600 text-sm font-sans'>
         <p>{post?.body ? averageReadingTime + ' read' : ''}</p>
         {
-          (auth?._id && post?.likes?.includes(auth?._id)) 
+          (userId && (post?.sharedLikes ? post?.sharedLikes?.includes(userId) : post?.likes?.includes(userId))) 
             ?
               <p className="flex items-center gap-1">
                 <BsFillHandThumbsUpFill title='like' className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
@@ -141,13 +142,19 @@ export const Post = ({ post }: Props) => {
             </Link>
           )
         }
-        {auth?._id && (    
+        {/* {auth?._id && (     */}
+          <p className='flex items-center gap-1.5'>
             <RxShare2 
               title='share story' 
-              className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
+              className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
+            />
+            <span role='count' title='share count' className={`${theme == 'light' ? 'text-black' : 'text-white'}`}>
+              {post?.isShared?.length}
+            </span>
+          </p>
           
-          )
-        }
+          {/* )
+        } */}
       </div>
     </article>
   )

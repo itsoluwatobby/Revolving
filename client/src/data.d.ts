@@ -16,13 +16,20 @@ type StoryProps = {
   editDate: string
 }
 
+interface CommentProps{
+  _id: string,
+  storyId: string,
+  userId: string,
+  commentDate: string,
+  comment: string,
+  likes: string, //array of string
+  author: string,
+  edited: boolean,
+  editDate: string
+}
+
 type USERROLES = number
 type ALLOWEDROLES = Record<string, USERROLES>
-
-interface ClaimProps{
-  roles: USERROLES[],
-  email: string
-}
 
 interface SharedProps{
   sharerId: string,

@@ -9,3 +9,17 @@ export const NAVIGATE: Record<ComponentKey, Components> = {
   'NODE': 'Node',
   'BASH SCRIPTING': 'Bash scripting'
 }
+
+type Option = 'letter' | 'word'
+
+export const reduceLength = (content: string, maxLength: number, option: Option = 'letter'): string => {
+  let responseOutput;
+  if(option == 'letter'){
+    responseOutput = content?.length > maxLength ? content?.substring(0, maxLength) +'...' : content
+  }
+  else{
+    responseOutput = content?.split(' ').length > maxLength ? content?.substring(0, maxLength * 4) +'...' : content
+  }
+
+  return responseOutput
+}
