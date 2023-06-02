@@ -27,8 +27,9 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
     revalidate: true
   })
-  const { filteredStories, setNavPosts } = usePostContext() as PostContextType
+  const { filteredStories, navPosts, setNavPosts } = usePostContext() as PostContextType
   const { openComment } = useThemeContext() as ThemeContextType
+  const [reloadListener, setReloadListener] = useState<number>(0)
 
   //(b?.sharedDate.localeCompare(a?.sharedDate))
   useEffect(() => {
@@ -36,13 +37,25 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     const triggerCategory = async() =>{
       const res = await trigger()
       setNavPosts(res as PostType[])
+      setReloadListener(0);
     }
     isMounted && triggerCategory()
 
     return () => {
       isMounted = false
     }
-  }, [navigationTab, trigger, setNavPosts])
+  }, [navigationTab, trigger, setNavPosts, reloadListener])
+
+  useEffect(() => {
+    let hotReloadId: number;
+    if(!navPosts?.length){
+      hotReloadId = setTimeout(() => {
+        console.log('running')
+        setReloadListener(prev => prev + 1)
+      }, 5000)
+    }
+    return () => clearTimeout(hotReloadId)
+  }, [navPosts])
   
   let content;
 

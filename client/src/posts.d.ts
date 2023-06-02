@@ -49,6 +49,8 @@ type PostContextType = {
   setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
 }
 
+type PromptLiterals = 'Show' | 'Discard' | 'Retain' | 'Dommant'
+
 type Theme = 'light' | 'dark';
 type FontStyle = string | 'font_style';
 
