@@ -3,15 +3,24 @@ import { MdOutlineInsertComment } from 'react-icons/md';
 import { Theme, ThemeContextType } from '../../posts';
 import { CommentProps } from '../../data';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import WriteModal from './WriteModal';
+import { PopUpPrompt } from './PopUpPrompt';
+import { useState } from 'react';
+
+type REACTSETSTATEACTION = React.Dispatch<React.SetStateAction<boolean>>
 
 type BaseProps = {
+  mini?: boolean
   userId: string,
   theme: Theme,
+  openReply?: boolean,
+  setOpenReply?: REACTSETSTATEACTION,
   comment: Pick<CommentProps, '_id' | 'likes' | 'comment'>
 }
 
-export default function CommentBase({userId, theme, comment}: BaseProps) {
-  const {setParseId, setEnlarge} = useThemeContext() as ThemeContextType
+export default function CommentBase({openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
+  const {setParseId, setEnlarge } = useThemeContext() as ThemeContextType;
+  const [writeReply, setWriteReply] = useState<string>('')
 
   const openUpComment = (commentId: string) => {
     setEnlarge(true)
@@ -43,15 +52,19 @@ export default function CommentBase({userId, theme, comment}: BaseProps) {
             {comment?.likes?.length}
           </span>
         </p>
-        {comment?.comment && (
+        {(mini && comment?.comment) && (
             comment?.comment.split(' ').length >= 60 &&
               <small 
                 onClick={() => openUpComment(comment?._id)}
                 className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-gray-200`}>Read more</small>
           )
         }
-        <span 
+        <span
+          onClick={() => setOpenReply(true)}
           className="cursor-pointer hover:opacity-70">reply</span>
+      {openReply ? <WriteModal setWriteReply={setWriteReply} /> : null}
+      {writeReply?.length >= 1 ? <PopUpPrompt /> : null}
     </>
   )
 }
+

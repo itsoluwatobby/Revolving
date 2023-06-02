@@ -8,12 +8,11 @@ import CommentBase from './CommentBase'
 import { format } from 'timeago.js'
 import { RiArrowGoBackLine } from 'react-icons/ri'
 
-
 export default function EnlargeComment() {
   const { theme, parseId, setEnlarge } = useThemeContext() as ThemeContextType
   const [targetComment, setTargetComment] = useState<CommentProps | null>(null);
   const userId = localStorage.getItem('revolving_userId') as string
-
+  
   useEffect(() => {
     const comment = comments.find(comm => comm?._id === parseId)
     setTargetComment(comment as CommentProps)
