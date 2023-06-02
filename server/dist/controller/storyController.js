@@ -113,12 +113,10 @@ export const getStoryByCategory = (req, res) => {
         const storyCategory = yield getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
                 const sharedCategoryStory = yield getAllSharedByCategories(category);
-                console.log(sharedCategoryStory);
                 const reMoulded = sharedCategoryStory.map(share => {
                     const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.sharedDate });
                     return object;
                 });
-                console.log(reMoulded);
                 const refactoredModel = [...categoryStory, ...reMoulded];
                 return refactoredModel;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });

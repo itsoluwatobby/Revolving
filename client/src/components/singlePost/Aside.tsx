@@ -3,15 +3,15 @@ import { PostType, ThemeContextType } from "../../posts";
 import { MdOutlineCancel } from "react-icons/md";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { useEffect, useState } from "react";
+import { reduceLength } from "../../assets/navigator";
 
 type AsideProps = {
   posts: PostType[],
   sidebar: boolean,
-  setSidebar: React.Dispatch<React.SetStateAction<boolean>>,
-  summarized: (length: number, sentence: string) => string
+  setSidebar: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function Aside({ posts, setSidebar, sidebar, summarized }: AsideProps) {
+export default function Aside({ posts, setSidebar, sidebar }: AsideProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [recentPosts, setRecentPosts] = useState<PostType[]>([])
 
@@ -31,15 +31,16 @@ export default function Aside({ posts, setSidebar, sidebar, summarized }: AsideP
       </div>
       {
         posts?.length ? (
-          <ul className="flex flex-col font-sans text-sm justify-center hover:pb-1 rounded-md transition-all duration-200 gap-2">
+          <ul className="flex flex-col font-sans text-sm justify-center rounded-md transition-all duration-200 gap-1">
             {
               recentPosts?.map(post => (
-                <li key={post?._id}
-                  className={`shadow-sm ${theme == 'light' ? 'bg-gray-100' : ''} p-2`}
+                <li 
+                  key={post?._id}
+                  className={` hover:scale-[1.01] transition-all shadow-sm ${theme == 'light' ? 'bg-gray-100' : ''} p-2`}
                 >
                   <Link to={`/story/${post?._id}`}>
-                    <p className="text-center uppercase font-medium underline underline-offset-4">{summarized(15, post?.title)}</p>
-                    <p className="cursor-pointer">{summarized(100, post?.body)}</p>
+                    <p className="text-center uppercase font-medium underline underline-offset-4">{reduceLength(post?.title, 18)}</p>
+                    <p className="cursor-pointer">{reduceLength(post?.body, 25, 'word')}</p>
                   </Link>
                 </li>
               ))

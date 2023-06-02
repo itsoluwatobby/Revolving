@@ -70,6 +70,7 @@ interface CommentProps extends Document{
   commentDate: string,
   comment: string,
   likes: string[],
+  author: string,
   edited: boolean,
   editDate: string
 }

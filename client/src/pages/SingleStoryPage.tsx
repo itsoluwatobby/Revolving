@@ -42,12 +42,7 @@ export default function SingleStoryPage() {
   const watchWords = TextRules.keywords as string
 
   const end = averageReadingTime.split(' ')[1]
-  averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
-
-  const summarized = (length: number, sentence: string): string => {
-    const sum = sentence.length > length ? sentence.substring(0, length)+'...' : sentence;
-    return sum
-  }
+  averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end;
 
   useEffect(() => {
     //console.log(titleFocus)
@@ -65,8 +60,8 @@ export default function SingleStoryPage() {
       <main className='single_page box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl'>
         <div className="flex h-full">
           <Aside 
-            posts={posts as PostType[]} summarized={summarized}
-            sidebar={sidebar} setSidebar={setSidebar}
+            posts={posts as PostType[]} sidebar={sidebar} 
+            setSidebar={setSidebar}
           />
           <ArticleComp 
             post={targetStory as PostType} bodyContent={bodyContent as JSX.Element[]}

@@ -28,7 +28,7 @@ export const Post = ({ post }: Props) => {
   let averageReadingTime = useWordCount(post?.body) as string;
   const {mutate} = useSWRConfig()
 
-  const { theme } = useThemeContext() as ThemeContextType
+  const { theme, setOpenComment } = useThemeContext() as ThemeContextType
   const {auth} = useAuthenticationContext() as AuthenticationContextType
   const end = averageReadingTime.split(' ')[1]
 
@@ -105,7 +105,7 @@ export const Post = ({ post }: Props) => {
       <Link to={`/story/${post?._id}`} >
         <p 
           onClick={openText}
-          className='whitespace-pre-wrap text-sm'>
+          className='whitespace-pre-wrap text-sm first-letter:ml-3 first-letter:text-lg first-letter:capitalize'>
             {bodyContent}
         </p>
       </Link>
@@ -129,10 +129,15 @@ export const Post = ({ post }: Props) => {
               </p>
         }
         {/* {auth?._id && (     */}
+          <p className={`flex items-center gap-1.5 ${theme == 'light' ? 'text-black' : 'text-white'}`}>
             <MdOutlineInsertComment 
-              title='comments' 
+              title='comments'
+              onClick={() => setOpenComment(true)}
               className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
-          
+            <span className="">
+              {post?.likes?.length}
+            </span>
+          </p>
           {/* )
         } */}
         {post?.body && (

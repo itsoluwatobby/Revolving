@@ -15,16 +15,16 @@ export default function CommentCompo({ comment, theme }: CommentType) {
   const [reveal, setReveal] = useState<boolean>(false)
 
   return (
-    <article className="text-sm flex flex-col gap-1">
-      <div className={`flex items-center gap-4 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit p-0.5 rounded-full pl-2 pr-2`}>
+    <article className="text-sm flex flex-col gap-1 p-1.5">
+      <div className={`flex items-center gap-4 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
         <p 
           className={`cursor-pointer hover:opacity-70 transition-all text-sm ${theme == 'light' ? '' : 'text-black'}`}>{reduceLength(comment?.author, 15)}</p>
         <span className="font-bold text-black">.</span>
-        <p className="text-xs text-gray-700">{format(comment?.commentDate)}</p>
+        <p className="text-xs text-gray-950">{format(comment?.commentDate)}</p>
       </div>
       <p 
         onClick={() => setReveal(prev => !prev)}
-        className="cursor-grab text-justify tracking-wide first-letter:ml-3 first-letter:text-lg first-letter:font-medium">
+        className="cursor-grab text-justify tracking-wide first-letter:ml-3 first-letter:font-medium">
         {reveal ? comment?.comment : reduceLength(comment?.comment, 60, 'word')}
       </p>
       <div className="flex items-center gap-4">
