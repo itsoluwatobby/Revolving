@@ -3,20 +3,25 @@ import { CommentProps } from "../../data"
 import { format } from 'timeago.js';
 import { PromptLiterals, Theme } from "../../posts";
 import CommentBase from "./CommentBase";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type CommentType = {
   comment: CommentProps,
-  theme: Theme
+  theme: Theme,
+  setOpenBox: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function CommentCompo({ comment, theme }: CommentType) {
+export default function CommentCompo({ comment, theme, setOpenBox }: CommentType) {
   const userId = localStorage.getItem('revolving_userId') as string
   const [reveal, setReveal] = useState<boolean>(false)
   const [openReply, setOpenReply] = useState<boolean>(false)
   const [writeReply, setWriteReply] = useState<string>('');
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const responseRef = useRef<HTMLTextAreaElement>();
+
+  useEffect(() => {
+    openReply ? setOpenBox(true) : setOpenBox(false)
+  }, [openReply, setOpenBox])
 
   const closeInput = () => {
     !writeReply.length ? setOpenReply(false) : setKeepPrompt('Show');

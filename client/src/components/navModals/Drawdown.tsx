@@ -14,8 +14,8 @@ export default function Drawdown() {
   const excludeRoute = ['/new_story', `/edit_story`, `/story`]
 
   return (
-    !excludeRoute.includes(home) ? (
-    <ul className={`absolute rounded-md tracking-widest right-6 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-gray-50' : 'bg-gray-600'} last:border-0 p-2`}>
+    // !excludeRoute.includes(home) ? (
+    <ul className={`absolute rounded-md tracking-widest right-6 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-gray-50' : 'bg-gray-600'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'}`}>
     {
       !userId && 
         (pathname != '/signIn' &&
@@ -28,16 +28,18 @@ export default function Drawdown() {
           </li>
         )
     }
-    {userId && 
-      (
-        <li className={modalClass}>
-          <Link to={`/profile/${userId}`}>
-            profile
-          </Link>
-        </li>
-      )
+    {
+      userId && 
+        (
+          <li className={modalClass}>
+            <Link to={`/profile/${userId}`}>
+              profile
+            </Link>
+          </li>
+        )
     }
-    {userId && 
+    {
+      userId && 
       (
         <li className={modalClass}>
           <Link to={`/account/${userId}`}>
@@ -69,8 +71,10 @@ export default function Drawdown() {
           about
         </Link>
       </li>
-      <li className={modalClass}>contact</li>                                
-  </ul>
-  ) : <p></p>
+      <li className={modalClass}>
+        contact
+      </li>                                
+    </ul>
+  // ) : <p></p>
   )
 }

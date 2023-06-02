@@ -4,13 +4,17 @@ import { comments } from '../../commentData'
 import CommentCompo from './CommentCompo'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { ThemeContextType } from '../../posts'
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { SkeletonComment } from '../skeletons/SkeletonComment'
 import { CommentProps } from '../../data'
 
 export default function CommentBody() {
-  const { theme, setOpenComment } = useThemeContext() as ThemeContextType
-  const [isLoading, setIsloading] = useState<boolean>(true)
+  const { theme, setOpenComment } = useThemeContext() as ThemeContextType;
+  const [openBox, setOpenBox] = useState<boolean>(false)
+  const [isLoading, setIsloading] = useState<boolean>(true);
+  const [reply, setReply] = useState<string>('');
+
+  const handleReply = (event: ChangeEvent<HTMLInputElement>) => setReply(event.target.value)
 
   let commentContent;
 
@@ -27,11 +31,22 @@ export default function CommentBody() {
             key={comment?._id}
             comment={comment as CommentProps} 
             theme={theme} 
+            setOpenBox={setOpenBox}
           />
         ))
       }
     </>
   )
+
+  const handleSubmit = () => {
+    try{
+      console.log(reply)
+      setReply('')
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
 
   return (
     <>
@@ -43,11 +58,15 @@ export default function CommentBody() {
           type="text"
           name="comment"
           autoFocus={true}
+          disabled={openBox}
           autoComplete="off"
           placeholder="share your thought"
+          onChange={handleReply}
           className={`flex-auto font-serif p-1.5 h-full text-sm w-10/12 focus:outline-none rounded-md ${theme == 'light' ? 'text-black' : 'text-white'} bg-inherit`}
         />
-        <button className="flex-none w-12 hover:bg-opacity-50 hover:opacity-50 h-10 grid place-content-center transition-all rounded-tr-md rounded-br-md">
+        <button 
+          onClick={handleSubmit}
+          className="flex-none w-12 hover:bg-opacity-50 hover:opacity-50 h-10 grid place-content-center transition-all rounded-tr-md rounded-br-md">
           <BsSend
             className={`text-lg text-center hover:scale-[1.08] active:scale-[1]`}
           />

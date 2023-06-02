@@ -6,8 +6,6 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
 
-const modalButton = 'cursor-pointer border border-gray-500 p-1 text-[11px] rounded-md hover:opacity-80 transition-all';
-
 type BaseProps = {
   mini?: boolean
   userId: string,
@@ -22,8 +20,12 @@ type BaseProps = {
   comment: Pick<CommentProps, '_id' | 'likes' | 'comment'>
 }
 
+function modalButton(theme: Theme){ 
+  return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
+}
+
 export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
-  const {setParseId, setEnlarge } = useThemeContext() as ThemeContextType;
+  const {setParseId, enlarge, setEnlarge } = useThemeContext() as ThemeContextType;
 
   const openUpComment = (commentId: string) => {
     setEnlarge(true)
@@ -85,7 +87,9 @@ export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, wr
       {openReply || keepPrompt == 'Show' 
             ? <WriteModal 
                 responseRef={responseRef}
-                writeReply={writeReply} 
+                writeReply={writeReply}
+                keepPrompt={keepPrompt}
+                setOpenReply={setOpenReply}
                 setWriteReply={setWriteReply} 
               /> 
               : null
@@ -93,8 +97,10 @@ export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, wr
       {
         keepPrompt == 'Show' 
           ? <PopUpPrompt 
+              enlarge={enlarge}
               responseRef={responseRef} 
-              setKeepPrompt={setKeepPrompt} 
+              setKeepPrompt={setKeepPrompt}
+              theme={theme} 
             /> 
             : null
       }
@@ -103,24 +109,26 @@ export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, wr
 }
 
 type PopType={
+  theme: Theme,
+  enlarge: boolean,
   responseRef: React.MutableRefObject<HTMLTextAreaElement>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>
 }
 
-export function PopUpPrompt({ responseRef, setKeepPrompt }: PopType){
+export function PopUpPrompt({ enlarge, responseRef, setKeepPrompt, theme }: PopType){
 
   const keepFocus = () => {
     setKeepPrompt('Retain')
-    if(responseRef.current) responseRef.current.focus()
+    if(responseRef.current) responseRef?.current.focus()
   }
   return (
-    <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl shadow-slate-700 items-center gap-2 right-20 top-4 bg-slate-800`}>
+    <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl items-center gap-2 right-20 ${theme == 'light' ? 'bg-slate-700 shadow-slate-800' : 'bg-slate-800 shadow-slate-700'} ${enlarge ? 'bottom-20' : 'top-4'}`}>
       <p 
         onClick={keepFocus}
-        className={modalButton}>Keep writing</p>
+        className={modalButton(theme)}>Keep writing</p>
       <p 
         onClick={() => setKeepPrompt('Discard')}
-        className={modalButton}>Discard</p>
+        className={modalButton(theme)}>Discard</p>
     </section>
   )
 }
