@@ -60,14 +60,12 @@ type ThemeContextType = {
   openComment: boolean,
   parseId: string,
   enlarge: boolean,
-  openReply: boolean,
   changeTheme: (mode: string) => void,
-  setOpenReply: React.Dispatch<React.SetStateAction<boolean>>,
   setEnlarge: React.Dispatch<React.SetStateAction<boolean>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
+  setFontFamily: React.Dispatch<React.SetStateAction<string>>,
   setOpenComment: React.Dispatch<React.SetStateAction<boolean>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
-  setFontFamily: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>
 }
 

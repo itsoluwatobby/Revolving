@@ -37,7 +37,7 @@ export default function CommentBody() {
     <>
        <MdCancel
         onClick={() => setOpenComment(false)}
-        className={`fixed text-gray-800 text-2xl cursor-pointer hover:opacity-70 right-3 top-3`}/>
+        className={`absolute top-0 right-0 text-gray-800 text-2xl cursor-pointer hover:opacity-70`}/>
       <div className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'}`}>
         <input 
           type="text"
@@ -53,7 +53,7 @@ export default function CommentBody() {
           />
         </button>
       </div>
-      <div className="hidebars w-full overflow-y-scroll mt-2 flex flex-col">
+      <div className="hidebars relative w-full overflow-y-scroll mt-2 flex flex-col">
         {commentContent}
       </div>
     </>

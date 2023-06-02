@@ -1,18 +1,23 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent } from 'react'
 import { BsSend } from 'react-icons/bs'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { ThemeContextType } from '../../posts'
 
+type WriteProp={
+  setWriteReply: React.Dispatch<React.SetStateAction<string>>
+}
 
-export default function WriteModal() {
-  const [writeReply, setWriteReply] = useState<string>('')
-  const { openReply, theme } = useThemeContext() as ThemeContextType
+export default function WriteModal({ setWriteReply }: WriteProp) {
+  const { theme } = useThemeContext() as ThemeContextType
 
   const handleReply = (event: ChangeEvent<HTMLTextAreaElement>) => setWriteReply(event.target.value)
   
   const content = (
-    <article>
+    <article className='absolute w-full -bottom-20 z-50'>
       <div className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'}`}>
+        {/* <AiOutlineClose 
+          onClick={() => setOpenReply(false)}
+          className={`absolute right-1 top-2 text-black cursor-pointer font-bold hover:opacity-70 hover:scale-[1.1] active:scale-[1] transition-all`}/> */}
         <textarea 
           name="comment"
           autoFocus={true}
@@ -31,5 +36,5 @@ export default function WriteModal() {
     </article>
   )
 
-  return (openReply ? content : null)
+  return content
 }
