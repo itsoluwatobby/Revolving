@@ -2,7 +2,7 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 import { ThemeContextType } from '../../posts';
 import SkeletonLoading from './SkeletonLoading'
 
-export const SkeletonSinglePage = () => {
+export const SkeletonComment = () => {
   const {theme} = useThemeContext() as  ThemeContextType
 
   return (
@@ -10,9 +10,7 @@ export const SkeletonSinglePage = () => {
       <SkeletonLoading classes='title width-50' />
       <SkeletonLoading classes='text width-100' />
       <SkeletonLoading classes='text width-100' />
-      <SkeletonLoading classes='text width-100' />
-      <SkeletonLoading classes='text width-100' />
-      <SkeletonLoading classes='text width-100' />
+      <SkeletonLoading classes='text width-50' />
     </div>
   )
 }

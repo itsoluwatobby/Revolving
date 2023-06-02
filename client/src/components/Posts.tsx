@@ -1,5 +1,5 @@
 //import { useState, useEffect } from 'react';
-import { PostContextType, PostType } from '../posts'
+import { PostContextType, PostType, ThemeContextType } from '../posts'
 import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
 import { RiSignalWifiErrorLine } from 'react-icons/ri'
@@ -9,6 +9,7 @@ import { Categories } from '../data';
 import useSwrMutation from 'swr/mutation'
 import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
 import Comments from './comments/Comments';
+import { useThemeContext } from '../hooks/useThemeContext';
 
 type PostsProps = {
   navigationTab: Categories
@@ -23,11 +24,12 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     const res = await postAxios.get(`${cacheKey}/category?category=${navigationTab}`)
     return res?.data?.data
   }, {
-    onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate))
+    onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
+    revalidate: true
   })
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
-  const [switchComment, setSwitchComment] = useState<boolean>(false)
-  
+  const { openComment } = useThemeContext() as ThemeContextType
+
   //(b?.sharedDate.localeCompare(a?.sharedDate))
   useEffect(() => {
     let isMounted = true;
@@ -54,18 +56,18 @@ export const Posts = ({ navigationTab }: PostsProps) => {
     {isError?.message}
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
-  :(  filteredStories?.length ? content = (
-    filteredStories?.map(post => (
-          <Post key={post?.sharedId || post?._id} post={post as PostType} />
+  :(
+    filteredStories?.length ? content = (
+      filteredStories?.map(post => (
+            <Post key={post?.sharedId || post?._id} post={post as PostType} />
+          )
         )
-      )
-    ) 
-    : content = (<p>No posts available</p>)
+      ) 
+      : content = (<p className='m-auto text-3xl capitalize font-mono text-gray-400'>No stories available</p>)
   )
   return (
     <div className='relative box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
-      {content}
-      <Comments />
+      {openComment ? <Comments /> : content }
     </div>
   )
 }

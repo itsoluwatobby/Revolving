@@ -25,7 +25,16 @@ interface CommentProps{
   likes: string, //array of string
   author: string,
   edited: boolean,
-  editDate: string
+  editDate: string,
+  commentResponse?: CommentResponseProps[]
+}
+
+type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
+
+interface Emerge extends CommentProps{
+  commentId: string[],
+  response: string,
+  responseDate: string
 }
 
 type USERROLES = number

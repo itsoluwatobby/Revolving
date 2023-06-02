@@ -23,7 +23,7 @@ export default function CommentBase({userId, theme, comment}: BaseProps) {
           {/* {auth?._id && (     */}
 
             <MdOutlineInsertComment 
-              title='comments' 
+              title='comments'
               className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
             />
             <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>

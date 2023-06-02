@@ -1,3 +1,5 @@
+import { CommentProps } from "../data"
+
 export type ComponentKey = 'GENERAL' | 'ENTERTAINMENT' | 'WEB DEVELOPMENT' | 'REACT' | 'NODE' | 'BASH SCRIPTING'
 export type Components = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
@@ -22,4 +24,9 @@ export const reduceLength = (content: string, maxLength: number, option: Option 
   }
 
   return responseOutput
+}
+
+export const checkCount = <T>(content: T[]): string => {
+  const count = content?.length > 1000 ? (content?.length / 1000).toString() + 'k' : content?.length.toString()
+  return count
 }

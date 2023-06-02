@@ -15,9 +15,11 @@ type ArticleProps = {
   error: string
 }
 
+type HoverType = 'unfollow' | 'following'
+
 export default function ArticleComp({ post, bodyContent, sidebar, averageReadingTime, isLoading, error }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
-  const [hoverThis, setHoverThis] = useState<boolean>(false);
+  const [hoverThis, setHoverThis] = useState<HoverType>('following');
 
   let content;
 
@@ -40,9 +42,9 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
             </button>
             ||
             <button 
-              onMouseEnter={() => setHoverThis(true)}
-              onMouseLeave={() => setHoverThis(false)}
-              className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">{hoverThis ? 'unfollow' : 'following'}
+              onMouseEnter={() => setHoverThis('unfollow')}
+              onMouseLeave={() => setHoverThis('following')}
+              className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 font-sans font-medium">{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
             </button>
           }
       </div>

@@ -11,11 +11,11 @@ type TopLeftProp={
 
 export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const {postData, search, setSearch} = usePostContext() as PostContextType
-  const {theme, setFontOption, setRollout} = useThemeContext() as ThemeContextType
+  const {theme, setFontOption, setOpenComment, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
-  const { postId } = useParams()
+  const { storyId } = useParams()
 
-  const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
+  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
 
   return (
@@ -32,7 +32,9 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
         </Link>
       {
         !address.includes(pathname) ?
-          <div className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-64 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-8`}>  
+          <div 
+            onClick={() => setOpenComment(false)}
+            className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-64 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-8`}>  
               <CiSearch className='text-gray-700 text-xl w-8'/>
               <input 
                 type="text"

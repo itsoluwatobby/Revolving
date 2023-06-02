@@ -42,7 +42,31 @@ export const comments = [
           "likes": '5',
           "author": 'anonymous',
           "edited": false,
-          "editDate": ''
+          "editDate": '',
+          "commentResponse": [
+            {
+              "_id": "98",
+              "userId": "75",
+              "commentId": "810",
+              "response": "i second this",
+              "responseDate": "2023-01-04T08:05:09.043Z",
+              "likes": '0',
+              "author": 'anonymous',
+              "edited": false,
+              "editDate": ''
+            },
+            {
+              "_id": "985",
+              "userId": "275",
+              "commentId": "810",
+              "response": "i second this this",
+              "responseDate": "2023-02-04T08:15:19.043Z",
+              "likes": '5',
+              "author": 'anonymous',
+              "edited": false,
+              "editDate": ''
+            },
+          ]
         },
         {
           "_id": "988",
