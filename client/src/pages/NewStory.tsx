@@ -27,9 +27,8 @@ export const NewStory = () => {
   const { pathname } = useLocation()
   const { storyId } = useParams()
 
-  console.log({storyId})
   const targetPost = posts?.find(story => story?._id == storyId) as PostType;
-console.log({targetPost})
+
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setInputValue(value);
@@ -57,6 +56,10 @@ console.log({targetPost})
   useEffect(() => {
     if(inputRef.current) inputRef.current.focus()
   }, [])
+
+  useEffect(() => {
+    targetPost && setPostCategory(targetPost?.category)
+  }, [targetPost])
 
   useEffect(() => {
     !debounceValue?.typing && (

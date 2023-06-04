@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { PostType } from '../posts';
+import { Categories } from '../data';
 
 export const posts_endPoint = '/story'
 export const auth_endPoint = '/login'

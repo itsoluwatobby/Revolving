@@ -30,16 +30,15 @@ export const App = () => {
             <Route path="signUp" element={<RegisterModal />} />
             <Route path="new_password" element={<NewPassword />} />
           </Route>
-          {/* PROTECTED */}
           <Route element={<PersistedLogin />}>
             
+            {/* PROTECTED */}
             <Route index element={<Home />} />
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
-
             <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
-          
+            
           </Route>
           
           <Route path="about" element={<About />} />

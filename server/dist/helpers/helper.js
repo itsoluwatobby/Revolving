@@ -42,9 +42,9 @@ export const verifyToken = (token, secret) => __awaiter(void 0, void 0, void 0, 
 //   message: string,
 //   data?: object
 // }
-export const responseType = ({ res, status = 200, count = 0, message = 'success', data = {} }) => {
+export const responseType = ({ res, status = 200, count = 0, message = 'success', data = {}, pages = {} }) => {
     return (data ?
-        res.status(status).json({ meta: { status, count, message }, data })
+        res.status(status).json({ pages, meta: { status, count, message }, data })
         : res.status(status).json({ meta: { status, message }, data }));
 };
 class UrlsObj {
@@ -107,4 +107,31 @@ export const asyncFunc = (res, callback) => {
         res.sendStatus(500);
     }
 };
+export const pagination = ({ startIndex = 1, endIndex = 1, page = 1, limit = 1, cb }) => __awaiter(void 0, void 0, void 0, function* () {
+    const pages = {};
+    try {
+        const parsedObject = yield cb();
+        if (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length) {
+            if (endIndex < (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length)) {
+                pages.next = {
+                    page: +page + 1,
+                    limit: +limit
+                };
+            }
+            if (startIndex > 0) {
+                pages.previous = {
+                    page: +page - 1,
+                    limit: +limit
+                };
+            }
+            const result = parsedObject;
+            return { pages, result };
+        }
+        const result = parsedObject;
+        return result;
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
 //# sourceMappingURL=helper.js.map

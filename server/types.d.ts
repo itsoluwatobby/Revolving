@@ -1,4 +1,4 @@
-import { Response } from "express"
+import { Request, Response } from "express"
 import { VerifyOptions } from "jsonwebtoken"
 import { Document, ObjectId, Types } from "mongoose"
 
@@ -63,16 +63,25 @@ interface StoryProps extends Document{
   editDate: string
 }
 
-interface CommentProps extends Document{
+interface CommentProps{
   _id: string,
-  postId: string,
+  storyId: string,
   userId: string,
   commentDate: string,
   comment: string,
   likes: string[],
   author: string,
   edited: boolean,
-  editDate: string
+  editDate: string,
+  commentResponse: CommentResponseProps[]
+}
+
+type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
+
+interface Emerge extends CommentProps{
+  commentId: string[],
+  response: string,
+  responseDate: string
 }
 
 interface SharedProps extends Document{
@@ -112,7 +121,22 @@ interface UserProps extends Document{
   country: string
 }
 
+interface PageRequest extends Request{
+  page: number,
+  limit: number
+}
+
+type PagesType = {
+  next?: { 
+    page: number, limit: number 
+  },
+  previous?: { 
+    page: number, limit: number 
+  }
+}
+
 interface ResponseType extends Response{
+  pages: PagesType,
   meta: {
     status: number,
     count?: number,

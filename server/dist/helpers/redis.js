@@ -16,7 +16,8 @@ export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) =>
         yield redisClient.connect();
     try {
         if (objInstance.isPresent(reqMtd)) {
-            redisClient.DEL(key);
+            //redisClient.DEL(key)
+            redisClient.flushAll();
             objInstance.pullIt(reqMtd);
         }
         const data = yield redisClient.get(key);
