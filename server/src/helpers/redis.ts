@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import { objInstance } from './helper.js';
+import { CommentResponseModel } from '../models/CommentResponse.js';
 
 type RedisOptionProps<T>={
   key: string,
@@ -13,7 +14,8 @@ export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}):
   if(!redisClient.isOpen) await redisClient.connect();
   try{
     if(objInstance.isPresent(reqMtd)){
-      redisClient.DEL(key)
+      //redisClient.DEL(key)
+      redisClient.flushAll()
       objInstance.pullIt(reqMtd)
     }
     const data = await redisClient.get(key)

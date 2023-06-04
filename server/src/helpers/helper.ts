@@ -1,9 +1,9 @@
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken'
-import { ClaimProps, ResponseType, USERROLES } from '../../types.js';
+import { ClaimProps, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 type ReqOpt = {
   mtd: string,
@@ -57,10 +57,10 @@ export const verifyToken = async(token: string, secret: string): Promise<string 
 //   message: string,
 //   data?: object
 // }
-export const responseType = ({res, status=200, count=0, message='success', data={}}): ResponseType => {
+export const responseType = ({res, status=200, count=0, message='success', data={}, pages={}}): ResponseType => {
   return (
     data ? 
-        res.status(status).json({meta:{status, count, message}, data})
+        res.status(status).json({pages, meta:{status, count, message}, data})
             : res.status(status).json({meta:{status, message}, data})
   )
 }
@@ -134,3 +134,36 @@ export const asyncFunc = (res: Response, callback: () => void) => {
     res.sendStatus(500)
   }
 }
+
+export const pagination = async<T>({startIndex=1, endIndex=1, page=1, limit=1, cb}) => {
+
+  const pages = {} as PagesType;
+  try{
+    const parsedObject = await cb() as StoryProps[] | string;
+    
+    if(parsedObject?.length){
+      if(endIndex < parsedObject?.length){
+        pages.next = {
+          page: +page + 1,
+          limit: +limit
+        }
+      }
+
+      if(startIndex > 0){
+        pages.previous = {
+          page: +page - 1,
+          limit: +limit
+        }
+      }
+      const result = parsedObject as StoryProps[]  
+      return {pages, result}
+    }
+    const result = parsedObject as string
+    return result
+  }
+  catch(error){
+    console.log(error)
+  }
+}
+
+export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>

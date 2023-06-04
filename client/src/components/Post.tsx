@@ -16,14 +16,15 @@ import useAuthenticationContext from '../hooks/useAuthenticationContext';
 import { deletePostOptions } from '../api/postApiOptions';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { AuthenticationContextType } from '../data';
+import { AuthenticationContextType, Categories } from '../data';
 import { reduceLength } from '../assets/navigator';
 
 type Props = {
   post: PostType
+  navigationTab: Categories
 }
 
-export const Post = ({ post }: Props) => {
+export const Post = ({ post, navigationTab }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
   let averageReadingTime = useWordCount(post?.body) as string;
   const {mutate} = useSWRConfig()
@@ -53,7 +54,7 @@ export const Post = ({ post }: Props) => {
   
   const deleted = (id: string) => {
     try{
-      mutate(posts_endPoint, async () => await axiosPrivate.delete(`${posts_endPoint}/${auth?._id}/${id}`), deletePostOptions(id)) as unknown as PostType[];
+      mutate(`${posts_endPoint}`, async () => await axiosPrivate.delete(`${posts_endPoint}/${userId}/${id}`), deletePostOptions(id)) as unknown as PostType[];
 
       toast.success('Success!! Post deleted', {
         duration: 2000, icon: '💀', style: { background: '#FA2B50'}
@@ -86,17 +87,22 @@ export const Post = ({ post }: Props) => {
         {/* MAKE THIS MORE ATTRACTIVE */}
         {open &&
           <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${theme == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
-            <Link to={`/edit_story/${post?._id}`} >  
-              <CiEdit 
-                title='Edit post'
-                className={`cursor-pointer hover:opacity-70 shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
-              />
-            </Link>
-            <FaTrash
-              onClick={() => deleted(post?._id)}
-              title='Delete post'
-              className={`cursor-pointer hover:opacity-70 text-xl shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
-            />
+            {userId == post?.userId ? (
+              <>
+                <Link to={`/edit_story/${post?._id}`} >  
+                  <CiEdit 
+                    title='Edit post'
+                    className={`cursor-pointer hover:opacity-70 shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
+                  />
+                </Link>
+                <FaTrash
+                  onClick={() => deleted(post?._id)}
+                  title='Delete post'
+                  className={`cursor-pointer hover:opacity-70 text-xl shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
+                />
+              </>
+              ) : null
+            }
           </div>
         }
       </div>

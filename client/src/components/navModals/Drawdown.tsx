@@ -51,7 +51,7 @@ export default function Drawdown() {
     {
       userId && 
         <li 
-          onClick={signOut}
+          onClick={() => signOut()}
           className={modalClass}>
             sign Out
         </li>

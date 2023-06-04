@@ -4,9 +4,11 @@ import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
 import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Categories } from '../data';
-import useSwrMutation from 'swr/mutation'
+import useSWRInfinite, {SWRInfiniteKeyLoader} from 'swr/infinite';
+import useSWRImmutable from 'swr/immutable';
+import useSwr from 'swr'
 import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
 import Comments from './comments/Comments';
 import { useThemeContext } from '../hooks/useThemeContext';
@@ -16,63 +18,43 @@ type PostsProps = {
 }
 
 export const Posts = ({ navigationTab }: PostsProps) => {
-  const {
-    trigger,
-    isMutating,
-    error: isError
-  } = useSwrMutation(cacheKey, async(): Promise<PostType[]> => {
+  const getKey = (navigationTab: Categories) => {
+    return `${cacheKey}/category/${navigationTab}`
+  }
+  const { data, isLoading, error, mutate} = useSWRImmutable<PostType[]>(getKey, async(): Promise<PostType[]> => {
     const res = await postAxios.get(`${cacheKey}/category?category=${navigationTab}`)
-    return res?.data?.data
+    return res?.data.data
   }, {
     onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
-    revalidate: true
   })
-  const { filteredStories, navPosts, setNavPosts } = usePostContext() as PostContextType
+
+  const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { openComment } = useThemeContext() as ThemeContextType
-  const [reloadListener, setReloadListener] = useState<number>(0)
-
-  //(b?.sharedDate.localeCompare(a?.sharedDate))
-  useEffect(() => {
-    let isMounted = true;
-    const triggerCategory = async() =>{
-      const res = await trigger()
-      setNavPosts(res as PostType[])
-      setReloadListener(0);
-    }
-    isMounted && triggerCategory()
-
-    return () => {
-      isMounted = false
-    }
-  }, [navigationTab, trigger, setNavPosts, reloadListener])
-
-  useEffect(() => {
-    let hotReloadId: number;
-    if(!navPosts?.length){
-      hotReloadId = setTimeout(() => {
-        console.log('running')
-        setReloadListener(prev => prev + 1)
-      }, 5000)
-    }
-    return () => clearTimeout(hotReloadId)
-  }, [navPosts])
   
+  useEffect(() => {
+    mutate()
+    setNavPosts(data as PostType[])
+  }, [navigationTab, data, mutate, setNavPosts])
+
   let content;
 
-  isMutating ? content = (
+  isLoading ? content = (
     [...Array(10).keys()].map(index => (
         <SkeletonBlog key={index} />
         )
       )
   ) 
-  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-    {isError?.message}
+  : error ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+    {error?.message}
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
   :(
     filteredStories?.length ? content = (
       filteredStories?.map(post => (
-            <Post key={post?.sharedId || post?._id} post={post as PostType} />
+            <Post key={post?.sharedId || post?._id} 
+              post={post as PostType} 
+              navigationTab={navigationTab}
+            />
           )
         )
       ) 

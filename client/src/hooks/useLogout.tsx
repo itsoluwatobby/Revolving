@@ -6,12 +6,14 @@ import { useThemeContext } from "./useThemeContext"
 import { ThemeContextType } from "../posts"
 import { AuthenticationContextType } from "../data"
 
+type SignOutType = 'dont' | 'use'
+
 export default function useLogout() {
   const { setAuth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
   const navigate = useNavigate()
 
-  const signOut = async() => {
+  const signOut = async(option: SignOutType = 'use') => {
     try{
       await axiosAuth.get(`/logout`)
       setAuth({_id: '', accessToken: '', roles: []})
@@ -27,7 +29,7 @@ export default function useLogout() {
       localStorage.removeItem('editStoryInputValue')
       localStorage.removeItem('editStoryTextareaValue')
       localStorage.removeItem('revolving_userId')
-      navigate('/signIn', { replace: true })
+      option == 'use' ? navigate('/signIn', { replace: true }) : null
     }catch(err){
       setAuth({_id: '', accessToken: '', roles: []})
       toast.success('Success!! You logged out', {
@@ -41,7 +43,7 @@ export default function useLogout() {
       localStorage.removeItem('editStoryInputValue')
       localStorage.removeItem('editStoryTextareaValue')
       localStorage.removeItem('revolving_userId')
-      navigate('/signIn', {replace: true})
+      option == 'use' ? navigate('/signIn', { replace: true }) : null
     }
   }
 

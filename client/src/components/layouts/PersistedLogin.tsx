@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import useAuthenticationContext from '../../hooks/useAuthenticationContext';
 import { useEffect, useState } from 'react';
 import useRefreshToken from '../../hooks/useRefreshToken';
@@ -16,9 +16,10 @@ export const PersistedLogin = () => {
   const getRefreshToken = useRefreshToken()
   const userId = localStorage.getItem('revolving_userId')
   const { theme } = useThemeContext() as ThemeContextType
+  const navigate = useNavigate()
   //const [retries, setRetries] = useState<number>(0);
   const signOut = useLogout()
-//console.log(retries)
+
   useEffect(() => {
     let isMounted = true
     const persistUserLogin = async() => {
@@ -28,21 +29,22 @@ export const PersistedLogin = () => {
         await getRefreshToken()
       }
       catch(error){
-        signOut()
+        signOut('dont')
         toast.error('bad credentials!', {
           duration: 4000, icon: '💀', style: { background: '#FA2B50'}
         })
+        navigate('/signIn', {replace: true})
       }
       finally{
         isMounted && setIsLoading(false)
       }
     }
-    (userId && !auth?.accessToken) ? persistUserLogin() : setIsLoading(false)
+    (!auth?.accessToken && userId) ? persistUserLogin() : setIsLoading(false)
 
     return () => {
       isMounted = false
     }
-  }, [auth, getRefreshToken, signOut, userId])
+  }, [auth, getRefreshToken, navigate, signOut, userId])
 
   return (
     <>

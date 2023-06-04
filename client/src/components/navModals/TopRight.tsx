@@ -31,9 +31,9 @@ export default function TopRight() {
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { postId } = useParams()
+  const { storyId } = useParams()
 
-  const address = ['/new_story', `/edit_story/${postId}`, `/story/${postId}`]
+  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   const addPost = () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
@@ -64,7 +64,7 @@ export default function TopRight() {
 
   const updatedPost = () => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const postUpdated = {...postData, _id: postId, editDate: dateTime} as PostType;
+    const postUpdated = {...postData, _id: storyId, editDate: dateTime} as PostType;
     try{
         mutate(cacheKey, async () => await axiosPrivate.put(`${cacheKey}/${auth?._id}/${postUpdated?._id}`, {...postUpdated}), updatePostOptions(postUpdated))
 
@@ -79,10 +79,7 @@ export default function TopRight() {
             },
             style: { background: '#3CB371'}
           }
-        ) 
-        // toast.success('Success!! Post updated', {
-        //   duration: 5000, icon: '💀', style: { background: '#FA2B50'}
-        // })
+        )
         navigate('/')
     }
     catch(err){
@@ -115,7 +112,7 @@ export default function TopRight() {
               </button>
               :
               (
-                pathname != `/story/${postId}` &&
+                pathname != `/story/${storyId}` &&
                   <button
                     className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
                       onClick={updatedPost}
