@@ -1,5 +1,6 @@
-import { CommentProps } from "../../types.js";
+import { CommentProps, CommentResponseProps } from "../../types.js";
 import { CommentModel } from "../models/CommentModel.js";
+import { CommentResponseModel } from "../models/CommentResponse.js";
 
 export const getAllCommentsInStory = async(storyId: string) => await CommentModel.find({ storyId }).lean();
 
@@ -31,3 +32,35 @@ export const deleteSingleComment = async(commentId: string) => await CommentMode
 export const deleteAllUserComments = async(userId: string) => await CommentModel.deleteMany({ userId })
 
 export const deleteAllUserCommentsInStory = async(userId: string, storyId: string) => await CommentModel.deleteMany({ userId, storyId })
+
+
+{/* ---------------------------------------------- COMMENT RESPONSE ------------------------------------------------- */}
+
+export const getAllCommentsResponse = async(commentId: string) => await CommentResponseModel.find({ commentId }).lean();
+
+export const getResponseById = async(responseId: string) => await CommentResponseModel.findById(responseId).exec();
+
+export const getUserResponses = async(userId: string, commentId: string) => await CommentResponseModel.find({ userId, commentId }).lean()
+
+export const createResponse = async(response: CommentResponseProps) => await CommentResponseModel.create({ ...response })
+
+export const editResponse = async(userId: string, responseId: string, editedResponse: CommentResponseProps) => await CommentResponseModel.findByIdAndUpdate({ userId, _id: responseId }, {...editedResponse})
+
+export const likeAndUnlikeResponse = async(userId: string, responseId: string): Promise<string> => {
+  const response = await CommentResponseModel.findById(responseId).exec();
+  if(!response?.likes.includes(userId)) {
+    await response?.updateOne({ $push: {likes: userId} })
+    return 'You liked this response'
+  }
+  else {
+    await response?.updateOne({ $pull: {likes: userId} })
+    return 'You unliked this response'
+  }
+}
+export type Like_Unlike_Response = Awaited<ReturnType<typeof likeAndUnlikeResponse>>
+
+export const deleteSingleResponse = async(responseId: string) => await CommentResponseModel.findByIdAndDelete({ _id: responseId })
+
+export const deleteAllUserResponses = async(userId: string) => await CommentModel.deleteMany({ userId })
+
+export const deleteAllUserResponseInComment = async(userId: string, commentId: string) => await CommentResponseModel.deleteMany({ userId, commentId })

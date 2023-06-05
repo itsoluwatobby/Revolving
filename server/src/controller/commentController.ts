@@ -1,13 +1,9 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
-import { Like_Unlike, createUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
-import { StoryModel } from "../models/Story.js";
-import { getAllSharedByCategories, getAllSharedStories } from "../helpers/sharedHelper.js";
-import { Categories, CommentProps, SharedProps, StoryProps } from "../../types.js";
+import { CommentProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import { SharedStoryModel } from "../models/SharedStory.js";
 import { Like_Unlike_Comment, createComment, deleteAllUserComments, deleteAllUserCommentsInStory, deleteSingleComment, editComment, getAllCommentsInStory, getCommentById, getUserComments, getUserCommentsInStory, likeAndUnlikeComment } from "../helpers/commentHelper.js";
 
 interface RequestProp extends Request{
