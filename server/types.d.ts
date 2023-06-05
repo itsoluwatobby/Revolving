@@ -92,6 +92,11 @@ interface SharedProps extends Document{
   sharedStory: StoryProps,
 }
 
+type SocialMediaAccoutProp = {
+  media: string,
+  link: string
+}
+
 interface UserProps extends Document{
   username: string,
   email: string,
@@ -118,7 +123,8 @@ interface UserProps extends Document{
   gender: 'Female' | 'Male' | 'Others',
   codeName: string,
   stack: string[],
-  country: string
+  country: string,
+  socialMediaAccouts: SocialMediaAccoutProp[]
 }
 
 interface PageRequest extends Request{

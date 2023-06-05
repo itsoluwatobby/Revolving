@@ -208,7 +208,7 @@ export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, fun
             if (conflictingPassword)
                 return responseType({ res, status: 409, message: 'same as old password' });
             const hashedPassword = yield brcypt.hash(resetPass, 10);
-            yield user.updateOne({ $set: { authentication: { password: hashedPassword }, resetPassword: false } })
+            yield user.updateOne({ $set: { authentication: { password: hashedPassword }, isResetPassword: false } })
                 .then(() => responseType({ res, status: 201, message: 'password reset successful, please login' }))
                 .catch(() => res.sendStatus(500));
         }
