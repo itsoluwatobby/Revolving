@@ -12,7 +12,7 @@ export const getUsers = (req: Request, res: Response) => {
       const allUsers = await getAllUsers()
       if(!allUsers?.length) return responseType({res, status: 404, message: 'No users available'})
       return allUsers
-    }}) as UserProps[];
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']}) as UserProps[];
     return responseType({res, status: 200, count: users?.length, data: users})
   })
 }
@@ -24,7 +24,7 @@ export const getUser = (req: Request, res: Response) => {
       const current = await getUserById(userId)
       if(!current) return responseType({res, status: 404, message: 'User not found'})
       return current;
-    }}) as UserProps;
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']}) as UserProps;
     return responseType({res, status: 200, count: 1, data: user})
   })
 }
@@ -34,7 +34,7 @@ export const followUnFollowUser = (req: Request, res: Response) => {
     const {followerId, followingId} = req.params
     if (!followerId || !followingId) return res.sendStatus(400);
     const user = await getUserById(followingId);
-    if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
+    if(!user) return responseType({res, status: 404, message: 'user not found'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await followOrUnFollow(followerId, followingId);
     result != 'duplicate' ? 

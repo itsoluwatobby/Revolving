@@ -100,10 +100,13 @@ export const getComment = (req: RequestProp, res: Response) => {
 // FOR ADMIN PAGE
 export const userComments = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
-    const {userId} = req.params
-    if(!userId) return res.sendStatus(400);
+    const {adminId, userId} = req.params
+    if(!adminId || !userId) return res.sendStatus(400);
+    if(!getUserById(adminId)) return res.sendStatus(401)
     if(!getUserById(userId)) return res.sendStatus(401)
     // if(user?.isAccountLocked) return res.sendStatus(401)
+    const admin = await getUserById(adminId)
+    if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
     const userComments = await getCachedResponse({key: `userComments:${userId}`, cb: async() => {
       const userComment = await getUserComments(userId) 
       return userComment

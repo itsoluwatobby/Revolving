@@ -100,12 +100,15 @@ export const getResponse = (req: RequestProp, res: Response) => {
 // FOR ADMIN PAGE
 export const userResponses = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
-    const {userId, commentId} = req.params
-    if(!userId || !commentId) return res.sendStatus(400);
+    const {adminId, userId, responseId} = req.params
+    if(!userId || !adminId || !responseId) return res.sendStatus(400);
+    if(!getUserById(adminId)) return res.sendStatus(401)
     if(!getUserById(userId)) return res.sendStatus(401)
     // if(user?.isAccountLocked) return res.sendStatus(401)
-    const userResponses = await getCachedResponse({key: `userResponses:${userId}/${commentId}`, cb: async() => {
-      const userResponse = await getUserResponses(userId, commentId) 
+    const admin = await getUserById(adminId)
+    if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
+    const userResponses = await getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
+      const userResponse = await getUserResponses(userId, responseId) 
       return userResponse
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (CommentResponseProps[] | string);
     

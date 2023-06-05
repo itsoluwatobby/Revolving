@@ -198,7 +198,7 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
       if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
       
       const hashedPassword = await brcypt.hash(resetPass, 10);
-      await user.updateOne({$set: { authentication: { password: hashedPassword }, resetPassword: false}})
+      await user.updateOne({$set: { authentication: { password: hashedPassword }, isResetPassword: false}})
         .then(() => responseType({res, status:201, message:'password reset successful, please login'}))
         .catch(() => res.sendStatus(500));
     }

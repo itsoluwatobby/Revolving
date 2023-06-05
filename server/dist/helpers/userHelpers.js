@@ -19,18 +19,18 @@ export const followOrUnFollow = (followerId, followingId) => __awaiter(void 0, v
     var _a;
     const user = yield UserModel.findById(followerId).exec();
     const following = yield UserModel.findById(followingId).exec();
-    if (user._id.equals(followingId))
+    if ((user === null || user === void 0 ? void 0 : user._id.toString()) == followingId)
         return 'duplicate';
-    if (!((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.includes(followerId))) {
-        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $push: { followings: followerId } }));
+    if (!((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.includes(followingId))) {
+        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $push: { followings: followingId } }));
         yield (following === null || following === void 0 ? void 0 : following.updateOne({ $push: { followers: followerId } }));
         return 'You followed this user';
     }
     else {
-        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $pull: { followings: followerId } }));
+        yield (user === null || user === void 0 ? void 0 : user.updateOne({ $pull: { followings: followingId } }));
         yield (following === null || following === void 0 ? void 0 : following.updateOne({ $pull: { followers: followerId } }));
         return 'You unfollowed this user';
     }
 });
-export const deleteUserAccount = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findByIdAndDelete({ _id: userId }); });
+export const deleteAccount = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findByIdAndDelete({ _id: userId }); });
 //# sourceMappingURL=userHelpers.js.map
