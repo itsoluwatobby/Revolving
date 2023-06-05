@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { asyncFunc, responseType } from "../helpers/helper.js";
-import { followOrUnFollow, getAllUsers, getUserById } from "../helpers/userHelpers.js";
+import { deleteAccount, followOrUnFollow, getAllUsers, getUserById, updateUser } from "../helpers/userHelpers.js";
 import { UserProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
+import { ROLES } from "../config/allowedRoles.js";
+import bcrypt from 'bcrypt'
 
-export const getUsers = async(req: Request, res: Response) => {
+export const getUsers = (req: Request, res: Response) => {
   asyncFunc(res, async() => { 
     const users = await getCachedResponse({key:`allUsers`, cb: async() => {
       const allUsers = await getAllUsers()
@@ -15,7 +17,7 @@ export const getUsers = async(req: Request, res: Response) => {
   })
 }
 
-export const getUser = async(req: Request, res: Response) => {
+export const getUser = (req: Request, res: Response) => {
   asyncFunc(res, async() => { 
     const {userId} = req.params
     const user = await getCachedResponse({key: `user:${userId}`, cb: async() => {
@@ -27,7 +29,7 @@ export const getUser = async(req: Request, res: Response) => {
   })
 }
 
-export const followUnFollowUser = async(req: Request, res: Response) => {
+export const followUnFollowUser = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {followerId, followingId} = req.params
     if (!followerId || !followingId) return res.sendStatus(400);
@@ -41,3 +43,48 @@ export const followUnFollowUser = async(req: Request, res: Response) => {
   })
 }
 
+export const updateUserInfo = (req: Request, res: Response) => {
+  asyncFunc(res, async () => {
+    const {userId} = req.params
+    const userInfo: UserProps = req.body
+    if (!userId) return res.sendStatus(400);
+    const user = await getUserById(userId);
+    if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
+    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+
+    if(userInfo?.authentication?.password){
+      const newPassword = userInfo?.authentication?.password
+      const conflictingPassword = await bcrypt.compare(newPassword, user?.authentication?.password);
+      if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
+      
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await user.updateOne({$set: { authentication: { password: hashedPassword }}})
+        .then(() => responseType({res, status:201, message:'password reset successful'}))
+        .catch(() => res.sendStatus(500));
+    }
+    else{
+      await updateUser(userId, userInfo)
+      .then(updatedInfo => {
+        return responseType({res, status: 201, message: 'success', data: updatedInfo});
+      })
+      .catch(error => responseType({res, status: 400, message: error.message}))
+    }    
+  })
+}
+
+export const deleteUserAccount = (req: Request, res: Response) => {
+  asyncFunc(res, async () => {
+    const {userId} = req.params
+    const {adminId} = req.query
+    if (!userId) return res.sendStatus(400);
+    const user = await getUserById(userId);
+    const admin = await getUserById(adminId as string);
+    if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
+    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    if(user || admin.roles.includes(ROLES.ADMIN)){
+      await deleteAccount(userId);
+      return responseType({res, status: 204})
+    }
+    return responseType({res, status: 401, message: 'unauthorized'});
+  })
+}
