@@ -23,6 +23,10 @@ import passwordResetRouter from './routes/resetPassword.js';
 import { logoutHandler } from './controller/authController.js';
 import { logURLAndMethods } from './middleware/urlLogger.js';
 import { fetchSharedStories, getSingleShared } from './controller/sharedStoryController.js';
+import { getComment, getStoryComments } from './controller/commentController.js';
+import commentRouter from './routes/commentRoutes.js';
+import { getResponse, getResponseByComment } from './controller/responseController.js';
+import responseRouter from './routes/responseRoutes.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
@@ -67,6 +71,7 @@ else {
     // ROUTES
     app.use('/revolving/auth', authRouter);
     app.get('/revolving/auth/logout', logoutHandler);
+    // USERS
     app.get('/revolving/users', getUsers);
     app.get('/revolving/users/:userId', getUser);
     //password reset
@@ -74,6 +79,10 @@ else {
     app.get('/revolving/story/share_getAll', fetchSharedStories);
     //public routes
     app.get('/revolving/story', getStories);
+    app.get('/revolving/comment_in_story/:storyId', getStoryComments);
+    app.get('/revolving/comment/:commentId', getComment);
+    app.get('/revolving/response_in_comment/:responseId', getResponseByComment);
+    app.get('/revolving/response/:responseId', getResponse);
     app.get('/revolving/story/category', getStoryByCategory);
     app.get('/revolving/story/:storyId', getStory);
     app.get('/revolving/story/share/:sharedId', getSingleShared);
@@ -83,6 +92,10 @@ else {
     app.use('/revolving/story', storyRouter);
     // user router
     app.use('/revolving/users', userRouter);
+    // comment router
+    app.use('/revolving/comments', commentRouter);
+    // response router
+    app.use('/revolving/responses', responseRouter);
     //app.use(errorLog);
     app.all('*', (req, res) => {
         res.status(404).json({ status: false, message: 'NOT FOUND' });

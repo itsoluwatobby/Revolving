@@ -107,12 +107,17 @@ export const getComment = (req, res) => {
 // FOR ADMIN PAGE
 export const userComments = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const { userId } = req.params;
-        if (!userId)
+        const { adminId, userId } = req.params;
+        if (!adminId || !userId)
             return res.sendStatus(400);
+        if (!getUserById(adminId))
+            return res.sendStatus(401);
         if (!getUserById(userId))
             return res.sendStatus(401);
         // if(user?.isAccountLocked) return res.sendStatus(401)
+        const admin = yield getUserById(adminId);
+        if (!admin.roles.includes(ROLES.ADMIN))
+            return res.sendStatus(401);
         const userComments = yield getCachedResponse({ key: `userComments:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const userComment = yield getUserComments(userId);
                 return userComment;
