@@ -2,6 +2,8 @@ import { axiosAuth } from "../api/axiosPost"
 import useAuthenticationContext from "./useAuthenticationContext"
 import useLogout from "./useLogout"
 import { AuthenticationContextType, ErrorResponse } from "../data"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-hot-toast"
 
 type ResponseType={
   data: { 
@@ -14,6 +16,7 @@ type ResponseType={
 export default function useRefreshToken() {
   const { auth, setAuth } = useAuthenticationContext() as AuthenticationContextType
   const signOut = useLogout()
+  const navigate = useNavigate()
 
   const getRefreshToken = async() => {
     try{
@@ -22,21 +25,16 @@ export default function useRefreshToken() {
       return response?.data?.data?.accessToken
     }
     catch(error){
-      let errorMessage;
+      let errorMessage = '';
       const errors = error as ErrorResponse
-      errors?.response?.status === 401 ? errorMessage = 'unauthorized' 
+      errors?.response?.status === 401 ? signOut('use')
         : errors?.response?.status === 404 ? errorMessage = 'Bad credentials' 
           : errors?.response?.status === 403 ? errorMessage = 'Session ended, please login' 
             : errors?.response?.status === 500 ? errorMessage = 'Internal server error' : errorMessage = 'No network'
-      
-        // !auth?.accessToken && (
-        //       toast.error(`${errorMessage}`, {
-        //       duration: 3000, icon: '💀', style: {
-        //       background: '#FF0000'
-        //     }
-        //   })
-        // )
-      //signOut()
+      // toast.error(errorMessage, {
+      //   duration: 10000, icon: '💀', style: { background: '#FA2B50'}
+      // })
+      // navigate('/signIn', {replace: true})
     }
   }
   return getRefreshToken

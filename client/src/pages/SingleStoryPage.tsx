@@ -25,7 +25,6 @@ export default function SingleStoryPage() {
   const { mutate } = useSWRConfig()
   const { trigger, error, isMutating } = useSWRMutation<PostType>(posts_endPoint, async() => {
     const res = await postAxios.get(`${posts_endPoint}/${storyId}`)
-    console.log(res?.data?.data)
     return res?.data?.data
   })
   const { user } = useAuthenticationContext() as AuthenticationContextType
@@ -33,7 +32,7 @@ export default function SingleStoryPage() {
   const [titleFocus, setTitleFocus] = useState<boolean>(false);
   const [targetStory, setTargetStory] = useState<PostType | null>(null);
   const { posts } = usePostContext() as PostContextType
-
+console.log({user})
   useEffect(() => {
     let isMounted = true;
     const getStory = async() => {
@@ -60,12 +59,12 @@ export default function SingleStoryPage() {
 
   const followOrUnfollow = async() => {
     try{
-      const res = await mutate(
+      mutate(
         user_endPoint, 
         followUnfollowUser(targetStory?.userId as string), 
         followUnfollowUserOption(user as UserProps, targetStory?.userId as string)
       )
-      res && toast.success('Success!! You logged out', {
+      toast.success('Success!!', {
         duration: 2000, icon: '👋', style: {
           background: '#8FBC8F'
         }

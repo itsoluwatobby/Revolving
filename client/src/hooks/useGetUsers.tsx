@@ -10,8 +10,11 @@ export default function useGetUsers() {
   }
 
   const getUser = async() => {
-    const res = await userAxios.get(`${user_endPoint}/${userId}`)
-    return res?.data?.data
+    if(userId != null){
+      const res = await userAxios.get(`${user_endPoint}/single/${userId}`)
+      return res?.data?.data
+    }
+    return
   }
 
   const updateUser = async(updatedInfo: UserProps) => {

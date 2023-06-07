@@ -15,45 +15,97 @@ export const updateUserOption = (targetUser: UserProps): object => {
   }
 }
 
-export const followUnfollowUserOption = (followerUser: UserProps, followingId: string): object => {
+export const followUnfollowUserOption = (currentUser: UserProps, followingId: string): object => {
+  return {
+    optimisticData: (users: UserProps[]): UserProps => {
+      let followingUser = users.find(user => user?._id !== followingId) as UserProps
+      if(!currentUser?.followings?.includes(followingId)){
+        currentUser?.followings?.push(followingId)
+        followingUser?.followers?.push(currentUser?._id)
+        // const otherUsers1 = users.filter(user => user?._id != followingId)
+        // const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        // return [...otherUsers2, followingUser, currentUser]
+        console.log({currentUser})
+        return currentUser
+      }
+      else{
+        const followings = currentUser?.followings?.filter(id => id != followingId)
+        const followers = followingUser?.followers?.filter(id => id != currentUser?._id)
+        followingUser = {...followingUser, followings}
+        currentUser = {...currentUser, followers}
+        // const otherUsers1 = users.filter(user => user?._id != followingId)
+        // const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        // return [...otherUsers2, followingUser, currentUser]
+        console.log({currentUser})
+        return currentUser
+      }
+    },
+    rollBackOnError: true,
+    populateCache: (users: UserProps[]): UserProps => {
+      let followingUser = users.find(user => user?._id !== followingId) as UserProps
+      if(!currentUser?.followings?.includes(followingId)){
+        currentUser?.followings?.push(followingId)
+        followingUser?.followers?.push(currentUser?._id)
+        // const otherUsers1 = users.filter(user => user?._id != followingId)
+        // const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        console.log({currentUser})
+        return currentUser
+      }
+      else{
+        const followings = currentUser?.followings?.filter(id => id != followingId)
+        const followers = followingUser?.followers?.filter(id => id != currentUser?._id)
+        followingUser = {...followingUser, followings}
+        currentUser = {...currentUser, followers}
+        // const otherUsers1 = users.filter(user => user?._id != followingId)
+        // const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        // return [...otherUsers2, followingUser, currentUser]
+        console.log({currentUser})
+        return currentUser
+      }
+    },
+    revalidate: false
+  }
+}
+
+export const followUnfollowUserAllOption = (currentUser: UserProps, followingId: string): object => {
   return {
     optimisticData: (users: UserProps[]): UserProps[] => {
       let followingUser = users.find(user => user?._id !== followingId) as UserProps
-      if(!followerUser?.followings?.includes(followingId)){
-        followerUser?.followings?.push(followingId)
-        followingUser?.followers?.push(followerUser?._id)
+      if(!currentUser?.followings?.includes(followingId)){
+        currentUser?.followings?.push(followingId)
+        followingUser?.followers?.push(currentUser?._id)
         const otherUsers1 = users.filter(user => user?._id != followingId)
-        const otherUsers2 = otherUsers1.filter(user => user?._id != followerUser?._id)
-        return [...otherUsers2, followingUser, followerUser]
+        const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        return [...otherUsers2, followingUser, currentUser]
       }
       else{
-        const followings = followerUser?.followings?.filter(id => id != followingId)
-        const followers = followingUser?.followers?.filter(id => id != followerUser?._id)
+        const followings = currentUser?.followings?.filter(id => id != followingId)
+        const followers = followingUser?.followers?.filter(id => id != currentUser?._id)
         followingUser = {...followingUser, followings}
-        followerUser = {...followerUser, followers}
+        currentUser = {...currentUser, followers}
         const otherUsers1 = users.filter(user => user?._id != followingId)
-        const otherUsers2 = otherUsers1.filter(user => user?._id != followerUser?._id)
-        return [...otherUsers2, followingUser, followerUser]
+        const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        return [...otherUsers2, followingUser, currentUser]
       }
     },
     rollBackOnError: true,
     populateCache: (users: UserProps[]): UserProps[] => {
       let followingUser = users.find(user => user?._id !== followingId) as UserProps
-      if(!followerUser?.followings?.includes(followingId)){
-        followerUser?.followings?.push(followingId)
-        followingUser?.followers?.push(followerUser?._id)
+      if(!currentUser?.followings?.includes(followingId)){
+        currentUser?.followings?.push(followingId)
+        followingUser?.followers?.push(currentUser?._id)
         const otherUsers1 = users.filter(user => user?._id != followingId)
-        const otherUsers2 = otherUsers1.filter(user => user?._id != followerUser?._id)
-        return [...otherUsers2, followingUser, followerUser]
+        const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        return [...otherUsers2, followingUser, currentUser]
       }
       else{
-        const followings = followerUser?.followings?.filter(id => id != followingId)
-        const followers = followingUser?.followers?.filter(id => id != followerUser?._id)
+        const followings = currentUser?.followings?.filter(id => id != followingId)
+        const followers = followingUser?.followers?.filter(id => id != currentUser?._id)
         followingUser = {...followingUser, followings}
-        followerUser = {...followerUser, followers}
+        currentUser = {...currentUser, followers}
         const otherUsers1 = users.filter(user => user?._id != followingId)
-        const otherUsers2 = otherUsers1.filter(user => user?._id != followerUser?._id)
-        return [...otherUsers2, followingUser, followerUser]
+        const otherUsers2 = otherUsers1.filter(user => user?._id != currentUser?._id)
+        return [...otherUsers2, followingUser, currentUser]
       }
     },
     revalidate: false
