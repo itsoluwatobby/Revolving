@@ -23,6 +23,7 @@ type HoverType = 'unfollow' | 'following'
 export default function ArticleComp({ post, bodyContent, user, sidebar, averageReadingTime, isLoading, error, followOrUnfollow }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
+  const userId = localStorage.getItem('revolving_userId')
 
   let content;
 
@@ -40,13 +41,14 @@ export default function ArticleComp({ post, bodyContent, user, sidebar, averageR
         <span>.</span>
         <p>{format(post?.storyDate, 'en-US')}</p>
           {
-            user?.followings?.includes(post?.userId) ? (
+            (userId && userId !== post?.userId) &&
+              !user?.followings?.includes(post?.userId) ? (
                 <button 
                   onClick={followOrUnfollow}
                   className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">
                   follow
                 </button>
-              ):(
+                ):(
                 <button 
                   onClick={followOrUnfollow}
                   onMouseEnter={() => setHoverThis('unfollow')}
