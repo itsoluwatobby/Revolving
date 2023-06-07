@@ -1,14 +1,14 @@
 import { Outlet, useNavigate } from 'react-router-dom';
-import useAuthenticationContext from '../../hooks/useAuthenticationContext';
+import useAuthenticationContext from '../hooks/useAuthenticationContext';
 import { useEffect, useState } from 'react';
-import useRefreshToken from '../../hooks/useRefreshToken';
+import useRefreshToken from '../hooks/useRefreshToken';
 import darkBGloader from '../../assets/darkLoader.svg'
 import whiteBGloader from '../../assets/whiteloader.svg'
-import { useThemeContext } from '../../hooks/useThemeContext';
-import { ThemeContextType } from '../../posts';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { ThemeContextType } from '../posts';
 import { toast } from 'react-hot-toast';
-import useLogout from '../../hooks/useLogout';
-import { AuthenticationContextType } from '../../data';
+import useLogout from '../hooks/useLogout';
+import { AuthenticationContextType } from '../data';
 
 export const PersistedLogin = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -17,23 +17,27 @@ export const PersistedLogin = () => {
   const userId = localStorage.getItem('revolving_userId')
   const { theme } = useThemeContext() as ThemeContextType
   const navigate = useNavigate()
-  //const [retries, setRetries] = useState<number>(0);
+  const [retries, setRetries] = useState<number>(0);
   const signOut = useLogout()
 
   useEffect(() => {
     let isMounted = true
     const persistUserLogin = async() => {
       setIsLoading(true)
-      //setRetries(prev => prev + 1)
       try{
+        setRetries(prev => prev + 1)
         await getRefreshToken()
       }
       catch(error){
-        signOut('dont')
-        toast.error('bad credentials!', {
-          duration: 4000, icon: '💀', style: { background: '#FA2B50'}
-        })
-        navigate('/signIn', {replace: true})
+        const errors = error as {response:{status:number}}
+        if(retries == 5){
+          errors?.response?.status == 401 && signOut('dont')
+          toast.error('bad credentials!', {
+            duration: 4000, icon: '💀', style: { background: '#FA2B50'}
+          })
+          setRetries(0)
+          navigate('/signIn', {replace: true})
+        }
       }
       finally{
         isMounted && setIsLoading(false)
@@ -44,7 +48,7 @@ export const PersistedLogin = () => {
     return () => {
       isMounted = false
     }
-  }, [auth, getRefreshToken, navigate, signOut, userId])
+  }, [auth, getRefreshToken, navigate, signOut, userId, retries])
 
   return (
     <>

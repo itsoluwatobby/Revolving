@@ -17,6 +17,16 @@ export default function useStoryMutation() {
     const res = await axiosPrivate.put(`${posts_endPoint}/${auth?._id}/${updatedPost?._id}`, {...updatedPost})
     return res?.data?.data
   }
+
+  const likeUnlikePost = async(storyId: string): Promise<PostType[]> => {
+    const res = await axiosPrivate.patch(`${posts_endPoint}/${auth?._id}/${storyId}`)
+    return res?.data?.message
+  }
+
+  const getUserStorys = async(): Promise<PostType[]> => {
+    const res = await axiosPrivate.patch(`${posts_endPoint}/user/${auth?._id}`)
+    return res?.data?.data
+  }
   
-  return [createPost, updatePost]
+  return {createPost, updatePost, likeUnlikePost, getUserStorys}
 }

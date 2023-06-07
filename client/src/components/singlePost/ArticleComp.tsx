@@ -5,19 +5,22 @@ import { format } from 'timeago.js';
 import { useState } from 'react';
 import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
+import { UserProps } from '../../data';
 
 type ArticleProps = {
   post: PostType,
   sidebar: boolean,
+  user: UserProps,
   bodyContent: JSX.Element[],
   averageReadingTime: string,
   isLoading: boolean,
-  error: string
+  error: string,
+  followOrUnfollow: () => Promise<void>
 }
 
 type HoverType = 'unfollow' | 'following'
 
-export default function ArticleComp({ post, bodyContent, sidebar, averageReadingTime, isLoading, error }: ArticleProps) {
+export default function ArticleComp({ post, bodyContent, user, sidebar, averageReadingTime, isLoading, error, followOrUnfollow }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
 
@@ -37,15 +40,20 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
         <span>.</span>
         <p>{format(post?.storyDate, 'en-US')}</p>
           {
-            <button className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">
-              follow
-            </button>
-            ||
-            <button 
-              onMouseEnter={() => setHoverThis('unfollow')}
-              onMouseLeave={() => setHoverThis('following')}
-              className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 font-sans font-medium">{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
-            </button>
+            user?.followings?.includes(post?.userId) ? (
+                <button 
+                  onClick={followOrUnfollow}
+                  className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">
+                  follow
+                </button>
+              ):(
+                <button 
+                  onClick={followOrUnfollow}
+                  onMouseEnter={() => setHoverThis('unfollow')}
+                  onMouseLeave={() => setHoverThis('following')}
+                  className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 font-sans font-medium">{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
+                </button>
+              )
           }
       </div>
         <p className='whitespace-pre-wrap font-bold text-3xl uppercase'>{post?.title}</p>
@@ -73,7 +81,7 @@ export default function ArticleComp({ post, bodyContent, sidebar, averageReading
 
   return (
     <article 
-      className={`app mt-2 flex-grow overflow-y-scroll ${post?.fontFamily} p-2 pl-3 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
+      className={`app mt-2 flex-grow flex flex-col gap-3 overflow-y-scroll ${post?.fontFamily} p-2 pl-3 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
         {content}
       </article>
   )

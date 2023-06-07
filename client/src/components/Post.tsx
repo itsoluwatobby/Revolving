@@ -16,8 +16,10 @@ import useAuthenticationContext from '../hooks/useAuthenticationContext';
 import { deletePostOptions } from '../api/postApiOptions';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { AuthenticationContextType, Categories } from '../data';
-import { reduceLength } from '../assets/navigator';
+import { AuthenticationContextType, Categories, UserProps } from '../data';
+import { reduceLength } from '../utils/navigator';
+import PostImage from './post/PostImages';
+import { userOfPost } from '../utils/helperFunc';
 
 type Props = {
   post: PostType
@@ -30,14 +32,16 @@ export const Post = ({ post, navigationTab }: Props) => {
   const {mutate} = useSWRConfig()
 
   const { theme, setOpenComment } = useThemeContext() as ThemeContextType
-  const {auth} = useAuthenticationContext() as AuthenticationContextType
+  const { users } = useAuthenticationContext() as AuthenticationContextType
+  const [imageLength, setImageLenth] = useState<boolean>(false)
   const end = averageReadingTime.split(' ')[1]
+
 
   const userId = localStorage.getItem('revolving_userId') as string
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
   const tooLong = (): string => {
     const wordLength = post?.body?.split(' ').length
-    const words = wordLength >= 100 ? post?.body?.substring(0, 400)+'...' : post?.body
+    const words = wordLength >= 100 ? post?.body?.substring(0, 280)+'...' : post?.body
     return words
   }
 
@@ -73,7 +77,10 @@ export const Post = ({ post, navigationTab }: Props) => {
       <div 
         // onClick={openText}
         className='relative flex items-center gap-3'>
-        <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{reduceLength(post?.author, 15) || 'anonymous'}</p>
+        <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{
+          reduceLength(userOfPost(users as UserProps[], post?.userId), 15) || 'anonymous'
+          }
+        </p>
         <span>.</span>
         <p>{format(post?.sharedDate || post?.storyDate, 'en-US')}</p>
         {userId && (
@@ -114,7 +121,10 @@ export const Post = ({ post, navigationTab }: Props) => {
           className='whitespace-pre-wrap text-sm first-letter:ml-3 first-letter:text-lg first-letter:capitalize'>
             {bodyContent}
         </p>
-      </Link>
+      </Link> 
+      
+      <PostImage imageLength={imageLength} />
+      
       <div className='mt-2 opacity-90 flex items-center gap-5 text-green-600 text-sm font-sans'>
         <p>{post?.body ? averageReadingTime + ' read' : ''}</p>
         {

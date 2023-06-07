@@ -73,7 +73,7 @@ export const Navbar = () => {
             options={options}
         />  
       }
-      {rollout && <Drawdown />}
+      <Drawdown rollout={rollout} />
     </nav>
   )
 }

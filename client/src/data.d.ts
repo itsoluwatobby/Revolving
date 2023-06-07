@@ -47,12 +47,20 @@ interface SharedProps{
   sharedStory: object
 }
 
-type UserProps={
+type SocialMediaAccoutProp = {
+  media: string,
+  link: string
+}
+
+interface UserProps{
   _id: string,
   username: string,
   email: string,
   description: string,
-  password: string,
+  authentication: {
+    password: string,
+    sessionID: string
+  },
   roles: USERROLES[],
   registrationDate: string,
   displayPicture: string,
@@ -64,10 +72,15 @@ type UserProps={
   followers?: string[],
   followings?: string[],
   lastSeen: string,
-  hobbies?: string[],
+  hobbies: string[],
   status: 'online' | 'offline',
   refreshToken: string,
-  editDate: string
+  editDate: string,
+  gender: 'Female' | 'Male' | 'Others',
+  codeName: string,
+  stack: string[],
+  country: string,
+  socialMediaAccouts: SocialMediaAccoutProp[]
 }
 
 interface ErrorResponse{
@@ -84,6 +97,10 @@ type AuthenticationContextType={
   auth: AuthType,
   userSession?: boolean,
   persistLogin: boolean,
+  user?: UserProps,
+  users?: UserProps[],
+  isLoading: boolean,
+  error: unknown,
   setAuth: React.Dispatch<React.SetStateAction<AuthType>>,
   setPersistLogin: React.Dispatch<React.SetStateAction<boolean>>
 }

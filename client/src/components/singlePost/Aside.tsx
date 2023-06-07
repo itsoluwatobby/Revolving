@@ -3,7 +3,7 @@ import { PostType, ThemeContextType } from "../../posts";
 import { MdOutlineCancel } from "react-icons/md";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { useEffect, useState } from "react";
-import { reduceLength } from "../../assets/navigator";
+import { reduceLength } from "../../utils/navigator";
 
 type AsideProps = {
   posts: PostType[],
