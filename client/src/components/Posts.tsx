@@ -8,7 +8,6 @@ import { useEffect } from 'react';
 import { Categories } from '../data';
 import useSWRInfinite, {SWRInfiniteKeyLoader} from 'swr/infinite';
 import useSWRImmutable from 'swr/immutable';
-import useSwr from 'swr'
 import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
 import Comments from './comments/Comments';
 import { useThemeContext } from '../hooks/useThemeContext';

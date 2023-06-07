@@ -1,4 +1,4 @@
-import { reduceLength } from "../../assets/navigator";
+import { reduceLength } from "../../utils/navigator";
 import { CommentProps } from "../../data"
 import { format } from 'timeago.js';
 import { PromptLiterals, Theme } from "../../posts";

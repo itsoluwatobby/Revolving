@@ -1,4 +1,3 @@
-import { CommentProps } from "../data"
 
 export type ComponentKey = 'GENERAL' | 'ENTERTAINMENT' | 'WEB DEVELOPMENT' | 'REACT' | 'NODE' | 'BASH SCRIPTING'
 export type Components = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'

@@ -94,6 +94,7 @@ else{
   app.use('/revolving/auth', authRouter);
   app.get('/revolving/auth/logout', logoutHandler);
 
+  // USERS
   app.get('/revolving/users', getUsers);
   app.get('/revolving/users/:userId', getUser);
 

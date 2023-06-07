@@ -3,7 +3,7 @@ import { ThemeContextType } from "../../posts"
 import { comments } from "../../commentData";
 import EnlargeComment from "./EnlargeComment";
 import CommentBody from "./CommentBody";
-import { checkCount } from "../../assets/navigator";
+import { checkCount } from "../../utils/navigator";
 
 export default function Comments() {
   const {theme, enlarge} = useThemeContext() as ThemeContextType;

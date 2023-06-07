@@ -9,17 +9,26 @@ import { WindowScroll } from "../components/WindowScroll";
 import Aside from "../components/singlePost/Aside";
 import ArticleComp from "../components/singlePost/ArticleComp";
 import useSWRMutation from 'swr/mutation';
-import { postAxios, posts_endPoint } from "../api/axiosPost";
+import { postAxios, posts_endPoint, user_endPoint } from "../api/axiosPost";
+import { useSWRConfig } from 'swr';
+import useGetUsers from "../hooks/useGetUsers";
+import { followUnfollowUserOption } from "../api/userApiOptions";
+import useAuthenticationContext from "../hooks/useAuthenticationContext";
+import { AuthenticationContextType, ErrorResponse, UserProps } from "../data";
+import { toast } from "react-hot-toast";
 
 const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
 export default function SingleStoryPage() {
   const { storyId } = useParams()
+  const { followUnfollowUser } = useGetUsers()
+  const { mutate } = useSWRConfig()
   const { trigger, error, isMutating } = useSWRMutation<PostType>(posts_endPoint, async() => {
     const res = await postAxios.get(`${posts_endPoint}/${storyId}`)
     console.log(res?.data?.data)
     return res?.data?.data
   })
+  const { user } = useAuthenticationContext() as AuthenticationContextType
   const [sidebar, setSidebar] = useState<boolean>(false);
   const [titleFocus, setTitleFocus] = useState<boolean>(false);
   const [targetStory, setTargetStory] = useState<PostType | null>(null);
@@ -49,6 +58,34 @@ export default function SingleStoryPage() {
    setTitleFocus(false)
   }, [])
 
+  const followOrUnfollow = async() => {
+    try{
+      const res = await mutate(
+        user_endPoint, 
+        followUnfollowUser(targetStory?.userId as string), 
+        followUnfollowUserOption(user as UserProps, targetStory?.userId as string)
+      )
+      res && toast.success('Success!! You logged out', {
+        duration: 2000, icon: '👋', style: {
+          background: '#8FBC8F'
+        }
+      })
+    }
+    catch(error){
+      let errorMessage: string
+      const errors = error as ErrorResponse
+      errors?.response.status == 400 ? errorMessage = 'bad input' 
+      : errors?.response.status == 404 ? errorMessage = 'user not found' 
+      : errors?.response?.status == 423 ? errorMessage = 'Account locked' 
+      : errors?.response?.status == 409 ? errorMessage = 'You cannot follow yourself'
+      : errorMessage = 'internal server error' 
+
+      toast.error(errorMessage, {
+        duration: 2000, icon: '💀', style: { background: '##8FBC8F'}
+      })
+    }
+  }
+
   const bodyContent = targetStory?.body ? targetStory?.body.split(' ').map((word, index) => {
     return (
       <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600 bg-gray-600 rounded-sm' : ''}`}>{word}{' '}</span>
@@ -64,9 +101,12 @@ export default function SingleStoryPage() {
             setSidebar={setSidebar}
           />
           <ArticleComp 
-            post={targetStory as PostType} bodyContent={bodyContent as JSX.Element[]}
-            averageReadingTime={averageReadingTime} sidebar={sidebar}
-            isLoading={isMutating} error={error}
+            post={targetStory as PostType} 
+            bodyContent={bodyContent as JSX.Element[]}
+            averageReadingTime={averageReadingTime} 
+            sidebar={sidebar} isLoading={isMutating} 
+            error={error} user={user as UserProps} 
+            followOrUnfollow={followOrUnfollow}
           />
         </div>
         <BsArrowBarRight 

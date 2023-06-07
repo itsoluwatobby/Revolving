@@ -2,16 +2,16 @@ import { Home } from "./pages/Home"
 import { useThemeContext } from "./hooks/useThemeContext"
 import { ThemeContextType } from "./posts";
 import { Routes, Route } from 'react-router-dom';
-import { BlogLayout } from "./components/layouts/BlogLayout";
+import { BlogLayout } from "./layouts/BlogLayout";
 import { NewStory } from "./pages/NewStory";
 import NotFound from "./pages/NotFound";
 import SingleStoryPage from "./pages/SingleStoryPage";
-import Welcome from "./components/layouts/Welcome";
+import Welcome from "./layouts/Welcome";
 import LoginModal from "./components/modals/LoginModal";
 import RegisterModal from "./components/modals/RegisterModel";
 import NewPassword from "./pages/NewPassword";
 import { Toaster } from "react-hot-toast";
-import { PersistedLogin } from "./components/layouts/PersistedLogin";
+import { PersistedLogin } from "./layouts/PersistedLogin";
 import ProfilePage from "./pages/ProfilePage";
 import About from "./pages/About";
 import { BsChatTextFill } from 'react-icons/bs'

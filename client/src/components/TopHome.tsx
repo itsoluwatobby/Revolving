@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react'
 import { IoIosArrowForward, IoIosArrowBack} from 'react-icons/io'
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
-import { Components, NAVIGATE } from '../assets/navigator';
+import { Components, NAVIGATE } from '../utils/navigator';
 
 type TopHomeProps={
   navigationTab: string,

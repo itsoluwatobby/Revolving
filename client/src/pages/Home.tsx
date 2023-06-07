@@ -5,7 +5,7 @@ import { TopHome } from "../components/TopHome"
 import useAuthenticationContext from "../hooks/useAuthenticationContext";
 import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
-import { Components, NAVIGATE } from "../assets/navigator";
+import { Components, NAVIGATE } from "../utils/navigator";
 import { useState } from "react";
 import { AuthenticationContextType } from "../data";
 

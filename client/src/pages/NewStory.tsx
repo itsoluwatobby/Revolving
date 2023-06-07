@@ -5,7 +5,7 @@ import { useThemeContext } from '../hooks/useThemeContext';
 import { PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent, useRef, LegacyRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
-import { Components, NAVIGATE } from '../assets/navigator';
+import { Components, NAVIGATE } from '../utils/navigator';
 import { Categories } from '../data';
 import CodeBlock from '../components/codeBlock/CodeBlock';
 

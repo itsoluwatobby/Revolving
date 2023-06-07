@@ -24,7 +24,7 @@ const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:sca
 
 export default function TopRight() {
   const { mutate } = useSWRConfig()
-  const [createPost, updatePost] = useStoryMutation()
+  const {createPost, updatePost} = useStoryMutation()
   const { theme, setRollout, changeTheme, setFontOption } = useThemeContext() as ThemeContextType
   const {postData, canPost} = usePostContext() as PostContextType
   const { auth } = useAuthenticationContext() as AuthenticationContextType;
