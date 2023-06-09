@@ -7,18 +7,19 @@ import { NewStory } from "./pages/NewStory";
 import NotFound from "./pages/NotFound";
 import SingleStoryPage from "./pages/SingleStoryPage";
 import Welcome from "./layouts/Welcome";
-import LoginModal from "./components/modals/LoginModal";
-import RegisterModal from "./components/modals/RegisterModel";
+import LoginModal from "./pages/LoginModal";
+import RegisterModal from "./pages/RegisterModel";
 import NewPassword from "./pages/NewPassword";
 import { Toaster } from "react-hot-toast";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import ProfilePage from "./pages/ProfilePage";
 import About from "./pages/About";
 import { BsChatTextFill } from 'react-icons/bs'
+import ChatSection from "./pages/chatAdmin/ChatSection";
 
  
 export const App = () => {
-  const {theme} = useThemeContext() as ThemeContextType;
+  const {theme, openChat, setOpenChat} = useThemeContext() as ThemeContextType;
 
   return (
     <main className={`app relative ${theme == 'light' ? '' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
@@ -49,7 +50,14 @@ export const App = () => {
       
       </Routes>
       <Toaster />
-      <BsChatTextFill className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-70 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}/>
+      {openChat === 'Open' ?
+        <ChatSection />
+        :  
+        <BsChatTextFill 
+          onClick={() => setOpenChat('Open')}
+          className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-70 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
+        />
+      }
     </main>
   )
 }

@@ -26,9 +26,8 @@ export const Posts = ({ navigationTab }: PostsProps) => {
   }, {
     onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
   })
-
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
-  const { openComment } = useThemeContext() as ThemeContextType
+  const { openComment, setOpenChat } = useThemeContext() as ThemeContextType
   
   useEffect(() => {
     mutate()
@@ -60,7 +59,9 @@ export const Posts = ({ navigationTab }: PostsProps) => {
       : content = (<p className='m-auto text-3xl capitalize font-mono text-gray-400'>No stories available</p>)
   )
   return (
-    <div className='relative box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
+    <div 
+      onClick={() => setOpenChat('Hide')}
+      className='relative box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
       {openComment ? <Comments /> : content }
     </div>
   )

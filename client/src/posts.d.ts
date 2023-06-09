@@ -53,6 +53,7 @@ type PromptLiterals = 'Show' | 'Discard' | 'Retain' | 'Dommant'
 
 type Theme = 'light' | 'dark';
 type FontStyle = string | 'font_style';
+type ChatOption = 'Hide' | 'Open';
 
 type ThemeContextType = {
   theme: Theme,
@@ -62,7 +63,9 @@ type ThemeContextType = {
   openComment: boolean,
   parseId: string,
   enlarge: boolean,
+  openChat: ChatOption,
   changeTheme: (mode: string) => void,
+  setOpenChat: React.Dispatch<React.SetStateAction<ChatOption>>,
   setEnlarge: React.Dispatch<React.SetStateAction<boolean>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
