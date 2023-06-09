@@ -1,15 +1,15 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
-import ForgotPassword from './ForgotPassword'
-import LoginComponent from './LoginComponent'
-import useAuthenticationContext from '../../hooks/useAuthenticationContext';
+import ForgotPassword from '../components/modals/ForgotPassword'
+import LoginComponent from '../components/modals/LoginComponent'
+import useAuthenticationContext from '../hooks/useAuthenticationContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { useThemeContext } from '../../hooks/useThemeContext';
-import { ThemeContextType } from '../../posts';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { ThemeContextType } from '../posts';
 import useSWRMutation from "swr/mutation"
-import { auth_endPoint } from '../../api/axiosPost';
-import useSignIn from '../../hooks/useSignIn';
-import { AuthType, AuthenticationContextType, ErrorResponse } from '../../data';
+import { auth_endPoint } from '../api/axiosPost';
+import useSignIn from '../hooks/useSignIn';
+import { AuthType, AuthenticationContextType, ErrorResponse } from '../data';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('')

@@ -8,7 +8,7 @@
 * Blog site
 * A mini tweeter page to view your tweets and probably make a post, view followers count
 * CV creation and free pdf format download
-* Text editor
+* Text editor - [**react-monaco-editor**]
 * Programming contents
 * Responsive pages
 * Feature to download any post in pdf format

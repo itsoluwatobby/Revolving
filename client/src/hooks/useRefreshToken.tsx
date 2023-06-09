@@ -30,10 +30,10 @@ export default function useRefreshToken() {
       errors?.response?.status === 401 ? signOut('use')
         : errors?.response?.status === 404 ? errorMessage = 'Bad credentials' 
           : errors?.response?.status === 403 ? errorMessage = 'Session ended, please login' 
-            : errors?.response?.status === 500 ? errorMessage = 'Internal server error' : errorMessage = 'No network'
-      // toast.error(errorMessage, {
-      //   duration: 10000, icon: '💀', style: { background: '#FA2B50'}
-      // })
+            : errors?.response?.status === 500 ? 'Internal Server Error' : signOut('use')
+      toast.error('No Network Connection', {
+        duration: 10000, icon: '💀', style: { background: '#FA2B50'}
+      })
       // navigate('/signIn', {replace: true})
     }
   }

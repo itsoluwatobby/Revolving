@@ -1,13 +1,13 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import useSWRMutation from "swr/mutation";
-import { useThemeContext } from '../../hooks/useThemeContext';
-import { ThemeContextType } from '../../posts';
-import { auth_endPoint } from '../../api/axiosPost';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { ThemeContextType } from '../posts';
+import { auth_endPoint } from '../api/axiosPost';
 import { toast } from 'react-hot-toast';
-import useSignUp from '../../hooks/useSignUp';
-import RegistrationForm from './RegistrationForm';
-import { ErrorResponse } from '../../data';
+import useSignUp from '../hooks/useSignUp';
+import RegistrationForm from '../components/modals/RegistrationForm';
+import { ErrorResponse } from '../data';
 
 
 export default function RegisterModal() {
