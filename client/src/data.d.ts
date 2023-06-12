@@ -117,7 +117,6 @@ interface UserInfoProps{
 }
 
 interface LoginProps extends UserInfoProps{
-  persistLogin: boolean,
   handleChecked: (event: ChangeEvent<HTMLInputElement>) => void,
   setForgot: React.Dispatch<React.SetStateAction<boolean>>,
 }

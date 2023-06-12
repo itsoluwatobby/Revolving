@@ -42,7 +42,7 @@ export default function CodeBlock() {
   const [filename, setFilename] = useState<{name?:string,value?:string}>({
     name: 'python', value: 'print(\'Welcome to python\')'
   });
-  const [options, setOptions] = useState<FileType>({});
+  const [options, setOptions] = useState<string>('');
   const [value, setValue] = useState<string>('');
   // const codeRef = useRef(null)
 //: editor.IModelContentChangedEvent
@@ -51,10 +51,9 @@ export default function CodeBlock() {
     editor.focus()
   }
 
-  // useEffect(() => {
-    
-  // }, [filename])
- console.log({filename})
+  useEffect(() => {
+    setValue(files[filename.name as keyof FileType].defaultValue)
+  }, [filename.name])
 
   return (
     <section className="single_page w-full flex flex-col gap-2">
@@ -65,8 +64,8 @@ export default function CodeBlock() {
             <p 
               onClick={() => setFilename({name: name})}
               className="cursor-pointer border border-t-0 border-b-0 px-6 border-l-0 last:border-r-0 capitalize"
-              key={name}
-            >{name}</p>
+              key={name}>{name}
+            </p>
           ))
         }
       </div>
@@ -76,7 +75,7 @@ export default function CodeBlock() {
         theme='vs-dark'
         language={filename.name}
         value={value}
-        defaultValue={files[filename.name as keyof FileType].defaultValue}
+        defaultValue={'options'}
         onChange={handleChange}
         editorDidMount={editorDidMount}
        />

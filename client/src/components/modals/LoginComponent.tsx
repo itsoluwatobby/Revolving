@@ -3,11 +3,14 @@ import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
 import { LoginProps } from "../../data";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { ThemeContextType } from "../../posts";
+import { useSelector } from 'react-redux'
+import { persisted } from "../../features/auth/authSlice";
 
 export default function LoginComponent({ 
-  handleSubmit, handleEmail, loading, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot, persistLogin
+  handleSubmit, handleEmail, loading, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot
  }: LoginProps) {
   const {theme} = useThemeContext() as ThemeContextType
+  const persistLogin = useSelector(persisted)
 
   const canSubmit = [email, password].every(Boolean)
   return (

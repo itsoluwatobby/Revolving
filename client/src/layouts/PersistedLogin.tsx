@@ -1,79 +1,76 @@
-import { Outlet, useNavigate } from 'react-router-dom';
-import useAuthenticationContext from '../hooks/useAuthenticationContext';
-import { useEffect, useState } from 'react';
-import useRefreshToken from '../hooks/useRefreshToken';
-import darkBGloader from '../assets/darkLoader.svg'
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux'
+import { useEffect } from 'react'
+import { selectCurrentToken, setCredentials } from '../features/auth/authSlice';
+import { persisted } from '../features/auth/authSlice';
+import { useNewAccessTokenQuery } from '../app/api/authApiSlice';
+import { AuthType } from '../data';
 import whiteBGloader from '../assets/whiteloader.svg'
+import darkBGloader from '../assets/darkLoader.svg'
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
-import { toast } from 'react-hot-toast';
-import useLogout from '../hooks/useLogout';
-import { AuthenticationContextType } from '../data';
 
 export const PersistedLogin = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { auth, persistLogin } = useAuthenticationContext() as AuthenticationContextType
-  const getRefreshToken = useRefreshToken()
-  const userId = localStorage.getItem('revolving_userId')
+  const location = useLocation()
   const { theme } = useThemeContext() as ThemeContextType
-  const navigate = useNavigate()
-  const signOut = useLogout()
-
+  const token = useSelector(selectCurrentToken)
+  const persistLogin = useSelector(persisted)
+  const dispatch = useDispatch()
+  const {data, isLoading, isError, refetch} = useNewAccessTokenQuery()
+  
   useEffect(() => {
-    let isMounted = true
-    const persistUserLogin = async() => {
-      if(userId != null){
-        setIsLoading(true)
-        try{
-          await getRefreshToken()
-        }
-        catch(error){
-          signOut('use')
-          const errors = error as {response:{status:number}}
-          errors?.response?.status == 401
-          toast.error('Session Ended!', {
-            duration: 10000, icon: '💀', style: { background: '#FA2B50'}
-          })
-          navigate('/signIn', {replace: true})
-        }
-        finally{
-          isMounted && setIsLoading(false)
-        }
-      }
-      return
+    if(!token){
+      refetch()
+      const res = data as unknown as {data: AuthType}
+      dispatch(setCredentials({...res?.data}))
     }
-    !auth?.accessToken ? persistUserLogin() : setIsLoading(false)
-
-    return () => {
-      isMounted = false
-    }
-  }, [auth, getRefreshToken, navigate, signOut, userId])
+  }, [token, refetch, data, dispatch])
 
   return (
     <>
       {
-        !persistLogin ? 
-          <Outlet />
+        isLoading ?  
+          (theme == 'light' ?
+            <figure className='border-none'>
+              <img src={whiteBGloader} 
+                alt="Loading..." 
+                className='bg-inherit border-none m-auto translate-y-40'
+              />
+            </figure>
             :
-              isLoading ? 
-                  (theme == 'light' ?
-                      <figure className='border-none'>
-                        <img src={whiteBGloader} 
-                          alt="Loading..." 
-                          className='bg-inherit border-none m-auto translate-y-40'
-                        />
-                      </figure>
-                      :
-                      <figure className='border-none'>
-                        <img src={darkBGloader} 
-                          alt="Loading..." 
-                          className='bg-inherit border-none m-auto translate-y-40'
-                        />
-                      </figure>
-                    )
-                  :
-                  <Outlet />
+            <figure className='border-none'>
+              <img src={darkBGloader} 
+                alt="Loading..." 
+                className='bg-inherit border-none m-auto translate-y-40'
+              />
+            </figure>
+          )
+        :
+          (
+            !persistLogin && token ? 
+            <Outlet />
+              :
+                token ? 
+                    <Outlet />
+                    : isError && <Navigate to='/signIn' state={{ from: location }} replace />
+              )
       } 
     </>
   )
 }
+
+ // (theme == 'light' ?
+//   <figure className='border-none'>
+//     <img src={whiteBGloader} 
+//       alt="Loading..." 
+//       className='bg-inherit border-none m-auto translate-y-40'
+//     />
+//   </figure>
+//   :
+//   <figure className='border-none'>
+//     <img src={darkBGloader} 
+//       alt="Loading..." 
+//       className='bg-inherit border-none m-auto translate-y-40'
+//     />
+//   </figure>
+// )

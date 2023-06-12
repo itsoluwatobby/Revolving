@@ -16,6 +16,8 @@ import { followUnfollowUserOption } from "../api/userApiOptions";
 import useAuthenticationContext from "../hooks/useAuthenticationContext";
 import { AuthenticationContextType, ErrorResponse, UserProps } from "../data";
 import { toast } from "react-hot-toast";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCurrentUser } from "../features/auth/authSlice";
 
 const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
@@ -28,11 +30,15 @@ export default function SingleStoryPage() {
     return res?.data?.data
   })
   const { user } = useAuthenticationContext() as AuthenticationContextType
+  const currentuserId = useSelector(selectCurrentUser)
+  const dispatch = useDispatch()
   const [sidebar, setSidebar] = useState<boolean>(false);
   const [titleFocus, setTitleFocus] = useState<boolean>(false);
   const [targetStory, setTargetStory] = useState<PostType | null>(null);
   const { posts } = usePostContext() as PostContextType
-console.log({user})
+
+  console.log({currentuserId})
+
   useEffect(() => {
     let isMounted = true;
     const getStory = async() => {

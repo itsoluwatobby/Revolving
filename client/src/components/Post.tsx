@@ -10,16 +10,14 @@ import { format } from 'timeago.js';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TextRules } from '../fonts';
-import { useSWRConfig } from 'swr';
-import { axiosPrivate, posts_endPoint } from '../api/axiosPost';
-import useAuthenticationContext from '../hooks/useAuthenticationContext';
-import { deletePostOptions } from '../api/postApiOptions';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { AuthenticationContextType, Categories, UserProps } from '../data';
+import { Categories, UserProps } from '../data';
 import { reduceLength } from '../utils/navigator';
 import PostImage from './post/PostImages';
 import { userOfPost } from '../utils/helperFunc';
+import { useGetUsersQuery } from '../app/api/usersApiSlice';
+import { useDeleteStoryMutation } from '../app/api/storyApiSlice';
 
 type Props = {
   post: PostType
@@ -29,10 +27,10 @@ type Props = {
 export const Post = ({ post, navigationTab }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
   let averageReadingTime = useWordCount(post?.body) as string;
-  const {mutate} = useSWRConfig()
 
   const { theme, setOpenComment } = useThemeContext() as ThemeContextType
-  const { users, user } = useAuthenticationContext() as AuthenticationContextType
+  const {data: users} = useGetUsersQuery()
+  const [deleteStory, {isError, isSuccess}] = useDeleteStoryMutation()
   const [imageLength, setImageLenth] = useState<boolean>(false)
   const end = averageReadingTime.split(' ')[1]
 
@@ -55,16 +53,15 @@ export const Post = ({ post, navigationTab }: Props) => {
     setOpen(false)
   }
   
-  const deleted = (id: string) => {
+  const deleted = async(id: string) => {
     try{
-      mutate(posts_endPoint, async () => await axiosPrivate.delete(`${posts_endPoint}/${userId}/${id}`), deletePostOptions(id)) as unknown as PostType[];
-
-      toast.success('Success!! Post deleted', {
+      await deleteStory({userId, storyId: id}).unwrap()
+      !isSuccess && toast.success('Success!! Post deleted', {
         duration: 2000, icon: '💀', style: { background: '#FA2B50'}
       })
     }
     catch(error){
-      toast.error('Failed!! Error deleting story', {
+      isError && toast.error('Failed!! Error deleting story', {
         duration: 2000, icon: '💀', style: { background: '#4BEB50'}
       })
     }
