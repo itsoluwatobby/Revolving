@@ -24,4 +24,5 @@
 > Tech stack
 * ReactJS
 * socket.io/client
+* redux-toolkit
 * Tailwindcss

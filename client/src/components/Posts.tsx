@@ -6,33 +6,35 @@ import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
 import { useEffect } from 'react';
 import { Categories } from '../data';
-import useSWRInfinite, {SWRInfiniteKeyLoader} from 'swr/infinite';
-import useSWRImmutable from 'swr/immutable';
-import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
+// import useSWRInfinite, {SWRInfiniteKeyLoader} from 'swr/infinite';
+// import useSWRImmutable from 'swr/immutable';
+// import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
 import Comments from './comments/Comments';
 import { useThemeContext } from '../hooks/useThemeContext';
+import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice';
 
 type PostsProps = {
   navigationTab: Categories
 }
 
 export const Posts = ({ navigationTab }: PostsProps) => {
-  const getKey = (navigationTab: Categories) => {
-    return `${cacheKey}/category/${navigationTab}`
-  }
-  const { data, isLoading, error, mutate} = useSWRImmutable<PostType[]>(getKey, async(): Promise<PostType[]> => {
-    const res = await postAxios.get(`${cacheKey}/category?category=${navigationTab}`)
-    return res?.data.data
-  }, {
-    onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
-  })
+  const {data, isLoading, isError, error} = useGetStoriesByCategoryQuery(navigationTab)
+  // const getKey = (navigationTab: Categories) => {
+  //   return `${cacheKey}/category/${navigationTab}`
+  // }
+  // const { data, isLoading, error, mutate} = useSWRImmutable<PostType[]>(getKey, async(): Promise<PostType[]> => {
+  //   const res = await postAxios.get(`${cacheKey}/category?category=${navigationTab}`)
+  //   return res?.data.data
+  // }, {
+  //   onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
+  // })
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { openComment, setOpenChat } = useThemeContext() as ThemeContextType
   
   useEffect(() => {
-    mutate()
+    // mutate()
     setNavPosts(data as PostType[])
-  }, [navigationTab, data, mutate, setNavPosts])
+  }, [navigationTab, data, setNavPosts])
 
   let content;
 
@@ -42,8 +44,8 @@ export const Posts = ({ navigationTab }: PostsProps) => {
         )
       )
   ) 
-  : error ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-    {error?.message}
+  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+    {error.status}
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
   :(
