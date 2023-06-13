@@ -41,7 +41,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       query: ({followerId, followedId}) => ({
         url: `users/follow_unfollow/${followerId}/${followedId}`,
         method: 'PUT',
-        body: null
+        body: followerId
       }),
       invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
     }),
@@ -50,13 +50,16 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       query: (userId) => ({
         url: `users/delete/${userId}`,
         method: 'DELETE',
-        body: null
+        body: userId
       }),
       invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
     }),
 
     getUserById: builder.query<UserProps, string>({
       query: (id) => `users/single/${id}`,
+      transformResponse: (baseQueryReturnValue: {data: UserProps}) => {
+          return baseQueryReturnValue?.data
+        },
       providesTags: [{ type: 'USERS' }]
     }),
    

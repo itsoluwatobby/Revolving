@@ -14,21 +14,24 @@ export const PersistedLogin = () => {
   const location = useLocation()
   const { theme } = useThemeContext() as ThemeContextType
   const token = useSelector(selectCurrentToken)
-  const persistLogin = useSelector(persisted)
+  const persistLogin = localStorage.getItem('persist-login')
   const dispatch = useDispatch()
   const {data, isLoading, isError, refetch} = useNewAccessTokenQuery()
   
   useEffect(() => {
-    if(!token){
+    if(persistLogin && !token){
       refetch()
       const res = data as unknown as {data: AuthType}
       dispatch(setCredentials({...res?.data}))
     }
-  }, [token, refetch, data, dispatch])
+  }, [token, refetch, data, dispatch, persistLogin])
 
   return (
     <>
       {
+      !persistLogin ? 
+        <Outlet />
+        :
         isLoading ?  
           (theme == 'light' ?
             <figure className='border-none'>
@@ -47,13 +50,10 @@ export const PersistedLogin = () => {
           )
         :
           (
-            !persistLogin && token ? 
-            <Outlet />
-              :
-                token ? 
-                    <Outlet />
-                    : isError && <Navigate to='/signIn' state={{ from: location }} replace />
-              )
+            token ? 
+              <Outlet />
+                : isError && <Navigate to='/signIn' state={{ from: location }} replace />
+          )
       } 
     </>
   )

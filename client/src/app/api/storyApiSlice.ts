@@ -36,11 +36,11 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
     
-    likeAndUnlikeStory: builder.mutation<void, StoryArgs>({
-      query: ({userId, storyId, story}) => ({
+    likeAndUnlikeStory: builder.mutation<void, Omit<StoryArgs, 'story'>>({
+      query: ({userId, storyId}) => ({
         url: `story/${userId}/${storyId}`,
         method: 'PATCH',
-        body: null
+        body: userId
       }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
@@ -49,13 +49,16 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       query: ({userId, storyId}) => ({
         url: `story/${userId}/${storyId}`,
         method: 'DELETE',
-        body: null
+        body: userId
       }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
 
     getStory: builder.query<PostType, string>({
       query: (id) => `story/${id}`,
+      transformResponse: (baseQueryReturnValue: {data: PostType}) => {
+        return baseQueryReturnValue?.data
+      },
       providesTags: ['STORY']
     }),
 
@@ -69,14 +72,22 @@ export const storyApiSlice = apiSlice.injectEndpoints({
     }), 
 
     getStories: builder.query<PostType[], void>({
-      query: () => `story`,
-      transformResponse: (data: PostType[]) => data?.sort((prev, next) => next?.storyDate.localeCompare(prev?.storyDate)), 
+      query: () => 'story',
+      transformResponse: (baseQueryReturnValue: ResponseType) => {
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.storyDate.localeCompare(prev?.storyDate))
+        console.log(response)
+        return response
+      }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
     }),
     
     getUserStories: builder.query<PostType[], string>({
       query: (userId) => `story/user/${userId}`,
-      transformResponse: (data: PostType[]) => data?.sort((prev, next) => next?.storyDate.localeCompare(prev?.storyDate)), 
+      transformResponse: (baseQueryReturnValue: ResponseType) => {
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.storyDate.localeCompare(prev?.storyDate))
+        console.log(response)
+        return response
+      }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
     }),
 

@@ -6,20 +6,20 @@ import { useEffect, useState } from "react";
 import { reduceLength } from "../../utils/navigator";
 
 type AsideProps = {
-  posts: PostType[],
+  stories: PostType[],
   sidebar: boolean,
   setSidebar: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function Aside({ posts, setSidebar, sidebar }: AsideProps) {
+export default function Aside({ stories, setSidebar, sidebar }: AsideProps) {
   const { theme } = useThemeContext() as ThemeContextType
-  const [recentPosts, setRecentPosts] = useState<PostType[]>([])
+  const [recentStories, setRecentStories] = useState<PostType[]>([])
 
   useEffect(() => {
-    setRecentPosts(
-      posts?.filter(post => +new Date(post.storyDate).getDay() < 3)
+    setRecentStories(
+      stories?.filter(story => +new Date(story.storyDate).getDay() < 3)
     )
-  }, [posts])
+  }, [stories])
   
   return (
     <aside className={`sidebars md:block flex-none sm:w-1/4 w-4/12 transition-all overflow-y-scroll h-full ${sidebar ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'} ${theme == 'light' ? 'bg-gray-50' : 'bg-slate-700'}  rounded-tr-lg z-50`}>
@@ -30,23 +30,23 @@ export default function Aside({ posts, setSidebar, sidebar }: AsideProps) {
           className={`absolute sm:hidden block right-0 rounded-md text-xl cursor-pointer transition-all duration-300 hover:opacity-80 active:scale-[0.9] shadow-xl ${theme == 'light' ? 'bg-gray-200 text-gray-700' : 'text-gray-400'}`} />
       </div>
       {
-        posts?.length ? (
+        stories?.length ? (
           <ul className="flex flex-col font-sans text-sm justify-center rounded-md transition-all duration-200 gap-1">
             {
-              recentPosts?.map(post => (
+              recentStories?.map(story => (
                 <li 
-                  key={post?._id}
+                  key={story?._id}
                   className={` hover:scale-[1.01] transition-all shadow-sm ${theme == 'light' ? 'bg-gray-100' : ''} p-2`}
                 >
-                  <Link to={`/story/${post?._id}`}>
-                    <p className="text-center uppercase font-medium underline underline-offset-4">{reduceLength(post?.title, 18)}</p>
-                    <p className="cursor-pointer">{reduceLength(post?.body, 25, 'word')}</p>
+                  <Link to={`/story/${story?._id}`}>
+                    <p className="text-center uppercase font-medium underline underline-offset-4">{reduceLength(story?.title, 18)}</p>
+                    <p className="cursor-pointer">{reduceLength(story?.body, 25, 'word')}</p>
                   </Link>
                 </li>
               ))
             }
           </ul>
-        ) : <p className="text-center">No posts</p>
+        ) : <p className="text-center">No stories</p>
       }
     </aside>
   )
