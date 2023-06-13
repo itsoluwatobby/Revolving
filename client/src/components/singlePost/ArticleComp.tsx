@@ -14,13 +14,14 @@ type ArticleProps = {
   bodyContent: JSX.Element[],
   averageReadingTime: string,
   isLoading: boolean,
-  error: string,
+  isError: boolean,
+  error: {error: string},
   followOrUnfollow: () => Promise<void>
 }
 
 type HoverType = 'unfollow' | 'following'
 
-export default function ArticleComp({ post, bodyContent, user, sidebar, averageReadingTime, isLoading, error, followOrUnfollow }: ArticleProps) {
+export default function ArticleComp({ isError, post, bodyContent, user, sidebar, averageReadingTime, isLoading, error, followOrUnfollow }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const userId = localStorage.getItem('revolving_userId')
@@ -29,8 +30,8 @@ export default function ArticleComp({ post, bodyContent, user, sidebar, averageR
 
   isLoading ? 
       content = <SkeletonSinglePage  />
-  : error ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-  {/* {error?.message as {message: string}} */}
+  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
+  {/* {error?.error as {message: string}} */}
   Failed to Load Post
   <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
   </p> 

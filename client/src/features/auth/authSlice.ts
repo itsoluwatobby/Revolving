@@ -20,7 +20,7 @@ const authSlice = createSlice({
       state._id = ''
       state.accessToken = ''
       state.roles = []
-      localStorage.removeItem('persist-login')
+      //localStorage.setItem('persist-login', 'false')
     },
     persistLogin: (state, action) => {
       state.persistedLogin = action?.payload
@@ -36,6 +36,4 @@ export const persisted = (state: RootState) => state?.auth?.persistedLogin
 export const { setCredentials, signOut, persistLogin } = authSlice.actions
 
 export default authSlice.reducer
-
-
 

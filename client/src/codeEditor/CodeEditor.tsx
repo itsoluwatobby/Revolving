@@ -56,7 +56,7 @@ export default function CodeBlock() {
   }, [filename.name])
 
   return (
-    <section className="single_page w-full flex flex-col gap-2">
+    <section className="code_page w-full flex flex-col gap-2">
 
       <div className="flex items-center justify-evenly border mb-0">
         {

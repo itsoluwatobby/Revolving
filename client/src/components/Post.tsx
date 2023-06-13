@@ -43,7 +43,7 @@ export const Post = ({ post, navigationTab }: Props) => {
   }
 
   const watchWords = TextRules.keywords as string[]
-  const bodyContent = post?.body ? tooLong().split(' ').map((word, index) => {
+  const bodyContent = post && post?.body ? tooLong().split(' ').map((word, index) => {
     return (
       <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'bg-gray-600 rounded-sm text-red-600' : ''}`}>{word}{' '}</span>
     )

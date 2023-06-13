@@ -19,15 +19,6 @@ type PostsProps = {
 
 export const Posts = ({ navigationTab }: PostsProps) => {
   const {data, isLoading, isError, error} = useGetStoriesByCategoryQuery(navigationTab)
-  // const getKey = (navigationTab: Categories) => {
-  //   return `${cacheKey}/category/${navigationTab}`
-  // }
-  // const { data, isLoading, error, mutate} = useSWRImmutable<PostType[]>(getKey, async(): Promise<PostType[]> => {
-  //   const res = await postAxios.get(`${cacheKey}/category?category=${navigationTab}`)
-  //   return res?.data.data
-  // }, {
-  //   onSuccess: data => data?.sort((a, b) => b?.storyDate.localeCompare(a?.storyDate)),
-  // })
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { openComment, setOpenChat } = useThemeContext() as ThemeContextType
   
