@@ -96,7 +96,7 @@ else{
 
   // USERS
   app.get('/revolving/users', getUsers);
-  app.get('/revolving/users/:userId', getUser);
+  app.get('/revolving/users/single/:userId', getUser);
 
   //password reset
   app.use('/revolving/auth', passwordResetRouter);

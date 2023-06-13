@@ -21,9 +21,12 @@ export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) =>
             objInstance.pullIt(reqMtd);
         }
         const data = yield redisClient.get(key);
-        if (data)
+        if (data) {
+            console.log('Cache Hit');
             return JSON.parse(data);
+        }
         const freshData = yield cb();
+        console.log('Cache Miss');
         redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
         return freshData;
     }
