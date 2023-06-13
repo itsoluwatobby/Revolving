@@ -119,7 +119,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-        const accessToken = yield signToken({ roles, email }, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
+        const accessToken = yield signToken({ roles, email }, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
         const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
         const { _id } = user, rest = __rest(user, ["_id"]);
         yield user.updateOne({ $set: { status: 'online', refreshToken } });

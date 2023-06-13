@@ -33,7 +33,7 @@ export const verifyAccessToken = async(req: TokenProp, res: Response, next: Next
 
 export const getNewTokens = async(req: CookieProp, res: Response) => {
   const cookie = req.cookies;
-  if(!cookie?.revolving) return res.sendStatus(401)
+  if(!cookie?.revolving) return responseType({res, status: 401, message: 'Bad Credentials'})
   const token = cookie?.revolving;
   const user = await getUserByToken(token)
   if(!user) return res.sendStatus(404)
@@ -49,12 +49,12 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
     else if(verify == 'Expired Token') {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
       user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
-      return res.sendStatus(403)
+      return responseType({res, status: 401, message: 'Bad Token'})
     }
   }
   const roles = Object.values(user?.roles);
   const newAccessToken = await signToken({roles, email: user?.email}, '35m', process.env.ACCESSTOKEN_STORY_SECRET);
-  const newRefreshToken = await signToken({roles, email: user?.email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
+  const newRefreshToken = await signToken({roles, email: user?.email}, '12h', process.env.REFRESHTOKEN_STORY_SECRET);
 
   await user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
     //authentication: { sessionID: req?.sessionID },

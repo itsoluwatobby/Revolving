@@ -73,7 +73,7 @@ else {
     app.get('/revolving/auth/logout', logoutHandler);
     // USERS
     app.get('/revolving/users', getUsers);
-    app.get('/revolving/users/:userId', getUser);
+    app.get('/revolving/users/single/:userId', getUser);
     //password reset
     app.use('/revolving/auth', passwordResetRouter);
     app.get('/revolving/story/share_getAll', fetchSharedStories);
