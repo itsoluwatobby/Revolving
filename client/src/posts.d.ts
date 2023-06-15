@@ -4,6 +4,8 @@ import React from 'react';
 type ChildrenProp = {
   children: React.ReactNode
 }
+
+type MakeToButtom = PostType & Pick<SharedProps, 'sharedLikes'>
   
 type PostType = {
   _id: string,
@@ -33,12 +35,9 @@ type PostType = {
 
 type PostContextType = {
   search: string,
-  posts?: PostType[],
   postData: Partial<PostType>,
   filteredStories: PostType[],
-  isLoading: boolean,
   typingEvent: boolean,
-  error?: {message: string, name: string, code: string},
   // editPost: Partial<PostType>, 
   canPost: boolean,
   navPosts: PostType[], 

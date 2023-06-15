@@ -1,24 +1,9 @@
 import { createContext, useEffect, useState } from 'react';
-import useSwr from 'swr';
 import { PostType, ChildrenProp, PostContextType } from '../posts';
-import { posts_endPoint as cacheKey } from '../api/axiosPost'
-import { getPosts } from '../api/axiosPost';
 
 export const PostContext = createContext<PostContextType | null>(null)
 
 export const PostDataProvider = ({ children }: ChildrenProp) => {
-  const {
-    data: posts,
-    isLoading,
-    error
-  } = useSwr<PostType[]>(cacheKey, getPosts, {
-    onSuccess: data => data?.sort((a, b) => {
-      const timeDiffrence = b?.storyDate.localeCompare(a?.storyDate);
-      // const likes = +b?.likes - +a?.likes;
-      //const dayDifference = timeDiffrence / (1000 * 3000 * 24);
-      return timeDiffrence
-    }),
-  })
   const [postData, setPostData] = useState<Partial<PostType>>({
     title: undefined, body: undefined, author: 'anonymous'
   })
@@ -38,7 +23,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }, [search, navPosts])
 
   const value = {
-    postData, filteredStories, setPostData, search, setSearch, posts, isLoading, error, typingEvent, setTypingEvent, canPost, setCanPost, navPosts, setNavPosts
+    postData, filteredStories, setPostData, search, setSearch, typingEvent, setTypingEvent, canPost, setCanPost, navPosts, setNavPosts
   }
 
   return (

@@ -34,12 +34,12 @@ export const App = () => {
           
           </Route>
           
-          <Route index element={<Home />} />
-          <Route path="story/:storyId" element={<SingleStoryPage />} />
           
           <Route element={<PersistedLogin />}>
             
             {/* PROTECTED */}
+            <Route index element={<Home />} />
+            <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />

@@ -11,6 +11,7 @@ type SignOutType = 'dont' | 'use'
 export default function useLogout() {
   const { setAuth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
+  const currentUserId = localStorage.getItem('revolving_userId')
   const navigate = useNavigate()
 
   const signOut = async(option: SignOutType = 'use') => {
@@ -23,11 +24,11 @@ export default function useLogout() {
         }
       })
       setRollout(false)
-      localStorage.removeItem('newStoryInputValue')
-      localStorage.removeItem('newStoryTextareaValue')
+      localStorage.removeItem(`newTitle?id=${currentUserId}`)
+      localStorage.removeItem(`newBody?id=${currentUserId}`)
 
-      localStorage.removeItem('editStoryInputValue')
-      localStorage.removeItem('editStoryTextareaValue')
+      localStorage.removeItem(`editTitle?id=${currentUserId}`)
+      localStorage.removeItem(`editBody?id=${currentUserId}`)
       localStorage.removeItem('revolving_userId')
       option == 'use' ? navigate('/signIn', { replace: true }) : null
     }catch(err){
@@ -37,11 +38,11 @@ export default function useLogout() {
           background: '#8FBC8F'
         }
       })
-      localStorage.removeItem('newStoryInputValue')
-      localStorage.removeItem('newStoryTextareaValue')
+      localStorage.removeItem(`newTitle?id=${currentUserId}`)
+      localStorage.removeItem(`newBody?id=${currentUserId}`)
 
-      localStorage.removeItem('editStoryInputValue')
-      localStorage.removeItem('editStoryTextareaValue')
+      localStorage.removeItem(`editTitle?id=${currentUserId}`)
+      localStorage.removeItem(`editBody?id=${currentUserId}`)
       localStorage.removeItem('revolving_userId')
       option == 'use' ? navigate('/signIn', { replace: true }) : null
     }

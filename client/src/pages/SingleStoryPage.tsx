@@ -20,14 +20,27 @@ export default function SingleStoryPage() {
   const { storyId } = useParams() as {storyId: string}
   const currentUserId = useSelector(selectCurrentUser)
   const currentId = localStorage.getItem('revolving_userId') as string
-  const {data: user} = useGetUserByIdQuery(currentId)
-  const [followUnfollowUser] = useFollowUnfollowUserMutation()
-  const { data: targetStory, isLoading, isError, error, isSuccess } = useGetStoryQuery(storyId);
   const [sidebar, setSidebar] = useState<boolean>(false);
   const [titleFocus, setTitleFocus] = useState<boolean>(false);
-  const {data: stories, isLoading: loading} = useGetStoriesQuery()
+  
+  const {
+    data: user, 
+    refetch 
+  } = useGetUserByIdQuery(currentId)
+  const [followUnfollowUser, { 
+    isLoading: isMutating, 
+    error: followError, 
+    isError: isFollowError, 
+    isSuccess: isFollowSuccess 
+  }] = useFollowUnfollowUserMutation()
+  const { data: targetStory, isLoading, isError, error, isSuccess } = useGetStoryQuery(storyId);
+  const {
+    data: stories, 
+    isLoading: loading
+  } = useGetStoriesQuery()
 
-  console.log(user)
+  // console.log(user)
+  // console.log(targetStory)
 
   let averageReadingTime = useWordCount(targetStory?.body as string)
   const watchWords = TextRules.keywords as string
@@ -45,27 +58,24 @@ export default function SingleStoryPage() {
       const {userId} = targetStory as PostType
       const requestIds = { followerId: currentId, followedId: userId }
     
-      await followUnfollowUser(requestIds).unwrap()       
-      isSuccess && toast.success('Success!!', {
+      await followUnfollowUser(requestIds).unwrap()
+      await refetch()     
+      isFollowSuccess && toast.success('Success!!', {
                       duration: 2000, icon: '👋', style: {
                         background: '#1E90FF'
                       }
                     })
     }
-    catch(error){
-      let errorMessage: string
-      const errors = error as ErrorResponse
-      errors?.response.status == 400 ? errorMessage = 'bad input' 
-      : errors?.response.status == 404 ? errorMessage = 'user not found' 
-      : errors?.response?.status == 423 ? errorMessage = 'Account locked' 
-      : errors?.response?.status == 409 ? errorMessage = 'You cannot follow yourself'
-      : errorMessage = 'internal server error' 
-
-      toast.error(errorMessage, {
-        duration: 2000, icon: '💀', style: { background: '##8FBC8F'}
+    catch(err: unknown){
+      const errors = followError as ErrorResponse
+      isFollowError && toast.error(`${errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
+          background: '#FF0000'
+        }
       })
     }
   }
+  //duration: 2000, icon: '💀', style: { background: '##8FBC8F'}
 
   const bodyContent = targetStory ? targetStory?.body.split(' ').map((word, index) => {
     return (
@@ -86,7 +96,7 @@ export default function SingleStoryPage() {
             post={targetStory as PostType} 
             bodyContent={bodyContent as JSX.Element[]}
             averageReadingTime={averageReadingTime} 
-            sidebar={sidebar} isLoading={isLoading} isError={isError}
+            sidebar={sidebar} isLoading={isLoading} isError={isError} isMutating={isMutating}
             error={error as {error: string}} user={user as UserProps} 
             followOrUnfollow={followOrUnfollow}
           />

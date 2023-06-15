@@ -3,7 +3,8 @@ import { ChangeEvent, FormEvent } from "react"
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
 type StoryProps = {
-  userId: Types.ObjectId
+  _id: string
+  userId: string
   title: string
   picture: string
   body: string
@@ -44,7 +45,8 @@ interface SharedProps{
   sharerId: string,
   storyId: string,
   sharedDate: string,
-  sharedStory: object
+  sharedStory: object,
+  sharedLikes: string[]
 }
 
 type SocialMediaAccoutProp = {
@@ -84,7 +86,12 @@ interface UserProps{
 }
 
 interface ErrorResponse{
-  response:{ status: number }
+  status: number 
+  data: {
+    meta: {
+      message: string
+    }
+  }
 }
 
 type AuthType={
@@ -97,10 +104,6 @@ type AuthenticationContextType={
   auth: AuthType,
   userSession?: boolean,
   persistLogin: boolean,
-  user?: UserProps,
-  users?: UserProps[],
-  isLoading: boolean,
-  error: unknown,
   setAuth: React.Dispatch<React.SetStateAction<AuthType>>,
   setPersistLogin: React.Dispatch<React.SetStateAction<boolean>>
 }

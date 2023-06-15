@@ -4,7 +4,7 @@ import { apiSlice } from "./apiSlice";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type StoryArgs = {
-  userId: string, storyId: string, story: PostType
+  userId: string, storyId?: string, story: PostType
 }
 
 type ResponseType = { data: PostType[] }
@@ -15,6 +15,7 @@ type ResponseType = { data: PostType[] }
 // const initialState = storyAdapter.getInitialState({})
 
 function providesTag<R extends { _id: string | number }, T extends string>(resultWithIds: R[] | undefined, TagType: T){
+  console.log({resultWithIds})
   return (
     resultWithIds ? [ 
       { type: TagType, id: 'LIST' }, 
@@ -27,12 +28,21 @@ function providesTag<R extends { _id: string | number }, T extends string>(resul
 
 export const storyApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
+    createStory: builder.mutation<PostType, StoryArgs>({
+      query: ({userId, story}) => ({
+        url: `story/${userId}`,
+        method: 'POST',
+        body: {...story}
+      }) as any,
+      invalidatesTags: [{ type: 'STORY' }],
+    }),
+
     updateStory: builder.mutation<PostType, StoryArgs>({
       query: ({userId, storyId, story}) => ({
         url: `story/${userId}/${storyId}`,
         method: 'PUT',
         body: {...story}
-      }),
+      }) as any,
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
     
@@ -41,7 +51,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `story/${userId}/${storyId}`,
         method: 'PATCH',
         body: userId
-      }),
+      }) as any,
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
     
@@ -50,7 +60,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `story/${userId}/${storyId}`,
         method: 'DELETE',
         body: userId
-      }),
+      }) as any,
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
 
@@ -61,15 +71,15 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       },
       providesTags: ['STORY']
     }),
-
+  
     getStoriesByCategory: builder.query<PostType[], Categories>({
       query: (category) => `story/category?category=${category}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
         //return storyAdapter.setAll(initialState, data)
         return baseQueryReturnValue?.data
       }, 
-      providesTags:(result) => providesTag(result?.data as PostType[], 'STORY')
-    }), 
+      providesTags:(result) => providesTag(result?.data, 'STORY')
+    }),
 
     getStories: builder.query<PostType[], void>({
       query: () => 'story',
@@ -78,7 +88,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         console.log(response)
         return response
       }, 
-      providesTags:(result) => providesTag(result as PostType[], 'STORY')
+      providesTags:(result) => providesTag(result?.data as PostType[], 'STORY')
     }),
     
     getUserStories: builder.query<PostType[], string>({
@@ -88,13 +98,14 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         console.log(response)
         return response
       }, 
-      providesTags:(result) => providesTag(result as PostType[], 'STORY')
+      providesTags:(result) => providesTag(result?.data as PostType[], 'STORY')
     }),
 
   })
 })
 
 export const {
+  useCreateStoryMutation,
   useUpdateStoryMutation,
   useLikeAndUnlikeStoryMutation,
   useDeleteStoryMutation,

@@ -33,8 +33,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `users/updateInfo/${user?._id}`,
         method: 'PUT',
         body: {...user}
-      }),
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      }) as any,
+      invalidatesTags: [{ type:  'USERS', id: 'LIST'}],
     }),
 
     followUnfollowUser: builder.mutation<string, {followerId: string, followedId: string}>({
@@ -42,7 +42,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `users/follow_unfollow/${followerId}/${followedId}`,
         method: 'PUT',
         body: followerId
-      }),
+      }) as any,
       invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
     }),
     
@@ -51,7 +51,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `users/delete/${userId}`,
         method: 'DELETE',
         body: userId
-      }),
+      }) as any,
       invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
     }),
 

@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import PasswordChecker from './PasswordChecker'
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { BsCheck } from 'react-icons/bs';
@@ -18,6 +18,20 @@ export default function PasswordInput({
   revealPassword, setRevealPassword, password, handlePassword, 
   handleConfirmPassword, confirmPassword, match
 }: PasswordCompoProps) {
+  const [correct, setCorrect] = useState(true);
+
+  useEffect(() => {
+    let timerId: any = '';
+    if(passwordRegex.test(password)){
+      timerId = setTimeout(() => {
+        setCorrect(false)
+      }, 5000)
+    }else{
+      setCorrect(true)
+    }
+    return () => clearTimeout(timerId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [password])
   
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
 
@@ -52,7 +66,7 @@ export default function PasswordInput({
                       className={`absolute cursor-pointer hover:opacity-90 text-slate-700 right-2 duration-100 bottom-2 text-2xl`} />
           }
       </label>
-      {password ? <PasswordChecker password={password} /> : null}
+      {(password && correct) ? <PasswordChecker password={password} /> : null}
       <label htmlFor="confirm-pwd" className='relative'>
         <span className='flex items-center gap-2 font-medium text-sm'>
           Confirm password

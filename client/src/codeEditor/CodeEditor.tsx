@@ -47,7 +47,7 @@ export default function CodeBlock() {
   // const codeRef = useRef(null)
 //: editor.IModelContentChangedEvent
   const handleChange = (newValue: string) => setValue(newValue)
-  const editorDidMount = (editor, monaco) => {
+  const editorDidMount = (editor: any, monaco: any) => {
     editor.focus()
   }
 

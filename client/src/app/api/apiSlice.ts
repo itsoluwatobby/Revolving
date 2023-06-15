@@ -1,7 +1,8 @@
-import { createApi, fetchBaseQuery, BaseQueryApi } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/query/react'
 import { setCredentials, signOut } from '../../features/auth/authSlice'
 import { AuthType } from '../../data'
 import { RootState } from '../store'
+import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
 
 const BASEURL = 'http://localhost:4000/revolving'
 // const AUTHURL = 'http://localhost:4000/revolving/auth'
@@ -21,21 +22,15 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithReAuth = async(args: string, api: BaseQueryApi, extraOptions: object) => {
   let result = await baseQuery(args, api, extraOptions)
-
   if (result?.error?.status === 403){
-    console.log('sending refresh token')
     const refresh = await baseQuery('/auth/new_access_token', api, extraOptions)
-    console.log(refresh)
     if(refresh?.data)
-    // const _id = api.getState().auth._id
-    // store the new token
     api.dispatch(setCredentials({...refresh?.data} as AuthType))
     // retry the request
-    result = baseQuery(args, api, extraOptions)
+    result = baseQuery(args, api, extraOptions) as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>
   }
   else
     api.dispatch(signOut())
-  
   return result;
 }
 

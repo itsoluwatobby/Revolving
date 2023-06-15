@@ -2,7 +2,6 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { selectCurrentToken, setCredentials } from '../features/auth/authSlice';
-import { persisted } from '../features/auth/authSlice';
 import { useNewAccessTokenQuery } from '../app/api/authApiSlice';
 import { AuthType } from '../data';
 import whiteBGloader from '../assets/whiteloader.svg'
@@ -29,7 +28,7 @@ export const PersistedLogin = () => {
   return (
     <>
       {
-      !persistLogin ? 
+      !token ? 
         <Outlet />
         :
         isLoading ?  
@@ -50,9 +49,12 @@ export const PersistedLogin = () => {
           )
         :
           (
-            token ? 
+            (!persistLogin && token) ? 
               <Outlet />
-                : isError && <Navigate to='/signIn' state={{ from: location }} replace />
+              :
+                (token && persistLogin) ? 
+                  <Outlet />
+                    : isError && <Navigate to='/signIn' state={{ from: location }} replace />
           )
       } 
     </>

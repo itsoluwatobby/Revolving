@@ -1,13 +1,21 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PasswordInput from "../components/modals/components/PasswordInput";
+import { useNewPasswordMutation } from "../app/api/authApiSlice";
+import { useThemeContext } from "../hooks/useThemeContext";
+import { ThemeContextType } from "../posts";
+import { toast } from "react-hot-toast";
+import { ErrorResponse } from "../data";
 
 export default function NewPassword() {
   const [password, setPassword] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [confirmPassword, setConfirmPassword] = useState<string>('')
   const [match, setMatch] = useState<boolean>(false)
-  const themeMode = localStorage.getItem('theme')
+  const location = useLocation()
+  const [newPassword, {isLoading, isSuccess, isError, error}] = useNewPasswordMutation()
+  const { theme } = useThemeContext() as ThemeContextType
+  const email = location?.search?.split('=')[1]
 
   const handlePassword = (event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)
   const handleConfirmPassword = (event: ChangeEvent<HTMLInputElement>) => setConfirmPassword(event.target.value)
@@ -18,24 +26,44 @@ export default function NewPassword() {
     )
   }, [password, confirmPassword])
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-
+    try{
+      await newPassword({ email, resetPass: password }).unwrap();
+      setPassword('')
+      setConfirmPassword('')
+      !isLoading && toast.success('Password reset successful', {
+            duration: 10000, icon: '🔥', 
+            style: { background: '#3CB371' }
+        }
+      )
+    }
+    catch(err: unknown){
+      const errors = error as ErrorResponse
+      console.log(error)
+      const msg = errors?.data ? errors?.data?.meta?.message : 'No Network'
+      isError && toast.error(`${msg}`, {
+        duration: 10000, icon: '💀', style: {
+          background: errors?.status == 403 ? 'A6BCE2' : '#FF0000'
+        }
+      })
+    }
   }
 
   const canSubmit = [password].every(Boolean)
   return (
-    <article className={`absolute md:w-1/4 w-1/2 border shadow-2xl ${themeMode == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-x-1/2 translate-y-12 z-30 rounded-md`}>
+    <article className={`absolute md:w-1/4 w-1/2 border shadow-2xl ${theme == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-x-1/2 translate-y-12 z-30 rounded-md`}>
         <form 
           onSubmit={handleSubmit}
-          className='flex flex-col p-2 w-full h-full gap-2'
+          className={`flex flex-col p-2 w-full h-full gap-2 ${isLoading && 'bg-gray-400 animate-pulse'}`}
           >
             <h2 className='open_sans text-center font-extrabold drop-shadow-xl'>NEW PASSWORD</h2>
             
             <PasswordInput 
               revealPassword={revealPassword} 
               setRevealPassword={setRevealPassword} 
-              password={password} handlePassword={handlePassword} handleConfirmPassword={handleConfirmPassword} 
+              password={password} handlePassword={handlePassword} 
+              handleConfirmPassword={handleConfirmPassword} 
               confirmPassword={confirmPassword} match={match}
             />
 
@@ -44,7 +72,7 @@ export default function NewPassword() {
             disabled={!canSubmit && !match}
             className={`w-full mt-2 rounded-md p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
-            Request password
+            {isSuccess ? 'Reset Successful' : 'Submit'}
           </button>
           <div className='flex flex-col text-sm gap-2'>
             <Link to={'/signIn'}>

@@ -15,13 +15,14 @@ type ArticleProps = {
   averageReadingTime: string,
   isLoading: boolean,
   isError: boolean,
+  isMutating: boolean
   error: {error: string},
   followOrUnfollow: () => Promise<void>
 }
 
 type HoverType = 'unfollow' | 'following'
 
-export default function ArticleComp({ isError, post, bodyContent, user, sidebar, averageReadingTime, isLoading, error, followOrUnfollow }: ArticleProps) {
+export default function ArticleComp({ isError, post, bodyContent, user, sidebar, averageReadingTime, isLoading, error, isMutating, followOrUnfollow }: ArticleProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const userId = localStorage.getItem('revolving_userId')
@@ -46,7 +47,7 @@ export default function ArticleComp({ isError, post, bodyContent, user, sidebar,
               !user?.followings?.includes(post?.userId) ? (
                 <button 
                   onClick={followOrUnfollow}
-                  className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100">
+                  className={`rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'}`}>
                   follow
                 </button>
                 ):(
@@ -54,7 +55,7 @@ export default function ArticleComp({ isError, post, bodyContent, user, sidebar,
                   onClick={followOrUnfollow}
                   onMouseEnter={() => setHoverThis('unfollow')}
                   onMouseLeave={() => setHoverThis('following')}
-                  className="rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 font-sans font-medium">{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
+                  className={`rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 font-sans active:opacity-100 font-medium ${isMutating && 'animate-pulse'}`}>{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
                 </button>
               )
           }
