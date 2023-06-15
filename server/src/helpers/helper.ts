@@ -93,6 +93,7 @@ class UrlsObj{
   }
   reset(){
     this.urls = []
+    this.req = { mtd: '', url: '' }
   }
 }
 export const objInstance = new UrlsObj();
@@ -107,22 +108,25 @@ export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTra
   }
 })
 
-
-export const mailOptions = (receiver: string, username: string, verificationLink: string) => {
+type OptionsType = 'account' | 'password'
+export const mailOptions = (receiver: string, username: string, verificationLink: string, option: OptionsType = 'account') => {
   return {
     to: receiver,
     from: process.env.REVOLVING_MAIL,
     subject: `ACCOUNT CONFIRMATION FOR ${username}`,
-    html: `<h2>Tap the Link below To Activate Your Account</h2><br/>
+    html: `<div style='padding: 5px; background-color: #696969; border-radius: 5px; box-shadow: 2px 4px 16px rgba(0,0,0,0.4);'>
+            <h2 style='text-decoration: underline; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);'>Tap the Link below To ${option == 'account' ? 'Activate Your Account' : 'Reset Your Password'}</h2><br/>
                 <p>Link expires in 30 minutes, please confirm now!!</p>
                 <a href=${verificationLink} target=_blank style='text-decoration:none;'>
                    <button style='padding:1rem; padding-left:2rem; padding-right:2rem; cursor:pointer; background-color: teal; border:none; border-radius:10px; font-size: 18px'>
-                      Account Verification
+                      ${option == 'account' ? 'Account Verification' : 'Reset Password'}
                    </button>
                 </a>
                 <p>Or copy the link below to your browser</p>
-                <p>${verificationLink}</p><br/>
-                <span>Please keep link private, it contains some sensitive information about you.</span>`
+                <p style='word-break: break-all;'>${verificationLink}</p><br/>
+                <span>Keep link private, it contains some sensitive information about you.</span>
+            </div>      
+          `
   }
 }
 

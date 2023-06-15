@@ -104,9 +104,9 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
         transporter.sendMail(options, (err) => {
           if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
         })
-        return responseType({res, status: 201, message: 'Please check your email'})
+        return responseType({res, status: 403, message: 'Please check your email'})
       }
-      else if (verify?.email) return responseType({res, status: 200, message: 'Please check your email to activate your account'})
+      else if (verify?.email) return responseType({res, status: 403, message: 'Please check your email to activate your account'})
     }
     const roles = Object.values(user?.roles);
     const accessToken = await signToken({roles, email}, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
@@ -114,7 +114,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
 
     const { _id, ...rest } = user
 
-    await user.updateOne({$set: { status: 'online', refreshToken }})
+    await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false }})
     //authentication: { sessionID: req?.sessionID },
     
     res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
@@ -160,7 +160,7 @@ export const forgetPassword = async(req: Request, res: Response) => {
 
     const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
     const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`
-    const options = mailOptions(email as string, user.username, verificationLink)
+    const options = mailOptions(email as string, user.username, verificationLink, 'password')
     await transporter.sendMail(options, (err) => {
       if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
     })

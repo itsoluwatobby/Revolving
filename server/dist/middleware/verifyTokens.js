@@ -11,7 +11,6 @@ import { getUserByToken } from "../helpers/userHelpers.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const auth = req.headers['authorization'];
-    console.log(auth);
     if (!auth || !auth.startsWith('Bearer '))
         return res.sendStatus(401);
     const token = auth === null || auth === void 0 ? void 0 : auth.split(' ')[1];

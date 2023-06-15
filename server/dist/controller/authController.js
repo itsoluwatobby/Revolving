@@ -113,16 +113,16 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                     if (err)
                         return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
                 });
-                return responseType({ res, status: 201, message: 'Please check your email' });
+                return responseType({ res, status: 403, message: 'Please check your email' });
             }
             else if (verify === null || verify === void 0 ? void 0 : verify.email)
-                return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
+                return responseType({ res, status: 403, message: 'Please check your email to activate your account' });
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
         const accessToken = yield signToken({ roles, email }, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
         const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
         const { _id } = user, rest = __rest(user, ["_id"]);
-        yield user.updateOne({ $set: { status: 'online', refreshToken } });
+        yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false } });
         //authentication: { sessionID: req?.sessionID },
         res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
         return responseType({ res, status: 200, count: 1, data: { _id, roles, accessToken } });
@@ -166,7 +166,7 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
             return responseType({ res, status: 423, message: 'Account locked' });
         const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`;
-        const options = mailOptions(email, user.username, verificationLink);
+        const options = mailOptions(email, user.username, verificationLink, 'password');
         yield transporter.sendMail(options, (err) => {
             if (err)
                 return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
