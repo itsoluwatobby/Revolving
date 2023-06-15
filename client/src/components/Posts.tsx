@@ -1,4 +1,3 @@
-//import { useState, useEffect } from 'react';
 import { PostContextType, PostType, ThemeContextType } from '../posts'
 import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
@@ -6,9 +5,6 @@ import { RiSignalWifiErrorLine } from 'react-icons/ri'
 import { usePostContext } from '../hooks/usePostContext';
 import { useEffect } from 'react';
 import { Categories } from '../data';
-// import useSWRInfinite, {SWRInfiniteKeyLoader} from 'swr/infinite';
-// import useSWRImmutable from 'swr/immutable';
-// import { posts_endPoint as cacheKey, postAxios } from '../api/axiosPost';
 import Comments from './comments/Comments';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice';
@@ -36,7 +32,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
       )
   ) 
   : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-    {error.status}
+    {error?.status}
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
   :(
@@ -44,7 +40,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
       filteredStories?.map(post => (
             <Post key={post?.sharedId || post?._id} 
               post={post as PostType} 
-              navigationTab={navigationTab}
+              //navigationTab={navigationTab}
             />
           )
         )

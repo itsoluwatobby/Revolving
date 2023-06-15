@@ -8,26 +8,30 @@ import { IoIosArrowDown, IoIosMore } from 'react-icons/io'
 import profileImage from "../../images/bg_image3.jpg"
 import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
-import { useSWRConfig } from 'swr'
-import { axiosPrivate, posts_endPoint as cacheKey } from '../../api/axiosPost'
-import { addPostOptions, updatePostOptions } from "../../api/postApiOptions"
 import { toast } from "react-hot-toast";
-import useStoryMutation from "../../hooks/useStoryMutation";
-import useAuthenticationContext from "../../hooks/useAuthenticationContext"
 import { sub } from "date-fns"
-import { AuthenticationContextType } from "../../data"
-//import useSWRMutation from 'swr/mutation'
+import { ErrorResponse } from "../../data"
+import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 export default function TopRight() {
-  const { mutate } = useSWRConfig()
-  const {createPost, updatePost} = useStoryMutation()
-  const { theme, setRollout, changeTheme, setFontOption } = useThemeContext() as ThemeContextType
+  const [updateStory, {
+    isLoading: updateLoading, 
+    error: updateError, isError: isUpdateError 
+  }] = useUpdateStoryMutation()
+  const [createStory, { 
+    isLoading: createLoading, 
+    error: createError, isError: isCreateError 
+  }] = useCreateStoryMutation()
+  const { 
+    theme, setRollout, changeTheme, 
+    setFontOption 
+  } = useThemeContext() as ThemeContextType
+
   const {postData, canPost} = usePostContext() as PostContextType
-  const { auth } = useAuthenticationContext() as AuthenticationContextType;
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -35,56 +39,50 @@ export default function TopRight() {
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
-  const addPost = () => {
+  const addPost = async() => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const newPost = { storyDate: dateTime, ...postData } as PostType
+    const newStory = { storyDate: dateTime, ...postData } as PostType
     try{
-        mutate(cacheKey, async () => await axiosPrivate.post(`${cacheKey}/${auth?._id}`, newPost), addPostOptions(newPost))
-        localStorage.removeItem('newStoryInputValue')
-        localStorage.removeItem('newStoryTextareaValue')
-        toast.promise(createPost(newPost), { 
-            loading: 'updating post 🚀', success: 'Success!! Post added', error: 'error occurred' 
-          },{
-            success:{
-              duration: 4000, icon: '🔥'
-            },
-              style: { background: '#3CB371'}
-            }
-          )
+        await createStory({ userId: newStory?.userId, story: newStory }).unwrap()
+        localStorage.removeItem(`newTitle?id=${newStory?.userId}`)
+        localStorage.removeItem(`newBody?id=${newStory?.userId}`)
+        
+        toast.success('Success!! Post added',{
+            duration: 2000, icon: '🔥', 
+            style: { background: '#3CB371' }
+          }
+        )  
         navigate('/')
     }
-    catch(error){
-       toast.error('Failed!! to add new post', {
-        duration: 1000, icon: '💀', style: {
+    catch(err: unknown){
+      const errors = createError as ErrorResponse
+      isCreateError && toast.error(`${errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
       })
     }
   }
 
-  const updatedPost = () => {
+  const updatedPost = async() => {
     const dateTime = sub(new Date, { minutes: 0 }).toISOString();
     const postUpdated = {...postData, _id: storyId, editDate: dateTime} as PostType;
     try{
-        mutate(cacheKey, async () => await axiosPrivate.put(`${cacheKey}/${auth?._id}/${postUpdated?._id}`, {...postUpdated}), updatePostOptions(postUpdated))
-
-        localStorage.removeItem('editStoryInputValue')
-        localStorage.removeItem('editStoryTextareaValue')
-    
-        toast.promise(updatePost(postUpdated), { 
-            loading: 'updating post 🚀', success: 'Success!! Post editted', error: 'error occurred' 
-          },{
-            success:{
-              duration: 2000, icon: '🔥'
-            },
-            style: { background: '#3CB371'}
-          }
-        )
-        navigate('/')
+      await updateStory({ userId: postUpdated?.userId, story: postUpdated }).unwrap()
+      localStorage.removeItem(`editTitle?id=${postUpdated?.userId}`)
+      localStorage.removeItem(`editBody?id=${postUpdated?.userId}`)
+      
+      toast.success('Success!! Post Updated',{
+          duration: 2000, icon: '🔥', 
+          style: { background: '#3CB371' }
+        }
+      )  
+      navigate('/')
     }
-    catch(err){
-      toast.error('Failed!! to update post', {
-        duration: 1000, icon: '💀', style: {
+    catch(err: unknown){
+      const errors = updateError as ErrorResponse
+      isUpdateError && toast.error(`${errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
       })

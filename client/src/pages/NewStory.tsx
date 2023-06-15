@@ -8,12 +8,15 @@ import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';
 import { Categories } from '../data';
 import CodeBlock from '../codeEditor/CodeEditor';
+import { useGetStoryQuery } from '../app/api/storyApiSlice';
 
 export const NewStory = () => {
+  const { storyId } = useParams()
   const { fontFamily } = useThemeContext() as ThemeContextType;
-  const { posts, setPostData, setTypingEvent, setCanPost } = usePostContext() as PostContextType;
+  const { setPostData, setTypingEvent, setCanPost } = usePostContext() as PostContextType;
+  const { data: targetStory } = useGetStoryQuery(storyId as string)
   const { theme } = useThemeContext() as ThemeContextType;
-
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null)
@@ -25,41 +28,40 @@ export const NewStory = () => {
     1000) as DebounceProps
 
   const { pathname } = useLocation()
-  const { storyId } = useParams()
 
-  const targetPost = posts?.find(story => story?._id == storyId) as PostType;
+  //const targetStory = posts?.find(story => story?._id == storyId) as PostType;
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setInputValue(value);
     pathname != `/edit_story/${storyId}` ? 
-      localStorage.setItem('newStoryInputValue', value) 
-      : localStorage.setItem('editStoryInputValue', value)
+      localStorage.setItem(`newTitle?id=${currentUserId}`, value) 
+      : localStorage.setItem(`editTitle?id=${currentUserId}`, value)
   }
   const handleBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value
     setTextareaValue(value);
     pathname != `/edit_story/${storyId}` ? 
-      localStorage.setItem('newStoryTextareaValue', value)
-        : localStorage.setItem('editStoryTextareaValue', value)
+      localStorage.setItem(`newBody?id=${currentUserId}`, value)
+        : localStorage.setItem(`editBody?id=${currentUserId}`, value)
   }
 
   useEffect(() => {
-    const savedTitle = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryInputValue') : localStorage.getItem('editStoryInputValue')) || targetPost?.title
-    const savedBody = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryTextareaValue') : localStorage.getItem('editStoryTextareaValue')) || targetPost?.body
+    const savedTitle = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryInputValue') : localStorage.getItem('editStoryInputValue')) || targetStory?.title
+    const savedBody = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryTextareaValue') : localStorage.getItem('editStoryTextareaValue')) || targetStory?.body
 
     setInputValue(savedTitle || '')
     setTextareaValue(savedBody || '')
     setTypingEvent(debounceValue?.typing )
-  }, [setTypingEvent, debounceValue.typing, targetPost, storyId, pathname])
+  }, [setTypingEvent, debounceValue.typing, targetStory, storyId, pathname])
 
   useEffect(() => {
     if(inputRef.current) inputRef.current.focus()
   }, [])
 
   useEffect(() => {
-    targetPost && setPostCategory(targetPost?.category)
-  }, [targetPost])
+    targetStory && setPostCategory(targetStory?.category)
+  }, [targetStory])
 
   useEffect(() => {
     !debounceValue?.typing && (

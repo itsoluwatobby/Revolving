@@ -1,13 +1,10 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import useSWRMutation from "swr/mutation";
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
-import { auth_endPoint } from '../api/axiosPost';
 import { toast } from 'react-hot-toast';
-import useSignUp from '../hooks/useSignUp';
 import RegistrationForm from '../components/modals/RegistrationForm';
 import { ErrorResponse } from '../data';
+import { useSignUpMutation } from '../app/api/authApiSlice';
 
 
 export default function RegisterModal() {
@@ -20,9 +17,7 @@ export default function RegisterModal() {
   const [validEmail, setValidEmail] = useState<boolean>(false);
   const [match, setMatch] = useState<boolean>(false);
   const { theme, setRollout } = useThemeContext() as ThemeContextType;
-  const signUpUser = useSignUp({username, email, password})
-  const { trigger, isMutating, error } = useSWRMutation(auth_endPoint, signUpUser);
-  const navigate = useNavigate()
+  const [signUp, { isLoading, isError, error, isSuccess }] = useSignUpMutation()
 
   const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
@@ -52,38 +47,22 @@ export default function RegisterModal() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    let message = '';
     try{
-      const res = await trigger() as unknown as { status: number };
-      res?.status === 200 
-        ? message = 'Please check your email to verify your account' 
-          : res?.status === 201 ? message = 'Please check your email to verify your account' : null;
+      const res = await signUp({username, email, password}).unwrap() as unknown as { data: { meta: { message: string } } };
 
-      toast.promise(trigger(), { 
-        loading: 'signing you up 🚀', success: message, error: 'error occurred' 
-      },{
-          success:{
-            duration: 2000, icon: '🔥'
-          },
-          style: { background: '#3CB371'}
-        }
-      )
+      !isLoading && toast.success(res?.data?.meta?.message, {duration: 10000, icon: '🔥', 
+                    style: { background: '#6B7F81' }
+                    }
+                  )
       setEmail('')
       setUsername('')
       setPassword('')
       setConfirmPassword('')
-      navigate('/')
     }
     catch(err: unknown){
-      let errorMessage;
       const errors = error as ErrorResponse
-        errors?.response?.status === 400 ? errorMessage = 'Email failed, Sign in to get a new mail' 
-              : errors?.response?.status === 423 ? errorMessage = 'Your account is locked'
-              : errors?.response?.status === 409 ? errorMessage = 'Email taken'
-                : errors?.response?.status === 500 ? errorMessage = 'Internal server error' : errorMessage = 'No network'
-
-      toast.error(`${errorMessage}`, {
-        duration: 5000, icon: '💀', style: {
+      isError && toast.error(`${errors?.data?.meta?.message}`, {
+        duration: 10000, icon: '💀', style: {
           background: '#FF0000'
         }
       })
@@ -100,7 +79,7 @@ export default function RegisterModal() {
         confirmPassword={confirmPassword} handlePassword={handlePassword} 
         handleConfirmPassword={handleConfirmPassword} revealPassword={revealPassword} 
         setRevealPassword={setRevealPassword} validEmail={validEmail} validPassword={validPassword} 
-        loading={isMutating} setValidEmail={setValidEmail} setValidPassword={setValidPassword} 
+        loading={isLoading} setValidEmail={setValidEmail} setValidPassword={setValidPassword} 
       />
     </div>
   )
