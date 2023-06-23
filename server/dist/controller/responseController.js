@@ -17,7 +17,7 @@ export const createNewResponse = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, commentId } = req.params;
         const newResponse = req.body;
-        if (!userId || commentId || !(newResponse === null || newResponse === void 0 ? void 0 : newResponse.response))
+        if (!userId || !commentId || !(newResponse === null || newResponse === void 0 ? void 0 : newResponse.response))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         if (!user)
@@ -58,7 +58,7 @@ export const deleteResponse = (req, res) => {
             yield deleteSingleResponse(responseId);
             return res.sendStatus(204);
         }
-        if (!(response === null || response === void 0 ? void 0 : response.userId.toString()) == (user === null || user === void 0 ? void 0 : user._id.toString()))
+        if ((response === null || response === void 0 ? void 0 : response.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
             return res.sendStatus(401);
         yield deleteSingleResponse(responseId);
         return res.sendStatus(204);

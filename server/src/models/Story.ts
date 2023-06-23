@@ -21,6 +21,7 @@ const STORYSCHEMA: Schema = new Schema(
     fontFamily: { type: String, default: 'open_sans' },
     edited: { type: Boolean, default: false },
     editDate: { type: String, default: '' },
+    author: { type: String, default: '' }
   },
   { 
     minimize: false, 

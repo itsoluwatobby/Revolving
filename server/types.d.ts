@@ -61,6 +61,7 @@ interface StoryProps extends Document{
   likes: string[]
   edited: false
   editDate: string
+  author: string
 }
 
 interface CommentProps{
@@ -89,6 +90,7 @@ interface SharedProps extends Document{
   storyId: string,
   sharedDate: string,
   sharedLikes: string[],
+  author: string,
   sharedStory: StoryProps,
 }
 

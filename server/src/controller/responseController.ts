@@ -16,8 +16,8 @@ interface RequestProp extends Request{
 export const createNewResponse = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, commentId } = req.params
-    const newResponse = req.body
-    if (!userId || commentId || !newResponse?.response) return res.sendStatus(400)
+    const newResponse: Partial<CommentResponseProps> = req.body
+    if (!userId || !commentId || !newResponse?.response) return res.sendStatus(400)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
@@ -52,7 +52,7 @@ export const deleteResponse = (req: RequestProp, res: Response) => {
       await deleteSingleResponse(responseId)
       return res.sendStatus(204)
     }
-    if(!response?.userId.toString() == user?._id.toString()) return res.sendStatus(401)
+    if(response?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
     await deleteSingleResponse(responseId)
     return res.sendStatus(204)
   })

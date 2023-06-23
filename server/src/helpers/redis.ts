@@ -2,10 +2,13 @@ import { createClient } from 'redis';
 import { objInstance } from './helper.js';
 import { CommentResponseModel } from '../models/CommentResponse.js';
 
+type Methods = 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+
 type RedisOptionProps<T>={
   key: string,
   timeTaken: number,
   cb: () => Promise<T>
+  reqMtd: Methods[]
 }
 export const redisClient = createClient();
 

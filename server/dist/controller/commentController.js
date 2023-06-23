@@ -17,7 +17,7 @@ export const createNewComment = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
         const newComment = req.body;
-        if (!userId || storyId || !(newComment === null || newComment === void 0 ? void 0 : newComment.comment))
+        if (!userId || !storyId || !(newComment === null || newComment === void 0 ? void 0 : newComment.comment))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         if (!user)
@@ -58,7 +58,7 @@ export const deleteComment = (req, res) => {
             yield deleteSingleComment(commentId);
             return res.sendStatus(204);
         }
-        if (!(comment === null || comment === void 0 ? void 0 : comment.userId.toString()) == (user === null || user === void 0 ? void 0 : user._id.toString()))
+        if ((comment === null || comment === void 0 ? void 0 : comment.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
             return res.sendStatus(401);
         yield deleteSingleComment(commentId);
         return res.sendStatus(204);
@@ -130,21 +130,21 @@ export const userComments = (req, res) => {
 export const getUserCommentStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
-        if (!userId || storyId)
+        if (!userId || !storyId)
             return res.sendStatus(400);
         const commentsInStories = yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const comments = yield getUserCommentsInStory(userId, storyId);
                 return comments;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length))
-            return responseType({ res, status: 404, message: 'No comments available' });
+            return responseType({ res, status: 404, message: 'No comments by you' });
         return responseType({ res, status: 200, count: commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length, data: commentsInStories });
     }));
 };
 ///////////////////////////////////////////
 export const getStoryComments = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const { storyId } = req.query;
+        const { storyId } = req.params;
         if (!storyId)
             return res.sendStatus(400);
         const storyComments = yield getCachedResponse({ key: `storyComments:${storyId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {

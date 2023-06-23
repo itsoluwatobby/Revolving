@@ -16,8 +16,8 @@ interface RequestProp extends Request{
 export const createNewComment = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params
-    const newComment = req.body
-    if (!userId || storyId || !newComment?.comment) return res.sendStatus(400)
+    const newComment: Partial<CommentProps> = req.body
+    if (!userId || !storyId || !newComment?.comment) return res.sendStatus(400)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
@@ -52,7 +52,7 @@ export const deleteComment = (req: RequestProp, res: Response) => {
       await deleteSingleComment(commentId)
       return res.sendStatus(204)
     }
-    if(!comment?.userId.toString() == user?._id.toString()) return res.sendStatus(401)
+    if(comment?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
     await deleteSingleComment(commentId)
     return res.sendStatus(204)
   })
@@ -120,13 +120,13 @@ export const userComments = (req: Request, res: Response) => {
 export const getUserCommentStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params;
-    if(!userId || storyId) return res.sendStatus(400);
+    if(!userId || !storyId) return res.sendStatus(400);
     const commentsInStories = await getCachedResponse({key:'allStories', cb: async() => {
       const comments = await getUserCommentsInStory(userId, storyId);
       return comments
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (CommentProps[] | string)
 
-    if(!commentsInStories?.length) return responseType({res, status: 404, message: 'No comments available'})
+    if(!commentsInStories?.length) return responseType({res, status: 404, message: 'No comments by you'})
     return responseType({res, status: 200, count: commentsInStories?.length, data: commentsInStories})
   })
 }
@@ -135,7 +135,7 @@ export const getUserCommentStory = (req: RequestProp, res: Response) => {
 
 export const getStoryComments = (req: RequestProp, res: Response) => {
   asyncFunc(res, async() => {
-    const { storyId } = req.query
+    const { storyId } = req.params
     if(!storyId) return res.sendStatus(400);
     const storyComments = await getCachedResponse({key:`storyComments:${storyId}`, cb: async() => {
       const storyComment = await getAllCommentsInStory(storyId as string)
