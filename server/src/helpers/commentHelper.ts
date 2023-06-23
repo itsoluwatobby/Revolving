@@ -66,7 +66,7 @@ export const getResponseById = async(responseId: string) => await CommentRespons
 
 export const getResponseByCommentId = async(commentId: string) => await CommentResponseModel.findById(commentId).lean();
 
-export const getUserResponses = async(userId: string, commentId: string) => await CommentResponseModel.find({ userId, commentId }).lean()
+export const getUserResponses = async(userId: string, responseId: string) => await CommentResponseModel.find({ userId, _id: responseId }).lean()
 
 export const createResponse = async(response: Partial<CommentResponseProps>) => {
   const newResponse = await CommentResponseModel.create({ ...response })

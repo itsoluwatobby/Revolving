@@ -6,6 +6,7 @@ import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 import { redisClient } from "../helpers/redis.js";
+import { ROLES } from "../config/allowedRoles.js";
 
 interface NewUserProp extends Request{
   username: string,
@@ -161,7 +162,7 @@ export const forgetPassword = async(req: Request, res: Response) => {
     const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
     const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`
     const options = mailOptions(email as string, user.username, verificationLink, 'password')
-    await transporter.sendMail(options, (err) => {
+    transporter.sendMail(options, (err) => {
       if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
     })
     await user.updateOne({$set: { isResetPassword: true, verificationToken: passwordResetToken }})
@@ -201,6 +202,30 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
       await user.updateOne({$set: { authentication: { password: hashedPassword }, isResetPassword: false}})
         .then(() => responseType({res, status:201, message:'password reset successful, please login'}))
         .catch(() => res.sendStatus(500));
+    }
+    else return responseType({res, status:401, message:'unauthorised'})
+  })
+}
+
+export const toggleAdminRole = (req: Request, res: Response) => {
+  asyncFunc(res, async() => {
+    const {adminId, userId} = req.params
+    if(!adminId || !userId) return res.sendStatus(400)
+    const user = await getUserById(userId);
+    const admin = await getUserById(adminId);
+    if(!user || !admin) return responseType({res, status: 401, message:'User not found'})
+    if(admin?.roles.includes(ROLES.ADMIN)) {
+      if(!user?.roles.includes(ROLES.ADMIN)) {
+        user.roles = [...user.roles, ROLES.ADMIN]
+        user.save()
+        // user.updateOne({$push: { roles: ROLES.ADMIN }})
+        return responseType({res, status:201, message:'admin role assigned'})
+      }
+      else{
+        user.roles = [ROLES.USER]
+        user.save()
+        return responseType({res, status:201, message:'admin role removed'})
+      }
     }
     else return responseType({res, status:401, message:'unauthorised'})
   })

@@ -128,7 +128,7 @@ export const userResponses = (req, res) => {
                 return userResponse;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(userResponses === null || userResponses === void 0 ? void 0 : userResponses.length))
-            return responseType({ res, status: 404, message: 'You have no response' });
+            return responseType({ res, status: 404, message: 'User have no response' });
         return responseType({ res, status: 200, count: userResponses === null || userResponses === void 0 ? void 0 : userResponses.length, data: userResponses });
     }));
 };

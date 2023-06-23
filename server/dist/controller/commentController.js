@@ -126,7 +126,7 @@ export const userComments = (req, res) => {
                 return userComment;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(userComments === null || userComments === void 0 ? void 0 : userComments.length))
-            return responseType({ res, status: 404, message: 'You have no comments' });
+            return responseType({ res, status: 404, message: 'User have no comments' });
         return responseType({ res, status: 200, count: userComments === null || userComments === void 0 ? void 0 : userComments.length, data: userComments });
     }));
 };

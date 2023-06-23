@@ -70,7 +70,7 @@ export const deleteUserResponses = (req: RequestProp, res: Response) => {
     if(!userId || !responseId) return res.sendStatus(400)
     const user = await getUserById(userId)
     const adminUser = await getUserById(adminId)
-    if(!user || !adminUser) return responseType({res, status: 401, message: 'You do not have an account'})
+    if(!user || !adminUser) return responseType({res, status: 404, message: 'You do not have an account'})
     if(adminUser?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
     if(adminUser?.roles.includes(ROLES.ADMIN)) {
@@ -80,7 +80,7 @@ export const deleteUserResponses = (req: RequestProp, res: Response) => {
       }
       else if(option?.command == 'allUserResponse'){
         await deleteAllUserResponses(userId)
-        return responseType({res, status: 201, message: 'All user responses in comment deleted'})
+        return responseType({res, status: 201, message: 'All user responses deleted'})
       }
     }
     return responseType({res, status: 401, message: 'unauthorized'})
@@ -116,7 +116,7 @@ export const userResponses = (req: Request, res: Response) => {
       return userResponse
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (CommentResponseProps[] | string);
     
-    if(!userResponses?.length) return responseType({res, status: 404, message: 'You have no response'})
+    if(!userResponses?.length) return responseType({res, status: 404, message: 'User have no response'})
     return responseType({res, status: 200, count: userResponses?.length, data: userResponses})
   })
 }

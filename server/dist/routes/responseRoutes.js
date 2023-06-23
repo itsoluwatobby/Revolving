@@ -4,7 +4,7 @@ import { ROLES } from "../config/allowedRoles.js";
 import { createNewResponse, deleteResponse, deleteUserResponses, like_Unlike_Response, updateResponse, userResponses } from "../controller/responseController.js";
 const responseRouter = Router();
 responseRouter.post('/:userId/:commentId', verifyRoles([ROLES.USER]), createNewResponse);
-//responseRouter.get('/user/:userId/:storyId', verifyRoles([ROLES.USER]), getUserCommentStory)
+// responseRouter.get('/user/:userId/:storyId', verifyRoles([ROLES.USER]), getUserCommentStory)
 responseRouter.put('/:userId/:responseId', verifyRoles([ROLES.USER]), updateResponse);
 responseRouter.patch('/:userId/:responseId', verifyRoles([ROLES.USER]), like_Unlike_Response);
 responseRouter.delete('/:userId/:responseId', verifyRoles([ROLES.USER, ROLES.ADMIN]), deleteResponse);

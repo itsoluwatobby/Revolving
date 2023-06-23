@@ -57,7 +57,7 @@ export const deleteAllUserCommentsInStory = (userId, storyId) => __awaiter(void 
 export const getAllCommentsResponse = (commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.find({ commentId }).lean(); });
 export const getResponseById = (responseId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.findById(responseId).exec(); });
 export const getResponseByCommentId = (commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.findById(commentId).lean(); });
-export const getUserResponses = (userId, commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.find({ userId, commentId }).lean(); });
+export const getUserResponses = (userId, responseId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.find({ userId, _id: responseId }).lean(); });
 export const createResponse = (response) => __awaiter(void 0, void 0, void 0, function* () {
     const newResponse = yield CommentResponseModel.create(Object.assign({}, response));
     yield CommentModel.findByIdAndUpdate({ _id: response.commentId }, { $push: { commentResponse: newResponse === null || newResponse === void 0 ? void 0 : newResponse._id } });

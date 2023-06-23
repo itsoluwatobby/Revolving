@@ -115,7 +115,7 @@ export const userComments = (req: Request, res: Response) => {
       return userComment
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (CommentProps[] | string);
     
-    if(!userComments?.length) return responseType({res, status: 404, message: 'You have no comments'})
+    if(!userComments?.length) return responseType({res, status: 404, message: 'User have no comments'})
     return responseType({res, status: 200, count: userComments?.length, data: userComments})
   })
 }
