@@ -15,16 +15,17 @@ type PostButtomProps = {
 
 export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
-  const { theme,  setOpenComment } = useThemeContext() as ThemeContextType
+  const { theme,  setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation()
 
   const likeUnlikeStory = async() => {
     try{
-      const {userId, _id} = story   
-      await likeAndUnlikeStory({userId, storyId: _id}).unwrap()
+      const { _id } = story
+      await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
     }
     catch(err: unknown){
-      const errors = likeError as ErrorResponse
+      const errors = likeError as Partial<ErrorResponse>
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
       isLikeError && toast.error(`${errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'

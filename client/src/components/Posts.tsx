@@ -16,7 +16,7 @@ type PostsProps = {
 export const Posts = ({ navigationTab }: PostsProps) => {
   const {data, isLoading, isError, error} = useGetStoriesByCategoryQuery(navigationTab)
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
-  const { openComment, setOpenChat } = useThemeContext() as ThemeContextType
+  const { openComment, setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
   
   useEffect(() => {
     // mutate()
@@ -32,7 +32,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
       )
   ) 
   : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-    {error?.status}
+    <span>{error?.status}</span>
     <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
     </p> 
   :(
@@ -49,8 +49,12 @@ export const Posts = ({ navigationTab }: PostsProps) => {
   )
   return (
     <div 
-      onClick={() => setOpenChat('Hide')}
-      className='relative box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5'>
+      onClick={() => {
+        setOpenChat('Hide')
+        setLoginPrompt('Hide')
+      }
+      }
+      className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5`}>
       {openComment ? <Comments /> : content }
     </div>
   )

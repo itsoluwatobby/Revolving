@@ -20,6 +20,7 @@ export const NewStory = () => {
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null)
+  // const [targetStory, setTargetStory] = useState<PostType>()
 
   const [codeEditor, setCodeEditor] = useState<boolean>(false);
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
@@ -30,6 +31,10 @@ export const NewStory = () => {
   const { pathname } = useLocation()
 
   //const targetStory = posts?.find(story => story?._id == storyId) as PostType;
+
+  // useEffect(() => {
+  //   setTargetStory(data as PostType)
+  // }, [data])
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -46,14 +51,19 @@ export const NewStory = () => {
         : localStorage.setItem(`editBody?id=${currentUserId}`, value)
   }
 
+  // useEffect(() => {
+  //   localStorage.removeItem(`editTitle?id=${currentUserId}`)
+  //   localStorage.removeItem(`editBody?id=${currentUserId}`)
+  // }, [currentUserId])
+
   useEffect(() => {
-    const savedTitle = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryInputValue') : localStorage.getItem('editStoryInputValue')) || targetStory?.title
-    const savedBody = (pathname != `/edit_story/${storyId}` ? localStorage.getItem('newStoryTextareaValue') : localStorage.getItem('editStoryTextareaValue')) || targetStory?.body
+    const savedTitle = (pathname != `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title
+    const savedBody = (pathname != `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body
 
     setInputValue(savedTitle || '')
     setTextareaValue(savedBody || '')
     setTypingEvent(debounceValue?.typing )
-  }, [setTypingEvent, debounceValue.typing, targetStory, storyId, pathname])
+  }, [setTypingEvent, debounceValue.typing, targetStory, currentUserId, storyId, pathname])
 
   useEffect(() => {
     if(inputRef.current) inputRef.current.focus()

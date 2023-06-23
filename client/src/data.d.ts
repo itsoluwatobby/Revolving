@@ -1,3 +1,5 @@
+import { SerializedError } from "@reduxjs/toolkit"
+import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query"
 import { ChangeEvent, FormEvent } from "react"
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
@@ -15,6 +17,7 @@ type StoryProps = {
   likes: string[]
   edited: false
   editDate: string
+  author: string
 }
 
 interface CommentProps{
@@ -82,18 +85,22 @@ interface UserProps{
   codeName: string,
   stack: string[],
   country: string,
-  socialMediaAccouts: SocialMediaAccoutProp[]
+  socialMediaAccounts: SocialMediaAccoutProp[]
 }
 
+type DeleteCommentByAdmin = 'onlyInStory' | 'allUserComment'
+type DeleteResponseByAdmin = 'onlyInComment' | 'allUserResponse'
+
 interface ErrorResponse{
-  status: number 
+  status: number,
   data: {
     meta: {
       message: string
     }
-  }
+  },
+  originalStatus?: number
 }
-
+//  FetchBaseQueryError | SerializedError
 type AuthType={
   _id: string,
   accessToken: string,

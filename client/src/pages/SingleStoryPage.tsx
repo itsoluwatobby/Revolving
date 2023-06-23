@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-import { PostType } from "../posts"
+import { PostType, ThemeContextType } from "../posts"
 import { useWordCount } from "../hooks/useWordCount"
 import { TextRules } from "../fonts";
 import { BsArrowBarRight } from 'react-icons/bs';
@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../features/auth/authSlice";
 import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from "../app/api/usersApiSlice";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
+import { useThemeContext } from "../hooks/useThemeContext";
 
 const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
@@ -21,6 +22,7 @@ export default function SingleStoryPage() {
   const currentUserId = useSelector(selectCurrentUser)
   const currentId = localStorage.getItem('revolving_userId') as string
   const [sidebar, setSidebar] = useState<boolean>(false);
+  const { setLoginPrompt, loginPrompt } = useThemeContext() as ThemeContextType
   const [titleFocus, setTitleFocus] = useState<boolean>(false);
   
   const {
@@ -51,7 +53,9 @@ export default function SingleStoryPage() {
   useEffect(() => {
     //console.log(titleFocus)
    setTitleFocus(false)
-  }, [])
+  //  localStorage.removeItem(`editTitle?id=${currentUserId}`)
+  //  localStorage.removeItem(`editBody?id=${currentUserId}`)
+  }, [currentUserId])
 
   const followOrUnfollow = async() => {
     try{
@@ -85,7 +89,7 @@ export default function SingleStoryPage() {
 
   return (
     <WindowScroll>
-      <main className='single_page h-full box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl'>
+      <main className={`single_page h-full ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl`}>
         <div className="flex h-full">
           {Array.isArray(stories) && stories.length 
             && <Aside 

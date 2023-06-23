@@ -9,6 +9,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     localStorage.getItem('fontFamily') || 'font_style'
     );
   const [openChat, setOpenChat] = useState<ChatOption>('Hide');
+  const [loginPrompt, setLoginPrompt] = useState<ChatOption>('Hide');
 
   const [fontOption, setFontOption] = useState<boolean>(false);
   const [rollout, setRollout] = useState<boolean>(false);
@@ -25,7 +26,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge, openChat, setOpenChat
+    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, loginPrompt, setLoginPrompt, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge, openChat, setOpenChat
   }
   return (
     <ThemeContext.Provider value={ values }>

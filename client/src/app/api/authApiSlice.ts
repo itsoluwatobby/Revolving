@@ -1,4 +1,4 @@
-import { AuthType } from "../../data";
+import { AuthType, UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
 
 type NewUser = {
@@ -47,6 +47,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
     newAccessToken: builder.query<AuthType, void>({
       query: () => '/auth/new_access_token',
     }),
+    toggleRoleByAdmin: builder.mutation<UserProps, {adminId: string, userId: string}>({
+      query: ({adminId, userId}) => ({
+        url: `auth/toggle_role/${adminId}/${userId}`,
+        method: 'PATCH',
+        body: adminId
+      }) as any
+    })
   })
 })
 
@@ -57,5 +64,6 @@ export const {
   useSignOutQuery,
   useForgotPasswordMutation,
   useNewPasswordMutation,
-  useNewAccessTokenQuery
+  useNewAccessTokenQuery,
+  useToggleRoleByAdminMutation
 } = authApiSlice

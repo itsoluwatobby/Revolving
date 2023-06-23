@@ -16,10 +16,11 @@ import ProfilePage from "./pages/ProfilePage";
 import About from "./pages/About";
 import { BsChatTextFill } from 'react-icons/bs'
 import ChatSection from "./pages/chatAdmin/ChatSection";
+import PrompLogin from "./components/modals/PrompLogin";
 
  
 export const App = () => {
-  const {theme, openChat, setOpenChat} = useThemeContext() as ThemeContextType;
+  const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
 
   return (
     <main className={`app relative ${theme == 'light' ? '' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
@@ -62,6 +63,7 @@ export const App = () => {
           className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-70 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
         />
       }
+      {loginPrompt == 'Open' ? <PrompLogin /> : null}
     </main>
   )
 }
