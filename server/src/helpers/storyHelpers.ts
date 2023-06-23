@@ -23,7 +23,7 @@ export const updateUserStory = async(userId: string, storyId: string, updateStor
 
 export const likeAndUnlikeStory = async(userId: string, storyId: string): Promise<string> => {
   const story = await StoryModel.findById(storyId).exec();
-  if(!story?.likes.includes(userId)) {
+  if(!story?.likes?.includes(userId)) {
     await story?.updateOne({ $push: {likes: userId} })
     return 'You liked this post'
   }

@@ -7,7 +7,7 @@ const CommentResponseSchema = new Schema({
     responseDate: { type: String, default: '' },
     author: { type: String, default: '' },
     edited: { type: Boolean, default: false },
-    editDate: { type: String, required: [true, 'comment edit date required'], default: '' }
+    editDate: { type: String, default: '' }
 }, {
     minimize: false,
     timestamps: true

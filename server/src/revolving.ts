@@ -105,6 +105,8 @@ else{
 
   //public routes
   app.get('/revolving/story', getStories);
+  
+  // comments
   app.get('/revolving/comment_in_story/:storyId', getStoryComments);
   app.get('/revolving/comment/:commentId', getComment);
   

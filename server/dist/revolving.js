@@ -79,6 +79,7 @@ else {
     app.get('/revolving/story/share_getAll', fetchSharedStories);
     //public routes
     app.get('/revolving/story', getStories);
+    // comments
     app.get('/revolving/comment_in_story/:storyId', getStoryComments);
     app.get('/revolving/comment/:commentId', getComment);
     app.get('/revolving/response_in_comment/:responseId', getResponseByComment);
