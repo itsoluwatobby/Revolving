@@ -9,7 +9,7 @@ export const getCommentById = async(commentId: string) => await CommentModel.fin
 
 export const getUserComments = async(userId: string) => await CommentModel.find({ userId }).lean()
 
-export const getUserCommentsInStory = async(userId: string, storyId: string) => await CommentModel.find({ userId, storyId }).lean()
+export const getUserCommentsInStory = async(userId: string, storyId: string) => await StoryModel.find({ userId, storyId }).lean()
 
 export const createComment = async(comment: Partial<CommentProps>) => {
   const newComment = await CommentModel.create({ ...comment })
@@ -17,7 +17,7 @@ export const createComment = async(comment: Partial<CommentProps>) => {
   return newComment
 }
 
-export const editComment = async(userId: string, commentId: string, editedComment: CommentProps) => await CommentModel.findByIdAndUpdate({ userId, _id: commentId }, {...editedComment})
+export const editComment = async(userId: string, commentId: string, editedComment: CommentProps) => await CommentModel.findByIdAndUpdate({ userId, _id: commentId }, {...editedComment, edited: true})
 
 export const likeAndUnlikeComment = async(userId: string, commentId: string): Promise<string> => {
   const comment = await CommentModel.findById(commentId).exec();
@@ -74,7 +74,7 @@ export const createResponse = async(response: Partial<CommentResponseProps>) => 
   return newResponse
 }
 
-export const editResponse = async(userId: string, responseId: string, editedResponse: CommentResponseProps) => await CommentResponseModel.findByIdAndUpdate({ userId, _id: responseId }, {...editedResponse})
+export const editResponse = async(userId: string, responseId: string, editedResponse: CommentResponseProps) => await CommentResponseModel.findByIdAndUpdate({ userId, _id: responseId }, {...editedResponse, edited: true})
 
 export const likeAndUnlikeResponse = async(userId: string, responseId: string): Promise<string> => {
   const response = await CommentResponseModel.findById(responseId).exec();

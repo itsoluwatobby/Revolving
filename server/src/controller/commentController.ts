@@ -120,13 +120,13 @@ export const userComments = (req: Request, res: Response) => {
 export const getUserCommentStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params;
-    if(!userId || storyId) return res.sendStatus(400);
+    if(!userId || !storyId) return res.sendStatus(400);
     const commentsInStories = await getCachedResponse({key:'allStories', cb: async() => {
       const comments = await getUserCommentsInStory(userId, storyId);
       return comments
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (CommentProps[] | string)
 
-    if(!commentsInStories?.length) return responseType({res, status: 404, message: 'No comments available'})
+    if(!commentsInStories?.length) return responseType({res, status: 404, message: 'No comments by you'})
     return responseType({res, status: 200, count: commentsInStories?.length, data: commentsInStories})
   })
 }

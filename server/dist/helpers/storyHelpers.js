@@ -31,7 +31,7 @@ export const createUserStory = (story) => __awaiter(void 0, void 0, void 0, func
     yield newStory.save();
     return newStory;
 });
-export const updateUserStory = (userId, storyId, updateStory) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.findByIdAndUpdate({ userId, _id: storyId }, Object.assign({}, updateStory)); });
+export const updateUserStory = (userId, storyId, updateStory) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.findByIdAndUpdate({ userId, _id: storyId }, Object.assign(Object.assign({}, updateStory), { edited: true })); });
 export const likeAndUnlikeStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const story = yield StoryModel.findById(storyId).exec();

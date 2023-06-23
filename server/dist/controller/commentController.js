@@ -130,14 +130,14 @@ export const userComments = (req, res) => {
 export const getUserCommentStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
-        if (!userId || storyId)
+        if (!userId || !storyId)
             return res.sendStatus(400);
         const commentsInStories = yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const comments = yield getUserCommentsInStory(userId, storyId);
                 return comments;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!(commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length))
-            return responseType({ res, status: 404, message: 'No comments available' });
+            return responseType({ res, status: 404, message: 'No comments by you' });
         return responseType({ res, status: 200, count: commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length, data: commentsInStories });
     }));
 };
