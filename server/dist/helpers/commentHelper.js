@@ -13,7 +13,7 @@ import { StoryModel } from "../models/Story.js";
 export const getAllCommentsInStory = (storyId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.find({ storyId }).lean(); });
 export const getCommentById = (commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.findById(commentId).exec(); });
 export const getUserComments = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.find({ userId }).lean(); });
-export const getUserCommentsInStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.find({ userId, storyId }).lean(); });
+export const getUserCommentsInStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.find({ userId, storyId }).lean(); });
 export const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
     const newComment = yield CommentModel.create(Object.assign({}, comment));
     yield StoryModel.findByIdAndUpdate({ _id: comment.storyId }, { $push: { commentIds: newComment === null || newComment === void 0 ? void 0 : newComment._id } });

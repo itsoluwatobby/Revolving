@@ -9,7 +9,7 @@ export const getCommentById = async(commentId: string) => await CommentModel.fin
 
 export const getUserComments = async(userId: string) => await CommentModel.find({ userId }).lean()
 
-export const getUserCommentsInStory = async(userId: string, storyId: string) => await StoryModel.find({ userId, storyId }).lean()
+export const getUserCommentsInStory = async(userId: string, storyId: string) => await CommentModel.find({ userId, storyId }).lean()
 
 export const createComment = async(comment: Partial<CommentProps>) => {
   const newComment = await CommentModel.create({ ...comment })

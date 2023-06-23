@@ -12,6 +12,7 @@ import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { createComment, deleteAllUserComments, deleteAllUserCommentsInStory, deleteSingleComment, editComment, getAllCommentsInStory, getCommentById, getUserComments, getUserCommentsInStory, likeAndUnlikeComment } from "../helpers/commentHelper.js";
+import { getStoryById } from "../helpers/storyHelpers.js";
 ;
 export const createNewComment = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
@@ -22,6 +23,9 @@ export const createNewComment = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
+        const story = yield getStoryById(storyId);
+        if (!story)
+            return responseType({ res, status: 404, message: 'Story not found' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const comment = yield createComment(Object.assign({}, newComment));
@@ -68,7 +72,7 @@ export const deleteComment = (req, res) => {
 export const deleteUserComments = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { adminId, userId, commentId } = req.params;
-        const { option } = req.query;
+        const option = req.query;
         if (!userId || !commentId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
@@ -84,7 +88,7 @@ export const deleteUserComments = (req, res) => {
             }
             else if ((option === null || option === void 0 ? void 0 : option.command) == 'allUserComment') {
                 yield deleteAllUserComments(userId);
-                return responseType({ res, status: 201, message: 'All user comments in story deleted' });
+                return responseType({ res, status: 201, message: 'All user comments deleted' });
             }
         }
         return responseType({ res, status: 401, message: 'unauthorized' });
@@ -110,10 +114,9 @@ export const userComments = (req, res) => {
         const { adminId, userId } = req.params;
         if (!adminId || !userId)
             return res.sendStatus(400);
-        if (!getUserById(adminId))
-            return res.sendStatus(401);
-        if (!getUserById(userId))
-            return res.sendStatus(401);
+        const user = yield getUserById(userId);
+        if (!user)
+            return res.sendStatus(404);
         // if(user?.isAccountLocked) return res.sendStatus(401)
         const admin = yield getUserById(adminId);
         if (!admin.roles.includes(ROLES.ADMIN))
@@ -132,7 +135,7 @@ export const getUserCommentStory = (req, res) => {
         const { userId, storyId } = req.params;
         if (!userId || !storyId)
             return res.sendStatus(400);
-        const commentsInStories = yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        const commentsInStories = yield getCachedResponse({ key: `userCommentsInStories:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const comments = yield getUserCommentsInStory(userId, storyId);
                 return comments;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });

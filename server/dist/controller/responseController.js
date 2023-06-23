@@ -11,7 +11,7 @@ import { getUserById } from "../helpers/userHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import { createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
+import { createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getCommentById, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
 ;
 export const createNewResponse = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
@@ -22,6 +22,9 @@ export const createNewResponse = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
+        const comment = yield getCommentById(commentId);
+        if (!comment)
+            return responseType({ res, status: 404, message: 'Comment not found' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const response = yield createResponse(Object.assign({}, newResponse));
@@ -39,6 +42,9 @@ export const updateResponse = (req, res) => {
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
+        const responseExist = yield getResponseById(responseId);
+        if (!responseExist)
+            return responseType({ res, status: 404, message: 'Response not found' });
         const response = yield editResponse(userId, responseId, editedResponse);
         return responseType({ res, status: 201, count: 1, data: response });
     }));
@@ -68,7 +74,7 @@ export const deleteResponse = (req, res) => {
 export const deleteUserResponses = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { adminId, userId, responseId } = req.params;
-        const { option } = req.query;
+        const option = req.query;
         if (!userId || !responseId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
@@ -110,10 +116,9 @@ export const userResponses = (req, res) => {
         const { adminId, userId, responseId } = req.params;
         if (!userId || !adminId || !responseId)
             return res.sendStatus(400);
-        if (!getUserById(adminId))
-            return res.sendStatus(401);
-        if (!getUserById(userId))
-            return res.sendStatus(401);
+        const user = yield getUserById(userId);
+        if (!user)
+            return res.sendStatus(404);
         // if(user?.isAccountLocked) return res.sendStatus(401)
         const admin = yield getUserById(adminId);
         if (!admin.roles.includes(ROLES.ADMIN))
@@ -132,7 +137,7 @@ export const getResponseByComment = (req, res) => {
         const { commentId } = req.params;
         if (!commentId)
             return res.sendStatus(400);
-        const responsesInStories = yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        const responsesInStories = yield getCachedResponse({ key: `responseInComment:${commentId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const responses = yield getAllCommentsResponse(commentId);
                 return responses;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });

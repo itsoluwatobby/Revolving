@@ -110,7 +110,7 @@ else{
   app.get('/revolving/comment_in_story/:storyId', getStoryComments);
   app.get('/revolving/comment/:commentId', getComment);
   
-  app.get('/revolving/response_in_comment/:responseId', getResponseByComment);
+  app.get('/revolving/response_in_comment/:commentId', getResponseByComment);
   app.get('/revolving/response/:responseId', getResponse);
 
   app.get('/revolving/story/category', getStoryByCategory);

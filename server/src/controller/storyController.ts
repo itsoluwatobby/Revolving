@@ -86,7 +86,8 @@ export const getUserStory = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId} = req.params
     if(!userId) return res.sendStatus(400);
-    if(!getUserById(userId)) return res.sendStatus(401)
+    const user = await getUserById(userId)
+    if(!user) return res.sendStatus(404)
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const userStories = await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
       const userStory = await getUserStories(userId) 
