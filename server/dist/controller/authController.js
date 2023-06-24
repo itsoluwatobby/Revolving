@@ -230,13 +230,14 @@ export const toggleAdminRole = (req, res) => {
             if (!(user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN))) {
                 user.roles = [...user.roles, ROLES.ADMIN];
                 user.save();
-                // user.updateOne({$push: { roles: ROLES.ADMIN }})
-                return responseType({ res, status: 201, message: 'admin role assigned' });
+                const userAd = yield getUserById(userId);
+                return responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: userAd });
             }
             else {
                 user.roles = [ROLES.USER];
                 user.save();
-                return responseType({ res, status: 201, message: 'admin role removed' });
+                const userAd = yield getUserById(userId);
+                return responseType({ res, status: 201, count: 1, message: 'admin role removed', data: userAd });
             }
         }
         else

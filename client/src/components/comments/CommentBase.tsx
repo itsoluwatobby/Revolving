@@ -33,7 +33,6 @@ export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, wr
   }
 
   useEffect(() => {
-
     if(writeReply?.length && !openReply){
       if(keepPrompt !== 'Retain') setKeepPrompt('Show')
       if(keepPrompt === 'Retain') {

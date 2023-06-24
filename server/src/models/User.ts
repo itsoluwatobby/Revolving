@@ -32,7 +32,7 @@ const USERSCHEMA: Schema = new Schema(
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     codeName: { type: String, default: '', trim: true },
     stack: { type: Array, default: [] },
-    socialMediaAccouts: { type: Array, default: [] },
+    socialMediaAccounts: { type: Array, default: [] },
     country: { type: Array, default: '' },
   },
   { 

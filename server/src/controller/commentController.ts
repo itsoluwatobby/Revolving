@@ -17,10 +17,11 @@ interface RequestProp extends Request{
 export const createNewComment = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params
-    const newComment: Partial<CommentProps> = req.body
+    let newComment: Partial<CommentProps> = req.body
     if (!userId || !storyId || !newComment?.comment) return res.sendStatus(400)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
+    newComment = {...newComment, author: user?.username}
     const story = await getStoryById(storyId)
     if(!story) return responseType({res, status: 404, message: 'Story not found'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});

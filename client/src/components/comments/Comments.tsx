@@ -1,12 +1,14 @@
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { ThemeContextType } from "../../posts"
-import { comments } from "../../commentData";
 import EnlargeComment from "./EnlargeComment";
 import CommentBody from "./CommentBody";
 import { checkCount } from "../../utils/navigator";
+import { useSelector } from "react-redux";
+import { getComments } from "../../features/story/commentSlice";
 
 export default function Comments() {
   const {theme, enlarge} = useThemeContext() as ThemeContextType;
+  const comments = useSelector(getComments)
 
   return (
     <section className="comment_page absolute z-50 bg-opacity-30 w-full flex flex-col p-3">
@@ -15,7 +17,7 @@ export default function Comments() {
           comments?.length ? (
               <p 
                 className={`text-center font-mono capitalize ${theme == 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
-                  {checkCount(comments)} {comments?.length == 1 ? 'comment' : 'comments'}
+                  {checkCount(comments)} {comments.length == 1 ? 'comment' : 'comments'}
               </p>
               ) : (
               <p className={`text-center font-mono capitalize ${theme == 'light' ? 'text-gray-700' : 'text-gray-300'}`}>no comment</p>

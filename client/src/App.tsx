@@ -15,7 +15,7 @@ import { PersistedLogin } from "./layouts/PersistedLogin";
 import ProfilePage from "./pages/ProfilePage";
 import About from "./pages/About";
 import { BsChatTextFill } from 'react-icons/bs'
-import ChatSection from "./pages/chatAdmin/ChatSection";
+import ChatModal from "./pages/chatAdmin/ChatModal";
 import PrompLogin from "./components/modals/PrompLogin";
 
  
@@ -56,7 +56,7 @@ export const App = () => {
       </Routes>
       <Toaster />
       {openChat === 'Open' ?
-        <ChatSection />
+        <ChatModal />
         :  
         <BsChatTextFill 
           onClick={() => setOpenChat('Open')}

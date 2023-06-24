@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, FontStyle, Theme, ThemeContextType } from '../posts';
+import { ChatOption, ChildrenProp, CommentOptionProp, FontStyle, Theme, ThemeContextType } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
@@ -13,7 +13,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
 
   const [fontOption, setFontOption] = useState<boolean>(false);
   const [rollout, setRollout] = useState<boolean>(false);
-  const [openComment, setOpenComment] = useState<boolean>(false);
+  const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' });
 
   const [parseId, setParseId] = useState<string>('');
   const [enlarge, setEnlarge] = useState<boolean>(false);

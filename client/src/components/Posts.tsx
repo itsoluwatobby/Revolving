@@ -2,26 +2,35 @@ import { PostContextType, PostType, ThemeContextType } from '../posts'
 import { SkeletonBlog } from './skeletons/SkeletonBlog';
 import { Post } from './Post';
 import { RiSignalWifiErrorLine } from 'react-icons/ri'
+import { BiErrorAlt } from 'react-icons/bi'
 import { usePostContext } from '../hooks/usePostContext';
-import { useEffect } from 'react';
-import { Categories } from '../data';
+import { useState, useEffect } from 'react';
+import { ErrorResponse } from '../data';
 import Comments from './comments/Comments';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice';
+import { useSelector } from 'react-redux';
+import { getTabCategory } from '../features/story/navigationSlice';
 
-type PostsProps = {
-  navigationTab: Categories
-}
-
-export const Posts = ({ navigationTab }: PostsProps) => {
-  const {data, isLoading, isError, error} = useGetStoriesByCategoryQuery(navigationTab)
+export const Posts = () => {
+  const getNavigation = useSelector(getTabCategory)
+  const {data, isLoading, isError, error} = useGetStoriesByCategoryQuery(getNavigation)
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { openComment, setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
+  const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
+
+  useEffect(() => {
+    let isMounted = true
+    isMounted && setErrorMsg(error as ErrorResponse)
+    return () => {
+      isMounted = false
+    }
+  }, [error])
   
   useEffect(() => {
     // mutate()
     setNavPosts(data as PostType[])
-  }, [navigationTab, data, setNavPosts])
+  }, [getNavigation, data, setNavPosts])
 
   let content;
 
@@ -31,21 +40,25 @@ export const Posts = ({ navigationTab }: PostsProps) => {
         )
       )
   ) 
-  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center text-red-400'>
-    <span>{error?.status}</span>
-    <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
+  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center mt-5 text-red-400'>
+    <span>{errorMsg?.status == 404 ? 'No Story Avaialable' : 'Network Error, Please check your connection'}</span>
+    {errorMsg?.status == 404 ? 
+      <BiErrorAlt className='text-6xl text-gray-400' />
+      :
+      <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
+    }
     </p> 
   :(
     filteredStories?.length ? content = (
       filteredStories?.map(post => (
             <Post key={post?.sharedId || post?._id} 
-              post={post as PostType} 
-              //navigationTab={navigationTab}
+              story={post as PostType} 
+              // getNavigation={getNavigation}
             />
           )
         )
       ) 
-      : content = (<p className='m-auto text-3xl capitalize font-mono text-gray-400'>No stories available</p>)
+      : null
   )
   return (
     <div 
@@ -55,7 +68,7 @@ export const Posts = ({ navigationTab }: PostsProps) => {
       }
       }
       className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-2 drop-shadow-2xl pb-5`}>
-      {openComment ? <Comments /> : content }
+      {openComment?.option == 'Open' ? <Comments /> : content }
     </div>
   )
 }

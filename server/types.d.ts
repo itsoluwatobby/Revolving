@@ -126,7 +126,7 @@ interface UserProps extends Document{
   codeName: string,
   stack: string[],
   country: string,
-  socialMediaAccouts: SocialMediaAccoutProp[]
+  socialMediaAccounts: SocialMediaAccoutProp[]
 }
 
 interface PageRequest extends Request{

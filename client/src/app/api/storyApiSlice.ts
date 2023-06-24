@@ -9,11 +9,6 @@ type StoryArgs = {
 }
 
 type ResponseType = { data: PostType[] }
-// const storyAdapter: EntityAdapter<PostType> = createEntityAdapter<PostType>({
-//   sortComparer: (prev, next) => next.storyDate.localeCompare(prev.storyDate)
-// })
-
-// const initialState = storyAdapter.getInitialState({})
 
 export const storyApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({

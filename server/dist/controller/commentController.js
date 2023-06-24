@@ -17,12 +17,13 @@ import { getStoryById } from "../helpers/storyHelpers.js";
 export const createNewComment = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
-        const newComment = req.body;
+        let newComment = req.body;
         if (!userId || !storyId || !(newComment === null || newComment === void 0 ? void 0 : newComment.comment))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
+        newComment = Object.assign(Object.assign({}, newComment), { author: user === null || user === void 0 ? void 0 : user.username });
         const story = yield getStoryById(storyId);
         if (!story)
             return responseType({ res, status: 404, message: 'Story not found' });

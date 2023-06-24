@@ -19,10 +19,9 @@ export const createNewStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId } = req.params
     let newStory = req.body
-    newStory = {...newStory, userId}
-
     if (!userId || !newStory?.title || !newStory?.body) return res.sendStatus(400)
     const user = await getUserById(userId);
+    newStory = {...newStory, userId, author: user?.username} as StoryProps
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const story = await createUserStory({...newStory});

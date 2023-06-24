@@ -46,7 +46,7 @@ export const shareStory = (req, res) => {
         const user = yield getUserById(userId);
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        const newShare = yield createShareStory(userId, storyId);
+        const newShare = yield createShareStory(user, storyId);
         return responseType({ res, status: 201, count: 1, data: newShare });
     }));
 };

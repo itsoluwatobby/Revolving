@@ -40,7 +40,7 @@ type PostContextType = {
   typingEvent: boolean,
   // editPost: Partial<PostType>, 
   canPost: boolean,
-  navPosts: PostType[], 
+  navPosts: PostType[],
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>
   setSearch: React.Dispatch<React.SetStateAction<string>>
@@ -54,12 +54,17 @@ type Theme = 'light' | 'dark';
 type FontStyle = string | 'font_style';
 type ChatOption = 'Hide' | 'Open';
 
+type CommentOptionProp = { 
+  option: ChatOption, 
+  storyId: string
+}
+
 type ThemeContextType = {
   theme: Theme,
   fontFamily: FontStyle,
   fontOption: boolean,
   rollout: boolean,
-  openComment: boolean,
+  openComment: CommentOptionProp,
   parseId: string,
   enlarge: boolean,
   openChat: ChatOption,
@@ -70,7 +75,7 @@ type ThemeContextType = {
   setEnlarge: React.Dispatch<React.SetStateAction<boolean>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
-  setOpenComment: React.Dispatch<React.SetStateAction<boolean>>,
+  setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>
 }

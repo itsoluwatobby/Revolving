@@ -1,5 +1,3 @@
-import { SerializedError } from "@reduxjs/toolkit"
-import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query"
 import { ChangeEvent, FormEvent } from "react"
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
@@ -110,9 +108,7 @@ type AuthType={
 type AuthenticationContextType={
   auth: AuthType,
   userSession?: boolean,
-  persistLogin: boolean,
-  setAuth: React.Dispatch<React.SetStateAction<AuthType>>,
-  setPersistLogin: React.Dispatch<React.SetStateAction<boolean>>
+  setAuth: React.Dispatch<React.SetStateAction<AuthType>>
 }
 
 interface UserInfoProps{

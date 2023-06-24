@@ -1,3 +1,4 @@
+import { UserProps } from "../../types.js";
 import { SharedStoryModel } from "../models/SharedStory.js";
 import { dateTime } from "./helper.js";
 import { getStoryById } from "./storyHelpers.js";
@@ -10,13 +11,13 @@ export const getAllSharedStories = async() => await SharedStoryModel.find().lean
 
 export const getAllSharedByCategories = async(category: string) => await SharedStoryModel.find({'sharedStory.category': [category]});
 
-export const createShareStory = async(userId: string, storyId: string) => {
+export const createShareStory = async(user: UserProps, storyId: string) => {
   const story = await getStoryById(storyId)
   const newSharedStory = new SharedStoryModel({
-    sharerId: userId, storyId: story?._id, sharedDate: dateTime, sharedStory: {...story}
+    sharerId: user?._id, storyId: story?._id, sharedDate: dateTime, author: user?.username, sharedStory: {...story}
   })
   await newSharedStory.save();
-  await story?.updateOne({$push: { isShared: { userId, sharedId: newSharedStory?._id.toString() } }});
+  await story?.updateOne({$push: { isShared: { userId: user?._id, sharedId: newSharedStory?._id.toString() } }});
   return newSharedStory;
 }
 

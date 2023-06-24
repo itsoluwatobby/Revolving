@@ -2,7 +2,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { PostContextType, PostType, ThemeContextType } from '../posts';
+import { PostContextType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';

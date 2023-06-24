@@ -16,12 +16,13 @@ import { createResponse, deleteAllUserResponseInComment, deleteAllUserResponses,
 export const createNewResponse = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, commentId } = req.params;
-        const newResponse = req.body;
+        let newResponse = req.body;
         if (!userId || !commentId || !(newResponse === null || newResponse === void 0 ? void 0 : newResponse.response))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
+        newResponse = Object.assign(Object.assign({}, newResponse), { author: user === null || user === void 0 ? void 0 : user.username });
         const comment = yield getCommentById(commentId);
         if (!comment)
             return responseType({ res, status: 404, message: 'Comment not found' });
@@ -80,7 +81,7 @@ export const deleteUserResponses = (req, res) => {
         const user = yield getUserById(userId);
         const adminUser = yield getUserById(adminId);
         if (!user || !adminUser)
-            return responseType({ res, status: 401, message: 'You do not have an account' });
+            return responseType({ res, status: 404, message: 'You do not have an account' });
         if (adminUser === null || adminUser === void 0 ? void 0 : adminUser.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         if (adminUser === null || adminUser === void 0 ? void 0 : adminUser.roles.includes(ROLES.ADMIN)) {
@@ -90,7 +91,7 @@ export const deleteUserResponses = (req, res) => {
             }
             else if ((option === null || option === void 0 ? void 0 : option.command) == 'allUserResponse') {
                 yield deleteAllUserResponses(userId);
-                return responseType({ res, status: 201, message: 'All user responses in comment deleted' });
+                return responseType({ res, status: 201, message: 'All user responses deleted' });
             }
         }
         return responseType({ res, status: 401, message: 'unauthorized' });

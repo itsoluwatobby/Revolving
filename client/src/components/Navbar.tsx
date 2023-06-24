@@ -7,6 +7,7 @@ import { custom_fonts } from '../fonts.js'
 import Drawdown from './navModals/Drawdown.js';
 import TopRight from './navModals/TopRight.js';
 import TopLeft from './navModals/TopLeft.js';
+import { useGetStoriesQuery } from '../app/api/storyApiSlice.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
@@ -17,15 +18,16 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 // const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
-  const {posts, typingEvent} = usePostContext() as PostContextType
+  const {data: stories} = useGetStoriesQuery()
+  const {typingEvent} = usePostContext() as PostContextType
   const {theme, rollout, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { storyId } = useParams()
   const [delayedSaving, setDelayedSaving] = useState(false)
   const [options, setOptions] = useState<string>('')
-  
+
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
-  const targetPost = posts?.find(story => story?._id == storyId)
+  const targetPost = stories?.find(story => story?._id == storyId)
 
   const changeFontFamily = (font: string) => {
     setFontFamily(targetPost?.fontFamily || font)

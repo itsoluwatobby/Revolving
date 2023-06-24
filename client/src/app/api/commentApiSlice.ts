@@ -7,8 +7,8 @@ type CommentArgs = {
   userId: string, 
   adminId: string, 
   command: DeleteCommentByAdmin, 
-  commentId?: string, 
-  comment: CommentProps, 
+  commentId?: string,
+  comment: Partial<CommentProps>, 
   storyId: string
 }
 
@@ -21,13 +21,13 @@ type ResponseType = { data: CommentProps[] }
 
 export const commentApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    createComment: builder.mutation<CommentProps, CommentArgs>({
+    createComment: builder.mutation<CommentProps, Partial<CommentArgs>>({
       query: ({userId, storyId, comment}) => ({
         url: `comments/${userId}/${storyId}`,
         method: 'POST',
         body: {...comment}
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT' }],
+      invalidatesTags: [{ type: 'COMMENT' }, { type: 'STORY', id: 'LIST' }],
     }),
 
     updateComment: builder.mutation<CommentProps, CommentArgs>({
