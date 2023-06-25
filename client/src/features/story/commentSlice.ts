@@ -13,7 +13,8 @@ import { CommentProps } from "../../data";
 
 const initialState = {
   // commentLength: 0,
-  comments: [] as CommentProps[] 
+  comments: [] as CommentProps[],
+  editComment: {} as CommentProps
 }
 
 const commentSlice = createSlice({
@@ -22,12 +23,16 @@ const commentSlice = createSlice({
   reducers: {
     setAllComments: (state, action: PayloadAction<CommentProps[]>) => {
       state.comments = action.payload
+    },
+    setEditComment: (state, action: PayloadAction<CommentProps>) => {
+      state.editComment = action.payload
     }
   }
 })
 
-export const { setAllComments } = commentSlice.actions
+export const { setAllComments, setEditComment } = commentSlice.actions
 export const getComments = (state: RootState) => state.comment.comments
+export const getEditComments = (state: RootState) => state.comment.editComment
 
 export default commentSlice.reducer
 

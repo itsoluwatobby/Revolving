@@ -2,39 +2,37 @@ import { useLocation, useParams } from 'react-router-dom';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { PostContextType, ThemeContextType } from '../posts';
+import { PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';
 import { Categories } from '../data';
 import CodeBlock from '../codeEditor/CodeEditor';
 import { useGetStoryQuery } from '../app/api/storyApiSlice';
+import { useDispatch } from 'react-redux';
+import { setStoryData } from '../features/story/storySlice';
+import { sub } from 'date-fns';
 
 export const NewStory = () => {
   const { storyId } = useParams()
   const { fontFamily } = useThemeContext() as ThemeContextType;
-  const { setPostData, setTypingEvent, setCanPost } = usePostContext() as PostContextType;
-  const { data: targetStory } = useGetStoryQuery(storyId as string)
+  const { setTypingEvent, setCanPost } = usePostContext() as PostContextType;
+  const { data: target } = useGetStoryQuery(storyId as string)
   const { theme } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null)
-  // const [targetStory, setTargetStory] = useState<PostType>()
-
+  const [targetStory, setTargetStory] = useState<PostType>()
+  const dateTime = sub(new Date, { minutes: 0 }).toISOString();
   const [codeEditor, setCodeEditor] = useState<boolean>(false);
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
     1000) as DebounceProps
+  const dispatch = useDispatch();
 
   const { pathname } = useLocation()
-
-  //const targetStory = posts?.find(story => story?._id == storyId) as PostType;
-
-  // useEffect(() => {
-  //   setTargetStory(data as PostType)
-  // }, [data])
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -51,14 +49,17 @@ export const NewStory = () => {
         : localStorage.setItem(`editBody?id=${currentUserId}`, value)
   }
 
-  // useEffect(() => {
-  //   localStorage.removeItem(`editTitle?id=${currentUserId}`)
-  //   localStorage.removeItem(`editBody?id=${currentUserId}`)
-  // }, [currentUserId])
+  useEffect(() => {
+    let isMounted = true
+    isMounted ? setTargetStory(target as PostType) : null
+    return () => {
+      isMounted = false
+    }
+  }, [target])
 
   useEffect(() => {
-    const savedTitle = (pathname != `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title
-    const savedBody = (pathname != `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body
+    const savedTitle = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
+    const savedBody = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : (localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body)
 
     setInputValue(savedTitle || '')
     setTextareaValue(savedBody || '')
@@ -74,8 +75,31 @@ export const NewStory = () => {
   }, [targetStory])
 
   useEffect(() => {
-    !debounceValue?.typing && (
-      setPostData(prev => {
+    if(!debounceValue?.typing){
+      const storyData = targetStory ? {
+        ...targetStory,
+        title: inputValue,
+        body: textareaValue,
+        category: postCategory,
+        editDate: dateTime,
+        fontFamily
+      } : {
+        title: inputValue, 
+        body: textareaValue,
+        category: postCategory,
+        storyDate: dateTime,
+        fontFamily
+      }
+    dispatch(setStoryData(storyData))
+  }
+  else{
+    return
+  }
+    setCanPost([inputValue, textareaValue].every(Boolean))
+  }, [setCanPost, dateTime, dispatch, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
+  
+  /*
+    setPostData(prev => {
         return {...prev, 
           title: inputValue, 
           body: textareaValue,
@@ -83,17 +107,15 @@ export const NewStory = () => {
           fontFamily
         }
       })
-    )
-    setCanPost([inputValue, textareaValue].every(Boolean))
-  }, [setCanPost, setPostData, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
-  
+  */
+
   const addCategory = (category: Categories) => {
     let categories: Categories[] = [...postCategory];
     if(!categories.includes(category)){
       categories.push(category)
     }
     else{
-      categories = categories.filter(cat => cat != category)
+      categories = categories.filter(cat => cat !== category)
     }
     setPostCategory([...categories])
   } 

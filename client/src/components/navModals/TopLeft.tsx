@@ -4,13 +4,16 @@ import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg'
 import { usePostContext } from "../../hooks/usePostContext";
 import { PostContextType, ThemeContextType } from "../../posts";
 import { useThemeContext } from "../../hooks/useThemeContext";
+import { useSelector } from "react-redux";
+import { getStoryData } from "../../features/story/storySlice";
 
 type TopLeftProp={
   delayedSaving: boolean
 }
 
 export default function TopLeft({ delayedSaving }: TopLeftProp) {
-  const {postData, search, setSearch} = usePostContext() as PostContextType
+  const postData = useSelector(getStoryData) 
+  const { search, setSearch} = usePostContext() as PostContextType
   const {theme, setFontOption, setOpenComment, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
   const { storyId } = useParams()
@@ -33,7 +36,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
       {
         !address.includes(pathname) ?
           <div 
-            onClick={() => setOpenComment(false)}
+            onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
             className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-64 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-8`}>  
               <CiSearch className='text-gray-700 text-xl w-8'/>
               <input 

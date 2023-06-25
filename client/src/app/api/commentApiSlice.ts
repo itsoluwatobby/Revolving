@@ -39,7 +39,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
     }),
     
-    likeAndUnlikeComment: builder.mutation<void, Omit<CommentArgs, 'comment'>>({
+    likeAndUnlikeComment: builder.mutation<void, Pick<CommentArgs, 'userId' | 'commentId'>>({
       query: ({userId, commentId}) => ({
         url: `comments/${userId}/${commentId}`,
         method: 'PATCH',
@@ -49,7 +49,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
     }),
     
     // Also works for admin deleting a user comment
-    deleteComment: builder.mutation<void, Omit<CommentArgs, 'comment'>>({
+    deleteComment: builder.mutation<void, Pick<CommentArgs, 'userId' | 'commentId'>>({
       query: ({userId, commentId}) => ({
         url: `comments/${userId}/${commentId}`,
         method: 'DELETE',

@@ -102,7 +102,7 @@ export default function CommentBody() {
     ))
   )
   : isError ? commentContent = (
-    <p className='text-center mt-10 text-lg'>{errorMsg?.data.meta.message}</p>
+    <p className='text-center mt-10 text-lg'>{errorMsg?.status == 404 ? 'No Comment Avaialable' : 'Network Error, Please check your connection'}</p>
   ) : commentContent = (
     <>
       {!isLoading && comments?.length ? 

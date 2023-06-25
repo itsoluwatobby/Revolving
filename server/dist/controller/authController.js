@@ -18,7 +18,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { createUser, getUserByEmail, getUserById, getUserByToken, getUserByVerificationToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
@@ -131,14 +131,13 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cookies = req.cookies;
-        if (!(cookies === null || cookies === void 0 ? void 0 : cookies.revolving)) {
+        const { userId } = req.params;
+        if (!userId) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
             redisFunc();
             return res.sendStatus(204);
         }
-        const token = cookies === null || cookies === void 0 ? void 0 : cookies.revolving;
-        const user = yield getUserByToken(token);
+        const user = yield getUserById(userId);
         if (!user) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
             redisFunc();

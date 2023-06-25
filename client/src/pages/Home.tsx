@@ -1,15 +1,9 @@
-import { Footer } from "../components/Footer";
-import { } from 'react-icons/io';
 import { Posts } from "../components/Posts"
 import { TopHome } from "../components/TopHome"
-import useAuthenticationContext from "../hooks/useAuthenticationContext";
 import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
-import { AuthenticationContextType } from "../data";
-
 
 export const Home = () => {
-  const { auth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
  
   return (

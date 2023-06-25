@@ -23,26 +23,17 @@ export default function SingleStoryPage() {
   const currentId = localStorage.getItem('revolving_userId') as string
   const [sidebar, setSidebar] = useState<boolean>(false);
   const { setLoginPrompt, loginPrompt } = useThemeContext() as ThemeContextType
-  const [titleFocus, setTitleFocus] = useState<boolean>(false);
   
-  const {
-    data: user, 
-    refetch 
-  } = useGetUserByIdQuery(currentId)
-  const [followUnfollowUser, { 
-    isLoading: isMutating, 
-    error: followError, 
-    isError: isFollowError, 
-    isSuccess: isFollowSuccess 
-  }] = useFollowUnfollowUserMutation()
-  const { data: targetStory, isLoading, isError, error, isSuccess } = useGetStoryQuery(storyId);
-  const {
-    data: stories, 
-    isLoading: loading
-  } = useGetStoriesQuery()
+  const {data: user, refetch} = useGetUserByIdQuery(currentId)
+  const [followUnfollowUser, { isLoading: isMutating, 
+    error: followError,  isError: isFollowError, 
+    isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
+  const { data: target, isLoading, isError, error, refetch: reload } = useGetStoryQuery(storyId);
+  const { data, isLoading: loading } = useGetStoriesQuery()
+  const [stories, setStories] = useState<PostType[]>([])
+  const [targetStory, setTargetStory] = useState<PostType>();
 
-  // console.log(user)
-  // console.log(targetStory)
+  type RefetchType = Awaited<ReturnType<typeof reload>>
 
   let averageReadingTime = useWordCount(targetStory?.body as string)
   const watchWords = TextRules.keywords as string
@@ -51,11 +42,20 @@ export default function SingleStoryPage() {
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end;
 
   useEffect(() => {
-    //console.log(titleFocus)
-   setTitleFocus(false)
-  //  localStorage.removeItem(`editTitle?id=${currentUserId}`)
-  //  localStorage.removeItem(`editBody?id=${currentUserId}`)
-  }, [currentUserId])
+    let isMounted = true
+    isMounted ? setTargetStory(target as PostType) : null
+    return () => {
+      isMounted = false
+    }
+  }, [target])
+
+  useEffect(() => {
+    let isMounted = true
+    isMounted ? setStories(data as PostType[]) : null
+    return () => {
+      isMounted = false
+    }
+  }, [data])
 
   const followOrUnfollow = async() => {
     try{
@@ -72,15 +72,15 @@ export default function SingleStoryPage() {
     }
     catch(err: unknown){
       const errors = followError as ErrorResponse
-      isFollowError && toast.error(`${errors?.data?.meta?.message}`, {
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      isFollowError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
       })
     }
   }
-  //duration: 2000, icon: '💀', style: { background: '##8FBC8F'}
-
+  
   const bodyContent = targetStory ? targetStory?.body.split(' ').map((word, index) => {
     return (
       <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600 bg-gray-600 rounded-sm' : ''}`}>{word}{' '}</span>
@@ -94,15 +94,15 @@ export default function SingleStoryPage() {
           {Array.isArray(stories) && stories.length 
             && <Aside 
             stories={stories as PostType[]} sidebar={sidebar} 
-            setSidebar={setSidebar}
+            setSidebar={setSidebar} 
           />}
           <ArticleComp 
-            post={targetStory as PostType} 
+            story={targetStory as PostType} 
             bodyContent={bodyContent as JSX.Element[]}
             averageReadingTime={averageReadingTime} 
             sidebar={sidebar} isLoading={isLoading} isError={isError} isMutating={isMutating}
             error={error as {error: string}} user={user as UserProps} 
-            followOrUnfollow={followOrUnfollow}
+            followOrUnfollow={followOrUnfollow} refetch={reload}
           />
         </div>
         <BsArrowBarRight 

@@ -126,14 +126,13 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
 
 export const logoutHandler = async(req: NewUserProp, res: Response) => {
   try{
-    const cookies = req.cookies
-    if(!cookies?.revolving) {
+    const { userId } = req.params
+    if(!userId) {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
       redisFunc()
       return res.sendStatus(204);
     }
-    const token = cookies?.revolving;
-    const user = await getUserByToken(token)
+    const user = await getUserById(userId)
     if (!user) {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
       redisFunc()

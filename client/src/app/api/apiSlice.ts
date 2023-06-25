@@ -1,12 +1,10 @@
 import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/query/react'
-import { setCredentials, signOut } from '../../features/auth/authSlice'
+import { setCredentials, signUserOut } from '../../features/auth/authSlice'
 import { AuthType } from '../../data'
 import { RootState } from '../store'
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
 
 const BASEURL = 'http://localhost:4000/revolving'
-// const AUTHURL = 'http://localhost:4000/revolving/auth'
-// const USERSURL = 'http://localhost:4000/revolving'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASEURL,
@@ -30,7 +28,7 @@ const baseQueryWithReAuth = async(args: string, api: BaseQueryApi, extraOptions:
     result = baseQuery(args, api, extraOptions) as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>
   }
   else
-    api.dispatch(signOut())
+    api.dispatch(signUserOut())
   return result;
 }
 

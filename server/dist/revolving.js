@@ -70,7 +70,7 @@ else {
     app.use(logURLAndMethods);
     // ROUTES
     app.use('/revolving/auth', authRouter);
-    app.get('/revolving/auth/logout', logoutHandler);
+    app.post('/revolving/auth/logout/:userId', logoutHandler);
     // USERS
     app.get('/revolving/users', getUsers);
     app.get('/revolving/users/single/:userId', getUser);

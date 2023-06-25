@@ -1,52 +1,53 @@
 import { toast } from "react-hot-toast"
-import { axiosAuth } from "../api/axiosPost"
-import useAuthenticationContext from "./useAuthenticationContext"
 import { useNavigate } from "react-router-dom"
 import { useThemeContext } from "./useThemeContext"
 import { ThemeContextType } from "../posts"
-import { AuthenticationContextType } from "../data"
+import { ErrorResponse } from "../data"
+import { useSignOutMutation } from "../app/api/authApiSlice"
+import { useDispatch } from "react-redux"
+import { signUserOut } from "../features/auth/authSlice"
 
 type SignOutType = 'dont' | 'use'
 
 export default function useLogout() {
-  const { setAuth } = useAuthenticationContext() as AuthenticationContextType
   const { setRollout } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId')
+  const [signedOut] = useSignOutMutation()
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const signOut = async(option: SignOutType = 'use') => {
     try{
-      await axiosAuth.get(`/logout`)
-      setAuth({_id: '', accessToken: '', roles: []})
+      await signedOut(currentUserId as string)
+      dispatch(signUserOut())
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
           background: '#8FBC8F'
         }
       })
       setRollout(false)
-      localStorage.removeItem(`newTitle?id=${currentUserId}`)
-      localStorage.removeItem(`newBody?id=${currentUserId}`)
-
-      localStorage.removeItem(`editTitle?id=${currentUserId}`)
-      localStorage.removeItem(`editBody?id=${currentUserId}`)
-      localStorage.removeItem('revolving_userId')
+      clearStorage(currentUserId as string)
       option == 'use' ? navigate('/signIn', { replace: true }) : null
     }catch(err){
-      setAuth({_id: '', accessToken: '', roles: []})
+      // const errors = error as ErrorResponse
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
           background: '#8FBC8F'
         }
       })
-      localStorage.removeItem(`newTitle?id=${currentUserId}`)
-      localStorage.removeItem(`newBody?id=${currentUserId}`)
-
-      localStorage.removeItem(`editTitle?id=${currentUserId}`)
-      localStorage.removeItem(`editBody?id=${currentUserId}`)
-      localStorage.removeItem('revolving_userId')
+      clearStorage(currentUserId as string)
       option == 'use' ? navigate('/signIn', { replace: true }) : null
     }
   }
 
   return signOut
+}
+
+function clearStorage(userId: string){
+  localStorage.removeItem(`newTitle?id=${userId}`)
+  localStorage.removeItem(`newBody?id=${userId}`)
+
+  localStorage.removeItem(`editTitle?id=${userId}`)
+  localStorage.removeItem(`editBody?id=${userId}`)
+  localStorage.removeItem('revolving_userId')
 }

@@ -41,8 +41,12 @@ export const authApiSlice = apiSlice.injectEndpoints({
     verify_account: builder.mutation<null, null>({
       query: () => 'auth/verify_account',
     }),
-    signOut: builder.query({
-      query: () => 'auth/logout',
+    signOut: builder.mutation<void, string>({
+      query: (userId) => ({
+        url: `auth/logout/${userId}`,
+        method: 'POST',
+        body: userId
+      }) as any
     }),
     newAccessToken: builder.query<AuthType, void>({
       query: () => '/auth/new_access_token',
@@ -61,7 +65,7 @@ export const {
   useSignUpMutation,
   useSignInMutation,
   useVerify_accountMutation, // not in use on client side
-  useSignOutQuery,
+  useSignOutMutation,
   useForgotPasswordMutation,
   useNewPasswordMutation,
   useNewAccessTokenQuery,

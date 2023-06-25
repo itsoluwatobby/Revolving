@@ -35,17 +35,14 @@ type PostType = {
 
 type PostContextType = {
   search: string,
-  postData: Partial<PostType>,
   filteredStories: PostType[],
   typingEvent: boolean,
-  // editPost: Partial<PostType>, 
   canPost: boolean,
   navPosts: PostType[],
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
-  setPostData: React.Dispatch<React.SetStateAction<Partial<PostType>>>,
 }
 
 type PromptLiterals = 'Show' | 'Discard' | 'Retain' | 'Dommant'

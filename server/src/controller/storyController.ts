@@ -37,11 +37,13 @@ export const updateStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const story = await getStoryById(storyId)
-    if(!story) return res.sendStatus(404)
-    await story.updateOne({$set: { ...editedStory, edited: true }})
-    const edited = await getStoryById(storyId)
-    return responseType({res, status: 201, count:1, data: edited})
+    await StoryModel.findByIdAndUpdate({ userId, _id: storyId }, {...editedStory, edited: true})
+    .then((data) => {
+      return responseType({res, status: 201, count:1, data})
+    })
+    .catch((error) => {
+      return responseType({res, status: 404, message: 'Story not found'})
+    })
   })
 }
 

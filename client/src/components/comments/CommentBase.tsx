@@ -1,13 +1,16 @@
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs'
 import { MdOutlineInsertComment } from 'react-icons/md';
 import { PromptLiterals, Theme, ThemeContextType } from '../../posts';
-import { CommentProps } from '../../data';
+import { CommentProps, ErrorResponse } from '../../data';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
+import { useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
+import { toast } from 'react-hot-toast';
 
 type BaseProps = {
   mini?: boolean
+  reveal?: boolean
   userId: string,
   theme: Theme,
   writeReply: string,
@@ -17,15 +20,16 @@ type BaseProps = {
   setOpenReply: React.Dispatch<React.SetStateAction<boolean>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>,
-  comment: Pick<CommentProps, '_id' | 'likes' | 'comment'>
+  comment: CommentProps
 }
 
 function modalButton(theme: Theme){ 
   return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
 }
 
-export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
-  const {setParseId, enlarge, setEnlarge } = useThemeContext() as ThemeContextType;
+export default function CommentBase({ responseRef, reveal, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
+  const {setParseId, setLoginPrompt, enlarge, setEnlarge } = useThemeContext() as ThemeContextType;
+  const [likeAndUnlikeComment, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeCommentMutation();
 
   const openUpComment = (commentId: string) => {
     setEnlarge(true)
@@ -47,6 +51,22 @@ export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, wr
     }
   }, [writeReply, openReply, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
 
+  const likeUnlikeComment = async() => {
+    try{
+      const { _id } = comment
+      await likeAndUnlikeComment({userId, commentId: _id}).unwrap()
+    }
+    catch(err: unknown){
+      const errors = likeError as ErrorResponse
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
+          background: '#FF0000'
+        }
+      })
+    }
+  }
+
   return (
     <>
       <p className="flex items-center gap-1.5">
@@ -57,23 +77,27 @@ export default function CommentBase({ responseRef, keepPrompt, setKeepPrompt, wr
               className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
             />
             <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
-              {comment?.likes?.length}
+              {comment?.commentResponse?.length}
             </span>
-            {/* )
-          } */}
         </p>
-        <p className="flex items-center gap-1">
+        <p className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
           {userId && comment?.likes?.includes(userId)
             ?
-            <BsFillHandThumbsUpFill title='like' className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
+            <BsFillHandThumbsUpFill 
+              title='like' 
+              onClick={likeUnlikeComment}
+              className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
             :
-            <BsHandThumbsUp title='like' className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer`} />
+            <BsHandThumbsUp 
+              title='like' 
+              onClick={likeUnlikeComment}
+              className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${comment?.likes.includes(userId) && 'text-red-500'}`} />
           }
           <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
             {comment?.likes?.length}
           </span>
         </p>
-        {(mini && comment?.comment) && (
+        {(!reveal && mini && comment?.comment) && (
             comment?.comment.split(' ').length >= 60 &&
               <small 
                 onClick={() => openUpComment(comment?._id)}

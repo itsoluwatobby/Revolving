@@ -56,7 +56,7 @@ export default function Drawdown({ rollout }: DrawdownProps) {
     {
       userId && 
         <li 
-          onClick={() => signOut()}
+          onClick={() => signOut('use')}
           className={modalClass(theme)}>
             sign Out
         </li>
