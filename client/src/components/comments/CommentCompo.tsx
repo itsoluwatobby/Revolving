@@ -1,37 +1,40 @@
 import { reduceLength } from "../../utils/navigator";
-import { CommentProps, ErrorResponse } from "../../data"
+import { CommentProps, ErrorResponse, Prompted } from "../../data"
 import { format } from 'timeago.js';
-import { ChatOption, PromptLiterals, Theme, ThemeContextType } from "../../posts";
+import { PromptLiterals, Theme, ThemeContextType } from "../../posts";
 import CommentBase from "./CommentBase";
 import { useEffect, useRef, useState } from "react";
 import { MdOutlineExpandMore } from 'react-icons/md'
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setEditComment } from "../../features/story/commentSlice";
 import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
 import { toast } from "react-hot-toast";
 import { useThemeContext } from "../../hooks/useThemeContext";
+import { storyApiSlice } from "../../app/api/storyApiSlice";
+import { getTabCategory } from "../../features/story/navigationSlice";
 
 type CommentType = {
   comment: CommentProps,
   theme: Theme,
-  setOpenBox: React.Dispatch<React.SetStateAction<boolean>>
+  setOpenBox: React.Dispatch<React.SetStateAction<boolean>>,
+  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
 }
 
 function buttonOptClass(theme: Theme){
-  return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-700 hover:text-gray-300'}`
+  return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
 }
 
-export default function CommentCompo({ comment, theme, setOpenBox }: CommentType) {
+export default function CommentCompo({ comment, theme, setPrompt, setOpenBox }: CommentType) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [reveal, setReveal] = useState<boolean>(false)
+  const getNavigation = useSelector(getTabCategory)
   const [openReply, setOpenReply] = useState<boolean>(false)
   const [writeReply, setWriteReply] = useState<string>('');
   const [expand, setExpand] = useState<boolean>(false)
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const { setLoginPrompt } = useThemeContext() as ThemeContextType
   const responseRef = useRef<HTMLTextAreaElement>();
-  const [deleteSuccess, setDeleteSuccess] = useState<ChatOption>('Hide');
-  const [deleteComment, { isLoading, isError, error, isSuccess }] = useDeleteCommentMutation()
+  const [deleteComment, { isLoading, isError, error, isSuccess: isSuccessDeleted, isUninitialized }] = useDeleteCommentMutation()
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -39,13 +42,14 @@ export default function CommentCompo({ comment, theme, setOpenBox }: CommentType
   }, [openReply, setOpenBox])
 
   const closeInput = () => {
-    !writeReply.length ? setOpenReply(false) : setKeepPrompt('Show');
+    !writeReply ? setOpenReply(false) : setKeepPrompt('Show');
     if(responseRef.current) responseRef?.current.focus()
   }
 
   const deleteSingleComment = async() => {
     try{
       await deleteComment({userId: currentUserId, commentId: comment?._id}).unwrap()
+      await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err: unknown){
       const errors = error as ErrorResponse
@@ -58,24 +62,25 @@ export default function CommentCompo({ comment, theme, setOpenBox }: CommentType
     }
   }
 
-  useEffect(() => {
-    if(isSuccess) setDeleteSuccess('Open')
-    
-    const timerId = setTimeout(() => {
-      setDeleteSuccess('Hide')
-    }, 2500);
+  const editYourCommentPop = () => {
+    dispatch(setEditComment(comment))
+    setOpenReply(true)
+    setExpand(false)
+  }
 
-    return () => {
-      clearTimeout(timerId)
+  useEffect(() => {
+    let isMounted = true
+    if(!isUninitialized){
+      isMounted ? setPrompt({type: 'delete', assert: isSuccessDeleted}) : null
     }
-  }, [isSuccess, deleteSuccess])
+    return () => {
+      isMounted = false
+    }
+  }, [isSuccessDeleted])
 
   return (
     <article 
       className={`relative text-sm flex flex-col gap-1 p-1.5 transition-all ${isLoading ? 'animate-pulse' : ''}`}>
-        <p className={`absolute ${deleteSuccess === 'Open' ? 'scale-100' : 'scale-0'} z-30 transition-all bg-red-600 p-3.5 pt-1 pb-1 rounded-lg shadow-2xl tracking-wide text-sm font-mono shadow-slate-800 top-5 right-1/2 bg-opacity-90 border-2 border-gray-500`}>
-          Comment Deleted
-        </p>
       <div className={`flex items-center justify-between pr-2`}>
         <div 
           onClick={closeInput}
@@ -86,13 +91,17 @@ export default function CommentCompo({ comment, theme, setOpenBox }: CommentType
           <p className="text-xs text-gray-950">{format(comment?.commentDate)}</p>
         </div>
         <MdOutlineExpandMore
-          onClick={() => setExpand(prev => !prev)}
+          onClick={() => {
+              setExpand(prev => !prev)
+              dispatch(setEditComment({...comment, comment: ''}))
+            }
+          }
           className={`text-xl ${expand ? ' text-gray-300' : ''} hover:text-gray-300 cursor-pointer ${expand ? null : 'rotate-180'}`}
         />
         {
-          <p className={`absolute ${(expand && comment?.userId === currentUserId) ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-5 top-5 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? '' : 'border-gray-500 shadow-slate-800'}`}>
+          <p className={`absolute ${(expand && comment?.userId === currentUserId) ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-5 top-5 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'border-gray-400 bg-slate-700' : 'border-gray-900 shadow-slate-800'}`}>
             <span 
-              onClick={() => dispatch(setEditComment(comment))}
+              onClick={editYourCommentPop}
               className={buttonOptClass(theme)}>
               Edit
             </span>
@@ -123,7 +132,8 @@ export default function CommentCompo({ comment, theme, setOpenBox }: CommentType
           openReply={openReply} 
           setOpenReply={setOpenReply}
           keepPrompt={keepPrompt} 
-          setKeepPrompt={setKeepPrompt} 
+          setKeepPrompt={setKeepPrompt}
+          setPrompt={setPrompt}
         />
       </div>
     </article>

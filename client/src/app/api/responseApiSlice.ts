@@ -22,50 +22,50 @@ type ResponseType = { data: CommentResponseProps[] }
 
 export const responseApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    createResponse: builder.mutation<CommentResponseProps, ResponseArgs>({
+    createResponse: builder.mutation<CommentResponseProps, Partial<ResponseArgs>>({
       query: ({userId, storyId, response}) => ({
         url: `responses/${userId}/${storyId}`,
         method: 'POST',
         body: {...response}
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT' }],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST' }, { type: 'COMMENT', id: 'LIST' }],
     }),
 
-    updateResponse: builder.mutation<CommentResponseProps, ResponseArgs>({
+    updateResponse: builder.mutation<CommentResponseProps, Partial<ResponseArgs>>({
       query: ({userId, responseId, response}) => ({
         url: `responses/${userId}/${responseId}`,
         method: 'PUT',
         body: {...response}
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}],
     }),
     
-    likeAndUnlikeResponse: builder.mutation<void, Omit<ResponseArgs, 'response'>>({
+    likeAndUnlikeResponse: builder.mutation<void, Pick<ResponseArgs, 'userId' | 'responseId'>>({
       query: ({userId, responseId}) => ({
         url: `responses/${userId}/${responseId}`,
         method: 'PATCH',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}],
     }),
     
     // Also works for admin deleting a user comment
-    deleteResponse: builder.mutation<void, Omit<ResponseArgs, 'response'>>({
+    deleteResponse: builder.mutation<void, Pick<ResponseArgs, 'userId' | 'responseId'>>({
       query: ({userId, responseId}) => ({
         url: `responses/${userId}/${responseId}`,
         method: 'DELETE',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}, { type: 'COMMENT', id: 'LIST' }],
     }),
 
-    deleteResponsesByAdmin: builder.mutation<void, Omit<ResponseArgs, 'response'>>({
+    deleteResponsesByAdmin: builder.mutation<void, Omit<ResponseArgs, 'response' | 'storyId'>>({
       query: ({adminId, userId, responseId, command, commentId}) => ({
         url: `responses/admin/${adminId}/${userId}/${responseId}?command=${command}&commentId=${commentId}`,
         method: 'DELETE',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST' }, { type: 'COMMENT', id: 'LIST'}],
     }),
 
     getResponse: builder.query<CommentResponseProps, string>({
@@ -73,7 +73,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
       transformResponse: (baseQueryReturnValue: {data: CommentResponseProps}) => {
         return baseQueryReturnValue?.data
       },
-      providesTags: ['COMMENT']
+      providesTags: ['RESPONSE']
     }),
   
     getUserResponsesByAdmin: builder.query<CommentResponseProps[], Partial<ResponseArgs>>({
@@ -82,7 +82,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         //return storyAdapter.setAll(initialState, data)
         return baseQueryReturnValue?.data
       }, 
-      providesTags:(result) => providesTag(result as CommentResponseProps[], 'COMMENT')
+      providesTags:(result) => providesTag(result as CommentResponseProps[], 'RESPONSE')
     }),
 
     // story comments
@@ -92,7 +92,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         const response = baseQueryReturnValue.data?.sort((prev, next) => next?.responseDate.localeCompare(prev?.responseDate))
         return response
       }, 
-      providesTags:(result) => providesTag(result as CommentResponseProps[], 'COMMENT')
+      providesTags:(result) => providesTag(result as CommentResponseProps[], 'RESPONSE')
     }),
     
     // user comments in story

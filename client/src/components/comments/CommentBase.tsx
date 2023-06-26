@@ -1,12 +1,15 @@
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs'
 import { MdOutlineInsertComment } from 'react-icons/md';
 import { PromptLiterals, Theme, ThemeContextType } from '../../posts';
-import { CommentProps, ErrorResponse } from '../../data';
+import { CommentProps, ErrorResponse, Prompted } from '../../data';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
 import { useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
+import { checkCount } from '../../utils/navigator';
+import { setEditComment } from '../../features/story/commentSlice';
+import { useDispatch } from 'react-redux';
 
 type BaseProps = {
   mini?: boolean
@@ -17,6 +20,7 @@ type BaseProps = {
   openReply?: boolean,
   keepPrompt: PromptLiterals,
   responseRef: React.MutableRefObject<HTMLTextAreaElement>,
+  setPrompt?: React.Dispatch<React.SetStateAction<Prompted>>,
   setOpenReply: React.Dispatch<React.SetStateAction<boolean>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>,
@@ -27,9 +31,10 @@ function modalButton(theme: Theme){
   return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
 }
 
-export default function CommentBase({ responseRef, reveal, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
+export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
   const {setParseId, setLoginPrompt, enlarge, setEnlarge } = useThemeContext() as ThemeContextType;
   const [likeAndUnlikeComment, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeCommentMutation();
+  const dispatch = useDispatch()
 
   const openUpComment = (commentId: string) => {
     setEnlarge(true)
@@ -67,6 +72,11 @@ export default function CommentBase({ responseRef, reveal, keepPrompt, setKeepPr
     }
   }
 
+  const replyModal = () => {
+    setOpenReply(true)
+    dispatch(setEditComment({...comment, comment: ''}))
+  }
+
   return (
     <>
       <p className="flex items-center gap-1.5">
@@ -94,7 +104,7 @@ export default function CommentBase({ responseRef, reveal, keepPrompt, setKeepPr
               className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${comment?.likes.includes(userId) && 'text-red-500'}`} />
           }
           <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
-            {comment?.likes?.length}
+            {checkCount(comment?.likes)}
           </span>
         </p>
         {(!reveal && mini && comment?.comment) && (
@@ -105,15 +115,17 @@ export default function CommentBase({ responseRef, reveal, keepPrompt, setKeepPr
           )
         }
         <span
-          onClick={() => setOpenReply(true)}
+          onClick={replyModal}
           className="cursor-pointer hover:opacity-70">reply</span>
-      {openReply || keepPrompt == 'Show' 
+      {(openReply || keepPrompt == 'Show') 
             ? <WriteModal 
                 responseRef={responseRef}
                 writeReply={writeReply}
                 keepPrompt={keepPrompt}
                 setOpenReply={setOpenReply}
-                setWriteReply={setWriteReply} 
+                setWriteReply={setWriteReply}
+                setPrompt={setPrompt as React.Dispatch<React.SetStateAction<Prompted>>}
+                currentUserId={userId}
               /> 
               : null
       }

@@ -9,7 +9,7 @@ export default function ChatModal() {
   const { theme } = useThemeContext() as ThemeContextType;
 
   return (
-    <section className={`fixed right-1 bottom-2 flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'} w-1/2 rounded-md md:w-1/5 z-50 p-1 h-80`}>
+    <section className={`fixed right-1 bottom-2 flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700 shadow-slate-800'} w-1/2 rounded-md md:w-1/5 z-50 p-1 h-80 shadow-2xl`}>
       <main className="relative flex flex-col w-full h-full">
         <ChatHeader theme={theme} />
         <ChatBody theme={theme} />
