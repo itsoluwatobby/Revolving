@@ -46,13 +46,13 @@ const PORT = process.env.PORT || 4000
 
 const requestLimiter: RateLimitRequestHandler = rateLimit({
   windowMs: 60 * 1000, //remembers req for a minute
-  max: 30, // maximum of 10 requests per minute
+  max: 60, // maximum of 60 requests per minute
   message: `<p style='font-size: 18px; font-family: mono;'>Too many requests from this IP, please try again after a minute</>`
 })
 
 const speedLimiter = SlowDown({
   windowMs: 60 * 1000, // 60 seconds
-  delayAfter: 15, //starts slowing down after 5 consecutive requests
+  delayAfter: 30, //starts slowing down after 5 consecutive requests
   delayMs: 500, // adds a 500ms delay per request after delay limit is reached
   maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
 })

@@ -30,7 +30,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'COMMENT' }, { type: 'STORY', id: 'LIST' }],
     }),
 
-    updateComment: builder.mutation<CommentProps, CommentArgs>({
+    updateComment: builder.mutation<CommentProps, Partial<CommentArgs>>({
       query: ({userId, commentId, comment}) => ({
         url: `comments/${userId}/${commentId}`,
         method: 'PUT',
@@ -55,7 +55,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }],
     }),
 
     deleteCommentsByAdmin: builder.mutation<void, Omit<CommentArgs, 'comment'>>({
@@ -64,7 +64,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }],
     }),
 
     getComment: builder.query<CommentProps, string>({

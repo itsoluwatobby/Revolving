@@ -7,6 +7,7 @@ import { AiOutlineRetweet } from "react-icons/ai"
 import { useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data"
+import { checkCount } from "../../utils/navigator"
 
 type PostButtomProps = {
   story: MakeToButtom,
@@ -50,27 +51,24 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
   return (
     <div className='mt-2 opacity-90 flex items-center gap-5 text-green-600 text-sm font-sans'>
         <p>{story?.body ? averageReadingTime + ' read' : ''}</p>
-        {
-          (story?.sharedLikes ? story?.sharedLikes?.includes(currentUserId) : story?.likes?.includes(currentUserId)) 
-            ?
-              <p 
-                onClick={likeUnlikeStory}
-                className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
-                <BsFillHandThumbsUpFill title='like' className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
-                <span className={`font-mono text-base ${theme == 'dark' && 'text-white'}`}>
-                  {story?.likes?.length}
-                </span>
-              </p>
-            :
-              <p 
-                onClick={likeUnlikeStory}
-                className={`flex items-center gap-1 ${theme == 'light' ? 'text-black' : 'text-white'} ${isLikeLoading && 'animate-bounce'} `}>
-                  <BsHandThumbsUp title='like' className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${story?.likes.includes(currentUserId) && 'text-red-500'}`} />
-                  <span className={``}>
-                    {story?.likes?.length}
-                  </span>
-              </p>
-        }
+        <p 
+          onClick={likeUnlikeStory}
+          className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
+          {
+            (story?.sharedLikes ? story?.sharedLikes?.includes(currentUserId) : story?.likes?.includes(currentUserId)) 
+              ?
+              <BsFillHandThumbsUpFill 
+              title='like'
+              className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
+              :
+              <BsHandThumbsUp 
+                title='like' 
+                className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
+          }
+            <span className={`font-mono text-base ${theme == 'dark' ? 'text-white' : 'text-black'}`}>
+              {checkCount(story?.likes)}
+            </span>
+        </p>
         {/* {auth?._id && (     */}
           <p className={`flex items-center gap-1.5 ${theme == 'light' ? 'text-black' : 'text-white'}`}>
             <MdOutlineInsertComment 

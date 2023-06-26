@@ -2,10 +2,10 @@ import { BsSend } from 'react-icons/bs'
 import { MdCancel } from 'react-icons/md'
 import CommentCompo from './CommentCompo'
 import { useThemeContext } from '../../hooks/useThemeContext'
-import { ThemeContextType } from '../../posts'
+import { ChatOption, ThemeContextType } from '../../posts'
 import { ChangeEvent, useState, useEffect } from 'react'
 import { SkeletonComment } from '../skeletons/SkeletonComment'
-import { CommentProps, ErrorResponse } from '../../data'
+import { CommentProps, ErrorResponse, Prompted } from '../../data'
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../app/api/commentApiSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { setAllComments } from '../../features/story/commentSlice'
@@ -25,8 +25,10 @@ export default function CommentBody() {
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [comment, setComment] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
-  const [createComment, { isLoading: isLoadingComment, isError: isErrorComment, error: errorComment }] = useCreateCommentMutation()
+  const [createComment, { isLoading: isLoadingComment, isUninitialized, isSuccess: isCommentSuccess, isError: isErrorComment, error: errorComment }] = useCreateCommentMutation()
   const dispatch = useDispatch();
+  const [successModal, setSuccessModal] = useState<ChatOption>('Hide');
+  const [prompt, setPrompt] = useState<Prompted>({type: 'nil', assert: false});
   const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
   const handleComment = (event: ChangeEvent<HTMLInputElement>) => setComment(event.target.value)
@@ -43,13 +45,8 @@ export default function CommentBody() {
       await createComment({ userId: currentUserId, 
         storyId: openComment?.storyId, 
         comment: newComment }).unwrap()
-        setComment('')
-        await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
-        toast.success('Success!! Comment added',{
-            duration: 2000, icon: '🔥', 
-            style: { background: '#3CB371' }
-          }
-        )
+      setComment('')
+      await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err){
       const errors = errorComment as ErrorResponse
@@ -61,21 +58,35 @@ export default function CommentBody() {
       })
     }
   }
-  
-  const editComment = async() => {
-    try{
-      ''
+
+  useEffect(() => {
+    let isMounted = true
+    if(!isUninitialized){
+      isMounted ? setPrompt({type: 'create', assert: isCommentSuccess}) : null
     }
-    catch(err){
-      const errors = errorComment as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+    return () => {
+      isMounted = false
     }
-  }
+  }, [isCommentSuccess])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const activate = () => {
+      if(prompt?.assert) setSuccessModal('Open') 
+    }
+    isMounted ? activate() : null
+
+    const timerId = setTimeout(() => {
+      setSuccessModal('Hide')
+      setPrompt({type: 'nil', assert: false})
+    }, 1500);
+    
+    return () => {
+      clearTimeout(timerId)
+      isMounted = false
+    }
+  }, [prompt?.type])
 
   useEffect(() => {
     let isMounted = true
@@ -113,6 +124,7 @@ export default function CommentBody() {
               comment={comment as CommentProps} 
               theme={theme} 
               setOpenBox={setOpenBox}
+              setPrompt={setPrompt}
             />
           ))
         ) : null
@@ -120,13 +132,16 @@ export default function CommentBody() {
     </>
   )
 
+  let successMsg;
+  prompt.type == 'create' ? successMsg = 'Success 🍡' : prompt.type == 'delete' ? successMsg = 'Comment Deleted' : prompt.type == 'edit' ? successMsg = 'success 🍬' : null
+
   return (
     <>
        <MdCancel
         onClick={() => setOpenComment({ option: 'Hide', storyId: '' })}
         className={`absolute top-0 right-0 text-gray-800 text-2xl cursor-pointer hover:opacity-70`}/>
       <div
-        onKeyUpCapture={event => event.key === 'Enter' ? createNewComment : null}
+        onKeyUpCapture={event => event.key === 'Enter' ? createNewComment() : null}
         className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'}  ${isLoadingComment ? 'animate-pulse' : null}`}>
         <input 
           type="text"
@@ -149,8 +164,16 @@ export default function CommentBody() {
         </button>
       </div>
       <div className="hidebars relative w-full overflow-y-scroll mt-2 flex flex-col">
-        {commentContent}
+        <>
+          {commentContent}
+          <p className={`absolute ${successModal === 'Open' ? 'scale-100' : 'scale-0'} z-30 transition-all ${(prompt.type == 'create' || prompt.type == 'edit') ? 'bg-green-600' : (prompt.type == 'delete' && 'bg-red-600')} p-3.5 pt-1 pb-1 rounded-lg shadow-2xl tracking-wide text-sm font-mono shadow-slate-800 top-7 right-1/3 bg-opacity-90 border-2 border-gray-500`}>
+          {successMsg}
+        </p>
+        </>
       </div>
     </>
   )
 }
+
+
+// (prompt.type == 'create' || prompt.type == 'edit') ? 'Success 🍡' : (prompt.type == 'delete' && 'Comment Deleted')

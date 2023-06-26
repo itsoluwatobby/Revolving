@@ -80,7 +80,8 @@ interface CommentProps{
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
-  responseId: string[],
+  responseTags: string[],
+  commentId: string,
   response: string,
   responseDate: string
 }
