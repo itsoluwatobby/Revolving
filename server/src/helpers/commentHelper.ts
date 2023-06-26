@@ -9,7 +9,7 @@ export const getCommentById = async(commentId: string) => await CommentModel.fin
 
 export const getUserComments = async(userId: string) => await CommentModel.find({ userId }).lean()
 
-export const getUserCommentsInStory = async(userId: string, storyId: string) => await StoryModel.find({ userId, storyId }).lean()
+export const getUserCommentsInStory = async(userId: string, storyId: string) => await CommentModel.find({ userId, storyId }).lean()
 
 export const createComment = async(comment: Partial<CommentProps>) => {
   const newComment = await CommentModel.create({ ...comment })
@@ -66,7 +66,7 @@ export const getResponseById = async(responseId: string) => await CommentRespons
 
 export const getResponseByCommentId = async(commentId: string) => await CommentResponseModel.findById(commentId).lean();
 
-export const getUserResponses = async(userId: string, commentId: string) => await CommentResponseModel.find({ userId, commentId }).lean()
+export const getUserResponses = async(userId: string, responseId: string) => await CommentResponseModel.find({ userId, _id: responseId }).lean()
 
 export const createResponse = async(response: Partial<CommentResponseProps>) => {
   const newResponse = await CommentResponseModel.create({ ...response })

@@ -15,6 +15,7 @@ type StoryProps = {
   likes: string[]
   edited: false
   editDate: string
+  author: string
 }
 
 interface CommentProps{
@@ -23,17 +24,17 @@ interface CommentProps{
   userId: string,
   commentDate: string,
   comment: string,
-  likes: string, //array of string
+  likes: string[],
   author: string,
   edited: boolean,
   editDate: string,
-  commentResponse?: CommentResponseProps[]
+  commentResponse: CommentResponseProps[]
 }
 
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
-  commentId: string[],
+  responseId: string[],
   response: string,
   responseDate: string
 }
@@ -82,18 +83,22 @@ interface UserProps{
   codeName: string,
   stack: string[],
   country: string,
-  socialMediaAccouts: SocialMediaAccoutProp[]
+  socialMediaAccounts: SocialMediaAccoutProp[]
 }
 
+type DeleteCommentByAdmin = 'onlyInStory' | 'allUserComment'
+type DeleteResponseByAdmin = 'onlyInComment' | 'allUserResponse'
+
 interface ErrorResponse{
-  status: number 
+  status: number | string,
   data: {
     meta: {
       message: string
     }
-  }
+  },
+  originalStatus?: number
 }
-
+//  FetchBaseQueryError | SerializedError
 type AuthType={
   _id: string,
   accessToken: string,
@@ -103,9 +108,7 @@ type AuthType={
 type AuthenticationContextType={
   auth: AuthType,
   userSession?: boolean,
-  persistLogin: boolean,
-  setAuth: React.Dispatch<React.SetStateAction<AuthType>>,
-  setPersistLogin: React.Dispatch<React.SetStateAction<boolean>>
+  setAuth: React.Dispatch<React.SetStateAction<AuthType>>
 }
 
 interface UserInfoProps{

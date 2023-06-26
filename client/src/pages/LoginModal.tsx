@@ -17,7 +17,7 @@ export default function Login() {
   const [password, setPassword] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [forgot, setForgot] = useState<boolean>(false)
-  const [signIn, { isLoading, isError, isSuccess, error }] = useSignInMutation()
+  const [signIn, { isLoading, isError, error }] = useSignInMutation()
   const { theme } = useThemeContext() as ThemeContextType;
   const navigate = useNavigate()
 
@@ -50,7 +50,7 @@ export default function Login() {
     }
     catch(err: unknown){
       const errors = error as ErrorResponse
-      isError && toast.error(`${errors?.data?.meta?.message}`, {
+      isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'Please Check Your Network' : errors?.data?.meta?.message}`, {
         duration: 10000, icon: '💀', style: {
           background: errors?.status == 403 ? 'A6BCE2' : '#FF0000'
         }
@@ -61,7 +61,7 @@ export default function Login() {
   return (
     <div className={`welcome w-full ${theme == 'light' ? 'bg-slate-100' : ''}`}>
       {forgot ? 
-          <ForgotPassword setForgot={setForgot}/> 
+          <ForgotPassword setForgot={setForgot}/>
           : <LoginComponent 
               handleSubmit={handleSubmit} handleEmail={handleEmail} email={email} 
               setForgot={setForgot} handlePassword={handlePassword} handleChecked={handleChecked} 

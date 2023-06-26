@@ -4,9 +4,6 @@ import { PostType, ChildrenProp, PostContextType } from '../posts';
 export const PostContext = createContext<PostContextType | null>(null)
 
 export const PostDataProvider = ({ children }: ChildrenProp) => {
-  const [postData, setPostData] = useState<Partial<PostType>>({
-    title: undefined, body: undefined, author: 'anonymous'
-  })
   const [search, setSearch] = useState<string>('');
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
@@ -23,7 +20,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }, [search, navPosts])
 
   const value = {
-    postData, filteredStories, setPostData, search, setSearch, typingEvent, setTypingEvent, canPost, setCanPost, navPosts, setNavPosts
+    filteredStories, search, setSearch, typingEvent, setTypingEvent, canPost, setCanPost, navPosts, setNavPosts
   }
 
   return (

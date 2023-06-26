@@ -80,7 +80,7 @@ interface CommentProps{
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
-  commentId: string[],
+  responseId: string[],
   response: string,
   responseDate: string
 }
@@ -126,7 +126,7 @@ interface UserProps extends Document{
   codeName: string,
   stack: string[],
   country: string,
-  socialMediaAccouts: SocialMediaAccoutProp[]
+  socialMediaAccounts: SocialMediaAccoutProp[]
 }
 
 interface PageRequest extends Request{

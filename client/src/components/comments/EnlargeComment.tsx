@@ -7,6 +7,7 @@ import { reduceLength } from '../../utils/navigator'
 import CommentBase from './CommentBase'
 import { format } from 'timeago.js'
 import { RiArrowGoBackLine } from 'react-icons/ri'
+import { useGetCommentQuery } from '../../app/api/commentApiSlice'
 
 export default function EnlargeComment() {
   const { theme, parseId, setEnlarge } = useThemeContext() as ThemeContextType
@@ -14,13 +15,18 @@ export default function EnlargeComment() {
   const userId = localStorage.getItem('revolving_userId') as string
   const [openReply, setOpenReply] = useState<boolean>(false)
   const [writeReply, setWriteReply] = useState<string>('');
+  const {data, isLoading, error} = useGetCommentQuery(parseId)
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const responseRef = useRef<HTMLTextAreaElement>();
 
   useEffect(() => {
-    const comment = comments.find(comm => comm?._id === parseId)
-    setTargetComment(comment as CommentProps)
-  }, [parseId])
+    let isMounted = true
+    isMounted && setTargetComment(data as CommentProps)
+
+    return () => {
+      isMounted = false
+    }
+  }, [parseId, data]) 
 
   const closeInput = () => {
     !writeReply.length ? setOpenReply(false) : setKeepPrompt('Show');

@@ -4,7 +4,8 @@ import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { CommentResponseProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import { Like_Unlike_Response, createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
+import { Like_Unlike_Response, createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getCommentById, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
+import { CommentModel } from "../models/CommentModel.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -16,10 +17,13 @@ interface RequestProp extends Request{
 export const createNewResponse = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, commentId } = req.params
-    const newResponse: Partial<CommentResponseProps> = req.body
+    let newResponse: Partial<CommentResponseProps> = req.body
     if (!userId || !commentId || !newResponse?.response) return res.sendStatus(400)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
+    newResponse = {...newResponse, author: user?.username}
+    const comment = await getCommentById(commentId)
+    if(!comment) return responseType({res, status: 404, message: 'Comment not found'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const response = await createResponse({...newResponse});
     return responseType({res, status: 201, count:1, data: response})
@@ -34,6 +38,8 @@ export const updateResponse = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    const responseExist = await getResponseById(responseId)
+    if(!responseExist) return responseType({res, status: 404, message: 'Response not found'})
     const response = await editResponse(userId, responseId, editedResponse)
     return responseType({res, status: 201, count:1, data: response})
   })
@@ -46,7 +52,6 @@ export const deleteResponse = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-
     const response = await getResponseById(responseId) as CommentResponseProps
     if(user?.roles.includes(ROLES.ADMIN)) {
       await deleteSingleResponse(responseId)
@@ -62,11 +67,11 @@ export const deleteResponse = (req: RequestProp, res: Response) => {
 export const deleteUserResponses = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { adminId, userId, responseId } = req.params;
-    const { option } = req.query as { option: {command: string, commentId: string} }
+    const option = req.query as { command: string, commentId: string }
     if(!userId || !responseId) return res.sendStatus(400)
     const user = await getUserById(userId)
     const adminUser = await getUserById(adminId)
-    if(!user || !adminUser) return responseType({res, status: 401, message: 'You do not have an account'})
+    if(!user || !adminUser) return responseType({res, status: 404, message: 'You do not have an account'})
     if(adminUser?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
     if(adminUser?.roles.includes(ROLES.ADMIN)) {
@@ -76,7 +81,7 @@ export const deleteUserResponses = (req: RequestProp, res: Response) => {
       }
       else if(option?.command == 'allUserResponse'){
         await deleteAllUserResponses(userId)
-        return responseType({res, status: 201, message: 'All user responses in comment deleted'})
+        return responseType({res, status: 201, message: 'All user responses deleted'})
       }
     }
     return responseType({res, status: 401, message: 'unauthorized'})
@@ -102,8 +107,8 @@ export const userResponses = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {adminId, userId, responseId} = req.params
     if(!userId || !adminId || !responseId) return res.sendStatus(400);
-    if(!getUserById(adminId)) return res.sendStatus(401)
-    if(!getUserById(userId)) return res.sendStatus(401)
+    const user = await getUserById(userId)
+    if(!user) return res.sendStatus(404)
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const admin = await getUserById(adminId)
     if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
@@ -112,7 +117,7 @@ export const userResponses = (req: Request, res: Response) => {
       return userResponse
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (CommentResponseProps[] | string);
     
-    if(!userResponses?.length) return responseType({res, status: 404, message: 'You have no response'})
+    if(!userResponses?.length) return responseType({res, status: 404, message: 'User have no response'})
     return responseType({res, status: 200, count: userResponses?.length, data: userResponses})
   })
 }
@@ -121,7 +126,7 @@ export const getResponseByComment = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { commentId } = req.params;
     if(!commentId) return res.sendStatus(400);
-    const responsesInStories = await getCachedResponse({key:'allStories', cb: async() => {
+    const responsesInStories = await getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
       const responses = await getAllCommentsResponse(commentId);
       return responses
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (CommentResponseProps[] | string)

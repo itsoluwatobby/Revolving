@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, FontStyle, Theme, ThemeContextType } from '../posts';
+import { ChatOption, ChildrenProp, CommentOptionProp, FontStyle, Theme, ThemeContextType } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
@@ -9,10 +9,11 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     localStorage.getItem('fontFamily') || 'font_style'
     );
   const [openChat, setOpenChat] = useState<ChatOption>('Hide');
+  const [loginPrompt, setLoginPrompt] = useState<ChatOption>('Hide');
 
   const [fontOption, setFontOption] = useState<boolean>(false);
   const [rollout, setRollout] = useState<boolean>(false);
-  const [openComment, setOpenComment] = useState<boolean>(false);
+  const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' });
 
   const [parseId, setParseId] = useState<string>('');
   const [enlarge, setEnlarge] = useState<boolean>(false);
@@ -25,7 +26,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge, openChat, setOpenChat
+    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, loginPrompt, setLoginPrompt, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge, openChat, setOpenChat
   }
   return (
     <ThemeContext.Provider value={ values }>

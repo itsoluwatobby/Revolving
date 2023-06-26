@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom'
 import { usePostContext } from '../hooks/usePostContext'
-import { PostContextType, ThemeContextType } from '../posts'
+import { PostContextType, PostType, ThemeContextType } from '../posts'
 import { useThemeContext } from '../hooks/useThemeContext'
 import { custom_fonts } from '../fonts.js'
 import Drawdown from './navModals/Drawdown.js';
 import TopRight from './navModals/TopRight.js';
 import TopLeft from './navModals/TopLeft.js';
+import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
+import { useSelector } from 'react-redux';
+import { getTabCategory } from '../features/story/navigationSlice.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
@@ -17,28 +20,43 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 // const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
-  const {posts, typingEvent} = usePostContext() as PostContextType
+  const getNavigation = useSelector(getTabCategory)
+  const {typingEvent} = usePostContext() as PostContextType
   const {theme, rollout, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { storyId } = useParams()
+  const {data} = useGetStoriesByCategoryQuery(getNavigation)
+  const [targetStory, setTargetStory] = useState<PostType>()
   const [delayedSaving, setDelayedSaving] = useState(false)
   const [options, setOptions] = useState<string>('')
-  
+
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
-  const targetPost = posts?.find(story => story?._id == storyId)
+  useEffect(() => {
+    let isMounted = true
+    if(data?.length){
+      const target = data.find(str => str?._id === storyId)
+      isMounted ? setTargetStory(target as PostType) : null
+    }
+    else{
+      return
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [data, storyId])
 
   const changeFontFamily = (font: string) => {
-    setFontFamily(targetPost?.fontFamily || font)
+    setFontFamily(targetStory?.fontFamily || font)
     localStorage.setItem('fontFamily', font);
   }
 
   useEffect(() => {
-    const responseTime = setTimeout(() => {
+    const responseId = setTimeout(() => {
       setDelayedSaving(typingEvent)
     }, 1000)
-    return () => clearTimeout(responseTime)
+    return () => clearTimeout(responseId)
   }, [typingEvent])
-//console.log({fontFamily})
+
   return(
     <nav 
       className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative

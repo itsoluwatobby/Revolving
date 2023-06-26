@@ -44,7 +44,7 @@ export const shareStory = (req: RequestProp, res: Response) => {
     if (!userId || !storyId) return res.sendStatus(400);
     const user = await getUserById(userId)
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const newShare = await createShareStory(userId, storyId)
+    const newShare = await createShareStory(user, storyId)
     return responseType({res, status: 201, count:1, data: newShare})
   })
 }

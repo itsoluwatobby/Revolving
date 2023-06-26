@@ -5,29 +5,30 @@ import { TextRules } from '../fonts';
 import PostImage from './post/PostImages';
 import PostTop from './post/PostTop';
 import PostBase from './post/PostBase';
+import { Categories } from '../data';
 
 type Props = {
-  post: PostType
-  //navigationTab: Categories
+  story: PostType
+  // navigationTab: Categories
 }
 
-export const Post = ({ post }: Props) => {
+export const Post = ({ story }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
-  let averageReadingTime = useWordCount(post?.body) as string;
+  let averageReadingTime = useWordCount(story?.body) as string;
 
   const [imageLength, setImageLenth] = useState<boolean>(false)
   const end = averageReadingTime.split(' ')[1]
 
-  const userId = localStorage.getItem('revolving_userId') as string
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
   const tooLong = (): string => {
-    const wordLength = post?.body?.split(' ').length
-    const words = wordLength >= 100 ? post?.body?.substring(0, 280)+'...' : post?.body
+    const wordLength = story?.body?.split(' ').length
+    const words = wordLength >= 100 ? story?.body?.substring(0, 280)+'...' : story?.body
     return words
   }
 
   const watchWords = TextRules.keywords as string[]
-  const bodyContent = post && post?.body ? tooLong().split(' ').map((word, index) => {
+  const bodyContent = story && story?.body ? tooLong().split(' ').map((word, index) => {
     return (
       <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'bg-gray-600 rounded-sm text-red-600' : ''}`}>{word}{' '}</span>
     )
@@ -39,16 +40,16 @@ export const Post = ({ post }: Props) => {
  
   return (
     <article 
-      className={`${post?.fontFamily} p-2 pl-3 text-xs sm:w-full min-w-[58%]`}>
+      className={`${story?.fontFamily} p-2 pl-3 text-xs sm:w-full min-w-[58%]`}>
       <PostTop 
         open={open} setOpen={setOpen} openText={openText}
-        bodyContent={bodyContent} story={post}
+        bodyContent={bodyContent} story={story}
       />
 
       <PostImage imageLength={imageLength} />
       
       <PostBase 
-        story={post as MakeToButtom} 
+        story={story as MakeToButtom}
         averageReadingTime={averageReadingTime}
       />
     </article>

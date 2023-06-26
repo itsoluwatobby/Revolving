@@ -1,7 +1,6 @@
-import { FetchBaseQueryMeta } from "@reduxjs/toolkit/dist/query";
 import { UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
-import { EntityState, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
+import { providesTag } from "../../utils/helperFunc";
 
 // interface TransformResponseType extends EntityState<UserProps>{
 //   baseQueryReturnValue?: UserProps[],
@@ -14,17 +13,6 @@ import { EntityState, createEntityAdapter, createSelector } from '@reduxjs/toolk
 // const usersAdapter = createEntityAdapter<UserProps>({})
 
 // const initialState: EntityState<UserProps> = usersAdapter.getInitialState({})
-
-function providesTag<R extends { _id: string | number }, T extends string>(resultWithIds: R[], TagType: T){
-  return (
-    resultWithIds ? [ 
-      { type: TagType, id: 'LIST' }, 
-      ...resultWithIds.map(({ _id }) => ({ type: TagType, id: _id }))
-    ] 
-    : 
-    [{ type: TagType, id: 'LIST' }]
-  )
-}
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -69,7 +57,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       //   usersAdapter.setAll(initialState, baseQueryReturnValue)
         return baseQueryReturnValue?.data
       },
-      providesTags: (result) => providesTag(result?.data as UserProps[], 'USERS')
+      providesTags: (result) => providesTag(result as UserProps[], 'USERS')
     })
   })
 })

@@ -19,10 +19,10 @@ export const createNewStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         let newStory = req.body;
-        newStory = Object.assign(Object.assign({}, newStory), { userId });
         if (!userId || !(newStory === null || newStory === void 0 ? void 0 : newStory.title) || !(newStory === null || newStory === void 0 ? void 0 : newStory.body))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        newStory = Object.assign(Object.assign({}, newStory), { userId, author: user === null || user === void 0 ? void 0 : user.username });
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
@@ -42,12 +42,13 @@ export const updateStory = (req, res) => {
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        const story = yield getStoryById(storyId);
-        if (!story)
-            return res.sendStatus(404);
-        yield story.updateOne({ $set: Object.assign(Object.assign({}, editedStory), { edited: true }) });
-        const edited = yield getStoryById(storyId);
-        return responseType({ res, status: 201, count: 1, data: edited });
+        yield StoryModel.findByIdAndUpdate({ userId, _id: storyId }, Object.assign(Object.assign({}, editedStory), { edited: true }))
+            .then((data) => {
+            return responseType({ res, status: 201, count: 1, data });
+        })
+            .catch((error) => {
+            return responseType({ res, status: 404, message: 'Story not found' });
+        });
     }));
 };
 export const deleteStory = (req, res) => {
@@ -93,8 +94,9 @@ export const getUserStory = (req, res) => {
         const { userId } = req.params;
         if (!userId)
             return res.sendStatus(400);
-        if (!getUserById(userId))
-            return res.sendStatus(401);
+        const user = yield getUserById(userId);
+        if (!user)
+            return res.sendStatus(404);
         // if(user?.isAccountLocked) return res.sendStatus(401)
         const userStories = yield getCachedResponse({ key: `userStory:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const userStory = yield getUserStories(userId);

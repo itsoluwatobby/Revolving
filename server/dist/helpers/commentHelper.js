@@ -13,7 +13,7 @@ import { StoryModel } from "../models/Story.js";
 export const getAllCommentsInStory = (storyId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.find({ storyId }).lean(); });
 export const getCommentById = (commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.findById(commentId).exec(); });
 export const getUserComments = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.find({ userId }).lean(); });
-export const getUserCommentsInStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.find({ userId, storyId }).lean(); });
+export const getUserCommentsInStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentModel.find({ userId, storyId }).lean(); });
 export const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
     const newComment = yield CommentModel.create(Object.assign({}, comment));
     yield StoryModel.findByIdAndUpdate({ _id: comment.storyId }, { $push: { commentIds: newComment === null || newComment === void 0 ? void 0 : newComment._id } });
@@ -57,7 +57,7 @@ export const deleteAllUserCommentsInStory = (userId, storyId) => __awaiter(void 
 export const getAllCommentsResponse = (commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.find({ commentId }).lean(); });
 export const getResponseById = (responseId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.findById(responseId).exec(); });
 export const getResponseByCommentId = (commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.findById(commentId).lean(); });
-export const getUserResponses = (userId, commentId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.find({ userId, commentId }).lean(); });
+export const getUserResponses = (userId, responseId) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.find({ userId, _id: responseId }).lean(); });
 export const createResponse = (response) => __awaiter(void 0, void 0, void 0, function* () {
     const newResponse = yield CommentResponseModel.create(Object.assign({}, response));
     yield CommentModel.findByIdAndUpdate({ _id: response.commentId }, { $push: { commentResponse: newResponse === null || newResponse === void 0 ? void 0 : newResponse._id } });

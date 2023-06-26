@@ -5,6 +5,7 @@ import { asyncFunc, responseType } from "../helpers/helper.js";
 import { CommentProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { Like_Unlike_Comment, createComment, deleteAllUserComments, deleteAllUserCommentsInStory, deleteSingleComment, editComment, getAllCommentsInStory, getCommentById, getUserComments, getUserCommentsInStory, likeAndUnlikeComment } from "../helpers/commentHelper.js";
+import { getStoryById } from "../helpers/storyHelpers.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -16,10 +17,13 @@ interface RequestProp extends Request{
 export const createNewComment = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params
-    const newComment: Partial<CommentProps> = req.body
+    let newComment: Partial<CommentProps> = req.body
     if (!userId || !storyId || !newComment?.comment) return res.sendStatus(400)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
+    newComment = {...newComment, author: user?.username}
+    const story = await getStoryById(storyId)
+    if(!story) return responseType({res, status: 404, message: 'Story not found'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const comment = await createComment({...newComment});
     return responseType({res, status: 201, count:1, data: comment})
@@ -62,7 +66,7 @@ export const deleteComment = (req: RequestProp, res: Response) => {
 export const deleteUserComments = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { adminId, userId, commentId } = req.params;
-    const { option } = req.query as { option: {command: string, storyId: string} }
+    const option = req.query as { command: string, storyId: string }
     if(!userId || !commentId) return res.sendStatus(400)
     const user = await getUserById(userId)
     const adminUser = await getUserById(adminId)
@@ -76,7 +80,7 @@ export const deleteUserComments = (req: RequestProp, res: Response) => {
       }
       else if(option?.command == 'allUserComment'){
         await deleteAllUserComments(userId)
-        return responseType({res, status: 201, message: 'All user comments in story deleted'})
+        return responseType({res, status: 201, message: 'All user comments deleted'})
       }
     }
     return responseType({res, status: 401, message: 'unauthorized'})
@@ -102,8 +106,8 @@ export const userComments = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {adminId, userId} = req.params
     if(!adminId || !userId) return res.sendStatus(400);
-    if(!getUserById(adminId)) return res.sendStatus(401)
-    if(!getUserById(userId)) return res.sendStatus(401)
+    const user = await getUserById(userId)
+    if(!user) return res.sendStatus(404)
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const admin = await getUserById(adminId)
     if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
@@ -112,7 +116,7 @@ export const userComments = (req: Request, res: Response) => {
       return userComment
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (CommentProps[] | string);
     
-    if(!userComments?.length) return responseType({res, status: 404, message: 'You have no comments'})
+    if(!userComments?.length) return responseType({res, status: 404, message: 'User have no comments'})
     return responseType({res, status: 200, count: userComments?.length, data: userComments})
   })
 }
@@ -121,7 +125,7 @@ export const getUserCommentStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params;
     if(!userId || !storyId) return res.sendStatus(400);
-    const commentsInStories = await getCachedResponse({key:'allStories', cb: async() => {
+    const commentsInStories = await getCachedResponse({key:`userCommentsInStories:${userId}`, cb: async() => {
       const comments = await getUserCommentsInStory(userId, storyId);
       return comments
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (CommentProps[] | string)

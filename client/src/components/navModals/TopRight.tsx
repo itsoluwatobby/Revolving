@@ -9,29 +9,24 @@ import profileImage from "../../images/bg_image3.jpg"
 import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
 import { toast } from "react-hot-toast";
-import { sub } from "date-fns"
 import { ErrorResponse } from "../../data"
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
+import { useSelector } from "react-redux"
+import { getStoryData } from "../../features/story/storySlice"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 export default function TopRight() {
-  const [updateStory, {
-    isLoading: updateLoading, 
-    error: updateError, isError: isUpdateError 
+  const [updateStory, { error: updateError, isError: isUpdateError 
   }] = useUpdateStoryMutation()
-  const [createStory, { 
-    isLoading: createLoading, 
-    error: createError, isError: isCreateError 
+  const [createStory, {  error: createError, isError: isCreateError 
   }] = useCreateStoryMutation()
-  const { 
-    theme, setRollout, changeTheme, 
-    setFontOption 
+  const { theme, setRollout, changeTheme, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-
-  const {postData, canPost} = usePostContext() as PostContextType
+  const { canPost } = usePostContext() as PostContextType
+  const storyData = useSelector(getStoryData) 
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -40,53 +35,62 @@ export default function TopRight() {
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   const addPost = async() => {
-    const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const newStory = { storyDate: dateTime, ...postData } as PostType
-    try{
-        await createStory({ userId: newStory?.userId, story: newStory }).unwrap()
-        localStorage.removeItem(`newTitle?id=${newStory?.userId}`)
-        localStorage.removeItem(`newBody?id=${newStory?.userId}`)
+    if(storyData){
+      const userId = storyData.userId as string
+      const story = storyData as PostType
+      try{
+          await createStory({ userId, story }).unwrap()
+          localStorage.removeItem(`newTitle?id=${userId}`)
+          localStorage.removeItem(`newBody?id=${userId}`)
+          
+          toast.success('Success!! Post added',{
+              duration: 2000, icon: '🔥', 
+              style: { background: '#3CB371' }
+            }
+          ) 
+          navigate('/')
+      }
+      catch(err: unknown){
+        const errors = createError as ErrorResponse
+        errors?.originalStatus == 401 && setLoginPrompt('Open')
+        isCreateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+          duration: 2000, icon: '💀', style: {
+            background: '#FF0000'
+          }
+        })
+      }
+    }
+    return
+  }
+
+  const updatedPost = async() => {
+    if(storyData){
+      const userId = storyData.userId as string
+      const story = storyData as PostType
+      try{
+        await updateStory({ userId, storyId: story?._id, story }).unwrap()
+        localStorage.removeItem(`editTitle?id=${userId}`)
+        localStorage.removeItem(`editBody?id=${userId}`)
         
-        toast.success('Success!! Post added',{
+        toast.success('Success!! Post Updated',{
             duration: 2000, icon: '🔥', 
             style: { background: '#3CB371' }
           }
         )  
         navigate('/')
+      }
+      catch(err: unknown){
+        const errors = updateError as ErrorResponse
+        console.log(errors)
+        errors?.originalStatus == 401 && setLoginPrompt('Open')
+        isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+          duration: 2000, icon: '💀', style: {
+            background: '#FF0000'
+          }
+        })
+      }
     }
-    catch(err: unknown){
-      const errors = createError as ErrorResponse
-      isCreateError && toast.error(`${errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
-  }
-
-  const updatedPost = async() => {
-    const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-    const postUpdated = {...postData, _id: storyId, editDate: dateTime} as PostType;
-    try{
-      await updateStory({ userId: postUpdated?.userId, story: postUpdated }).unwrap()
-      localStorage.removeItem(`editTitle?id=${postUpdated?.userId}`)
-      localStorage.removeItem(`editBody?id=${postUpdated?.userId}`)
-      
-      toast.success('Success!! Post Updated',{
-          duration: 2000, icon: '🔥', 
-          style: { background: '#3CB371' }
-        }
-      )  
-      navigate('/')
-    }
-    catch(err: unknown){
-      const errors = updateError as ErrorResponse
-      isUpdateError && toast.error(`${errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
+    return
   }
 
   return (

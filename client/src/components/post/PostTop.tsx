@@ -3,10 +3,8 @@ import { ErrorResponse, SharedProps, UserProps } from "../../data"
 import { reduceLength } from "../../utils/navigator"
 import { FiMoreVertical } from "react-icons/fi"
 import { Link } from "react-router-dom"
-import { CiEdit } from "react-icons/ci"
-import { FaTrash } from "react-icons/fa"
 import { useThemeContext } from "../../hooks/useThemeContext"
-import { PostType, ThemeContextType } from "../../posts"
+import { PostType, Theme, ThemeContextType } from "../../posts"
 import { userOfPost } from "../../utils/helperFunc"
 import { useGetUsersQuery } from "../../app/api/usersApiSlice"
 import { useDeleteStoryMutation } from "../../app/api/storyApiSlice"
@@ -45,10 +43,12 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
     }
   }
 
+
+
   return (
     <>
       <div 
-        // onClick={openText}
+        // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
         <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{
           reduceLength(userOfPost(users as UserProps[], story?.userId), 15) || 'anonymous'
@@ -65,21 +65,22 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           )
         }
         {/* MAKE THIS MORE ATTRACTIVE */}
-        {(userId == story?.userId && open) &&
-          <div className={`absolute top-4 right-4 flex flex-col gap-1.5 items-center text-2xl opacity-80 ${theme == 'light' ? 'bg-gray-300' : 'bg-gray-600'} p-1 rounded-md`}>
-            <Link to={`/edit_story/${story?._id}`} >  
-              <CiEdit 
+        {userId == story?.userId &&
+          <p className={`absolute ${open ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-3 top-4 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? '' : 'border-gray-500 shadow-slate-800'}`}>
+              <span 
                 title='Edit post'
-                className={`cursor-pointer hover:opacity-70 shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
-              />
-            </Link>
-            <FaTrash
+                className={buttonOptClass(theme)}>
+                  <Link to={`/edit_story/${story?._id}`} >  
+                    Edit
+                  </Link>
+              </span>
+            <span 
               onClick={() => deleted(story?._id)}
               title='Delete post'
-              className={`cursor-pointer hover:opacity-70 text-xl shadow-lg transition-all ${theme == 'light' ? 'text-gray-600' : 'text-gray-200'}`}
-            />
-          
-          </div>
+              className={buttonOptClass(theme)}>
+              Delete
+            </span>
+          </p>
         }
       </div>
         <p 
@@ -94,3 +95,9 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
     </>
   )
 }
+
+function buttonOptClass(theme: Theme){
+  return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-700 hover:text-gray-300'}`
+}
+
+

@@ -16,7 +16,7 @@ const authSlice = createSlice({
       state.accessToken = accessToken
       state.roles = roles
     },
-    signOut: (state) => {
+    signUserOut: (state) => {
       state._id = ''
       state.accessToken = ''
       state.roles = []
@@ -33,7 +33,7 @@ export const selectCurrentUser = (state: RootState) => state.auth._id
 export const selectCurrentToken = (state: RootState) => state.auth.accessToken
 export const persisted = (state: RootState) => state?.auth?.persistedLogin
 
-export const { setCredentials, signOut, persistLogin } = authSlice.actions
+export const { setCredentials, signUserOut, persistLogin } = authSlice.actions
 
 export default authSlice.reducer
 

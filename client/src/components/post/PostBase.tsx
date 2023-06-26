@@ -3,9 +3,9 @@ import { MdOutlineInsertComment } from "react-icons/md"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { MakeToButtom, ThemeContextType } from "../../posts"
 import { Link } from "react-router-dom"
-import { RxShare2 } from "react-icons/rx"
+import { AiOutlineRetweet } from "react-icons/ai"
 import { useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice"
-import { toast } from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data"
 
 type PostButtomProps = {
@@ -15,17 +15,31 @@ type PostButtomProps = {
 
 export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
-  const { theme,  setOpenComment } = useThemeContext() as ThemeContextType
+  const { theme,  setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation()
+  // const { data: commentData, isLoading, 
+  //   isError: isCommentError,
+  // } = useGetCommentsQuery(story?._id)
+  // const [comments, setComments] = useState<CommentProps[]>([])
+
+  // useEffect(() => {
+  //   let isMounted = true
+  //   isMounted && setComments(commentData as CommentProps[])
+  //   return () => {
+  //     isMounted = false
+  //   }
+  // }, [commentData])
+
 
   const likeUnlikeStory = async() => {
     try{
-      const {userId, _id} = story   
-      await likeAndUnlikeStory({userId, storyId: _id}).unwrap()
+      const { _id } = story
+      await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
     }
     catch(err: unknown){
-      const errors = likeError as ErrorResponse
-      isLikeError && toast.error(`${errors?.data?.meta?.message}`, {
+      const errors = likeError as Partial<ErrorResponse>
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
@@ -61,7 +75,7 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
           <p className={`flex items-center gap-1.5 ${theme == 'light' ? 'text-black' : 'text-white'}`}>
             <MdOutlineInsertComment 
               title='comments'
-              onClick={() => setOpenComment(true)}
+              onClick={() => setOpenComment({option: 'Open', storyId: story._id})}
               className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}/>
             <span className="">
               {story?.commentIds?.length}
@@ -78,8 +92,8 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
         }
         {/* {auth?._id && (     */}
           <p className='flex items-center gap-1.5'>
-            <RxShare2 
-              title='share story' 
+            <AiOutlineRetweet 
+              title='Repost' 
               className={`font-sans text-lg cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
             />
             <span role='count' title='share count' className={`${theme == 'light' ? 'text-black' : 'text-white'}`}>

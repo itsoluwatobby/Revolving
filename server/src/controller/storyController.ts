@@ -19,10 +19,9 @@ export const createNewStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId } = req.params
     let newStory = req.body
-    newStory = {...newStory, userId}
-
     if (!userId || !newStory?.title || !newStory?.body) return res.sendStatus(400)
     const user = await getUserById(userId);
+    newStory = {...newStory, userId, author: user?.username} as StoryProps
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const story = await createUserStory({...newStory});
@@ -38,11 +37,13 @@ export const updateStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const story = await getStoryById(storyId)
-    if(!story) return res.sendStatus(404)
-    await story.updateOne({$set: { ...editedStory, edited: true }})
-    const edited = await getStoryById(storyId)
-    return responseType({res, status: 201, count:1, data: edited})
+    await StoryModel.findByIdAndUpdate({ userId, _id: storyId }, {...editedStory, edited: true})
+    .then((data) => {
+      return responseType({res, status: 201, count:1, data})
+    })
+    .catch((error) => {
+      return responseType({res, status: 404, message: 'Story not found'})
+    })
   })
 }
 
@@ -86,7 +87,8 @@ export const getUserStory = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId} = req.params
     if(!userId) return res.sendStatus(400);
-    if(!getUserById(userId)) return res.sendStatus(401)
+    const user = await getUserById(userId)
+    if(!user) return res.sendStatus(404)
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const userStories = await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
       const userStory = await getUserStories(userId) 

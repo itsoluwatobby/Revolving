@@ -18,12 +18,13 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { createUser, getUserByEmail, getUserByToken, getUserByVerificationToken } from "../helpers/userHelpers.js";
+import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 import { redisClient } from "../helpers/redis.js";
+import { ROLES } from "../config/allowedRoles.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -130,14 +131,13 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cookies = req.cookies;
-        if (!(cookies === null || cookies === void 0 ? void 0 : cookies.revolving)) {
+        const { userId } = req.params;
+        if (!userId) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
             redisFunc();
             return res.sendStatus(204);
         }
-        const token = cookies === null || cookies === void 0 ? void 0 : cookies.revolving;
-        const user = yield getUserByToken(token);
+        const user = yield getUserById(userId);
         if (!user) {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); //secure: true
             redisFunc();
@@ -167,7 +167,7 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
         const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`;
         const options = mailOptions(email, user.username, verificationLink, 'password');
-        yield transporter.sendMail(options, (err) => {
+        transporter.sendMail(options, (err) => {
             if (err)
                 return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
         });
@@ -216,6 +216,33 @@ export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, fun
             return responseType({ res, status: 401, message: 'unauthorised' });
     }));
 });
+export const toggleAdminRole = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { adminId, userId } = req.params;
+        if (!adminId || !userId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        const admin = yield getUserById(adminId);
+        if (!user || !admin)
+            return responseType({ res, status: 401, message: 'User not found' });
+        if (admin === null || admin === void 0 ? void 0 : admin.roles.includes(ROLES.ADMIN)) {
+            if (!(user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN))) {
+                user.roles = [...user.roles, ROLES.ADMIN];
+                user.save();
+                const userAd = yield getUserById(userId);
+                return responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: userAd });
+            }
+            else {
+                user.roles = [ROLES.USER];
+                user.save();
+                const userAd = yield getUserById(userId);
+                return responseType({ res, status: 201, count: 1, message: 'admin role removed', data: userAd });
+            }
+        }
+        else
+            return responseType({ res, status: 401, message: 'unauthorised' });
+    }));
+};
 function redisFunc() {
     return __awaiter(this, void 0, void 0, function* () {
         objInstance.reset();

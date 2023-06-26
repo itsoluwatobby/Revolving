@@ -14,13 +14,13 @@ export const getSharedStoryById = (sharedId) => __awaiter(void 0, void 0, void 0
 export const getUserSharedStories = (sharerId) => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.find({ sharerId }).lean(); });
 export const getAllSharedStories = () => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.find().lean(); });
 export const getAllSharedByCategories = (category) => __awaiter(void 0, void 0, void 0, function* () { return yield SharedStoryModel.find({ 'sharedStory.category': [category] }); });
-export const createShareStory = (userId, storyId) => __awaiter(void 0, void 0, void 0, function* () {
+export const createShareStory = (user, storyId) => __awaiter(void 0, void 0, void 0, function* () {
     const story = yield getStoryById(storyId);
     const newSharedStory = new SharedStoryModel({
-        sharerId: userId, storyId: story === null || story === void 0 ? void 0 : story._id, sharedDate: dateTime, sharedStory: Object.assign({}, story)
+        sharerId: user === null || user === void 0 ? void 0 : user._id, storyId: story === null || story === void 0 ? void 0 : story._id, sharedDate: dateTime, author: user === null || user === void 0 ? void 0 : user.username, sharedStory: Object.assign({}, story)
     });
     yield newSharedStory.save();
-    yield (story === null || story === void 0 ? void 0 : story.updateOne({ $push: { isShared: { userId, sharedId: newSharedStory === null || newSharedStory === void 0 ? void 0 : newSharedStory._id.toString() } } }));
+    yield (story === null || story === void 0 ? void 0 : story.updateOne({ $push: { isShared: { userId: user === null || user === void 0 ? void 0 : user._id, sharedId: newSharedStory === null || newSharedStory === void 0 ? void 0 : newSharedStory._id.toString() } } }));
     return newSharedStory;
 });
 export const unShareStory = (userId, sharedId) => __awaiter(void 0, void 0, void 0, function* () {

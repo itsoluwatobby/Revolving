@@ -92,7 +92,7 @@ else{
   app.use(logURLAndMethods)
   // ROUTES
   app.use('/revolving/auth', authRouter);
-  app.get('/revolving/auth/logout', logoutHandler);
+  app.post('/revolving/auth/logout/:userId', logoutHandler);
 
   // USERS
   app.get('/revolving/users', getUsers);
@@ -110,7 +110,7 @@ else{
   app.get('/revolving/comment_in_story/:storyId', getStoryComments);
   app.get('/revolving/comment/:commentId', getComment);
   
-  app.get('/revolving/response_in_comment/:responseId', getResponseByComment);
+  app.get('/revolving/response_in_comment/:commentId', getResponseByComment);
   app.get('/revolving/response/:responseId', getResponse);
 
   app.get('/revolving/story/category', getStoryByCategory);
