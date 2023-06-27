@@ -118,11 +118,11 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
   // }, [isSuccessResponse])
 
   const canSubmit = Boolean(writeReply)
-
+  
+// TODO:SORT THIS OUT
   const content = (
-    <article className={`absolute w-full -bottom-20 z-50 ${enlarge && 'bottom-16 left-0'}`}>
+    <article className={`absolute w-full -bottom-[80px] z-50 ${enlarge && (enlarge.type === 'open' ? 'top-[88px] left-0' : 'bottom-[40px] left-0')}`}>
       <div 
-        //  onKeyUpCapture={event => event.key === 'Enter' ? handleSubmit() : null}
         className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingComment || isLoadingResponse) ? 'animate-pulse' : null}`}>
         <textarea 
           ref={responseRef}

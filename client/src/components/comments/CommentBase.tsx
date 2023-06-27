@@ -116,7 +116,9 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
         }
         <span
           onClick={replyModal}
-          className="cursor-pointer hover:opacity-70">reply</span>
+          className="cursor-pointer hover:opacity-70">
+            reply
+        </span>
       {(openReply.assert || keepPrompt == 'Show') 
             ? <WriteModal 
                 responseRef={responseRef}

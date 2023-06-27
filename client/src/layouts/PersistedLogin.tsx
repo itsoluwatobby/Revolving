@@ -13,10 +13,10 @@ export const PersistedLogin = () => {
   const location = useLocation()
   const { theme } = useThemeContext() as ThemeContextType
   const token = useSelector(selectCurrentToken)
-  const persistLogin = localStorage.getItem('persist-login')
+  const persistLogin = JSON.parse(localStorage.getItem('persist-login') as string) as unknown as boolean
   const dispatch = useDispatch()
   const {data, isLoading, isError, refetch} = useNewAccessTokenQuery()
-  
+
   useEffect(() => {
     if(persistLogin && !token){
       refetch()
