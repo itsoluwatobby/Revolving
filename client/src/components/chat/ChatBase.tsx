@@ -25,7 +25,7 @@ export default function ChatBase({ theme }: ChatBaseProp) {
   return (
     <section>
       <div
-        className={`absolute flex-none bottom-0 w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-800'}`}>
+        className={`flex-none w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-800'}`}>
         <input 
           type="text"
           ref={inputRef}

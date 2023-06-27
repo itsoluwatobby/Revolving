@@ -27,8 +27,10 @@ export const reduceLength = (content: string, maxLength: number, option: Option 
 
 export const checkCount = <T>(content: T[]): string => {
   let count = '';
-  if(content?.length <= 999)
-    count = content?.length.toString()
+  if(content?.length <= 999){
+    if(content?.length == 1 && content[0] == '') count = '0'
+    else count = content?.length.toString()
+  }
   else if(content?.length > 999 && content?.length <= 999_999)
     count = (content?.length / 1000).toString() + 'K'
   else if(content?.length > 999_999 && content?.length <= 999_999_999)

@@ -3,7 +3,8 @@ import { RootState } from "../../app/store";
 import { Components, NAVIGATE } from "../../utils/navigator";
 
 const initialState = {
-  navigationTab: localStorage.getItem('NAVIGATE') as Components || NAVIGATE.GENERAL
+  navigationTab: localStorage.getItem('NAVIGATE') as Components || NAVIGATE.GENERAL,
+  expandReply: {} as {}
 }
 
 const navigationSlice = createSlice({

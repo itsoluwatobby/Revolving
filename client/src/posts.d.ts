@@ -56,6 +56,11 @@ type CommentOptionProp = {
   storyId: string
 }
 
+type EnlargeCompo = {
+  type: 'open' | 'enlarge',
+  assert: boolean
+}
+
 type ThemeContextType = {
   theme: Theme,
   fontFamily: FontStyle,
@@ -63,13 +68,13 @@ type ThemeContextType = {
   rollout: boolean,
   openComment: CommentOptionProp,
   parseId: string,
-  enlarge: boolean,
+  enlarge: EnlargeCompo,
   openChat: ChatOption,
   loginPrompt: ChatOption,
   changeTheme: (mode: string) => void,
   setOpenChat: React.Dispatch<React.SetStateAction<ChatOption>>,
   setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
-  setEnlarge: React.Dispatch<React.SetStateAction<boolean>>,
+  setEnlarge: React.Dispatch<React.SetStateAction<EnlargeCompo>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,

@@ -19,9 +19,7 @@ export default function CommentBody() {
   const { theme, openComment, setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const [openBox, setOpenBox] = useState<boolean>(false);
   const currentUserId = localStorage.getItem('revolving_userId') as string;
-  const { data, isLoading, 
-    isError, error 
-  } = useGetCommentsQuery(openComment?.storyId);
+  const { data, isLoading, isError, error } = useGetCommentsQuery(openComment?.storyId);
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [comment, setComment] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
@@ -121,8 +119,7 @@ export default function CommentBody() {
           comments.map(comment => (
             <CommentCompo 
               key={comment?._id}
-              comment={comment as CommentProps} 
-              theme={theme} 
+              comment={comment as CommentProps}  
               setOpenBox={setOpenBox}
               setPrompt={setPrompt}
             />
@@ -133,7 +130,7 @@ export default function CommentBody() {
   )
 
   let successMsg;
-  prompt.type == 'create' ? successMsg = 'Success 🍡' : prompt.type == 'delete' ? successMsg = 'Comment Deleted' : prompt.type == 'edit' ? successMsg = 'success 🍬' : null
+  prompt.type == 'create' ? successMsg = 'Success 🍡' : prompt.type == 'delete' ? successMsg = 'Comment Deleted' : prompt.type == 'edit' ? successMsg = 'success 🍬' : prompt.type == 'response' ? successMsg = 'success ✔️' : null
 
   return (
     <>
@@ -163,10 +160,10 @@ export default function CommentBody() {
           />
         </button>
       </div>
-      <div className="hidebars relative w-full overflow-y-scroll mt-2 flex flex-col">
+      <div className="hidebars relative w-full overflow-y-scroll mt-1 flex flex-col">
         <>
           {commentContent}
-          <p className={`absolute ${successModal === 'Open' ? 'scale-100' : 'scale-0'} z-30 transition-all ${(prompt.type == 'create' || prompt.type == 'edit') ? 'bg-green-600' : (prompt.type == 'delete' && 'bg-red-600')} p-3.5 pt-1 pb-1 rounded-lg shadow-2xl tracking-wide text-sm font-mono shadow-slate-800 top-7 right-1/3 bg-opacity-90 border-2 border-gray-500`}>
+          <p className={`absolute ${successModal === 'Open' ? 'scale-100' : 'scale-0'} z-30 transition-all ${(prompt.type == 'create' || prompt.type == 'edit') ? 'bg-green-600' : prompt.type == 'response' ? 'bg-blue-600' : (prompt.type == 'delete' && 'bg-red-600')} p-3.5 pt-1 pb-1 rounded-lg shadow-2xl tracking-wide text-sm font-mono shadow-slate-800 top-7 right-1/3 bg-opacity-90 border-2 border-gray-500`}>
           {successMsg}
         </p>
         </>
