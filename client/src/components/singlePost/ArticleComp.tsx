@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { ErrorResponse, UserProps } from '../../data';
-import { useLikeAndUnlikeStoryMutation } from '../../app/api/storyApiSlice';
+import { storyApiSlice, useLikeAndUnlikeStoryMutation } from '../../app/api/storyApiSlice';
 import { toast } from 'react-hot-toast';
 import { checkCount } from '../../utils/navigator';
 
@@ -21,12 +21,11 @@ type ArticleProps = {
   isMutating: boolean
   error: {error: string},
   followOrUnfollow: () => Promise<void>,
-  refetch: () => Promise<void>
 }
 
 type HoverType = 'unfollow' | 'following'
 
-export default function ArticleComp({ isError, story, bodyContent, user, sidebar, averageReadingTime, isLoading, error, isMutating, followOrUnfollow, refetch }: ArticleProps) {
+export default function ArticleComp({ isError, story, bodyContent, user, sidebar, averageReadingTime, isLoading, error, isMutating, followOrUnfollow }: ArticleProps) {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const currentUserId = localStorage.getItem('revolving_userId') as string
@@ -36,7 +35,7 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
     try{
       const { _id } = story
       await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
-      refetch()
+      await storyApiSlice.useGetStoryQuery(_id).refetch()
     }
     catch(err: unknown){
       const errors = likeError as ErrorResponse

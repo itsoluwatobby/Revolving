@@ -41,7 +41,17 @@ interface Emerge extends CommentProps{
 }
 
 type Prompted = {
-  type: 'create' | 'edit' | 'delete' | 'nil',
+  type: 'create' | 'edit' | 'delete' | 'response' | 'nil',
+  assert: boolean
+}
+
+type OpenReply = {
+  type: 'reply' | 'edit' | 'nil',
+  assert: boolean
+}
+
+type EnlargeCompo = {
+  type: 'open' | 'enlarge',
   assert: boolean
 }
 

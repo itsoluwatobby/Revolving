@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { CommentProps } from "../../data";
+import { CommentProps, CommentResponseProps } from "../../data";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 // const storyAdapter: EntityAdapter<CommentProps> = createEntityAdapter<CommentProps>({
@@ -12,9 +12,10 @@ import { CommentProps } from "../../data";
 // })
 
 const initialState = {
-  // commentLength: 0,
   comments: [] as CommentProps[],
-  editComment: {} as CommentProps
+  editComment: {} as CommentProps,
+  responses: [] as CommentResponseProps[],
+  editResponse: {} as CommentResponseProps
 }
 
 const commentSlice = createSlice({
@@ -26,13 +27,23 @@ const commentSlice = createSlice({
     },
     setEditComment: (state, action: PayloadAction<CommentProps>) => {
       state.editComment = action.payload
+    },
+    setAllResponses: (state, action: PayloadAction<CommentResponseProps[]>) => {
+      state.responses = action.payload
+    },
+    setEditResponse: (state, action: PayloadAction<CommentResponseProps>) => {
+      state.editResponse = action.payload
     }
   }
 })
 
-export const { setAllComments, setEditComment } = commentSlice.actions
+export const { setAllComments, setEditComment, setEditResponse, setAllResponses } = commentSlice.actions
+
 export const getComments = (state: RootState) => state.comment.comments
 export const getEditComments = (state: RootState) => state.comment.editComment
+
+export const getResponses = (state: RootState) => state.comment.responses
+export const getEditResponses = (state: RootState) => state.comment.editResponse
 
 export default commentSlice.reducer
 

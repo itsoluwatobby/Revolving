@@ -9,8 +9,7 @@ type ResponseArgs = {
   command: DeleteResponseByAdmin, 
   commentId?: string,
   responseId?: string,
-  response: CommentResponseProps, 
-  storyId: string
+  response: Partial<CommentResponseProps>
 }
 
 type ResponseType = { data: CommentResponseProps[] }
@@ -23,8 +22,8 @@ type ResponseType = { data: CommentResponseProps[] }
 export const responseApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     createResponse: builder.mutation<CommentResponseProps, Partial<ResponseArgs>>({
-      query: ({userId, storyId, response}) => ({
-        url: `responses/${userId}/${storyId}`,
+      query: ({userId, commentId, response}) => ({
+        url: `responses/${userId}/${commentId}`,
         method: 'POST',
         body: {...response}
       }) as any,

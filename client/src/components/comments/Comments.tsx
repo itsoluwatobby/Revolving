@@ -13,7 +13,7 @@ export default function Comments() {
   return (
     <section className="comment_page absolute z-50 bg-opacity-30 w-full flex flex-col p-3">
       <article className={`relative ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-700'} flex flex-col h-4/5 p-2 pt-1 md:w-4/5 shadow-lg rounded-lg`}>
-        {!enlarge && (
+        {!enlarge?.assert && (
           comments?.length ? (
               <p 
                 className={`text-center font-mono capitalize ${theme == 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
@@ -24,7 +24,7 @@ export default function Comments() {
             )
           )
         }
-        {enlarge ? <EnlargeComment /> : <CommentBody />}
+        {enlarge?.assert ? <EnlargeComment /> : <CommentBody />}
       </article>
     </section>
   )

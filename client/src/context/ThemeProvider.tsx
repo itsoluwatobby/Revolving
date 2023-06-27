@@ -1,5 +1,6 @@
 import { createContext, useState } from 'react';
 import { ChatOption, ChildrenProp, CommentOptionProp, FontStyle, Theme, ThemeContextType } from '../posts';
+import { EnlargeCompo } from '../data';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
@@ -16,7 +17,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' });
 
   const [parseId, setParseId] = useState<string>('');
-  const [enlarge, setEnlarge] = useState<boolean>(false);
+  const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
 
   const changeTheme = (mode: string) => {
     setTheme(prev => {

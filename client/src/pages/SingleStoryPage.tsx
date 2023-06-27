@@ -28,12 +28,10 @@ export default function SingleStoryPage() {
   const [followUnfollowUser, { isLoading: isMutating, 
     error: followError,  isError: isFollowError, 
     isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
-  const { data: target, isLoading, isError, error, refetch: reload } = useGetStoryQuery(storyId);
+  const { data: target, isLoading, isError, error } = useGetStoryQuery(storyId);
   const { data, isLoading: loading } = useGetStoriesQuery()
   const [stories, setStories] = useState<PostType[]>([])
   const [targetStory, setTargetStory] = useState<PostType>();
-
-  type RefetchType = Awaited<ReturnType<typeof reload>>
 
   let averageReadingTime = useWordCount(targetStory?.body as string)
   const watchWords = TextRules.keywords as string
@@ -102,7 +100,7 @@ export default function SingleStoryPage() {
             averageReadingTime={averageReadingTime} 
             sidebar={sidebar} isLoading={isLoading} isError={isError} isMutating={isMutating}
             error={error as {error: string}} user={user as UserProps} 
-            followOrUnfollow={followOrUnfollow} refetch={reload}
+            followOrUnfollow={followOrUnfollow}
           />
         </div>
         <BsArrowBarRight 

@@ -1,15 +1,16 @@
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs'
 import { MdOutlineInsertComment } from 'react-icons/md';
-import { PromptLiterals, Theme, ThemeContextType } from '../../posts';
-import { CommentProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../data';
-import { useThemeContext } from '../../hooks/useThemeContext';
+import { PromptLiterals, Theme, ThemeContextType } from '../../../posts';
+import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../../data';
+import { useThemeContext } from '../../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
-import { useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
+import { useLikeAndUnlikeCommentMutation } from '../../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
-import { checkCount } from '../../utils/navigator';
-import { setEditComment } from '../../features/story/commentSlice';
+import { checkCount } from '../../../utils/navigator';
+import { setEditComment, setEditResponse } from '../../../features/story/commentSlice';
 import { useDispatch } from 'react-redux';
+import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
 
 type BaseProps = {
   mini?: boolean
@@ -24,6 +25,7 @@ type BaseProps = {
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>,
+  response: CommentResponseProps,
   comment: CommentProps
 }
 
@@ -31,15 +33,15 @@ function modalButton(theme: Theme){
   return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
 }
 
-export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
+export default function ResponseBase({ responseRef, comment, reveal, setPrompt, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, response}: BaseProps) {
   const {setParseId, setLoginPrompt, enlarge, setEnlarge } = useThemeContext() as ThemeContextType;
-  const [likeAndUnlikeComment, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeCommentMutation();
+  const [likeAndUnlikeResponse, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeResponseMutation();
   const dispatch = useDispatch()
 
-  const expandComment = (commentId: string, main=true) => {
+  const expandResponse = (responseId: string, main=true) => {
     if(main) setEnlarge({type: 'open', assert: true})
     else setEnlarge({type: 'enlarge', assert: true})
-    setParseId(commentId)
+    setParseId(responseId)
   }
 
   useEffect(() => {
@@ -57,10 +59,10 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
     }
   }, [writeReply, openReply.assert, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
 
-  const likeUnlikeComment = async() => {
+  const likeUnlikeResponse = async() => {
     try{
-      const { _id } = comment
-      await likeAndUnlikeComment({userId, commentId: _id}).unwrap()
+      const { _id } = response
+      await likeAndUnlikeResponse({userId, responseId: _id}).unwrap()
     }
     catch(err: unknown){
       const errors = likeError as ErrorResponse
@@ -75,7 +77,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
 
   const replyModal = () => {
     setOpenReply({type: 'reply', assert: true})
-    dispatch(setEditComment({...comment, comment: ''}))
+    dispatch(setEditResponse({...response, response: ''}))
   }
 
   return (
@@ -83,34 +85,34 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
         <p className="flex items-center gap-1.5">
           <MdOutlineInsertComment 
             title='responses'
-            onClick={() => expandComment(comment._id, true)}
+            onClick={() => expandResponse(response._id, true)}
             className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
           />
           <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
-            {checkCount(comment?.commentResponse)}
+            {checkCount(response?.responseTags)}
           </span>
         </p>
         <p className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
-          {userId && comment?.likes?.includes(userId)
+          {userId && response?.likes?.includes(userId)
             ?
             <BsFillHandThumbsUpFill 
               title='like' 
-              onClick={likeUnlikeComment}
+              onClick={likeUnlikeResponse}
               className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
             :
             <BsHandThumbsUp 
               title='like' 
-              onClick={likeUnlikeComment}
-              className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${comment?.likes.includes(userId) && 'text-red-500'}`} />
+              onClick={likeUnlikeResponse}
+              className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${response?.likes.includes(userId) && 'text-red-500'}`} />
           }
           <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
-            {checkCount(comment?.likes)}
+            {checkCount(response?.likes)}
           </span>
         </p>
-        {(!reveal && mini && comment?.comment) && (
-            comment?.comment.split(' ').length >= 60 &&
+        {(!reveal && mini && response?.response) && (
+            response?.response.split(' ').length >= 60 &&
               <small 
-                onClick={() => expandComment(comment?._id, false)}
+                onClick={() => expandResponse(response?._id, false)}
                 className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-gray-200`}>Read more</small>
           )
         }
@@ -127,6 +129,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
                 setWriteReply={setWriteReply}
                 setPrompt={setPrompt as React.Dispatch<React.SetStateAction<Prompted>>}
                 currentUserId={userId}
+                response={response}
                 comment={comment}
               /> 
               : null
