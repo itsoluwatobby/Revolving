@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
-import { Like_Unlike, createUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
+import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
@@ -59,12 +59,32 @@ export const deleteStory = (req: RequestProp, res: Response) => {
     if(!story) return responseType({res, status: 404, message: 'story not found'})
 
     if(user?.roles.includes(ROLES.ADMIN)) {
-      await story.deleteOne()
+      await deleteUserStory(storyId)
       return res.sendStatus(204)
     }
     if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
-    await story.deleteOne()
+    await deleteUserStory(storyId)
     return res.sendStatus(204)
+  })
+}
+
+// Delete user story by admin
+export const deleteStoryByAdmin = (req: RequestProp, res: Response) => {
+  asyncFunc(res, async () => {
+    const { adminId, userId, storyId } = req.params;
+    if(!adminId || !userId || !storyId) return res.sendStatus(400)
+    const user = await getUserById(userId)
+    if(!user) return responseType({res, status: 401, message: 'user not found'})
+    
+    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    const story = await getUserStories(userId)
+    if(!story.length) return responseType({res, status: 404, message: 'user does not have a story'})
+
+    if(user?.roles.includes(ROLES.ADMIN)) {
+      await deleteAllUserStories(userId)
+      return responseType({res, status: 201, message: 'All user stories deleted'})
+    } 
+    return responseType({res, status: 401, message: 'unauthorized'})
   })
 }
 

@@ -1,6 +1,7 @@
-import { ObjectId } from "mongoose";
-import { Categories, StoryProps } from "../../types.js";
+import { StoryProps } from "../../types.js";
 import { StoryModel } from "../models/Story.js";
+import { CommentResponseModel } from "../models/CommentResponse.js";
+import { CommentModel } from "../models/CommentModel.js";
 
 export const getAllStories = async() => await StoryModel.find().lean();
 
@@ -42,6 +43,20 @@ export const likeAndUnlikeStory = async(userId: string, storyId: string): Promis
 }
 export type Like_Unlike = Awaited<ReturnType<typeof likeAndUnlikeStory>>
 
-export const deleteUserStory = async(storyId: string) => await StoryModel.findByIdAndDelete({ _id: storyId })
+export const deleteUserStory = async(storyId: string) =>{
+  await StoryModel.findByIdAndDelete({ _id: storyId })
+  const commentInStory = await CommentModel.find({ storyId }).lean()
+  await Promise.all(commentInStory.map(comment => {
+    CommentResponseModel.deleteMany({ commentId: comment._id })
+  }))
+  await CommentModel.deleteMany({ storyId })
+}
 
-export const deleteAllUserStories = async(userId: string) => await StoryModel.deleteMany({ userId })
+export const deleteAllUserStories = async(userId: string) => {
+  await StoryModel.deleteMany({ userId })
+  const userComments = await CommentModel.find({ userId }).lean()
+  await Promise.all(userComments.map(comment => {
+    CommentResponseModel.deleteMany({ commentId: comment._id })
+  }))
+  await CommentModel.deleteMany({ userId })
+}

@@ -1,5 +1,6 @@
 import { UserProps } from "../../types.js";
 import { UserModel } from "../models/User.js";
+import { deleteAllUserStories } from "./storyHelpers.js";
 
 export const getAllUsers = async() => await UserModel.find().lean();
 
@@ -28,4 +29,7 @@ export const followOrUnFollow = async(followerId: string, followingId: string): 
   }
 }
 
-export const deleteAccount = async(userId: string) => await UserModel.findByIdAndDelete({ _id: userId })
+export const deleteAccount = async(userId: string) => {
+  await UserModel.findByIdAndDelete({ _id: userId })
+  await deleteAllUserStories(userId)
+}
