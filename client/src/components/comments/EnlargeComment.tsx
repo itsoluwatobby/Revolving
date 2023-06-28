@@ -97,7 +97,7 @@ export default function EnlargeComment() {
               {
                 errorMsg?.status == 404 ? 
                   <p className='flex flex-col gap-2'>
-                    <span>No responses yets</span>
+                    <span>No response yet</span>
                     <span>Say something to start the converstion</span>
                   </p> 
                   : 
@@ -133,11 +133,21 @@ export default function EnlargeComment() {
         {
           isLoading ? <SkeletonComment />
         : isError ? (
-          <p className='text-center mt-10 text-lg'>{errorMsg?.status == 404 ? 'No Comment Avaialable' : 'Network Error, Please check your connection'}</p>
+          <p className='text-center mt-10 text-sm'>
+          {
+            errorMsg?.status == 404 ? 
+              <p className='flex flex-col gap-2'>
+                <span>No responses yets</span>
+                <span>Say something to start the converstion</span>
+              </p> 
+              : 
+              <span>Network Error, Please check your connection</span>
+            }
+          </p>
         ) : (
-          enlarge?.type == 'enlarge' ?
-            targetComment && singleCommentContent
-            :
+          // enlarge?.type == 'enlarge' ?
+          //   targetComment && singleCommentContent
+          //   :
             enlarge?.type == 'open' ? commentWithResponse : null
           )
         }

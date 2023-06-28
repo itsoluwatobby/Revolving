@@ -11,6 +11,7 @@ import { useThemeContext } from '../hooks/useThemeContext';
 import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice';
 import { useSelector } from 'react-redux';
 import { getTabCategory } from '../features/story/navigationSlice';
+import useRevolvingPostFeed from '../hooks/useRevolvingPostFeed';
 
 export const Posts = () => {
   const getNavigation = useSelector(getTabCategory)
@@ -18,6 +19,7 @@ export const Posts = () => {
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { openComment, setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
+  //const filteredFeeds = useRevolvingPostFeed(filteredStories, filteredStories) as PostType[]
 
   useEffect(() => {
     let isMounted = true
@@ -53,7 +55,6 @@ export const Posts = () => {
       filteredStories?.map(post => (
             <Post key={post?.sharedId || post?._id} 
               story={post as PostType} 
-              // getNavigation={getNavigation}
             />
           )
         )

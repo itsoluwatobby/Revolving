@@ -115,7 +115,7 @@ export default function CommentBody() {
       {
         errorMsg?.status == 404 ? 
           <p className='flex flex-col gap-2 font-serif'>
-            <span>No comments yets</span>
+            <span>No comments yet</span>
             <span>Say something to start the converstion</span>
           </p> 
           : 

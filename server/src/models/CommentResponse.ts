@@ -8,10 +8,8 @@ const CommentResponseSchema: Schema = new Schema(
     likes: { type: Array, default: [] },
     responseTags: { type: Array, default: '' },
     response: { type: String, default: '' },
-    responseDate: { type: String, default: '' },
     author: { type: String, default: '' },
     edited: { type: Boolean, default: false },
-    editDate: { type: String, default: '' },
   },
   {
     minimize: false,

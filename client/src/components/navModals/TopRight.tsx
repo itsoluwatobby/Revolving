@@ -19,10 +19,8 @@ const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 export default function TopRight() {
-  const [updateStory, { error: updateError, isError: isUpdateError 
-  }] = useUpdateStoryMutation()
-  const [createStory, {  error: createError, isError: isCreateError 
-  }] = useCreateStoryMutation()
+  const [updateStory, {error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
+  const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, setRollout, changeTheme, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
   const { canPost } = usePostContext() as PostContextType
@@ -34,7 +32,7 @@ export default function TopRight() {
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
-  const addPost = async() => {
+  const createNewStory = async() => {
     if(storyData){
       const userId = storyData.userId as string
       const story = storyData as PostType
@@ -108,7 +106,7 @@ export default function TopRight() {
               pathname == '/new_story' ?
               <button
                 className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
-                onClick={addPost}
+                onClick={createNewStory}
                 disabled = {!canPost}
                 >Publish
               </button>
@@ -124,7 +122,7 @@ export default function TopRight() {
               )
             )
           :
-            <Link to={address.includes(pathname) ? '' : 'new_story'} >
+            <Link to={'/new_story'} >
               <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-700 duration-200 ease-linear font-normal ml-2'>
                 <FiEdit className='text-xl' />
                 <span className=''>Post</span>

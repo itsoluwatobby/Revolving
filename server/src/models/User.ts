@@ -28,7 +28,6 @@ const USERSCHEMA: Schema = new Schema(
     status: { type: String, default: 'offline', enum: ['online', 'offline'] },
     refreshToken: { type: String, default: '' },
     edited: { type: Boolean, default: false },
-    editDate: { type: String, default: '' },
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     codeName: { type: String, default: '', trim: true },
     stack: { type: Array, default: [] },

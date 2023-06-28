@@ -14,18 +14,17 @@ type PostType = {
   picture: string,
   body: string,
   author: string | 'anonymous',
-  storyDate: string,
   likes: string[],
   isShared?: string[],
   category: Categories[] | Categories,
   fontFamily?: string | 'sans',
   commentIds?: string[],
   edited: false,
-  editDate: string,
-  sharedDate: string,
   sharerId?: string,
   sharedId?: string,
-  sharedLikes?: string[]
+  sharedLikes?: string[],
+  createdAt: string,
+  updatedAt: string
 }
 
 // interface WindowScrollType{

@@ -1,24 +1,46 @@
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { BsSend } from 'react-icons/bs';
 import { Theme } from '../../posts'
+import { sub } from 'date-fns';
+import { useDispatch } from 'react-redux';
+import { createChatMessage } from '../../features/chat/chatSlice';
+import { ChatProps } from '../../data';
+import { nanoid } from '@reduxjs/toolkit';
 
 type ChatBaseProp={
   theme: Theme
+  input: string
+  setInput: React.Dispatch<React.SetStateAction<string>>
 }
 
-export default function ChatBase({ theme }: ChatBaseProp) {
-  const [entry, setEntry] = useState<string>('')
+export default function ChatBase({ theme, input, setInput }: ChatBaseProp) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const currentUserId = localStorage.getItem('revolving_userId') as string
+  const dateTime = sub(new Date, { minutes: 0 }).toISOString();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if(inputRef.current) inputRef?.current.focus()
   }, [])
 
-  const handleChatInput = (event: ChangeEvent<HTMLInputElement>) => setEntry(event.target.value)
+  const handleChatInput = (event: ChangeEvent<HTMLInputElement>) => setInput(event.target.value)
   
   const handleChat = async() => {
+    if(!input.length) return
+    try{
+      const clientMsg = {
+        _id: nanoid(5),
+        message: input,
+        userId: currentUserId,
+        dateTime
+      }
 
-    return
+      dispatch(createChatMessage(clientMsg))
+      setInput('')
+    }
+    catch(err){
+      console.log(err)
+    }
   }
 
   // ${isLoadingComment ? 'animate-pulse' : null}
@@ -29,7 +51,7 @@ export default function ChatBase({ theme }: ChatBaseProp) {
         <input 
           type="text"
           ref={inputRef}
-          value={entry}
+          value={input}
           autoComplete="off"
           placeholder="Say hello"
           onChange={handleChatInput}

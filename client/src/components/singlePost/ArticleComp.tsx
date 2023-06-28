@@ -62,7 +62,7 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
       <div className='relative flex items-center gap-3'>
         <p className='capitalize'>{story?.author || 'anonymous'}</p>
         <span>.</span>
-        <p>{format(story?.storyDate, 'en-US')}</p>
+        <p>{format(story?.createdAt, 'en-US')}</p>
           {
             (currentUserId && currentUserId !== story?.userId) ? (
               !user?.followings?.includes(story?.userId) ? (
@@ -109,7 +109,7 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
                         {checkCount(story?.likes)}
                       </span>
                   </p>
-            {story?.edited && <p>edited {format(story?.editDate)}</p>}
+            {story?.edited && <p>edited {format(story?.updatedAt)}</p>}
         </div>
           : ''
         }

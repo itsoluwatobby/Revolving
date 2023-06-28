@@ -87,6 +87,7 @@ export const NewStory = () => {
         title: inputValue, 
         body: textareaValue,
         category: postCategory,
+        userId: currentUserId,
         storyDate: dateTime,
         fontFamily
       }

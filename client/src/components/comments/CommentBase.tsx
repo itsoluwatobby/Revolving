@@ -36,9 +36,8 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
   const [likeAndUnlikeComment, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeCommentMutation();
   const dispatch = useDispatch()
 
-  const expandComment = (commentId: string, main=true) => {
-    if(main) setEnlarge({type: 'open', assert: true})
-    else setEnlarge({type: 'enlarge', assert: true})
+  const expandComment = (commentId: string) => {
+    setEnlarge({type: 'open', assert: true})
     setParseId(commentId)
   }
 
@@ -55,7 +54,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
     }
-  }, [writeReply, openReply.assert, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
+  }, [writeReply, openReply.assert, openReply.type, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
 
   const likeUnlikeComment = async() => {
     try{
@@ -83,7 +82,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
         <p className="flex items-center gap-1.5">
           <MdOutlineInsertComment 
             title='responses'
-            onClick={() => expandComment(comment._id, true)}
+            onClick={() => expandComment(comment._id)}
             className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
           />
           <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
@@ -110,7 +109,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
         {(!reveal && mini && comment?.comment) && (
             comment?.comment.split(' ').length >= 60 &&
               <small 
-                onClick={() => expandComment(comment?._id, false)}
+                onClick={() => expandComment(comment?._id)}
                 className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-gray-200`}>Read more</small>
           )
         }

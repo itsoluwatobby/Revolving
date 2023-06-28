@@ -54,9 +54,9 @@ export default function BodyComponent({ currentUserId, expand, reveal, comment, 
           onClick={closeInput}
           className={`flex items-center gap-4 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
           <p 
-            className={`cursor-pointer hover:opacity-70 transition-all text-sm ${theme == 'light' ? '' : 'text-black'}`}>{reduceLength(comment?.author, 15) || 'anonymous'}</p>
+            className={`cursor-pointer hover:opacity-70 transition-all text-sm ${theme == 'light' ? '' : 'text-black'}`}>{reduceLength(comment.author, 15) || 'anonymous'}</p>
           <span className="font-bold text-black">.</span>
-          <p className="text-xs text-gray-950">{format(comment?.commentDate)}</p>
+          <p className="text-xs text-gray-950">{format(comment.createdAt)}</p>
         </div>
         <MdOutlineExpandMore
           onClick={() => {

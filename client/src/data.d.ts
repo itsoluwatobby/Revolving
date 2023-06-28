@@ -8,26 +8,26 @@ type StoryProps = {
   title: string
   picture: string
   body: string
-  storyDate: string
   category: Categories[]
   commentIds?: string[]
   isShared?: string[]
   likes: string[]
   edited: false
-  editDate: string
   author: string
+  createdAt: string,
+  updatedAt: string
 }
 
 interface CommentProps{
   _id: string,
   storyId: string,
   userId: string,
-  commentDate: string,
   comment: string,
   likes: string[],
   author: string,
   edited: boolean,
-  editDate: string,
+  createdAt: string,
+  updatedAt: string
   commentResponse: CommentResponseProps[]
 }
 
@@ -37,7 +37,6 @@ interface Emerge extends CommentProps{
   responseTags: string[],
   commentId: string,
   response: string,
-  responseDate: string
 }
 
 type Prompted = {
@@ -55,15 +54,22 @@ type EnlargeCompo = {
   assert: boolean
 }
 
+type ObjectUnknown<K>={
+  [index: string]: K | string,
+  createdAt: string,
+  likes: string[]
+}
+
 type USERROLES = number
 type ALLOWEDROLES = Record<string, USERROLES>
 
 interface SharedProps{
   sharerId: string,
   storyId: string,
-  sharedDate: string,
   sharedStory: object,
-  sharedLikes: string[]
+  sharedLikes: string[],
+  createdAt: string,
+  updatedAt: string
 }
 
 type SocialMediaAccoutProp = {
@@ -99,7 +105,20 @@ interface UserProps{
   codeName: string,
   stack: string[],
   country: string,
-  socialMediaAccounts: SocialMediaAccoutProp[]
+  socialMediaAccounts: SocialMediaAccoutProp[],
+  createdAt: string,
+  updatedAt: string
+}
+
+type ChatProps = {
+  _id?: string,
+  adminId?: string,
+  message: string,
+  userId: string,
+  dateTime?: string,
+  image?: string,
+  createdAt?: string
+  updatedAt?: string
 }
 
 type DeleteCommentByAdmin = 'onlyInStory' | 'allUserComment'

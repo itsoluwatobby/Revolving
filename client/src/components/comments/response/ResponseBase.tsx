@@ -5,10 +5,9 @@ import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenRe
 import { useThemeContext } from '../../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
-import { useLikeAndUnlikeCommentMutation } from '../../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
 import { checkCount } from '../../../utils/navigator';
-import { setEditComment, setEditResponse } from '../../../features/story/commentSlice';
+import { setEditResponse } from '../../../features/story/commentSlice';
 import { useDispatch } from 'react-redux';
 import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
 
@@ -57,7 +56,7 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
     }
-  }, [writeReply, openReply.assert, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
+  }, [writeReply, openReply.assert, openReply.type, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
 
   const likeUnlikeResponse = async() => {
     try{

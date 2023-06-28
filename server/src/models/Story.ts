@@ -10,17 +10,15 @@ const STORYSCHEMA: Schema = new Schema(
     title: { type: String, required: [true, 'story title is required'], trim: true },
     picture: { type: String, default: '' },
     body: { type: String, required: [true, 'story body is required'] },
-    storyDate: { type: String, required: [true, 'story date should be added'], default: '' },
     commentIds: { type: Array, default: [] },
     category: { 
       type: Array, required: true, 
-      default: ['General']
+      default: []
     },
     isShared: { type: Array, default: [] },
     likes: { type: Array, default: [] },
     fontFamily: { type: String, default: 'open_sans' },
     edited: { type: Boolean, default: false },
-    editDate: { type: String, default: '' },
     author: { type: String, default: '' }
   },
   { 

@@ -88,7 +88,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
     getResponses: builder.query<CommentResponseProps[], string>({
       query: (commentId) => `response_in_comment/${commentId}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.responseDate.localeCompare(prev?.responseDate))
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response
       }, 
       providesTags:(result) => providesTag(result as CommentResponseProps[], 'RESPONSE')

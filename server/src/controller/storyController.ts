@@ -5,9 +5,8 @@ import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
 import { getAllSharedByCategories, getAllSharedStories } from "../helpers/sharedHelper.js";
-import { Categories, SharedProps, StoryProps } from "../../types.js";
+import { Categories, StoryProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import { SharedStoryModel } from "../models/SharedStory.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -130,7 +129,7 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
       const reMoulded = sharedCategoryStory.map(share => {
         const object = {
           ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
-          sharerId: share?.sharerId, sharedDate: share?.sharedDate
+          sharerId: share?.sharerId, sharedDate: share?.createdAt
         }
         return object
       })
@@ -152,7 +151,7 @@ export const getStories = (req: Request, res: Response) => {
         const object = {
           ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
           sharerId: share?.sharerId,
-          sharedDate: share?.sharedDate 
+          sharedDate: share?.createdAt 
         }
         return object
       })
