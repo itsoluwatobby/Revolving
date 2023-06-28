@@ -88,7 +88,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
     getComments: builder.query<CommentProps[], string>({
       query: (storyId) => `comment_in_story/${storyId}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.commentDate.localeCompare(prev?.commentDate))
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response
       }, 
       providesTags:(result) => providesTag(result as CommentProps[], 'COMMENT')
@@ -98,7 +98,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
     getUserComments: builder.query<CommentProps[], Pick<CommentArgs, 'userId' | 'storyId'>>({
       query: ({userId, storyId}) => `comments/user/${userId}/${storyId}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.commentDate.localeCompare(prev?.commentDate))
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response
       }, 
       providesTags:(result) => providesTag(result as CommentProps[], 'COMMENT')

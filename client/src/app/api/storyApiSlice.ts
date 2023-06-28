@@ -68,7 +68,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
     getStories: builder.query<PostType[], void>({
       query: () => 'story',
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.storyDate.localeCompare(prev?.storyDate))
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
@@ -77,7 +77,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
     getUserStories: builder.query<PostType[], string>({
       query: (userId) => `story/user/${userId}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.storyDate.localeCompare(prev?.storyDate))
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')

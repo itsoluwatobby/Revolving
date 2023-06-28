@@ -88,8 +88,7 @@ export default function CommentBody() {
 
   useEffect(() => {
     let isMounted = true
-    const sortedData = data?.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    isMounted && setComments(sortedData as CommentProps[])
+    isMounted && setComments(data as CommentProps[])
     isMounted && dispatch(setAllComments(data as CommentProps[]))
     return () => {
       isMounted = false

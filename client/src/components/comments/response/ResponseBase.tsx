@@ -56,7 +56,7 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
     }
-  }, [writeReply, openReply.assert, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
+  }, [writeReply, openReply.assert, openReply.type, keepPrompt, setKeepPrompt, setWriteReply, setOpenReply])
 
   const likeUnlikeResponse = async() => {
     try{

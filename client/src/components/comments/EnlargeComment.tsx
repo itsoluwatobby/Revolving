@@ -35,8 +35,7 @@ export default function EnlargeComment() {
   
   useEffect(() => {
     let isMounted = true
-    const sortedData = responseData?.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    isMounted && setResponses(sortedData as CommentResponseProps[])
+    isMounted && setResponses(responseData as CommentResponseProps[])
 
     return () => {
       isMounted = false

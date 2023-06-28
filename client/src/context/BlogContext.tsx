@@ -17,7 +17,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
         return (
           post?.title?.toLowerCase().includes(search?.toLowerCase()) || post?.body?.toLowerCase().includes(search?.toLowerCase())
         )
-      }).sort((a, b) => b?.createdAt.localeCompare(a?.createdAt)) as PostType[]
+      }) as PostType[]
       // const optimizedFeed = await contentFeedAlgorithm(filtered, 5) as unknown as PostType[]
       // console.log(optimizedFeed)
       setFilterStories(filtered)
