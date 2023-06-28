@@ -42,7 +42,7 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
     }
   }, [])
 
-  const handleSubmit = async() => {
+  const updateEditComment = async() => {
     if(!writeReply.length) return
     const updatedComment = {
       ...getCommentEdit,
@@ -58,9 +58,9 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
         dispatch(setEditComment({...updatedComment, comment: ''}))
     }
     catch(err){
-      const errors = errorResponse as ErrorResponse
+      const errors = errorComment as ErrorResponse
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
@@ -68,7 +68,7 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
     }
   }
  
-  const handleReply = async() => {
+  const createNewResponse = async() => {
     if(!writeReply.length) return
     const newResponse = {
       userId: currentUserId,
@@ -85,9 +85,9 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
       await commentApiSlice.useGetCommentQuery(comment._id).refetch()
     }
     catch(err){
-      const errors = errorComment as ErrorResponse
+      const errors = errorResponse as ErrorResponse
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+      isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
@@ -116,17 +116,17 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
   //     isMounted = false
   //   }
   // }, [isSuccessResponse])
-
+  // ${enlarge.assert && (enlarge.type === 'open' ? 'button-[88px] left-0' : 'bottom-[40px] left-0')}
   const canSubmit = Boolean(writeReply)
-  
+//(enlarge.type === 'open' ? 'top-[88px] left-0' :
 // TODO:SORT THIS OUT
   const content = (
-    <article className={`absolute w-full -bottom-[80px] z-50 ${enlarge && (enlarge.type === 'open' ? 'top-[88px] left-0' : 'bottom-[40px] left-0')}`}>
+    <article className={`absolute ${enlarge.type === 'open' ?'w- w-[95%] left-3 bottom-8' : 'w-full'} -bottom-[80px] z-50`}>
       <div 
         className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingComment || isLoadingResponse) ? 'animate-pulse' : null}`}>
         <textarea 
           ref={responseRef}
-          name="comment"
+          key={openReply.type}
           value={writeReply}
           disabled={keepPrompt == 'Show'}
           autoFocus={true}
@@ -138,7 +138,7 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
         ></textarea>
         <button 
           disabled={isLoadingComment && !canSubmit}
-          onClick={openReply.type === 'reply' ? handleReply : openReply.type === 'edit' ? handleSubmit : () => {return}}
+          onClick={openReply.type === 'reply' ? createNewResponse : openReply.type === 'edit' ? updateEditComment : () => {return}}
           className="flex-none w-12 hover:bg-opacity-50 hover:opacity-50 h-10 grid place-content-center transition-all rounded-tr-md rounded-br-md">
           <BsSend
             className={`text-lg text-center hover:scale-[1.08] active:scale-[1]`}

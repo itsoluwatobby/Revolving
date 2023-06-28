@@ -1,6 +1,6 @@
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken'
-import { ClaimProps, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
+import { ClaimProps, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
 import { Request, Response } from 'express';
@@ -171,3 +171,31 @@ export const pagination = async<T>({startIndex=1, endIndex=1, page=1, limit=1, c
 }
 
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
+
+// export function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
+//   const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes)
+//   const otherLikedPosts = entry?.filter(post => Number(post?.likes) < numLikes)
+
+//   shufflePosts(mostLikedPosts)
+//   shufflePosts(otherLikedPosts)
+
+//   sortByTime(mostLikedPosts)
+//   sortByTime(otherLikedPosts)
+
+//   const combinedPosts = [...mostLikedPosts, ...otherLikedPosts]
+//   return combinedPosts
+// }
+
+// function shufflePosts<K>(content: ObjectUnknown<K>[]){
+//   for(let i = content?.length - 1; i > 0; i--){
+//     const j = Math.floor(Math.random() * (i + 1))
+//     const temp = content[i]
+//     content[i] = content[j]
+//     content[j] = temp
+//   }
+// }
+
+// function sortByTime<K>(content: ObjectUnknown<K>[]){
+//   content?.sort((a, b) => Number(b?.createdAt) - Number(a?.createdAt))
+// }
+

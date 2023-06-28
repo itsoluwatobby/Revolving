@@ -138,4 +138,25 @@ export const pagination = ({ startIndex = 1, endIndex = 1, page = 1, limit = 1, 
         console.log(error);
     }
 });
+// export function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
+//   const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes)
+//   const otherLikedPosts = entry?.filter(post => Number(post?.likes) < numLikes)
+//   shufflePosts(mostLikedPosts)
+//   shufflePosts(otherLikedPosts)
+//   sortByTime(mostLikedPosts)
+//   sortByTime(otherLikedPosts)
+//   const combinedPosts = [...mostLikedPosts, ...otherLikedPosts]
+//   return combinedPosts
+// }
+// function shufflePosts<K>(content: ObjectUnknown<K>[]){
+//   for(let i = content?.length - 1; i > 0; i--){
+//     const j = Math.floor(Math.random() * (i + 1))
+//     const temp = content[i]
+//     content[i] = content[j]
+//     content[j] = temp
+//   }
+// }
+// function sortByTime<K>(content: ObjectUnknown<K>[]){
+//   content?.sort((a, b) => Number(b?.createdAt) - Number(a?.createdAt))
+// }
 //# sourceMappingURL=helper.js.map

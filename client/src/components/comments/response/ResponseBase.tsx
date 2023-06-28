@@ -5,10 +5,9 @@ import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenRe
 import { useThemeContext } from '../../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
-import { useLikeAndUnlikeCommentMutation } from '../../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
 import { checkCount } from '../../../utils/navigator';
-import { setEditComment, setEditResponse } from '../../../features/story/commentSlice';
+import { setEditResponse } from '../../../features/story/commentSlice';
 import { useDispatch } from 'react-redux';
 import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
 

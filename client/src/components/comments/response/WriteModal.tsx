@@ -119,7 +119,7 @@ export default function WriteModal({ keepPrompt, comment, response, responseRef,
   const canSubmit = Boolean(writeReply)
 
   const content = (
-    <article className={`absolute w-full -bottom-[80px] z-50 ${enlarge && 'bottom-16 left-0'}`}>
+    <article className={`absolute w-full -bottom-[80px] z-50 ${enlarge.assert && 'left-0'}`}>
       <div 
         className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingResponse) ? 'animate-pulse' : null}`}>
         <textarea 

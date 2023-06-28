@@ -32,9 +32,11 @@ export const likeAndUnlikeComment = async(userId: string, commentId: string): Pr
 }
 export type Like_Unlike_Comment = Awaited<ReturnType<typeof likeAndUnlikeComment>>
 
-export const deleteSingleComment = async(commentId: string) => {
-  const comment = await getCommentById(commentId)
-  await StoryModel.findByIdAndUpdate({_id: comment.storyId}, { $pull: {commentIds: comment?._id}})
+export const deleteSingleComment = async(commentId: string, option=true) => {
+  if(option){
+    const comment = await getCommentById(commentId)
+    await StoryModel.findByIdAndUpdate({_id: comment.storyId}, { $pull: {commentIds: comment?._id}})
+  }
   await CommentModel.findByIdAndDelete({ _id: commentId })
   await CommentResponseModel.deleteMany({ commentId })
 }

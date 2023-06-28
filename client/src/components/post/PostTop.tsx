@@ -1,5 +1,5 @@
 import { format } from "timeago.js"
-import { ErrorResponse, SharedProps, UserProps } from "../../data"
+import { ErrorResponse, UserProps } from "../../data"
 import { reduceLength } from "../../utils/navigator"
 import { FiMoreVertical } from "react-icons/fi"
 import { Link } from "react-router-dom"
@@ -10,10 +10,8 @@ import { useGetUsersQuery } from "../../app/api/usersApiSlice"
 import { useDeleteStoryMutation } from "../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast"
 
-type MakeTo = PostType & Pick<SharedProps, 'sharedDate'>
-
 type PostTopProps = {
-  story: MakeTo,
+  story: PostType,
   bodyContent: JSX.Element[] | "No content",
   open: boolean,
   openText: () => void,
@@ -24,7 +22,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   const { theme } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const {data: users} = useGetUsersQuery()
-  const [deleteStory, { isLoading: deleteLoading, isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
+  const [deleteStory, { isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
 
   const deleted = async(id: string) => {
     try{
@@ -55,7 +53,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           }
         </p>
         <span>.</span>
-        <p>{format(story?.sharedDate || story?.storyDate, 'en-US')}</p>
+        <p>{format(story?.createdAt, 'en-US')}</p>
         {userId && (
           <FiMoreVertical
             onClick={() => setOpen(prev => !prev)}
@@ -66,7 +64,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
         }
         {/* MAKE THIS MORE ATTRACTIVE */}
         {userId == story?.userId &&
-          <p className={`absolute ${open ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-3 top-4 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? '' : 'border-gray-500 shadow-slate-800'}`}>
+          <p className={`absolute ${open ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-3 top-4 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'bg-slate-900 text-white' : 'border-gray-500 shadow-slate-800 bg-slate-900'}`}>
               <span 
                 title='Edit post'
                 className={buttonOptClass(theme)}>
@@ -88,7 +86,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
       <Link to={`/story/${story?._id}`} >
         <p 
           onClick={openText}
-          className='whitespace-pre-wrap text-sm first-letter:ml-3 first-letter:text-lg first-letter:capitalize'>
+          className={`whitespace-pre-wrap text-sm first-letter:ml-3 first-letter:text-lg first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
             {bodyContent}
         </p>
       </Link> 
@@ -97,7 +95,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
 }
 
 function buttonOptClass(theme: Theme){
-  return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-700 hover:text-gray-300'}`
+  return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
 }
 
 

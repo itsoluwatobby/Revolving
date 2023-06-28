@@ -2,6 +2,7 @@ import { StoryProps } from "../../types.js";
 import { StoryModel } from "../models/Story.js";
 import { CommentResponseModel } from "../models/CommentResponse.js";
 import { CommentModel } from "../models/CommentModel.js";
+import { deleteSingleComment } from "./commentHelper.js";
 
 export const getAllStories = async() => await StoryModel.find().lean();
 
@@ -47,16 +48,14 @@ export const deleteUserStory = async(storyId: string) =>{
   await StoryModel.findByIdAndDelete({ _id: storyId })
   const commentInStory = await CommentModel.find({ storyId }).lean()
   await Promise.all(commentInStory.map(comment => {
-    CommentResponseModel.deleteMany({ commentId: comment._id })
+    deleteSingleComment(comment._id, false)
   }))
-  await CommentModel.deleteMany({ storyId })
 }
 
 export const deleteAllUserStories = async(userId: string) => {
   await StoryModel.deleteMany({ userId })
   const userComments = await CommentModel.find({ userId }).lean()
   await Promise.all(userComments.map(comment => {
-    CommentResponseModel.deleteMany({ commentId: comment._id })
+    deleteSingleComment(comment._id, false)
   }))
-  await CommentModel.deleteMany({ userId })
 }

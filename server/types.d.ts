@@ -54,27 +54,27 @@ interface StoryProps extends Document{
   picture: string
   body: string
   fontFamily: string
-  storyDate: string
   category: Categories[]
   commentIds?: ObjectId[]
   isShared?: SharedInfo[]
   likes: string[]
   edited: false
-  editDate: string
   author: string
+  createdAt: string
+  updatedAt: string
 }
 
 interface CommentProps{
   _id: string,
   storyId: string,
   userId: string,
-  commentDate: string,
   comment: string,
   likes: string[],
   author: string,
   edited: boolean,
-  editDate: string,
   commentResponse: CommentResponseProps[]
+  createdAt: string
+  updatedAt: string
 }
 
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
@@ -83,16 +83,16 @@ interface Emerge extends CommentProps{
   responseTags: string[],
   commentId: string,
   response: string,
-  responseDate: string
 }
 
 interface SharedProps extends Document{
   sharerId: string,
   storyId: string,
-  sharedDate: string,
   sharedLikes: string[],
   author: string,
   sharedStory: StoryProps,
+  createdAt: string,
+  updatedAt: string
 }
 
 type SocialMediaAccoutProp = {
@@ -122,12 +122,13 @@ interface UserProps extends Document{
   hobbies: string[],
   status: 'online' | 'offline',
   refreshToken: string,
-  editDate: string,
   gender: 'Female' | 'Male' | 'Others',
   codeName: string,
   stack: string[],
   country: string,
-  socialMediaAccounts: SocialMediaAccoutProp[]
+  socialMediaAccounts: SocialMediaAccoutProp[],
+  createdAt: string,
+  updatedAt: string
 }
 
 interface PageRequest extends Request{
@@ -152,4 +153,10 @@ interface ResponseType extends Response{
     message?: string
   },
   data?: object
+}
+
+type ObjectUnknown<K>={
+  [index: string]: K | string,
+  createdAt: string,
+  likes: string[]
 }

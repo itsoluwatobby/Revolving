@@ -88,7 +88,8 @@ export default function CommentBody() {
 
   useEffect(() => {
     let isMounted = true
-    isMounted && setComments(data as CommentProps[])
+    const sortedData = data?.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    isMounted && setComments(sortedData as CommentProps[])
     isMounted && dispatch(setAllComments(data as CommentProps[]))
     return () => {
       isMounted = false
@@ -115,7 +116,7 @@ export default function CommentBody() {
       {
         errorMsg?.status == 404 ? 
           <p className='flex flex-col gap-2 font-serif'>
-            <span>No comments yets</span>
+            <span>No comments yet</span>
             <span>Say something to start the converstion</span>
           </p> 
           : 

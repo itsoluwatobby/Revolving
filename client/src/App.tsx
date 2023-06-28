@@ -58,9 +58,10 @@ export const App = () => {
       {openChat === 'Open' ?
         <ChatModal />
         :  
-        <BsChatTextFill 
+        <BsChatTextFill
+          title='Chat with Admin'
           onClick={() => setOpenChat('Open')}
-          className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-70 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
+          className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
         />
       }
       {loginPrompt == 'Open' ? <PrompLogin /> : null}

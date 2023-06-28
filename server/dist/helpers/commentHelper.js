@@ -31,9 +31,11 @@ export const likeAndUnlikeComment = (userId, commentId) => __awaiter(void 0, voi
         return 'You unliked this comment';
     }
 });
-export const deleteSingleComment = (commentId) => __awaiter(void 0, void 0, void 0, function* () {
-    const comment = yield getCommentById(commentId);
-    yield StoryModel.findByIdAndUpdate({ _id: comment.storyId }, { $pull: { commentIds: comment === null || comment === void 0 ? void 0 : comment._id } });
+export const deleteSingleComment = (commentId, option = true) => __awaiter(void 0, void 0, void 0, function* () {
+    if (option) {
+        const comment = yield getCommentById(commentId);
+        yield StoryModel.findByIdAndUpdate({ _id: comment.storyId }, { $pull: { commentIds: comment === null || comment === void 0 ? void 0 : comment._id } });
+    }
     yield CommentModel.findByIdAndDelete({ _id: commentId });
     yield CommentResponseModel.deleteMany({ commentId });
 });

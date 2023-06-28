@@ -45,7 +45,7 @@ export const ResponseBody = ({ response, theme, userId, targetComment, isLoading
           <p 
             className={`cursor-pointer hover:opacity-70 transition-all text-sm ${theme == 'light' ? '' : 'text-black'}`}>{reduceLength(response?.author, 15) || 'anonymous'}</p>
           <span className="font-bold text-black">.</span>
-          <p className="text-xs text-gray-950">{format(response?.responseDate)}</p>
+          <p className="text-xs text-gray-950">{format(response?.createdAt)}</p>
         </div>
         <MdOutlineExpandMore
           onClick={() => {

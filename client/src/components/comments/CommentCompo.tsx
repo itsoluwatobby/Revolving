@@ -55,7 +55,7 @@ export default function CommentCompo({ comment, setPrompt, setOpenBox }: Comment
     return () => {
       isMounted = false
     }
-  }, [isSuccessDeleted])
+  }, [isSuccessDeleted, isUninitialized, setPrompt])
 
   return (
     <article 
