@@ -87,7 +87,7 @@ export default function BodyComponent({ currentUserId, expand, reveal, comment, 
         className="cursor-grab text-justify tracking-wide first-letter:ml-3 first-letter:font-medium">
         {reveal ? comment?.comment : reduceLength(comment?.comment, 60, 'word')}
       </p>
-      <div className="relative flex items-center gap-4">
+      <section className="relative flex items-center gap-4">
         <CommentBase mini 
           responseRef={
             responseRef as React.MutableRefObject<HTMLTextAreaElement>
@@ -103,7 +103,7 @@ export default function BodyComponent({ currentUserId, expand, reveal, comment, 
           setKeepPrompt={setKeepPrompt}
           setPrompt={setPrompt}
         />
-      </div>
+      </section>
     </>
   )
 }

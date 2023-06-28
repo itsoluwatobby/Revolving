@@ -1,13 +1,13 @@
 import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../data"
 import { PromptLiterals, ThemeContextType } from "../../posts";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
 import { toast } from "react-hot-toast";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { storyApiSlice } from "../../app/api/storyApiSlice";
 import { getTabCategory } from "../../features/story/navigationSlice";
 import BodyComponent from "./BodyComponent";
+import { useSelector } from "react-redux";
 
 type CommentType = {
   comment: CommentProps,
@@ -59,7 +59,7 @@ export default function CommentCompo({ comment, setPrompt, setOpenBox }: Comment
 
   return (
     <article 
-      className={`relative text-sm flex flex-col gap-0.5 p-1.5 transition-all ${isLoading ? 'animate-pulse' : ''}`}>
+      className={`relative text-sm flex flex-col gap-1 p-1.5 transition-all ${isLoading ? 'animate-pulse' : ''}`}>
       <BodyComponent 
         responseRef={
           responseRef as React.MutableRefObject<HTMLTextAreaElement>
@@ -74,7 +74,7 @@ export default function CommentCompo({ comment, setPrompt, setOpenBox }: Comment
         setOpenReply={setOpenReply}
         keepPrompt={keepPrompt} 
         setKeepPrompt={setKeepPrompt}
-        setPrompt={setPrompt}
+        setPrompt={setPrompt}  
         deleteSingleComment={deleteSingleComment}
         setExpand={setExpand} 
         setReveal={setReveal}

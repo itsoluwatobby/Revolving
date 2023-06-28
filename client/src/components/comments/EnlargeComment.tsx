@@ -89,14 +89,22 @@ export default function EnlargeComment() {
     <>
       {singleCommentContent}
       <div className={`w-full h-[2px] bg-slate-600 mt-2`} />
-      <div className={`flex flex-col`}>
+      <div className={`flex flex-col bg-slate-800`}>
         {
           isLoadingResponses ? <SkeletonComment />
             : isError ? (
-              <p className='text-center mt-10 text-lg'>{errorMsg?.status == 404 && 'Network Error, Please check your connection'}</p>
-            ) : (
-              <section>
-                {
+              <p className='text-center mt-10 text-sm'>
+              {
+                errorMsg?.status == 404 ? 
+                  <p className='flex flex-col gap-2'>
+                    <span>No responses yets</span>
+                    <span>Say something to start the converstion</span>
+                  </p> 
+                  : 
+                  <span>Network Error, Please check your connection</span>
+                }
+              </p>
+              ) : (
                   !isLoadingResponses && responses?.length ? (
                     responses.map(response => (
                       <ResponseBody 
@@ -109,9 +117,7 @@ export default function EnlargeComment() {
                       />
                     ))
                   ) : null
-                }
-              </section>
-            )
+              )
         }
       </div>
     </>
