@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect } from 'react'
 import { BsSend } from 'react-icons/bs'
+import { AiFillCloseSquare } from 'react-icons/ai'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { PromptLiterals, ThemeContextType } from '../../posts'
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,27 +21,45 @@ type WriteProp={
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>
+  setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>
 }
 
 // TODO: When Prompt is up, disable textarea
 
-export default function WriteModal({ keepPrompt, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
+export default function WriteModal({ keepPrompt, setKeepPrompt, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const dateTime = sub(new Date, { minutes: 0 }).toISOString();
   const getCommentEdit = useSelector(getEditComments)
   const [updateComment, { error: errorComment, isError: isErrorComment, isLoading: isLoadingComment, isSuccess: isSuccessEdited, isUninitialized }] = useUpdateCommentMutation()
-  const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse, isSuccess: isSuccessResponse, isUninitialized: isUninitializedResponse }] = useCreateResponseMutation()
+  const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse }] = useCreateResponseMutation()
   const dispatch = useDispatch()
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => setWriteReply(event.target.value)
 
   useEffect(() => {
     let isMounted = true
-    isMounted ? setWriteReply('' || getCommentEdit?.comment) : null
+    if(isMounted){
+      const username = '@'+getCommentEdit.author+' '
+      openReply.type === 'edit' ? setWriteReply('' || getCommentEdit?.comment+' ') : openReply.type === 'reply' ? setWriteReply(username) : null
+    }
     return () => {
       isMounted  = false
     }
-  }, [])
+  }, [getCommentEdit, setWriteReply, openReply])
+
+  const closeInput = () => {
+    !writeReply ? setOpenReply({type: 'nil', assert: false}) : setKeepPrompt('Show');
+    if(responseRef.current) responseRef?.current.focus()
+  }
+
+  // useEffect(() => {
+  //   let isMounted = true
+  //   const username = '@'+getResponseEdit.author+' '
+  //   isMounted ? setWriteReply(username) : null
+  //   return () => {
+  //     isMounted = false
+  //   }
+  // }, [getResponseEdit, setWriteReply])
 
   const updateEditComment = async() => {
     if(!writeReply.length) return
@@ -73,8 +92,7 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
     const newResponse = {
       userId: currentUserId,
       commentId: comment?._id,
-      response: writeReply,
-      responseDate: dateTime
+      response: writeReply
     } as Partial<CommentResponseProps>
     try{
       await createResponse({ userId: currentUserId, 
@@ -104,7 +122,7 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
     return () => {
       isMounted = false
     }
-  }, [isSuccessEdited])
+  }, [isSuccessEdited, isUninitialized])
   
   // useEffect(() => {
   //   let isMounted = true
@@ -116,14 +134,13 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
   //     isMounted = false
   //   }
   // }, [isSuccessResponse])
-  // ${enlarge.assert && (enlarge.type === 'open' ? 'button-[88px] left-0' : 'bottom-[40px] left-0')}
+  
   const canSubmit = Boolean(writeReply)
-//(enlarge.type === 'open' ? 'top-[88px] left-0' :
-// TODO:SORT THIS OUT
+
   const content = (
-    <article className={`absolute ${enlarge.type === 'open' ?'w- w-[95%] left-3 bottom-8' : 'w-full'} -bottom-[80px] z-50`}>
+    <article className={`absolute w-full ${openReply.pos == 'enlarge' ? '-bottom-20' : '-bottom-[80px]'} z-50 ${enlarge.assert && 'left-0'}`}>
       <div 
-        className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingComment || isLoadingResponse) ? 'animate-pulse' : null}`}>
+        className={`relative w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingComment || isLoadingResponse) ? 'animate-pulse' : null}`}>
         <textarea 
           ref={responseRef}
           key={openReply.type}
@@ -144,6 +161,10 @@ export default function WriteModal({ keepPrompt, comment, responseRef, openReply
             className={`text-lg text-center hover:scale-[1.08] active:scale-[1]`}
           />
         </button>
+        <AiFillCloseSquare 
+          onClick={closeInput}
+          className={`absolute top-0 right-0 text-lg text-gray-300 rounded-full cursor-pointer hover:opacity-80 transition-all`}
+        />
       </div>
     </article>
   )

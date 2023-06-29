@@ -43,7 +43,7 @@ export const getComments = (state: RootState) => state.comment.comments
 export const getEditComments = (state: RootState) => state.comment.editComment
 
 export const getResponses = (state: RootState) => state.comment.responses
-export const getEditResponses = (state: RootState) => state.comment.editResponse
+export const getEditResponse = (state: RootState) => state.comment.editResponse
 
 export default commentSlice.reducer
 

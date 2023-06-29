@@ -16,6 +16,7 @@ type BaseProps = {
   reveal?: boolean
   userId: string,
   theme: Theme,
+  enlarged?: boolean,
   writeReply: string,
   openReply: OpenReply,
   keepPrompt: PromptLiterals,
@@ -31,7 +32,7 @@ function modalButton(theme: Theme){
   return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
 }
 
-export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
+export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
   const {setParseId, setLoginPrompt, enlarge, setEnlarge } = useThemeContext() as ThemeContextType;
   const [likeAndUnlikeComment, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeCommentMutation();
   const dispatch = useDispatch()
@@ -49,7 +50,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
         setOpenReply({type: openReply.type, assert: false});
       }
     }
-    else if(keepPrompt == 'Discard') {
+    else if(keepPrompt === 'Discard') {
       setKeepPrompt('Dommant')
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
@@ -73,7 +74,9 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
   }
 
   const replyModal = () => {
-    setOpenReply({type: 'reply', assert: true})
+    enlarged 
+        ? setOpenReply({type: 'reply', assert: true, pos: 'enlarge'}) 
+        : setOpenReply({type: 'reply', assert: true})
     dispatch(setEditComment({...comment, comment: ''}))
   }
 
@@ -110,7 +113,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
             comment?.comment.split(' ').length >= 60 &&
               <small 
                 onClick={() => expandComment(comment?._id)}
-                className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-gray-200`}>Read more</small>
+                className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900 hover:text-gray-500' : 'text-gray-300 hover:text-gray-200'} hover:text-gray-200`}>Read more</small>
           )
         }
         <span
@@ -123,6 +126,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
                 responseRef={responseRef}
                 writeReply={writeReply}
                 keepPrompt={keepPrompt}
+                setKeepPrompt={setKeepPrompt}
                 openReply={openReply}
                 setOpenReply={setOpenReply}
                 setWriteReply={setWriteReply}
@@ -133,7 +137,7 @@ export default function CommentBase({ responseRef, reveal, setPrompt, keepPrompt
               : null
       }
       {
-        keepPrompt == 'Show' 
+        keepPrompt === 'Show'
           ? <PopUpPrompt 
               enlarge={enlarge}
               responseRef={responseRef} 
@@ -159,14 +163,18 @@ export function PopUpPrompt({ enlarge, responseRef, setKeepPrompt, theme }: PopT
     setKeepPrompt('Retain')
     if(responseRef.current) responseRef?.current.focus()
   }
+
+  const discard = () => {
+    setKeepPrompt('Discard')
+  }
   return (
-    <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl items-center gap-2 right-20 ${theme == 'light' ? 'bg-slate-700 shadow-slate-800' : 'bg-slate-800 shadow-slate-700'} ${enlarge.assert ? 'bottom-20' : 'top-4'}`}>
-      <p 
+    <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl items-center gap-2 right-20 ${theme == 'light' ? 'bg-slate-700 shadow-slate-800' : 'bg-slate-800 shadow-slate-700'} ${enlarge.assert ? '-bottom-12' : 'top-4'}`}>
+      <small 
         onClick={keepFocus}
-        className={modalButton(theme)}>Keep writing</p>
-      <p 
-        onClick={() => setKeepPrompt('Discard')}
-        className={modalButton(theme)}>Discard</p>
+        className={modalButton(theme)}>Keep writing</small>
+      <small 
+        onClick={discard}
+        className={modalButton(theme)}>Discard</small>
     </section>
   )
 }

@@ -4,10 +4,8 @@ const CommentSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'users', required: [true, 'user id required'] },
     likes: { type: Array, default: [] },
     comment: { type: String, default: '' },
-    commentDate: { type: String, default: '' },
     author: { type: String, default: '' },
     edited: { type: Boolean, default: false },
-    editDate: { type: String, default: '' },
     commentResponse: { type: Array, ref: 'commentResponse', default: [] }
 }, {
     minimize: false,

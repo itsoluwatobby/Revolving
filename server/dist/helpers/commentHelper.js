@@ -63,6 +63,8 @@ export const getUserResponses = (userId, responseId) => __awaiter(void 0, void 0
 export const createResponse = (response) => __awaiter(void 0, void 0, void 0, function* () {
     const newResponse = yield CommentResponseModel.create(Object.assign({}, response));
     yield CommentModel.findByIdAndUpdate({ _id: response.commentId }, { $push: { commentResponse: newResponse === null || newResponse === void 0 ? void 0 : newResponse._id } });
+    (response === null || response === void 0 ? void 0 : response.responseId)
+        ? yield CommentResponseModel.findByIdAndUpdate({ _id: response === null || response === void 0 ? void 0 : response.responseId }, { $push: { responseTags: newResponse === null || newResponse === void 0 ? void 0 : newResponse._id } }) : null;
     return newResponse;
 });
 export const editResponse = (userId, responseId, editedResponse) => __awaiter(void 0, void 0, void 0, function* () { return yield CommentResponseModel.findByIdAndUpdate({ userId, _id: responseId }, Object.assign(Object.assign({}, editedResponse), { edited: true })); });
@@ -80,6 +82,7 @@ export const likeAndUnlikeResponse = (userId, responseId) => __awaiter(void 0, v
 export const deleteSingleResponse = (responseId) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield getResponseById(responseId);
     yield CommentResponseModel.findByIdAndDelete({ _id: responseId });
+    (response === null || response === void 0 ? void 0 : response.responseId) ? yield CommentResponseModel.findByIdAndUpdate({ _id: response.responseId }, { $pull: { responseTags: response === null || response === void 0 ? void 0 : response._id } }) : null;
     yield CommentModel.findByIdAndUpdate({ _id: response.commentId }, { $pull: { commentResponse: response === null || response === void 0 ? void 0 : response._id } });
 });
 export const deleteAllUserResponses = (userId) => __awaiter(void 0, void 0, void 0, function* () {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { PromptLiterals, ThemeContextType } from '../../posts';
 import { comments } from '../../commentData';
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply } from '../../data';
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import { useGetCommentQuery } from '../../app/api/commentApiSlice';
 import { SkeletonComment } from '../skeletons/SkeletonComment';
@@ -10,6 +10,7 @@ import { useGetResponsesQuery } from '../../app/api/responseApiSlice';
 import SingleComment from './SingleComment';
 import CommentBase from './CommentBase';
 import { ResponseBody } from './response/ResponseBody';
+import { checkCount } from '../../utils/navigator';
 
 export default function EnlargeComment() {
   const { theme, parseId, enlarge, setEnlarge } = useThemeContext() as ThemeContextType
@@ -18,8 +19,9 @@ export default function EnlargeComment() {
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const [writeReply, setWriteReply] = useState<string>('');
   const {data, isLoading, isError, error} = useGetCommentQuery(parseId)
-  const {data: responseData, isLoading: isLoadingResponses, isError: isErrorResponses, error: errorResponses} = useGetResponsesQuery(parseId)
+  const {data: responseData, isLoading: isLoadingResponses} = useGetResponsesQuery(parseId)
   const [responses, setResponses] = useState<CommentResponseProps[]>([]);
+  const [prompt, setPrompt] = useState<Prompted>({type: 'nil', assert: false});
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const responseRef = useRef<HTMLTextAreaElement>();
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
@@ -64,8 +66,8 @@ export default function EnlargeComment() {
             closeInput={closeInput}
             theme={theme}
           />
-          <div className="flex items-center gap-4">
-            <CommentBase 
+          <div className="relative flex items-center gap-4">
+            <CommentBase enlarged
               responseRef={
                 responseRef as React.MutableRefObject<HTMLTextAreaElement>
               }
@@ -76,7 +78,7 @@ export default function EnlargeComment() {
               openReply={openReply} 
               setOpenReply={setOpenReply} 
               keepPrompt={keepPrompt} 
-              setKeepPrompt={setKeepPrompt} 
+              setKeepPrompt={setKeepPrompt}
             />
           </div>
         </>
@@ -110,8 +112,9 @@ export default function EnlargeComment() {
                       <ResponseBody 
                         key={response._id}
                         userId={userId}
-                        theme={theme}
-                        response={response}
+                        response={response} 
+                        prompt={prompt}
+                        setPrompt={setPrompt} 
                         targetComment={targetComment as CommentProps}
                         isLoadingResponses={isLoadingResponses}
                       />
@@ -124,7 +127,7 @@ export default function EnlargeComment() {
   )
 
   return (
-    <section className='hidebars overflow-y-scroll p-2'>
+    <section className='hidebars relative overflow-y-scroll p-2'>
       <>
         <RiArrowGoBackLine
           onClick={() => setEnlarge({type: 'enlarge', assert: false})}
@@ -152,6 +155,9 @@ export default function EnlargeComment() {
           )
         }
       </>
+      <p className={`absolute right-2 top-1 rounded-lg text-xs font-mono pr-2.5 pl-2.5 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-600'}`}>
+        Responses <span>{checkCount(targetComment?.commentResponse as string[])}</span>
+      </p>
     </section>
   )
 }

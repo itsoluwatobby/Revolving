@@ -20,7 +20,7 @@ type BaseProps = {
   openReply: OpenReply,
   keepPrompt: PromptLiterals,
   responseRef: React.MutableRefObject<HTMLTextAreaElement>,
-  setPrompt?: React.Dispatch<React.SetStateAction<Prompted>>,
+  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>,
@@ -123,6 +123,7 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
                 responseRef={responseRef}
                 writeReply={writeReply}
                 keepPrompt={keepPrompt}
+                setKeepPrompt={setKeepPrompt}
                 openReply={openReply}
                 setOpenReply={setOpenReply}
                 setWriteReply={setWriteReply}
@@ -159,9 +160,11 @@ export function PopUpPrompt({ enlarge, responseRef, setKeepPrompt, theme }: PopT
   const keepFocus = () => {
     setKeepPrompt('Retain')
     if(responseRef.current) responseRef?.current.focus()
+
+    console.log('running too')
   }
   return (
-    <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl items-center gap-2 right-20 ${theme == 'light' ? 'bg-slate-700 shadow-slate-800' : 'bg-slate-800 shadow-slate-700'} ${enlarge.assert ? 'bottom-20' : 'top-4'}`}>
+    <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl items-center gap-2 right-20 ${theme == 'light' ? 'bg-slate-700 shadow-slate-800' : 'bg-slate-800 shadow-slate-700'} ${enlarge.assert ? '-bottom-16' : 'top-4'}`}>
       <p 
         onClick={keepFocus}
         className={modalButton(theme)}>Keep writing</p>

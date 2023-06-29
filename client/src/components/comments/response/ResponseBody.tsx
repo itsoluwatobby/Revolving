@@ -1,19 +1,24 @@
 import { format } from "timeago.js";
-import { CommentProps, CommentResponseProps, OpenReply } from "../../../data";
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from "../../../data";
 import { reduceLength } from "../../../utils/navigator";
-import { PromptLiterals, Theme } from "../../../posts";
-import { useState, useEffect, useRef } from 'react';
+import { PromptLiterals, Theme, ThemeContextType } from "../../../posts";
+import { useState, useRef } from 'react';
 import { MdOutlineExpandMore } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { setEditResponse } from "../../../features/story/commentSlice";
 import ResponseBase from "./ResponseBase";
+import { useDeleteResponseMutation } from "../../../app/api/responseApiSlice";
+import { useThemeContext } from "../../../hooks/useThemeContext";
+import { toast } from "react-hot-toast";
+import { commentApiSlice } from "../../../app/api/commentApiSlice";
 
 
 type ResponseBodyProps = {
   response: CommentResponseProps,
   userId: string,
-  theme: Theme,
   targetComment: CommentProps,
+  prompt: Prompted,
+  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
   isLoadingResponses: boolean
 }
 
@@ -21,13 +26,15 @@ function buttonOptClass(theme: Theme){
   return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
 }
 
-export const ResponseBody = ({ response, theme, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
+export const ResponseBody = ({ response, prompt, setPrompt, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
   const [reveal, setReveal] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(false);
+  const { theme, setLoginPrompt, parseId } = useThemeContext() as ThemeContextType
   const [writeReply, setWriteReply] = useState<string>('');
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const responseRef = useRef<HTMLTextAreaElement>();
+  const [deleteResponse, {isError, error}] = useDeleteResponseMutation()
   const dispatch = useDispatch();
 
   const closeInput = () => {
@@ -35,13 +42,35 @@ export const ResponseBody = ({ response, theme, userId, targetComment, isLoading
     if(responseRef.current) responseRef?.current.focus()
   }
 
+  const editYourResponsePop = () => {
+    dispatch(setEditResponse(response))
+    setOpenReply({type: 'edit', assert: true})
+    setExpand(false)
+  }
+
+  const deleteSingleResponse = async() => {
+    try{
+      await deleteResponse({ userId, responseId: response?._id}).unwrap()
+      await commentApiSlice.useGetCommentQuery(parseId).refetch()
+    }
+    catch(err: unknown){
+      const errors = error as ErrorResponse
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
+          background: '#FF0000'
+        }
+      })
+    }
+  }
+
   return (
     <article 
-      className={`relative text-sm flex flex-col gap-1 p-1.5 transition-all ${isLoadingResponses ? 'animate-pulse' : ''}`}>
+      className={`relative text-sm ${theme == 'light' ? 'bg-slate-200' : ''} flex flex-col gap-1 p-1.5 transition-all ${isLoadingResponses ? 'animate-pulse' : ''}`}>
         <div className={`flex items-center justify-between pr-2`}>
         <div 
           onClick={closeInput}
-          className={`flex items-center gap-4 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
+          className={`flex items-center gap-1.5 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
           <p 
             className={`cursor-pointer hover:opacity-70 transition-all text-sm ${theme == 'light' ? '' : 'text-black'}`}>{reduceLength(response?.author, 15) || 'anonymous'}</p>
           <span className="font-bold text-black">.</span>
@@ -53,16 +82,17 @@ export const ResponseBody = ({ response, theme, userId, targetComment, isLoading
               dispatch(setEditResponse({...response, response: ''}))
             }
           }
-          className={`text-xl ${expand ? 'text-gray-300' : ''} ${response?.userId === userId ? 'text-gray-300 block' : 'hidden'} hover:text-gray-300 cursor-pointer ${expand ? null : 'rotate-180'}`}
+          className={`text-xl ${theme == 'light' ? 'text-slate-600 hover:text-gray-500' : 'hover:text-gray-300'} ${response?.userId === userId ? 'text-gray-300 block' : 'hidden'} cursor-pointer ${expand ? 'text-slate-300' : 'rotate-180'}`}
         />
         {
           <p className={`absolute ${(expand && response?.userId === userId) ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-5 top-5 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'border-gray-400 bg-slate-700' : 'border-gray-900 shadow-slate-800'}`}>
             <span 
+              onClick={editYourResponsePop}
               className={buttonOptClass(theme)}>
               Edit
             </span>
             <span 
-              // onClick={deleteSingleComment}
+              onClick={deleteSingleResponse}
               className={buttonOptClass(theme)}>
               Delete
             </span>
@@ -73,7 +103,11 @@ export const ResponseBody = ({ response, theme, userId, targetComment, isLoading
         onClick={closeInput}
         onDoubleClick={() => setReveal(prev => !prev)}
         className="cursor-grab text-justify tracking-wide first-letter:ml-3 first-letter:font-medium">
-        {reveal ? response?.response : reduceLength(response?.response, 60, 'word')}
+        {
+          reveal ? 
+            <FormattedContent content={response?.response} /> 
+            : 
+            <FormattedContent content={reduceLength(response?.response, 60, 'word')} />}
       </p>
       <div className="relative flex items-center gap-4">
         <ResponseBase
@@ -84,6 +118,8 @@ export const ResponseBody = ({ response, theme, userId, targetComment, isLoading
           response={response} 
           reveal={reveal}
           writeReply={writeReply} 
+          // prompt={prompt}
+          setPrompt={setPrompt}
           setWriteReply={setWriteReply} 
           openReply={openReply} 
           setOpenReply={setOpenReply}
@@ -95,3 +131,19 @@ export const ResponseBody = ({ response, theme, userId, targetComment, isLoading
     </article>
   )
 }
+
+type FormattedProp = {
+  content: string
+}
+
+export const FormattedContent = ({ content }: FormattedProp) => {
+  const username = content.split(' ')[0];
+  const others = content?.split(' ').slice(1).join(' ');
+
+  return (
+  <span className='flex items-center'>
+    <small className='text-gray-400'>{username}</small> &nbsp;
+    <small>{others}</small>
+  </span>)
+}
+

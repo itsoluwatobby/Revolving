@@ -64,7 +64,7 @@ export default function BodyComponent({ currentUserId, expand, reveal, comment, 
               dispatch(setEditComment({...comment, comment: ''}))
             }
           }
-          className={`text-xl ${expand ? 'text-gray-300' : ''} ${comment?.userId === currentUserId ? 'text-gray-300 block' : 'hidden'} hover:text-gray-300 cursor-pointer ${expand ? null : 'rotate-180'}`}
+          className={`text-xl ${expand ? 'text-gray-300' : 'rotate-180'} ${comment?.userId === currentUserId ? 'text-gray-300 block' : 'hidden'} hover:text-gray-300 cursor-pointer ${theme == 'light' ? 'text-slate-600' : ''}`}
         />
         {
           <p className={`absolute ${(expand && comment?.userId === currentUserId) ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-5 top-5 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'border-gray-400 bg-slate-700' : 'border-gray-900 shadow-slate-800'}`}>

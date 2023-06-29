@@ -1,9 +1,10 @@
 import { ChangeEvent, useEffect } from 'react'
 import { BsSend } from 'react-icons/bs'
+import { AiFillCloseSquare } from 'react-icons/ai'
 import { useThemeContext } from '../../../hooks/useThemeContext'
 import { PromptLiterals, ThemeContextType } from '../../../posts'
 import { useDispatch, useSelector } from 'react-redux';
-import { getEditResponses, setEditResponse } from '../../../features/story/commentSlice';
+import { getEditResponse, setEditResponse } from '../../../features/story/commentSlice';
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../../data';
 import { commentApiSlice } from '../../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
@@ -21,27 +22,36 @@ type WriteProp={
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>
+  setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>
 }
 
 // TODO: When Prompt is up, disable textarea
 
-export default function WriteModal({ keepPrompt, comment, response, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
+export default function WriteModal({ keepPrompt, setKeepPrompt, comment, response, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const dateTime = sub(new Date, { minutes: 0 }).toISOString();
-  const getResponseEdit = useSelector(getEditResponses)
+  const getResponseEdit = useSelector(getEditResponse)
   const [updateResponse, { error, isError, isLoading, isSuccess, isUninitialized }] = useUpdateResponseMutation()
-  const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse, isSuccess: isSuccessResponse, isUninitialized: isUninitializedResponse }] = useCreateResponseMutation()
+  const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse, isUninitialized: isUninitializedResponse, isSuccess: isSuccessResponse }] = useCreateResponseMutation()
   const dispatch = useDispatch()
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => setWriteReply(event.target.value)
 
   useEffect(() => {
     let isMounted = true
-    isMounted ? setWriteReply('' || getResponseEdit?.response) : null
+    if(isMounted){
+      const username = '@'+getResponseEdit.author+' '
+      openReply.type == 'edit' ? setWriteReply('' || getResponseEdit?.response) : openReply.type == 'reply' ? setWriteReply(username) : null
+    }
     return () => {
       isMounted  = false
     }
-  }, [])
+  }, [getResponseEdit, setWriteReply, openReply])
+
+  const closeInput = () => {
+    !writeReply ? setOpenReply({type: 'nil', assert: false}) : setKeepPrompt('Show');
+    if(responseRef.current) responseRef?.current.focus()
+  }
 
   const handleSubmit = async() => {
     if(!writeReply.length) return
@@ -68,14 +78,14 @@ export default function WriteModal({ keepPrompt, comment, response, responseRef,
       })
     }
   }
- 
-  const handleReply = async() => {
+
+  const createNewResponse = async() => {
     if(!writeReply.length) return
     const newResponse = {
       userId: currentUserId,
+      commentId: comment?._id,
       responseId: response?._id,
-      response: writeReply,
-      responseDate: dateTime
+      response: writeReply
     } as Partial<CommentResponseProps>
     try{
       await createResponse({ userId: currentUserId, 
@@ -83,7 +93,7 @@ export default function WriteModal({ keepPrompt, comment, response, responseRef,
         response: newResponse }).unwrap()
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
-      await commentApiSlice.useGetCommentQuery(response._id).refetch()
+      await commentApiSlice.useGetCommentQuery(comment._id).refetch()
     }
     catch(err){
       const errors = error as ErrorResponse
@@ -104,7 +114,7 @@ export default function WriteModal({ keepPrompt, comment, response, responseRef,
     return () => {
       isMounted = false
     }
-  }, [isSuccess])
+  }, [isSuccess, isUninitialized, setPrompt])
   
   useEffect(() => {
     let isMounted = true
@@ -114,7 +124,7 @@ export default function WriteModal({ keepPrompt, comment, response, responseRef,
     return () => {
       isMounted = false
     }
-  }, [isSuccessResponse])
+  }, [isSuccessResponse, isUninitializedResponse, setPrompt])
 
   const canSubmit = Boolean(writeReply)
 
@@ -136,12 +146,16 @@ export default function WriteModal({ keepPrompt, comment, response, responseRef,
         ></textarea>
         <button 
           disabled={isLoadingResponse && !canSubmit}
-          onClick={openReply.type === 'reply' ? handleReply : openReply.type === 'edit' ? handleSubmit : () => {return}}
+          onClick={openReply.type === 'reply' ? createNewResponse : openReply.type === 'edit' ? handleSubmit : () => {return}}
           className="flex-none w-12 hover:bg-opacity-50 hover:opacity-50 h-10 grid place-content-center transition-all rounded-tr-md rounded-br-md">
           <BsSend
             className={`text-lg text-center hover:scale-[1.08] active:scale-[1]`}
           />
         </button>
+        <AiFillCloseSquare 
+          onClick={closeInput}
+          className={`absolute top-1 right-0 text-lg text-gray-300 rounded-full cursor-pointer hover:opacity-80 transition-all`}
+        />
       </div>
     </article>
   )

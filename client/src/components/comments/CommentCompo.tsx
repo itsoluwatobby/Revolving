@@ -25,7 +25,9 @@ export default function CommentCompo({ comment, setPrompt, setOpenBox }: Comment
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const { setLoginPrompt } = useThemeContext() as ThemeContextType
   const responseRef = useRef<HTMLTextAreaElement>();
-  const [deleteComment, { isLoading, isError, error, isSuccess: isSuccessDeleted, isUninitialized }] = useDeleteCommentMutation()
+  const [deleteComment, { 
+    isLoading, isError, isSuccess: isSuccessDeleted, 
+    error, isUninitialized }] = useDeleteCommentMutation()
 
   useEffect(() => {
     openReply.assert ? setOpenBox(true) : setOpenBox(false)
