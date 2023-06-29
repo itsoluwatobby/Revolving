@@ -8,7 +8,6 @@ import { getEditResponse, setEditResponse } from '../../../features/story/commen
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../../data';
 import { commentApiSlice } from '../../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
-import { sub } from 'date-fns';
 import { useCreateResponseMutation, useUpdateResponseMutation } from '../../../app/api/responseApiSlice';
 
 type WriteProp={
@@ -29,7 +28,6 @@ type WriteProp={
 
 export default function WriteModal({ keepPrompt, setKeepPrompt, comment, response, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
-  const dateTime = sub(new Date, { minutes: 0 }).toISOString();
   const getResponseEdit = useSelector(getEditResponse)
   const [updateResponse, { error, isError, isLoading, isSuccess, isUninitialized }] = useUpdateResponseMutation()
   const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse, isUninitialized: isUninitializedResponse, isSuccess: isSuccessResponse }] = useCreateResponseMutation()
@@ -57,8 +55,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     if(!writeReply.length) return
     const updatedResponse = {
       ...getResponseEdit,
-      response: writeReply,
-      editDate: dateTime
+      response: writeReply
     }
     try{
       await updateResponse({ userId: currentUserId, 

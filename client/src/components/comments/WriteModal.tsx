@@ -8,7 +8,6 @@ import { getEditComments, setEditComment } from '../../features/story/commentSli
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
 import { commentApiSlice, useUpdateCommentMutation } from '../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
-import { sub } from 'date-fns';
 import { useCreateResponseMutation } from '../../app/api/responseApiSlice';
 
 type WriteProp={
@@ -28,7 +27,6 @@ type WriteProp={
 
 export default function WriteModal({ keepPrompt, setKeepPrompt, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
-  const dateTime = sub(new Date, { minutes: 0 }).toISOString();
   const getCommentEdit = useSelector(getEditComments)
   const [updateComment, { error: errorComment, isError: isErrorComment, isLoading: isLoadingComment, isSuccess: isSuccessEdited, isUninitialized }] = useUpdateCommentMutation()
   const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse }] = useCreateResponseMutation()
@@ -40,7 +38,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     let isMounted = true
     if(isMounted){
       const username = '@'+getCommentEdit.author+' '
-      openReply.type === 'edit' ? setWriteReply('' || getCommentEdit?.comment+' ') : openReply.type === 'reply' ? setWriteReply(username) : null
+      openReply.type === 'edit' ? setWriteReply('' || getCommentEdit?.comment) : openReply.type === 'reply' ? setWriteReply(username) : null
     }
     return () => {
       isMounted  = false
@@ -65,8 +63,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     if(!writeReply.length) return
     const updatedComment = {
       ...getCommentEdit,
-      comment: writeReply,
-      editDate: dateTime
+      comment: writeReply
     }
     try{
       await updateComment({ userId: currentUserId, 
@@ -86,7 +83,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
       })
     }
   }
- 
+
   const createNewResponse = async() => {
     if(!writeReply.length) return
     const newResponse = {

@@ -85,7 +85,7 @@ export const ResponseBody = ({ response, prompt, setPrompt, userId, targetCommen
           className={`text-xl ${theme == 'light' ? 'text-slate-600 hover:text-gray-500' : 'hover:text-gray-300'} ${response?.userId === userId ? 'text-gray-300 block' : 'hidden'} cursor-pointer ${expand ? 'text-slate-300' : 'rotate-180'}`}
         />
         {
-          <p className={`absolute ${(expand && response?.userId === userId) ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-5 top-5 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'border-gray-400 bg-slate-700' : 'border-gray-900 shadow-slate-800'}`}>
+          <p className={`absolute z-30 ${(expand && response?.userId === userId) ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-5 top-5 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'border-gray-400 bg-slate-700' : 'border-gray-900 shadow-slate-800'}`}>
             <span 
               onClick={editYourResponsePop}
               className={buttonOptClass(theme)}>

@@ -10,14 +10,13 @@ import { useCreateCommentMutation, useGetCommentsQuery } from '../../app/api/com
 import { useDispatch, useSelector } from 'react-redux'
 import { setAllComments } from '../../features/story/commentSlice'
 import { toast } from 'react-hot-toast'
-import { sub } from 'date-fns'
 import { storyApiSlice } from '../../app/api/storyApiSlice'
 import { getTabCategory } from '../../features/story/navigationSlice'
 
 export default function CommentBody() {
   const getNavigation = useSelector(getTabCategory)
   const { theme, openComment, setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType;
-  const [openBox, setOpenBox] = useState<boolean>(false);
+  const [deactivateInputBox, setDeactivateInputBox] = useState<boolean>(false);
   const currentUserId = localStorage.getItem('revolving_userId') as string;
   const { data, isLoading, isError, error } = useGetCommentsQuery(openComment?.storyId);
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -27,7 +26,6 @@ export default function CommentBody() {
   const dispatch = useDispatch();
   const [successModal, setSuccessModal] = useState<ChatOption>('Hide');
   const [prompt, setPrompt] = useState<Prompted>({type: 'nil', assert: false});
-  const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
   const handleComment = (event: ChangeEvent<HTMLInputElement>) => setComment(event.target.value)
 
@@ -36,7 +34,6 @@ export default function CommentBody() {
     const newComment = {
       userId: currentUserId,
       storyId: openComment?.storyId,
-      commentDate: dateTime,
       comment
     } as Partial<CommentProps>
     try{
@@ -130,7 +127,7 @@ export default function CommentBody() {
             <CommentCompo 
               key={comment?._id}
               comment={comment as CommentProps}  
-              setOpenBox={setOpenBox}
+              setDeactivateInputBox={setDeactivateInputBox}
               setPrompt={setPrompt}
             />
           ))
@@ -154,7 +151,7 @@ export default function CommentBody() {
           type="text"
           name="comment"
           autoFocus={true}
-          disabled={openBox}
+          disabled={deactivateInputBox}
           value={comment}
           autoComplete="off"
           placeholder="share your thought"

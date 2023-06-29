@@ -5,6 +5,7 @@ import authReducer from '../features/auth/authSlice'
 import commentReducer from '../features/story/commentSlice'
 import navigationTabReducer from '../features/story/navigationSlice';
 import storyReducer from '../features/story/storySlice';
+import codeReducer from '../features/story/codeSlice';
 import chatReducer from '../features/chat/chatSlice';
 //import userReducer from '../features/auth/userSlice'
 
@@ -16,6 +17,7 @@ export const store = configureStore({
     navigate: navigationTabReducer,
     story: storyReducer,
     chat: chatReducer,
+    code: codeReducer,
     //user: userReducer,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(apiSlice.middleware),

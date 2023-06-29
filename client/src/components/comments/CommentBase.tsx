@@ -47,7 +47,7 @@ export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, 
       if(keepPrompt !== 'Retain') setKeepPrompt('Show')
       if(keepPrompt === 'Retain') {
         setKeepPrompt('Dommant')
-        setOpenReply({type: openReply.type, assert: false});
+        setOpenReply({type: 'nil', assert: false});
       }
     }
     else if(keepPrompt === 'Discard') {
