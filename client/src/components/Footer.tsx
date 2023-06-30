@@ -8,7 +8,30 @@ const top_border = "border w-1/3 pt-2.5 bg-slate-100 rounded-t-3xl border-slate-
 export const Footer = () => {
   return (
     <footer className='absolute bottom-0 w-full flex flex-col'>
-      <div className='flex justify-evenly w-full flex-wrap'>
+      <div className={`flex items-center justify-evenly`}>
+        <div className='flex flex-col'>
+          <span>Active Todos: false</span>
+          <p className='flex items-center gap-4'>
+            <span>Todos done count</span>
+            <span>Total Todos count</span>
+          </p>
+        </div>
+        <p className='flex flex-col'>
+          <span>Followers count</span>
+          <span>Number of posts</span>
+          <span>Number of likes</span>
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+{/* <p className='flex gap-1 items-center self-start cursor-pointer pl-3 hover:text-gray-800'>
+          <AiOutlineMail className='text-xl' />
+          <a href="mailto:itsoluwatobby@gmail.com">itsoluwatobby@gmail.com</a>
+        </p> */}
+{/**
+<div className='flex justify-evenly w-full flex-wrap'>
         <p className={top_border}>
           <a href='https://github.com/itsoluwatobby' target='_blank' className={footer_list}>
             <FaGithub className={icon_style} />
@@ -34,11 +57,4 @@ export const Footer = () => {
           Thanks visiting. Follow me on any of the social media accounts above
         </span>
       </div>
-    </footer>
-  )
-}
-
-{/* <p className='flex gap-1 items-center self-start cursor-pointer pl-3 hover:text-gray-800'>
-          <AiOutlineMail className='text-xl' />
-          <a href="mailto:itsoluwatobby@gmail.com">itsoluwatobby@gmail.com</a>
-        </p> */}
+*/}

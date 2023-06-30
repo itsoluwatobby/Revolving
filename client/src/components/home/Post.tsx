@@ -1,11 +1,11 @@
-import { MakeToButtom, PostType } from '../posts'
-import { useWordCount } from '../hooks/useWordCount'
+import { MakeToButtom, PostType } from '../../posts'
+import { useWordCount } from '../../hooks/useWordCount'
 import { useState } from 'react';
-import { TextRules } from '../fonts';
+import { TextRules } from '../../fonts';
 import PostImage from './post/PostImages';
 import PostTop from './post/PostTop';
 import PostBase from './post/PostBase';
-import { Categories } from '../data';
+import { Categories } from '../../data';
 
 type Props = {
   story: PostType

@@ -9,8 +9,6 @@ import Aside from "../components/singlePost/Aside";
 import ArticleComp from "../components/singlePost/ArticleComp";
 import { ErrorResponse, UserProps } from "../data";
 import { toast } from "react-hot-toast";
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "../features/auth/authSlice";
 import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from "../app/api/usersApiSlice";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
 import { useThemeContext } from "../hooks/useThemeContext";
@@ -19,12 +17,11 @@ const specialFont = "first-line:uppercase first-line:tracking-widest first-lette
 
 export default function SingleStoryPage() {
   const { storyId } = useParams() as {storyId: string}
-  const currentUserId = useSelector(selectCurrentUser)
-  const currentId = localStorage.getItem('revolving_userId') as string
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   const [sidebar, setSidebar] = useState<boolean>(false);
   const { setLoginPrompt, loginPrompt } = useThemeContext() as ThemeContextType
   
-  const {data: user, refetch} = useGetUserByIdQuery(currentId)
+  const {data: user, refetch} = useGetUserByIdQuery(currentUserId)
   const [followUnfollowUser, { isLoading: isMutating, 
     error: followError,  isError: isFollowError, 
     isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
@@ -58,7 +55,7 @@ export default function SingleStoryPage() {
   const followOrUnfollow = async() => {
     try{
       const {userId} = targetStory as PostType
-      const requestIds = { followerId: currentId, followedId: userId }
+      const requestIds = { followerId: currentUserId, followedId: userId }
     
       await followUnfollowUser(requestIds).unwrap()
       await refetch()     
@@ -91,7 +88,8 @@ export default function SingleStoryPage() {
         <div className="flex h-full">
           {Array.isArray(stories) && stories.length 
             && <Aside 
-            stories={stories as PostType[]} sidebar={sidebar} 
+            stories={stories as PostType[]} 
+            sidebar={sidebar} 
             setSidebar={setSidebar} 
           />}
           <ArticleComp 

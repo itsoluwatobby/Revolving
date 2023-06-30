@@ -5,7 +5,7 @@ import { CommentProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '
 import { useThemeContext } from '../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
-import { useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
+import { commentApiSlice, useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
 import { checkCount } from '../../utils/navigator';
 import { setEditComment } from '../../features/story/commentSlice';
@@ -61,6 +61,7 @@ export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, 
     try{
       const { _id } = comment
       await likeAndUnlikeComment({userId, commentId: _id}).unwrap()
+      dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err: unknown){
       const errors = likeError as ErrorResponse

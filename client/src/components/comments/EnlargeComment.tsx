@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { PromptLiterals, ThemeContextType } from '../../posts';
-import { comments } from '../../commentData';
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import { useGetCommentQuery } from '../../app/api/commentApiSlice';
@@ -59,7 +58,7 @@ export default function EnlargeComment() {
  
   const singleCommentContent = (
     <article className="text-sm flex flex-col gap-1">
-      {!isLoading && comments?.length ? 
+      {!isLoading && targetComment ? 
         <>
           <SingleComment 
             targetComment={targetComment as CommentProps}

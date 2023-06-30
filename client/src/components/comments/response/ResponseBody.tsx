@@ -51,7 +51,8 @@ export const ResponseBody = ({ response, prompt, setPrompt, userId, targetCommen
   const deleteSingleResponse = async() => {
     try{
       await deleteResponse({ userId, responseId: response?._id}).unwrap()
-      await commentApiSlice.useGetCommentQuery(parseId).refetch()
+      dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
+      //await commentApiSlice.useGetCommentQuery(parseId).refetch()
     }
     catch(err: unknown){
       const errors = error as ErrorResponse

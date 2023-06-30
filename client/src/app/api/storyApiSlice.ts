@@ -36,7 +36,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
+      invalidatesTags: [{ type: 'STORY', id: 'LIST' }],
     }),
     
     deleteStory: builder.mutation<void, Omit<StoryArgs, 'story'>>({

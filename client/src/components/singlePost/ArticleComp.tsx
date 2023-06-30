@@ -10,6 +10,7 @@ import { storyApiSlice, useLikeAndUnlikeStoryMutation } from '../../app/api/stor
 import { toast } from 'react-hot-toast';
 import { checkCount } from '../../utils/navigator';
 import { dateFormat } from '../../utils/helperFunc';
+import { useDispatch } from 'react-redux';
 
 type ArticleProps = {
   story: PostType,
@@ -31,12 +32,13 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation()
+  const dispatch = useDispatch()
 
   const likeUnlikeStory = async() => {
     try{
       const { _id } = story
       await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
-      await storyApiSlice.useGetStoryQuery(_id).refetch()
+      dispatch(storyApiSlice.util.invalidateTags(['STORY']))
     }
     catch(err: unknown){
       const errors = likeError as ErrorResponse
@@ -88,9 +90,9 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
           className={`mt-2 whitespace-pre-wrap tracking-wider text-justify`}>
             {bodyContent}
         </p>
-      <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-gray-800' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans`}>{
+      <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans`}>{
       story?.body ?
-        <div className="flex items-center justify-between w-full text-gray-300">
+        <div className="flex flex-wrap items-center justify-between w-full text-gray-300">
             <p>{averageReadingTime} read</p>
                   <p 
                     onClick={likeUnlikeStory}
@@ -100,7 +102,7 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
                         ?
                         <BsFillHandThumbsUpFill 
                         title='like'
-                        className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
+                        className={`text-lg shadow-2xl shadow-slate-200 hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-500' : ''}`} />
                         :
                         <BsHandThumbsUp 
                           title='like' 
@@ -110,7 +112,7 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
                         {story?.sharedLikes ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}
                       </span>
                   </p>
-            {story?.edited && <p>edited {format(story?.updatedAt)}</p>}
+            {story?.edited && <p className='text-center'>edited {format(story?.updatedAt)}</p>}
         </div>
           : ''
         }
