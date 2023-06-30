@@ -23,7 +23,7 @@ textarea::-webkit-scrollbar{
 }
 
 .code_page{
-  height: calc(100vh - 164px);
+  height: calc(100vh - 190px);
 }
 
 .comment_page{

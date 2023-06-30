@@ -11,7 +11,6 @@ import CodeBlock from '../codeEditor/CodeEditor';
 import { useGetStoryQuery } from '../app/api/storyApiSlice';
 import { useDispatch } from 'react-redux';
 import { setStoryData } from '../features/story/storySlice';
-import { sub } from 'date-fns';
 
 export const NewStory = () => {
   const { storyId } = useParams()
@@ -24,7 +23,6 @@ export const NewStory = () => {
   const [textareaValue, setTextareaValue] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null)
   const [targetStory, setTargetStory] = useState<PostType>()
-  const dateTime = sub(new Date, { minutes: 0 }).toISOString();
   const [codeEditor, setCodeEditor] = useState<boolean>(false);
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
@@ -81,14 +79,12 @@ export const NewStory = () => {
         title: inputValue,
         body: textareaValue,
         category: postCategory,
-        editDate: dateTime,
         fontFamily
       } : {
         title: inputValue, 
         body: textareaValue,
         category: postCategory,
         userId: currentUserId,
-        storyDate: dateTime,
         fontFamily
       }
     dispatch(setStoryData(storyData))
@@ -97,19 +93,8 @@ export const NewStory = () => {
     return
   }
     setCanPost([inputValue, textareaValue].every(Boolean))
-  }, [setCanPost, dateTime, dispatch, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
+  }, [setCanPost, currentUserId, dispatch, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
   
-  /*
-    setPostData(prev => {
-        return {...prev, 
-          title: inputValue, 
-          body: textareaValue,
-          category: postCategory,
-          fontFamily
-        }
-      })
-  */
-
   const addCategory = (category: Categories) => {
     let categories: Categories[] = [...postCategory];
     if(!categories.includes(category)){
@@ -150,7 +135,7 @@ export const NewStory = () => {
       <div className='bg-slate-500 w-1/2 md:w-1/5 p-1.5 rounded-md gap-2 flex items-center'>
         <BiCodeAlt 
           onClick={() => setCodeEditor(prev => !prev)}
-          title='Code Editor' className={`text-3xl cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-400' : 'text-gray-300 bg-gray-500'}`} />
+          title='Code Editor' className={`text-3xl cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
         <div title='Scroll left/right' className='hidebars flex items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600'>
           {
             Object.values(NAVIGATE).map(nav => (

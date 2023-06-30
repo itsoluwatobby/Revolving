@@ -17,7 +17,7 @@ export default function Comments() {
           comments?.length ? (
               <p 
                 className={`text-left gap-2 flex items-center font-mono capitalize ${theme == 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
-                  <span className='font-sans p-2' >
+                  <span className='font-sans p-0.5' >
                     {comments.length == 1 ? 'comment' : 'comments'} 
                   </span>
                   <span>
@@ -25,7 +25,7 @@ export default function Comments() {
                   </span>
               </p>
               ) : (
-              <p className={`text-center font-mono capitalize ${theme == 'light' ? 'text-gray-700' : 'text-gray-300'}`}>no comment</p>
+              <p className={`text-center font-mono capitalize p-2.5 ${theme == 'light' ? 'text-gray-700' : 'text-gray-300'}`}/>
             )
           )
         }

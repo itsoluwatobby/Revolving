@@ -137,7 +137,7 @@ export const getStoryByCategory = (req, res) => {
                 const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
                 const sharedCategoryStory = yield getAllSharedByCategories(category);
                 const reMoulded = sharedCategoryStory.map(share => {
-                    const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.sharedDate });
+                    const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.createdAt });
                     return object;
                 });
                 const refactoredModel = [...categoryStory, ...reMoulded];
@@ -154,7 +154,7 @@ export const getStories = (req, res) => {
                 const stories = yield getAllStories();
                 const sharedStories = yield getAllSharedStories();
                 const reMoulded = sharedStories.map(share => {
-                    const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.sharedDate });
+                    const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.createdAt });
                     return object;
                 });
                 const everyStories = [...stories, ...reMoulded];

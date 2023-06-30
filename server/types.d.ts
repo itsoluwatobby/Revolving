@@ -72,7 +72,7 @@ interface CommentProps{
   likes: string[],
   author: string,
   edited: boolean,
-  commentResponse: CommentResponseProps[]
+  commentResponse: string[]
   createdAt: string
   updatedAt: string
 }
@@ -83,6 +83,7 @@ interface Emerge extends CommentProps{
   responseTags: string[],
   commentId: string,
   response: string,
+  responseId?: string
 }
 
 interface SharedProps extends Document{

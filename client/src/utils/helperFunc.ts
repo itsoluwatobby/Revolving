@@ -16,6 +16,14 @@ export function providesTag<R extends { _id: string | number }, T extends string
   )
 }
 
+export const dateFormat = (dateTime: string) => {
+  const constructDate = new Date(dateTime)
+  const date = new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium'
+  }).format(constructDate)
+  return date
+}
+
 export async function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
   const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes) ?? []
   const otherLikedPosts = entry?.filter(post => Number(post?.likes) < numLikes) ?? []

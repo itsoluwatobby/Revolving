@@ -73,6 +73,8 @@ export const getUserResponses = async(userId: string, responseId: string) => awa
 export const createResponse = async(response: Partial<CommentResponseProps>) => {
   const newResponse = await CommentResponseModel.create({ ...response })
   await CommentModel.findByIdAndUpdate({_id: response.commentId}, { $push: {commentResponse: newResponse?._id}})
+  response?.responseId 
+      ? await CommentResponseModel.findByIdAndUpdate({_id: response?.responseId}, { $push: {responseTags: newResponse?._id}}) : null
   return newResponse
 }
 
@@ -94,6 +96,8 @@ export type Like_Unlike_Response = Awaited<ReturnType<typeof likeAndUnlikeRespon
 export const deleteSingleResponse = async(responseId: string) => {
   const response = await getResponseById(responseId)
   await CommentResponseModel.findByIdAndDelete({ _id: responseId })
+  response?.responseId 
+      ? await CommentResponseModel.findByIdAndUpdate({_id: response.responseId}, { $pull: {responseTags: response?._id}}) : null
   await CommentModel.findByIdAndUpdate({_id: response.commentId}, { $pull: {commentResponse: response?._id}})
 }
 

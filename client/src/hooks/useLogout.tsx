@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom"
 import { useThemeContext } from "./useThemeContext"
 import { ThemeContextType } from "../posts"
 import { useSignOutMutation } from "../app/api/authApiSlice"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { signUserOut } from "../features/auth/authSlice"
+import { getLanguages } from "../features/story/codeSlice"
 
 type SignOutType = 'dont' | 'use'
 
@@ -12,6 +13,7 @@ export default function useLogout() {
   const { setRollout } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId')
   const [signedOut] = useSignOutMutation()
+  const languages = useSelector(getLanguages)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -25,7 +27,7 @@ export default function useLogout() {
         }
       })
       setRollout(false)
-      clearStorage(currentUserId as string)
+      clearStorage(currentUserId as string, languages)
       option == 'use' ? navigate('/signIn', { replace: true }) : null
     }catch(err){
       // const errors = error as ErrorResponse
@@ -34,7 +36,7 @@ export default function useLogout() {
           background: '#8FBC8F'
         }
       })
-      clearStorage(currentUserId as string)
+      clearStorage(currentUserId as string, languages)
       option == 'use' ? navigate('/signIn', { replace: true }) : null
     }
   }
@@ -42,11 +44,15 @@ export default function useLogout() {
   return signOut
 }
 
-function clearStorage(userId: string){
+function clearStorage(userId: string, languages: string[]){
   localStorage.removeItem(`newTitle?id=${userId}`)
   localStorage.removeItem(`newBody?id=${userId}`)
+  languages.map(language => {
+    localStorage.removeItem(`revolving-${language}`)
+  })
 
   localStorage.removeItem(`editTitle?id=${userId}`)
   localStorage.removeItem(`editBody?id=${userId}`)
   localStorage.removeItem('revolving_userId')
+  localStorage.removeItem('revolving-languageName')
 }

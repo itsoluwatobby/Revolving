@@ -28,7 +28,7 @@ interface CommentProps{
   edited: boolean,
   createdAt: string,
   updatedAt: string
-  commentResponse: CommentResponseProps[]
+  commentResponse: string[]
 }
 
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
@@ -37,6 +37,7 @@ interface Emerge extends CommentProps{
   responseTags: string[],
   commentId: string,
   response: string,
+  responseId?: string
 }
 
 type Prompted = {
@@ -46,7 +47,8 @@ type Prompted = {
 
 type OpenReply = {
   type: 'reply' | 'edit' | 'nil',
-  assert: boolean
+  assert: boolean,
+  pos?: 'enlarge'
 }
 
 type EnlargeCompo = {

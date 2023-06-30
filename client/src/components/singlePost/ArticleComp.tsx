@@ -9,6 +9,7 @@ import { ErrorResponse, UserProps } from '../../data';
 import { storyApiSlice, useLikeAndUnlikeStoryMutation } from '../../app/api/storyApiSlice';
 import { toast } from 'react-hot-toast';
 import { checkCount } from '../../utils/navigator';
+import { dateFormat } from '../../utils/helperFunc';
 
 type ArticleProps = {
   story: PostType,
@@ -106,7 +107,7 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
                           className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
                     }
                       <span className={`font-mono text-base ${theme == 'dark' && 'text-white'}`}>
-                        {checkCount(story?.likes)}
+                        {story?.sharedLikes ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}
                       </span>
                   </p>
             {story?.edited && <p>edited {format(story?.updatedAt)}</p>}

@@ -19,7 +19,6 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { StoryModel } from "../models/Story.js";
-import { CommentResponseModel } from "../models/CommentResponse.js";
 import { CommentModel } from "../models/CommentModel.js";
 import { deleteSingleComment } from "./commentHelper.js";
 export const getAllStories = () => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.find().lean(); });
@@ -59,17 +58,14 @@ export const deleteUserStory = (storyId) => __awaiter(void 0, void 0, void 0, fu
     yield StoryModel.findByIdAndDelete({ _id: storyId });
     const commentInStory = yield CommentModel.find({ storyId }).lean();
     yield Promise.all(commentInStory.map(comment => {
-        //CommentResponseModel.deleteMany({ commentId: comment._id })
         deleteSingleComment(comment._id, false);
     }));
-    //await CommentModel.deleteMany({ storyId })
 });
 export const deleteAllUserStories = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     yield StoryModel.deleteMany({ userId });
     const userComments = yield CommentModel.find({ userId }).lean();
     yield Promise.all(userComments.map(comment => {
-        CommentResponseModel.deleteMany({ commentId: comment._id });
+        deleteSingleComment(comment._id, false);
     }));
-    yield CommentModel.deleteMany({ userId });
 });
 //# sourceMappingURL=storyHelpers.js.map

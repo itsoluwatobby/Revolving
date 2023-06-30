@@ -53,7 +53,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           }
         </p>
         <span>.</span>
-        <p>{format(story?.createdAt, 'en-US')}</p>
+        <p>{format(story?.createdAt)}</p>
         {userId && (
           <FiMoreVertical
             onClick={() => setOpen(prev => !prev)}

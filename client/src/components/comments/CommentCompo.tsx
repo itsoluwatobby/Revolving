@@ -11,25 +11,26 @@ import { useSelector } from "react-redux";
 
 type CommentType = {
   comment: CommentProps,
-  setOpenBox: React.Dispatch<React.SetStateAction<boolean>>,
+  setDeactivateInputBox: React.Dispatch<React.SetStateAction<boolean>>,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
 }
 
-export default function CommentCompo({ comment, setPrompt, setOpenBox }: CommentType) {
+export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox }: CommentType) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [reveal, setReveal] = useState<boolean>(false)
   const getNavigation = useSelector(getTabCategory)
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const [writeReply, setWriteReply] = useState<string>('');
   const [expand, setExpand] = useState<boolean>(false)
-  const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
+  // const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const { setLoginPrompt } = useThemeContext() as ThemeContextType
   const responseRef = useRef<HTMLTextAreaElement>();
-  const [deleteComment, { isLoading, isError, error, isSuccess: isSuccessDeleted, isUninitialized }] = useDeleteCommentMutation()
+  const [deleteComment, { isLoading, isError, isSuccess: isSuccessDeleted, 
+    error, isUninitialized }] = useDeleteCommentMutation()
 
   useEffect(() => {
-    openReply.assert ? setOpenBox(true) : setOpenBox(false)
-  }, [openReply.assert, setOpenBox])
+    openReply.assert ? setDeactivateInputBox(true) : setDeactivateInputBox(false)
+  }, [openReply.assert, setDeactivateInputBox])
 
   const deleteSingleComment = async() => {
     try{
@@ -72,8 +73,8 @@ export default function CommentCompo({ comment, setPrompt, setOpenBox }: Comment
         setWriteReply={setWriteReply} 
         openReply={openReply} 
         setOpenReply={setOpenReply}
-        keepPrompt={keepPrompt} 
-        setKeepPrompt={setKeepPrompt}
+        // keepPrompt={keepPrompt} 
+        // setKeepPrompt={setKeepPrompt}
         setPrompt={setPrompt}  
         deleteSingleComment={deleteSingleComment}
         setExpand={setExpand} 
