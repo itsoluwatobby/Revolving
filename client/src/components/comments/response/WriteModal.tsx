@@ -90,7 +90,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
         response: newResponse }).unwrap()
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
-      await commentApiSlice.useGetCommentQuery(comment._id).refetch()
+      dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err){
       const errors = error as ErrorResponse

@@ -28,7 +28,7 @@ export default function ProfilePage() {
   // }, [])
 
   return (
-    <main role="User profile" className="single_page text-sm p-2 flex md:flex-row flex-col gap-2">
+    <main role="User profile" className="single_page text-sm p-2 flex md:flex-row flex-col gap-2 w-full">
       <div className="md:flex-none h-1/4 rounded-md border md:h-full md:w-1/2 md:sticky md:top-0">
         <figure role="Cover photo" className="relative bg-slate-700 h-full rounded-md shadow-transparent shadow-2xl border-2">
           cover photo

@@ -17,6 +17,7 @@ import About from "./pages/About";
 import { BsChatTextFill } from 'react-icons/bs'
 import ChatModal from "./pages/chatAdmin/ChatModal";
 import PrompLogin from "./components/modals/PrompLogin";
+import TaskManager from "./pages/TaskManager";
 
  
 export const App = () => {
@@ -35,7 +36,6 @@ export const App = () => {
           
           </Route>
           
-          
           <Route element={<PersistedLogin />}>
             
             {/* PROTECTED */}
@@ -44,6 +44,7 @@ export const App = () => {
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
+            <Route path="taskManager/:userId" element={<TaskManager />} />
             
           </Route>
           

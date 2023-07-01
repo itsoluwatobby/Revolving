@@ -13,6 +13,7 @@ import { useCreateResponseMutation } from '../../app/api/responseApiSlice';
 type WriteProp={
   writeReply: string,
   keepPrompt: PromptLiterals,
+  enlarged?: boolean,
   currentUserId: string,
   comment: CommentProps,
   openReply: OpenReply,
@@ -25,7 +26,7 @@ type WriteProp={
 
 // TODO: When Prompt is up, disable textarea
 
-export default function WriteModal({ keepPrompt, setKeepPrompt, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
+export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const getCommentEdit = useSelector(getEditComments)
   const [updateComment, { error: errorComment, isError: isErrorComment, isLoading: isLoadingComment, isSuccess: isSuccessEdited, isUninitialized }] = useUpdateCommentMutation()
@@ -71,7 +72,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
         comment: updatedComment }).unwrap()
         setWriteReply('')
         setOpenReply({type: 'nil', assert: false})
-        dispatch(setEditComment({...updatedComment, comment: ''}))
+        enlarged ? dispatch(setEditComment({...updatedComment, comment: ''})) : null
     }
     catch(err){
       const errors = errorComment as ErrorResponse
@@ -97,7 +98,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
         response: newResponse }).unwrap()
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
-      await commentApiSlice.useGetCommentQuery(comment._id).refetch()
+      dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err){
       const errors = errorResponse as ErrorResponse
@@ -119,7 +120,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     return () => {
       isMounted = false
     }
-  }, [isSuccessEdited, isUninitialized])
+  }, [isSuccessEdited, isUninitialized, setPrompt])
   
   // useEffect(() => {
   //   let isMounted = true

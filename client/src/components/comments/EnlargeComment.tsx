@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { PromptLiterals, ThemeContextType } from '../../posts';
-import { comments } from '../../commentData';
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import { useGetCommentQuery } from '../../app/api/commentApiSlice';
@@ -34,7 +33,7 @@ export default function EnlargeComment() {
       isMounted = false
     }
   }, [data])
-  
+
   useEffect(() => {
     let isMounted = true
     isMounted && setResponses(responseData as CommentResponseProps[])
@@ -59,7 +58,7 @@ export default function EnlargeComment() {
  
   const singleCommentContent = (
     <article className="text-sm flex flex-col gap-1">
-      {!isLoading && comments?.length ? 
+      {!isLoading && targetComment ? 
         <>
           <SingleComment 
             targetComment={targetComment as CommentProps}
@@ -98,10 +97,10 @@ export default function EnlargeComment() {
               <p className='text-center mt-10 text-sm'>
               {
                 errorMsg?.status == 404 ? 
-                  <p className='flex flex-col gap-2'>
-                    <span>No response yet</span>
-                    <span>Say something to start the converstion</span>
-                  </p> 
+                  <span className='flex flex-col gap-2'>
+                    <small>No response yet</small>
+                    <small>Say something to start the converstion</small>
+                  </span> 
                   : 
                   <span>Network Error, Please check your connection</span>
                 }

@@ -69,13 +69,17 @@ type ThemeContextType = {
   parseId: string,
   enlarge: EnlargeCompo,
   openChat: ChatOption,
+  toggleLeft: ChatOption,
+  notintersecting: ChatOption, 
   loginPrompt: ChatOption,
   changeTheme: (mode: string) => void,
   setOpenChat: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setToggleLeft: React.Dispatch<React.SetStateAction<ChatOption>>,
   setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
   setEnlarge: React.Dispatch<React.SetStateAction<EnlargeCompo>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
+  setNotIntersecting: React.Dispatch<React.SetStateAction<ChatOption>>
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>

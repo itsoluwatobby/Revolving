@@ -54,8 +54,12 @@ export default function CodeBlock() {
   }
 
   useEffect(() => {
-    localStorage.setItem(`revolving-${filename.name}`, value)
-  }, [value, filename.name])
+    const getValue = files[filename.name as string].defaultValue
+    if(getValue){
+      localStorage.setItem(`revolving-${filename.name}`, getValue)
+    }
+    else return
+  }, [value, filename])
 
   const options = {
     selectOnLineNumbers: true
@@ -77,12 +81,12 @@ export default function CodeBlock() {
   return (
     <section className="code_page w-full sm:w-3/5 sm:m-auto sm:mt-0 sm:mb-0 flex flex-col gap-2">
 
-      <div className="flex items-center shadow-lg justify-evenly border p-0.5 gap-0.5 mb-0 rounded-lg">
+      <div className="flex items-center w-full shadow-lg justify-evenly border p-0.5 gap-0.5 mb-0 rounded-lg">
         {
           language.map(name => (
             <p 
               onClick={() => setFilename({name: name})}
-              className={`cursor-pointer text-center w-full border border-t-0 border-b-0 px-6 border-l-0 last:border-r-0 capitalize rounded-lg shadow-2xl font-mono shadow-slate-900 ${theme == 'light' ? 'bg-slate-300' : '' } ${name == filename.name ? 'bg-slate-500' : ''}`}
+              className={`cursor-pointer text-center w-full mobile:text-xs mobile:font-bold border border-t-0 border-b-0 px-6 border-l-0 last:border-r-0 capitalize rounded-lg shadow-2xl font-mono shadow-slate-900 ${theme == 'light' ? 'bg-slate-300' : '' } ${name == filename.name ? 'bg-slate-500' : ''}`}
               key={name}>{name}
             </p>
           ))

@@ -51,6 +51,25 @@ type OpenReply = {
   pos?: 'enlarge'
 }
 
+type SubTasks = {
+  title: string, 
+  body: string,
+  completed: boolean
+}
+
+interface TaskProp{
+  _id: string,
+  task: string,
+  completed: boolean,
+  subTasks?: SubTasks[]
+  edited: boolean,
+  createdAt: string,
+  updatedAt?: string
+}
+
+type HoverType = 'unfollow' | 'following'
+type PositionType = 'navbar' | 'others'
+
 type EnlargeCompo = {
   type: 'open' | 'enlarge',
   assert: boolean

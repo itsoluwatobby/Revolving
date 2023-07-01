@@ -1,13 +1,13 @@
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs"
 import { MdOutlineInsertComment } from "react-icons/md"
-import { useThemeContext } from "../../hooks/useThemeContext"
-import { MakeToButtom, ThemeContextType } from "../../posts"
+import { useThemeContext } from "../../../hooks/useThemeContext"
+import { MakeToButtom, ThemeContextType } from "../../../posts"
 import { Link } from "react-router-dom"
 import { AiOutlineRetweet } from "react-icons/ai"
-import { useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice"
+import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast";
-import { ErrorResponse } from "../../data"
-import { checkCount } from "../../utils/navigator"
+import { ErrorResponse } from "../../../data"
+import { checkCount } from "../../../utils/navigator"
 
 type PostButtomProps = {
   story: MakeToButtom,
@@ -17,7 +17,7 @@ type PostButtomProps = {
 export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme,  setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType
-  const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation()
+  const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError, isUninitialized }] = useLikeAndUnlikeStoryMutation()
   // const { data: commentData, isLoading, 
   //   isError: isCommentError,
   // } = useGetCommentsQuery(story?._id)
@@ -31,7 +31,6 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
   //   }
   // }, [commentData])
 
-
   const likeUnlikeStory = async() => {
     try{
       const { _id } = story
@@ -39,7 +38,7 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
     }
     catch(err: unknown){
       const errors = likeError as Partial<ErrorResponse>
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      (!errors || errors?.originalStatus == 401) && setLoginPrompt('Open')
       isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'

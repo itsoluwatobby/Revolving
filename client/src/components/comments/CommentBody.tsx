@@ -62,7 +62,7 @@ export default function CommentBody() {
     return () => {
       isMounted = false
     }
-  }, [isCommentSuccess])
+  }, [isCommentSuccess, isUninitialized])
 
   useEffect(() => {
     let isMounted = true
@@ -81,7 +81,7 @@ export default function CommentBody() {
       clearTimeout(timerId)
       isMounted = false
     }
-  }, [prompt?.type])
+  }, [prompt?.assert])
 
   useEffect(() => {
     let isMounted = true
@@ -111,10 +111,10 @@ export default function CommentBody() {
     <p className='text-center mt-10 text-sm'>
       {
         errorMsg?.status == 404 ? 
-          <p className='flex flex-col gap-2 font-serif'>
-            <span>No comments yet</span>
-            <span>Say something to start the converstion</span>
-          </p> 
+          <span className='flex flex-col gap-2 font-serif'>
+            <small>No comments yet</small>
+            <small>Say something to start the converstion</small>
+          </span> 
           : 
           <span>Network Error, Please check your connection</span>
         }

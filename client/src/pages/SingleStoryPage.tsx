@@ -7,28 +7,16 @@ import { useEffect, useState } from "react";
 import { WindowScroll } from "../components/WindowScroll";
 import Aside from "../components/singlePost/Aside";
 import ArticleComp from "../components/singlePost/ArticleComp";
-import { ErrorResponse, UserProps } from "../data";
-import { toast } from "react-hot-toast";
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "../features/auth/authSlice";
-import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from "../app/api/usersApiSlice";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
 import { useThemeContext } from "../hooks/useThemeContext";
 
-const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
+// const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
 
 export default function SingleStoryPage() {
   const { storyId } = useParams() as {storyId: string}
-  const currentUserId = useSelector(selectCurrentUser)
-  const currentId = localStorage.getItem('revolving_userId') as string
   const [sidebar, setSidebar] = useState<boolean>(false);
-  const { setLoginPrompt, loginPrompt } = useThemeContext() as ThemeContextType
-  
-  const {data: user, refetch} = useGetUserByIdQuery(currentId)
-  const [followUnfollowUser, { isLoading: isMutating, 
-    error: followError,  isError: isFollowError, 
-    isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
-  const { data: target, isLoading, isError, error } = useGetStoryQuery(storyId);
+  const { loginPrompt } = useThemeContext() as ThemeContextType
+  const { data: target, isLoading, isError } = useGetStoryQuery(storyId);
   const { data, isLoading: loading } = useGetStoriesQuery()
   const [stories, setStories] = useState<PostType[]>([])
   const [targetStory, setTargetStory] = useState<PostType>();
@@ -54,30 +42,6 @@ export default function SingleStoryPage() {
       isMounted = false
     }
   }, [data])
-
-  const followOrUnfollow = async() => {
-    try{
-      const {userId} = targetStory as PostType
-      const requestIds = { followerId: currentId, followedId: userId }
-    
-      await followUnfollowUser(requestIds).unwrap()
-      await refetch()     
-      isFollowSuccess && toast.success('Success!!', {
-                      duration: 2000, icon: '👋', style: {
-                        background: '#1E90FF'
-                      }
-                    })
-    }
-    catch(err: unknown){
-      const errors = followError as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isFollowError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
-  }
   
   const bodyContent = targetStory ? targetStory?.body.split(' ').map((word, index) => {
     return (
@@ -91,16 +55,17 @@ export default function SingleStoryPage() {
         <div className="flex h-full">
           {Array.isArray(stories) && stories.length 
             && <Aside 
-            stories={stories as PostType[]} sidebar={sidebar} 
+            stories={stories as PostType[]} 
+            sidebar={sidebar} 
             setSidebar={setSidebar} 
           />}
           <ArticleComp 
             story={targetStory as PostType} 
             bodyContent={bodyContent as JSX.Element[]}
             averageReadingTime={averageReadingTime} 
-            sidebar={sidebar} isLoading={isLoading} isError={isError} isMutating={isMutating}
-            error={error as {error: string}} user={user as UserProps} 
-            followOrUnfollow={followOrUnfollow}
+            sidebar={sidebar} 
+            isLoading={isLoading} 
+            isError={isError}
           />
         </div>
         <BsArrowBarRight 

@@ -10,6 +10,7 @@ import { checkCount } from '../../../utils/navigator';
 import { setEditResponse } from '../../../features/story/commentSlice';
 import { useDispatch } from 'react-redux';
 import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
+import { commentApiSlice } from '../../../app/api/commentApiSlice';
 
 type BaseProps = {
   mini?: boolean

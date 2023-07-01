@@ -49,11 +49,13 @@ export const NewStory = () => {
 
   useEffect(() => {
     let isMounted = true
-    isMounted ? setTargetStory(target as PostType) : null
+    if(storyId){
+      isMounted ? setTargetStory(target as PostType) : null
+    }
     return () => {
       isMounted = false
     }
-  }, [target])
+  }, [storyId, target])
 
   useEffect(() => {
     const savedTitle = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
@@ -136,7 +138,7 @@ export const NewStory = () => {
         <BiCodeAlt 
           onClick={() => setCodeEditor(prev => !prev)}
           title='Code Editor' className={`text-3xl cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
-        <div title='Scroll left/right' className='hidebars flex items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600'>
+        <div title='Scroll left/right' className={`hidebars flex items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
           {
             Object.values(NAVIGATE).map(nav => (
               <p
