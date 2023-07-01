@@ -7,8 +7,8 @@ const top_border = "border w-1/3 pt-2.5 bg-slate-100 rounded-t-3xl border-slate-
 
 export const Footer = () => {
   return (
-    <footer className='absolute bottom-0 w-full flex flex-col'>
-      <div className={`flex items-center justify-evenly`}>
+    <footer className='flex-none h-20 w-full flex flex-col'>
+      <div className={`flex items-end justify-evenly`}>
         <div className='flex flex-col'>
           <span>Active Todos: false</span>
           <p className='flex items-center gap-4'>

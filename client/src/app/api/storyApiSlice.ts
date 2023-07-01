@@ -59,8 +59,8 @@ export const storyApiSlice = apiSlice.injectEndpoints({
     getStoriesByCategory: builder.query<PostType[], Categories>({
       query: (category) => `story/category?category=${category}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        //return storyAdapter.setAll(initialState, data)
-        return baseQueryReturnValue?.data
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
+        return response
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
     }),

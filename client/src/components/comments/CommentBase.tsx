@@ -123,7 +123,7 @@ export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, 
             reply
         </span>
       {(openReply.assert || keepPrompt == 'Show') 
-            ? <WriteModal 
+            ? <WriteModal enlarged
                 responseRef={responseRef}
                 writeReply={writeReply}
                 keepPrompt={keepPrompt}

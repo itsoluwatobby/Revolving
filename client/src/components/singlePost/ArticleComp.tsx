@@ -1,55 +1,38 @@
-import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs';
 import { PostType, ThemeContextType } from '../../posts'
 import { useThemeContext } from '../../hooks/useThemeContext'
 import { format } from 'timeago.js';
-import { useState } from 'react';
+import { useRef, useCallback } from 'react';
 import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
-import { ErrorResponse, UserProps } from '../../data';
-import { storyApiSlice, useLikeAndUnlikeStoryMutation } from '../../app/api/storyApiSlice';
-import { toast } from 'react-hot-toast';
-import { checkCount } from '../../utils/navigator';
-import { dateFormat } from '../../utils/helperFunc';
-import { useDispatch } from 'react-redux';
+import LikeStory from './LikeStory';
+import FollowUnFollow from './FollowUnFollow';
 
 type ArticleProps = {
   story: PostType,
   sidebar: boolean,
-  user: UserProps,
   bodyContent: JSX.Element[],
   averageReadingTime: string,
   isLoading: boolean,
   isError: boolean,
-  isMutating: boolean
-  error: {error: string},
-  followOrUnfollow: () => Promise<void>,
 }
 
-type HoverType = 'unfollow' | 'following'
-
-export default function ArticleComp({ isError, story, bodyContent, user, sidebar, averageReadingTime, isLoading, error, isMutating, followOrUnfollow }: ArticleProps) {
-  const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
-  const [hoverThis, setHoverThis] = useState<HoverType>('following');
-  const currentUserId = localStorage.getItem('revolving_userId') as string
-  const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation()
-  const dispatch = useDispatch()
-
-  const likeUnlikeStory = async() => {
-    try{
-      const { _id } = story
-      await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
-      dispatch(storyApiSlice.util.invalidateTags(['STORY']))
+export default function ArticleComp({ isError, story, bodyContent, sidebar, averageReadingTime, isLoading }: ArticleProps) {
+  const { theme, notintersecting, setNotIntersecting } = useThemeContext() as ThemeContextType
+  const observerRef = useRef<IntersectionObserver>(null)
+  const headingRef = useCallback((node: Element) => {
+    if(observerRef.current) observerRef.current.disconnect()
+    observerRef.current = new IntersectionObserver(entries => {
+      if(entries[0].isIntersecting){
+        setNotIntersecting('Hide')
+      }
+      else setNotIntersecting('Open')
+    },
+    { threshold: 0,
+      rootMargin: '-180px'
     }
-    catch(err: unknown){
-      const errors = likeError as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
-    }
-  }
+    )
+    if(node) observerRef.current.observe(node as unknown as Element)
+  }, [setNotIntersecting])
 
   let content;
 
@@ -66,56 +49,25 @@ export default function ArticleComp({ isError, story, bodyContent, user, sidebar
         <p className='capitalize'>{story?.author || 'anonymous'}</p>
         <span>.</span>
         <p>{format(story?.createdAt, 'en-US')}</p>
-          {
-            (currentUserId && currentUserId !== story?.userId) ? (
-              !user?.followings?.includes(story?.userId) ? (
-                <button 
-                  onClick={followOrUnfollow}
-                  className={`rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'}`}>
-                  follow
-                </button>
-                ):(
-                <button 
-                  onClick={followOrUnfollow}
-                  onMouseEnter={() => setHoverThis('unfollow')}
-                  onMouseLeave={() => setHoverThis('following')}
-                  className={`rounded-md p-1 pl-2 pr-2 shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 font-sans active:opacity-100 font-medium ${isMutating && 'animate-pulse'}`}>{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
-                </button>
-              )
-            ) : null
-          }
+
+        <FollowUnFollow story={story} position='others' />
+      
       </div>
-        <p className='whitespace-pre-wrap font-bold text-3xl uppercase'>{story?.title}</p>
+        <h1 
+          ref={headingRef as Element}
+          className='whitespace-pre-wrap font-bold text-3xl uppercase'>{story?.title}</h1>
         <p 
           className={`mt-2 whitespace-pre-wrap tracking-wider text-justify`}>
             {bodyContent}
         </p>
-      <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans`}>{
-      story?.body ?
-        <div className="flex flex-wrap items-center justify-between w-full text-gray-300">
-            <p>{averageReadingTime} read</p>
-                  <p 
-                    onClick={likeUnlikeStory}
-                    className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
-                    {
-                      (story?.sharedLikes ? story?.sharedLikes?.includes(currentUserId) : story?.likes?.includes(currentUserId)) 
-                        ?
-                        <BsFillHandThumbsUpFill 
-                        title='like'
-                        className={`text-lg shadow-2xl shadow-slate-200 hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-500' : ''}`} />
-                        :
-                        <BsHandThumbsUp 
-                          title='like' 
-                          className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
-                    }
-                      <span className={`font-mono text-base ${theme == 'dark' && 'text-white'}`}>
-                        {story?.sharedLikes ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}
-                      </span>
-                  </p>
-            {story?.edited && <p className='text-center'>edited {format(story?.updatedAt)}</p>}
+      <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 
+        <div className={`flex flex-wrap items-center justify-between w-full text-gray-300`}>
+          <p>{averageReadingTime} read</p>
+               <LikeStory 
+                story={story}
+               />
+          {story?.edited && <p className='text-center'>edited {format(story?.updatedAt)}</p>}
         </div>
-          : ''
-        }
       </div>
     </>
   )

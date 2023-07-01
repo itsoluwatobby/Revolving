@@ -20,7 +20,6 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
-
   return (
     <>
       <Link to='/'>
@@ -49,7 +48,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
                 />
             </div>
             : (
-                (postData?.title || postData?.body) && (
+                ((postData?.title || postData?.body) && pathname !== address[2]) && (
                   <div className='flex gap-2 mobile:ml-2'>
                     <p>{delayedSaving ? 'saving...' : 'saved'}</p>
                     <p className='text-gray-500'>Draft</p>

@@ -17,7 +17,7 @@ import About from "./pages/About";
 import { BsChatTextFill } from 'react-icons/bs'
 import ChatModal from "./pages/chatAdmin/ChatModal";
 import PrompLogin from "./components/modals/PrompLogin";
-import TaskScheduler from "./pages/TaskScheduler";
+import TaskManager from "./pages/TaskManager";
 
  
 export const App = () => {
@@ -44,7 +44,7 @@ export const App = () => {
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
-            <Route path="taskScheduler/:userId" element={<TaskScheduler />} />
+            <Route path="taskManager/:userId" element={<TaskManager />} />
             
           </Route>
           

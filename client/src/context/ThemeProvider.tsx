@@ -18,6 +18,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' });
 
   const [parseId, setParseId] = useState<string>('');
+  const [notintersecting, setNotIntersecting] = useState<ChatOption>('Open')
   const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
 
   const changeTheme = (mode: string) => {
@@ -28,7 +29,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, setToggleLeft, setLoginPrompt, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge, openChat, setOpenChat
+    theme, fontFamily, setFontFamily, changeTheme, rollout, setRollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, notintersecting, setNotIntersecting, setToggleLeft, setLoginPrompt, setFontOption, setParseId, setOpenComment, enlarge, setEnlarge, openChat, setOpenChat
   }
   return (
     <ThemeContext.Provider value={ values }>

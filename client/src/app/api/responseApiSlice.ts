@@ -78,8 +78,8 @@ export const responseApiSlice = apiSlice.injectEndpoints({
     getUserResponsesByAdmin: builder.query<CommentResponseProps[], Partial<ResponseArgs>>({
       query: ({adminId, userId, responseId}) => `responses/admin/${adminId}/${userId}/${responseId}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        //return storyAdapter.setAll(initialState, data)
-        return baseQueryReturnValue?.data
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
+        return response
       }, 
       providesTags:(result) => providesTag(result as CommentResponseProps[], 'RESPONSE')
     }),

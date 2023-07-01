@@ -5,11 +5,9 @@ import { TextRules } from '../../fonts';
 import PostImage from './post/PostImages';
 import PostTop from './post/PostTop';
 import PostBase from './post/PostBase';
-import { Categories } from '../../data';
 
 type Props = {
   story: PostType
-  // navigationTab: Categories
 }
 
 export const Post = ({ story }: Props) => {

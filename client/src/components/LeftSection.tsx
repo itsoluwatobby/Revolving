@@ -20,8 +20,8 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
         link: `profile/${id}`
       },
       {
-        name: 'Task Scheduler',
-        link: `taskScheduler/${id}`
+        name: 'Task Manager',
+        link: `taskManager/${id}`
       },
       {
         name: `About`,

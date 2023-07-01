@@ -10,6 +10,10 @@ import TopLeft from './navModals/TopLeft.js';
 import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
 import { useSelector } from 'react-redux';
 import { getTabCategory } from '../features/story/navigationSlice.js';
+import { format } from 'timeago.js';
+import { reduceLength } from '../utils/navigator.js';
+import LikeStory from './singlePost/LikeStory.js';
+import FollowUnFollow from './singlePost/FollowUnFollow.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
@@ -17,18 +21,17 @@ const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 b
 
 const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase text-center text-xs hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-sm';
 
-// const TIMEOUT = 3500
 export const Navbar = () => {
   const { pathname } = useLocation();
   const getNavigation = useSelector(getTabCategory)
   const {typingEvent} = usePostContext() as PostContextType
-  const {theme, rollout, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
+  const {theme, rollout, notintersecting, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { storyId } = useParams()
   const {data} = useGetStoriesByCategoryQuery(getNavigation)
   const [targetStory, setTargetStory] = useState<PostType>()
   const [delayedSaving, setDelayedSaving] = useState(false)
   const [options, setOptions] = useState<string>('')
-
+  const designatedPath =  `/story/${storyId}`
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   useEffect(() => {
@@ -64,7 +67,24 @@ export const Navbar = () => {
       
       <TopLeft delayedSaving={delayedSaving} />
 
-      <div className='flex-auto mobile:hidden'></div>
+      <div className={`flex-auto mobile:hidden grid transition-all place-content-center ${notintersecting === 'Open' ? 'scale-100' : 'scale-0'}`}>
+        <div className={`flex flex-col gap-1 ${pathname !== designatedPath ? 'hidden' : 'block'}`}>
+          <div className='flex items-center gap-2'>
+            <small className='capitalize text-xs cursor-pointer'>{targetStory?.author || 'anonymous'}</small>
+            <span>.</span>
+            <small className='text-xs text-gray-300'>{format(targetStory?.createdAt as string, 'en-US')}</small>
+
+            <FollowUnFollow story={targetStory as PostType} position='navbar' />
+
+          </div>
+          <div className='flex items-center gap-4'>
+            <h1 
+              className='whitespace-pre-wrap font-bold uppercase'>{reduceLength(targetStory?.title as string, 5, 'word')}
+            </h1>
+            <LikeStory story={targetStory as PostType} />
+          </div>
+        </div>
+      </div>
 
       <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 mobile:w-40 ${pathname != `/story/${storyId}` ? 'w-44' : 'w-32'}`}>
         <TopRight />

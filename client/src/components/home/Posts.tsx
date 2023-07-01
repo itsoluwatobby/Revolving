@@ -42,25 +42,31 @@ export const Posts = () => {
         )
       )
   ) 
-  : isError ? content = <p className='flex flex-col gap-5 items-center text-3xl text-center mt-5 text-red-400'>
-    <span>{errorMsg?.status == 404 ? 'No Story Avaialable' : 'Network Error, Please check your connection'}</span>
-    {errorMsg?.status == 404 ? 
-      <BiErrorAlt className='text-6xl text-gray-400' />
-      :
-      <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
-    }
-    </p> 
-  :(
-    filteredStories?.length ? content = (
-      filteredStories?.map(post => (
+  : isError ? content = (
+      <p className='flex flex-col gap-5 items-center text-3xl text-center mt-5 text-red-400'>
+        <span>
+          {errorMsg?.status == 404 ? 
+              'No Story Avaialable' 
+                  : 'Network Error, Please check your connection'
+          }
+        </span>
+        {errorMsg?.status == 404 ? 
+          <BiErrorAlt className='text-6xl text-gray-400' />
+          :
+          <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
+        }
+      </p> 
+    ) : (
+      filteredStories?.length ? content = (
+        filteredStories?.map(post => (
             <Post key={post?.sharedId || post?._id} 
               story={post as PostType} 
             />
           )
         )
-      ) 
-      : null
-  )
+      ) : null
+    )
+
   return (
     <div 
       onClick={() => {

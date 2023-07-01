@@ -31,7 +31,6 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
   //   }
   // }, [commentData])
 
-console.log({isUninitialized})
   const likeUnlikeStory = async() => {
     try{
       const { _id } = story
