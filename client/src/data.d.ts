@@ -53,12 +53,14 @@ type OpenReply = {
 
 type SubTasks = {
   title: string, 
-  body: string
+  body: string,
+  completed: boolean
 }
 
 interface TaskProp{
   _id: string,
   task: string,
+  completed: boolean,
   subTasks?: SubTasks[]
   edited: boolean,
   createdAt: string,

@@ -11,14 +11,10 @@ import { BsTrash } from "react-icons/bs"
 import { CiEdit } from "react-icons/ci"
 import { TaskProp } from "../data"
 import { MdOutlineCancelPresentation } from "react-icons/md"
-
-type ButtonType = 'EDIT' | 'DELETE'
-
-function buttonClass(theme: Theme, type: ButtonType){
-  return `
-  rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-900'}
-  `
-}
+import { useDispatch, useSelector } from "react-redux"
+import { getTask, setTask } from "../features/story/taskManagerSlice"
+import Tasks from "../components/taskManager/Tasks"
+import { ViewSingleTask } from "../components/taskManager/ViewSingleTask"
 
 export default function TaskManager() {
   const { theme } = useThemeContext() as ThemeContextType
@@ -26,21 +22,18 @@ export default function TaskManager() {
   const [viewSingle, setViewSingle] = useState<ChatOption>('Hide')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [inputTask, setTaskInput] = useState<string>()
-  const [task, setTask] = useState<TaskProp>()
-
+  const dispatch = useDispatch()
+  
   const handleTaskEntry = (event: ChangeEvent<HTMLInputElement>) => setTaskInput(event.target.value)
 
-  const viewTask = (task: TaskProp) => {
-    setViewSingle('Open')
-    setTask(task)
-  }
+  const canSubmit = Boolean(inputTask)
 
   return (
     <main className={`w-full h-full flex flex-col`}>
       <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-full flex flex-col gap-3 h-4/6`}>
 
         <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
-        <section className="hidebars relative shadow-2xl shadow-slate-900 h-[85%] flex flex-col gap-2 w-3/5 sm:w-1/2 pb-1.5 rounded-lg">
+        <section className="hidebars relative shadow-2xl shadow-slate-900 h-[85%] flex flex-col gap-2 w-3/5 sm:w-1/2 mobile:w-full pb-1.5 rounded-lg">
           <form className={`flex-none shadow-xl ${theme == 'light' ? 'shadow-slate-400 bg-slate-600' : 'shadow-slate-800 bg-slate-700'} sm:w-3/4 w-full h-14 p-1 rounded-md sm:self-center flex items-center`}>
             <input 
               type="text"
@@ -52,11 +45,12 @@ export default function TaskManager() {
             />
             <button
               type="submit"
-              className="w-12 grid place-content-center text-2xl text-green-400 "
+              disabled={!canSubmit}
+              className={`w-12 grid place-content-center text-2xl ${canSubmit ? 'hover:opacity-50' : ''} text-green-400`}
             >
-              {
+              {isLoading ?
                 <FaHourglassEnd />
-                ||
+                :
                 <IoIosSend />
               }
             </button>
@@ -64,25 +58,16 @@ export default function TaskManager() {
           <div className={`taskbars overflow-y-scroll p-1 flex flex-col gap-2 h-full`}>
             {
               tasks.map(task => (
-                <article 
-                  key={task._id}
-                  onClick={() => viewTask(task)}
-                  className="flex items-center gap-1 p-0.5 text-sm rounded-md shadow-inner shadow-slate-600"
-                >
-                  <p className="flex-auto flex flex-col p-1">
-                    <span className='text-justify tracking-tight cursor-grab'>{reduceLength(task.task, 22, 'word')}</span>
-                    <small className="text-right text-gray-400">{format(task.createdAt)}</small>
-                  </p>
-                  <p className={`flex-none w-8 shadow-lg rounded-md shadow-slate-600 h-full justify-center flex flex-col gap-1.5 p-0.5 items-center text-base`}>
-                    <CiEdit className={buttonClass(theme, 'EDIT')} />
-                    <BsTrash className={buttonClass(theme, 'DELETE')} />
-                  </p>
-                </article>
+                <Tasks 
+                  key={task?._id}
+                  task={task}
+                  theme={theme}
+                  setViewSingle={setViewSingle}
+                />
               ))  
             }
           </div>
-          <ViewWholeTaskCard 
-            task={task as TaskProp}
+          <ViewSingleTask 
             theme={theme}
             viewSingle={viewSingle}
             setViewSingle={setViewSingle} 
@@ -95,39 +80,3 @@ export default function TaskManager() {
   )
 }
 
-type TaskType = {
-  task: TaskProp,
-  theme: Theme,
-  viewSingle: ChatOption,
-  setViewSingle: React.Dispatch<React.SetStateAction<ChatOption>>
-}
-
-const ViewWholeTaskCard = ({ task, theme, viewSingle, setViewSingle }: TaskType) => {
-
-  return (
-    <article className={`absolute left-1 top-16 h-[83%] transition-all grid place-content-center shadow-xl ${viewSingle == 'Open' ? 'scale-100' : 'scale-0'} ${theme == 'light' ? 'bg-slate-500 bg-opacity-40' : 'bg-slate-900 bg-opacity-60 shadow-slate-700'} w-[98%] z-10  rounded-md`}>
-      <div className={`relative flex flex-col z-50 h-36 w-[98%] bg-red-600 rounded-md ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'}`}>
-        <p className="sticky top-0 flex items-center justify-center w-full bg-slate-300 rounded-t-md">
-          <span className="text-lg font-medium">Task</span>
-          <MdOutlineCancelPresentation 
-            onClick={() => setViewSingle('Hide')}
-            className={` absolute right-0.5 text-2xl cursor-pointer ${theme == 'light' ? 'hover:text-gray-500 active:text-gray-700 text-gray-700' : 'text-gray-300 hover:text-gray-100'} transition-all active:text-gray-300`}
-          />
-        </p>
-        <div 
-          className="taskbars text-justify text-[13px] whitespace-pre-wrap p-2 pt-0 overflow-y-scroll">{task?.task}
-          <p className={`${task?.subTasks?.length ? 'block' : 'hidden'}`}>
-            {
-              task?.subTasks?.map(sub => (
-                  <span>
-                    <small>{sub?.title}</small>
-                    <small>{sub?.body}</small>
-                  </span>
-                ))
-            }
-          </p>
-        </div>
-      </div>
-    </article>
-  )
-}

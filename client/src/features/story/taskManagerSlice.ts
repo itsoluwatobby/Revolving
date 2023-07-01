@@ -21,16 +21,16 @@ const taskManagerSlice = createSlice({
   name: 'task',
   initialState,
   reducers: {
-    setNewTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
+    setTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
       state.task = action.payload
     },
-    findTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
-      state.task = action.payload
-    }
+    // createTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
+    //   state.task = action.payload
+    // }
   }
 })
 
-export const { setNewTask, findTask } = taskManagerSlice.actions
+export const { setTask } = taskManagerSlice.actions
 export const getTask = (state: RootState) => state.task.task
 
 export default taskManagerSlice.reducer

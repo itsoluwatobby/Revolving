@@ -118,16 +118,12 @@ body {
 }
 
 .taskbars::-webkit-scrollbar{
-  width: 5px;
+  width: 3px;
   background-color: rgb(114, 113, 113);
 }
 
 .taskbars::-webkit-scrollbar-thumb{
   background-color: rgb(114, 113, 113);
-}
-
-.taskbars::-webkit-scrollbar-button{
-  height: 0;
 }
 
 .taskbars::-webkit-scrollbar-track{
