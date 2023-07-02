@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { CommentProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { Like_Unlike_Comment, createComment, deleteAllUserComments, deleteAllUserCommentsInStory, deleteSingleComment, editComment, getAllCommentsInStory, getCommentById, getUserComments, getUserCommentsInStory, likeAndUnlikeComment } from "../helpers/commentHelper.js";
@@ -20,6 +20,7 @@ export const createNewComment = (req: RequestProp, res: Response) => {
     let newComment: Partial<CommentProps> = req.body
     if (!userId || !storyId || !newComment?.comment) return res.sendStatus(400)
     const user = await getUserById(userId);
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     newComment = {...newComment, author: user?.username}
     const story = await getStoryById(storyId)
@@ -36,6 +37,7 @@ export const updateComment = (req: RequestProp, res: Response) => {
     const editedComment = req.body
     if(!userId || !commentId) return res.sendStatus(400)
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const comment = await editComment(userId, commentId, editedComment)
@@ -48,6 +50,7 @@ export const deleteComment = (req: RequestProp, res: Response) => {
     const { userId, commentId } = req.params;
     if(!userId || !commentId) return res.sendStatus(400)
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
@@ -69,6 +72,7 @@ export const deleteUserComments = (req: RequestProp, res: Response) => {
     const option = req.query as { command: string, storyId: string }
     if(!userId || !commentId) return res.sendStatus(400)
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     const adminUser = await getUserById(adminId)
     if(!user || !adminUser) return responseType({res, status: 401, message: 'You do not have an account'})
     if(adminUser?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
@@ -108,6 +112,7 @@ export const userComments = (req: Request, res: Response) => {
     if(!adminId || !userId) return res.sendStatus(400);
     const user = await getUserById(userId)
     if(!user) return res.sendStatus(404)
+    await autoDeleteOnExpire(userId)
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const admin = await getUserById(adminId)
     if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
@@ -125,6 +130,7 @@ export const getUserCommentStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params;
     if(!userId || !storyId) return res.sendStatus(400);
+    await autoDeleteOnExpire(userId)
     const commentsInStories = await getCachedResponse({key:`userCommentsInStories:${userId}`, cb: async() => {
       const comments = await getUserCommentsInStory(userId, storyId);
       return comments
@@ -155,6 +161,7 @@ export const like_Unlike_Comment = async(req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId, commentId} = req.params
     if (!userId || !commentId) return res.sendStatus(400);
+    await autoDeleteOnExpire(userId)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { deleteAccount, followOrUnFollow, getAllUsers, getUserById, updateUser } from "../helpers/userHelpers.js";
 import { UserProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
@@ -22,6 +22,7 @@ export const getUser = (req: Request, res: Response) => {
     const {userId} = req.params
     const user = await getCachedResponse({key: `user:${userId}`, cb: async() => {
       const current = await getUserById(userId)
+      await autoDeleteOnExpire(userId)
       if(!current) return responseType({res, status: 404, message: 'User not found'})
       return current;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']}) as UserProps;
@@ -34,6 +35,7 @@ export const followUnFollowUser = (req: Request, res: Response) => {
     const {followerId, followingId} = req.params
     if (!followerId || !followingId) return res.sendStatus(400);
     const user = await getUserById(followingId);
+    await autoDeleteOnExpire(followerId)
     if(!user) return responseType({res, status: 404, message: 'user not found'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await followOrUnFollow(followerId, followingId);
@@ -49,6 +51,7 @@ export const updateUserInfo = (req: Request, res: Response) => {
     const userInfo: UserProps = req.body
     if (!userId) return res.sendStatus(400);
     const user = await getUserById(userId);
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 

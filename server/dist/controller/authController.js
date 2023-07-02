@@ -21,10 +21,11 @@ var __rest = (this && this.__rest) || function (s, e) {
 import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
 import { sub } from "date-fns";
-import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
+import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken, autoDeleteOnExpire } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 import { redisClient } from "../helpers/redis.js";
 import { ROLES } from "../config/allowedRoles.js";
+import { TaskBinModel } from "../models/TaskManager.js";
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -122,6 +123,11 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
         const accessToken = yield signToken({ roles, email }, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
         const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
+        // create taskBin for user
+        if (!Boolean(yield TaskBinModel.exists({ userId: user === null || user === void 0 ? void 0 : user._id }))) {
+            yield TaskBinModel.create({ userId: user === null || user === void 0 ? void 0 : user._id, taskBin: [] });
+        }
+        yield autoDeleteOnExpire(user === null || user === void 0 ? void 0 : user._id);
         const { _id } = user, rest = __rest(user, ["_id"]);
         yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false } });
         //authentication: { sessionID: req?.sessionID },

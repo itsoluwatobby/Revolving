@@ -55,3 +55,12 @@ export const getCachedValueResponse = async({key, timeTaken=3600, value}): Promi
   }
 }
 
+export const timeConverterInMillis = () => {
+  const minute = 60 * 1000
+  const hour = minute * 60
+  const day = hour * 24
+ 
+  return {minute, hour, day}
+}
+
+

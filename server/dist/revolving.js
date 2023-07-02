@@ -62,12 +62,13 @@ if (cluster.isPrimary) {
     });
 }
 else {
-    console.log(`Worker with PID: ${process.pid} is running`);
     app.get('/', (req, res) => {
         res.status(200).json({ status: true, message: 'server up and running' });
     });
     // CACHING URLS
     app.use(logURLAndMethods);
+    // autoDelete bin
+    //app.use(autoDeleteOnExpire)
     // ROUTES
     app.use('/revolving/auth', authRouter);
     app.post('/revolving/auth/logout/:userId', logoutHandler);

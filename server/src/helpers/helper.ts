@@ -4,6 +4,8 @@ import { ClaimProps, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryP
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
 import { Request, Response } from 'express';
+import { TaskBinModel } from '../models/TaskManager.js';
+import { timeConverterInMillis } from './redis.js';
 
 type ReqOpt = {
   mtd: string,
@@ -171,6 +173,24 @@ export const pagination = async<T>({startIndex=1, endIndex=1, page=1, limit=1, c
 }
 
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
+
+export const autoDeleteOnExpire = async(userId: string)=>{
+  const {day} = timeConverterInMillis()
+  const expireAfterThirtyDays = day * 30
+  const currentTime = new Date()
+  if(!userId) return
+  else{
+    const { updatedAt } = await TaskBinModel.findOne({userId})
+    if(!updatedAt) return
+    const elaspedTime = +currentTime - +updatedAt
+    if(elaspedTime > expireAfterThirtyDays){
+      await TaskBinModel.findByIdAndUpdate(userId, { taskBin: [] })
+      return
+    }
+    return
+  }
+}
+
 
 // export function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
 //   const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes)

@@ -3,6 +3,7 @@ import { ThemeContextType } from "../posts";
 import { useEffect, useState } from 'react';
 import { FaTwitterSquare, FaGithub } from 'react-icons/fa';
 import { MdAttachEmail } from 'react-icons/md'
+import { reduceLength } from "../utils/navigator";
 
 
 export default function ProfilePage() {
@@ -28,23 +29,23 @@ export default function ProfilePage() {
   // }, [])
 
   return (
-    <main role="User profile" className="single_page text-sm p-2 flex md:flex-row flex-col gap-2 w-full">
-      <div className="md:flex-none h-1/4 rounded-md border md:h-full md:w-1/2 md:sticky md:top-0">
-        <figure role="Cover photo" className="relative bg-slate-700 h-full rounded-md shadow-transparent shadow-2xl border-2">
+    <main role="User profile" className={`single_page text-sm p-2 flex md:flex-row flex-col gap-2 w-full`}>
+      <div className="md:flex-none h-1/5 shadow-inner shadow-slate-800 rounded-md border md:h-2/3 md:w-1/2 md:sticky md:top-0">
+        <figure role="Cover photo" className="relative bg-slate-700 h-full rounded-md shadow-transparent shadow-2xl border-1">
           cover photo
         </figure>
-        <figure role="Display picture" className="rounded-full border-4 border-white  w-28 h-28 absolute translate-x-1/2 top-44 bg-slate-600 right-1/2 mobile:top-56">
+        <figure role="Display picture" className="rounded-full border-2 shadow-2xl shadow-slate-900 border-white  w-28 h-28 absolute translate-x-1/2 top-36 bg-slate-600 right-1/2 mobile:top-64">
             dp
         </figure>
-        <p role="Code name" className="absolute md:right-36 md:top-6 top-72 flex items-center gap-2 mobile:top-[330px]">
+      </div>
+      <p role="Code name" className="absolute md:right-36 md:top-6 top-72 flex items-center gap-2 mobile:top-[330px]">
           <span className="text-gray-500">CodeName:</span>
           <span>itsoluwatobby</span>  
         </p>
         <p role="Country" className="absolute right-2 top-72 flex items-center gap-2 mobile:top-[330px]">
           <span className="text-gray-500">Country:</span>
-          <span>NigeriaNigeria</span>  
+          <span>Nigeria</span>  
         </p>
-      </div>
       <div className={`md:hidden w-full translate-y-20 border ${theme == 'light' ? 'border-gray-200' : 'border-gray-400'}`}/>
       <article role="user information" className="relative flex p-2 pt-3 mt-16 mobile:flex-col">
         <div className="flex flex-col gap-1">
@@ -76,14 +77,14 @@ export default function ProfilePage() {
           <p className="flex flex-col">
             <span className="text-gray-500 underline underline-offset-2">About: </span>
             <span 
-              onClick={() => setShowAll(prev => !prev)}
+              onDoubleClick={() => setShowAll(prev => !prev)}
               className="text-justify cursor-pointer whitespace-pre-wrap tracking-wide first-letter:text-lg overflow-hidden">
-              {showAll ? about : truncate}
+              {showAll ? about : reduceLength(about, 50, 'word')}
             </span>
           </p>
         </div>
         <p className="absolute uppercase right-14 text-gray-500 font-semibold font-mono">TECH Stack</p>
-        <div className="stackflow overflow-y-scroll absolute h-12 right-2 p-1 pt-1.5 pl-1.5 mt-5 w-fit text-base font-serif font-light bg-slate-900 rounded-md">
+        <div className="stackflow overflow-y-scroll absolute h-12 right-2 p-1 pt-1.5 pl-1.5 mt-5 w-fit overflow-x-scroll max-w-[120px] last:border-b-0  text-sm whitespace-nowrap font-serif font-light bg-slate-900 rounded-md">
           <p className="rounded-md hover:opacity-60 transition-all cursor-grab">Javascript</p>
           <p className="rounded-md hover:opacity-60 transition-all cursor-grab">Nodejs</p>
           <p className="rounded-md hover:opacity-60 transition-all cursor-grab">VueJs</p>

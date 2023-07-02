@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken';
 import { createTransport } from 'nodemailer';
+import { TaskBinModel } from '../models/TaskManager.js';
+import { timeConverterInMillis } from './redis.js';
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 export const signToken = (claim, expires, secret) => __awaiter(void 0, void 0, void 0, function* () {
     const token = jwt.sign({
@@ -136,6 +138,27 @@ export const pagination = ({ startIndex = 1, endIndex = 1, page = 1, limit = 1, 
     }
     catch (error) {
         console.log(error);
+    }
+});
+export const autoDeleteOnExpire = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const { minute: aMinuteInMillis } = timeConverterInMillis();
+    const currentTime = new Date();
+    if (!userId)
+        return;
+    else {
+        const { updatedAt } = yield TaskBinModel.findOne({ userId });
+        if (!updatedAt)
+            return;
+        const elaspedTime = +currentTime - +updatedAt;
+        if (elaspedTime > aMinuteInMillis) {
+            console.log('DELETED BRO');
+            yield TaskBinModel.findByIdAndUpdate(userId, { taskBin: [] });
+            return;
+        }
+        else {
+            console.log('IN HERE 3');
+            return;
+        }
     }
 });
 // export function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){

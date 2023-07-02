@@ -3,6 +3,7 @@ import { getUserByToken } from "../helpers/userHelpers.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 import { ClaimProps, USERROLES } from "../../types.js";
 
+
 interface TokenProp extends Request{
   email: string,
   roles: USERROLES[]

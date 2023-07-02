@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { CommentResponseProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { Like_Unlike_Response, createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getCommentById, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
@@ -20,6 +20,7 @@ export const createNewResponse = (req: RequestProp, res: Response) => {
     let newResponse: Partial<CommentResponseProps> = req.body
     if (!userId || !commentId || !newResponse?.response) return res.sendStatus(400)
     const user = await getUserById(userId);
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     newResponse = {...newResponse, author: user?.username}
     const comment = await getCommentById(commentId)
@@ -36,6 +37,7 @@ export const updateResponse = (req: RequestProp, res: Response) => {
     const editedResponse = req.body
     if(!userId || !responseId) return res.sendStatus(400)
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const responseExist = await getResponseById(responseId)
@@ -50,6 +52,7 @@ export const deleteResponse = (req: RequestProp, res: Response) => {
     const { userId, responseId } = req.params;
     if(!userId || !responseId) return res.sendStatus(400)
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const response = await getResponseById(responseId) as CommentResponseProps
@@ -71,6 +74,7 @@ export const deleteUserResponses = (req: RequestProp, res: Response) => {
     if(!userId || !responseId) return res.sendStatus(400)
     const user = await getUserById(userId)
     const adminUser = await getUserById(adminId)
+    await autoDeleteOnExpire(userId)
     if(!user || !adminUser) return responseType({res, status: 404, message: 'You do not have an account'})
     if(adminUser?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
@@ -109,6 +113,7 @@ export const userResponses = (req: Request, res: Response) => {
     if(!userId || !adminId || !responseId) return res.sendStatus(400);
     const user = await getUserById(userId)
     if(!user) return res.sendStatus(404)
+    await autoDeleteOnExpire(userId)
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const admin = await getUserById(adminId)
     if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
@@ -157,6 +162,7 @@ export const like_Unlike_Response = async(req: Request, res: Response) => {
     const {userId, responseId} = req.params
     if (!userId || !responseId) return res.sendStatus(400);
     const user = await getUserById(userId);
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await likeAndUnlikeResponse(userId, responseId) as Like_Unlike_Response;

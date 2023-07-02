@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
 import { UserModel } from "../models/User.js";
 import { deleteAllUserStories } from "./storyHelpers.js";
 export const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.find().lean(); });
@@ -14,7 +15,13 @@ export const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* (
 export const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ email }).exec(); });
 export const getUserByToken = (token) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ refreshToken: token }).exec(); });
 export const getUserByVerificationToken = (token) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ verificationToken: token }).exec(); });
-export const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.create(user); });
+export const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const newUser = yield UserModel.create(user);
+    yield TaskBinModel.create({
+        userId: newUser === null || newUser === void 0 ? void 0 : newUser._id, taskBin: []
+    });
+    return newUser;
+});
 export const updateUser = (userId, updatedUser) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findByIdAndUpdate({ _id: userId }, Object.assign({}, updatedUser)); });
 export const followOrUnFollow = (followerId, followingId) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -36,5 +43,6 @@ export const followOrUnFollow = (followerId, followingId) => __awaiter(void 0, v
 export const deleteAccount = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     yield UserModel.findByIdAndDelete({ _id: userId });
     yield deleteAllUserStories(userId);
+    yield TaskManagerModel.deleteMany({ userId });
 });
 //# sourceMappingURL=userHelpers.js.map

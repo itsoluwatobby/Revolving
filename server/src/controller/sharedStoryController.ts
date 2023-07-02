@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { Like_Unlike_Shared, createShareStory, getAllSharedStories, getSharedStoryById, getUserSharedStories, likeAndUnlikeSharedStory, unShareStory } from "../helpers/sharedHelper.js";
 import { Categories, SharedProps, StoryProps } from "../../types.js";
 import { getCachedResponse, redisClient } from "../helpers/redis.js";
@@ -43,6 +43,7 @@ export const shareStory = (req: RequestProp, res: Response) => {
     const { userId, storyId } = req.params
     if (!userId || !storyId) return res.sendStatus(400);
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const newShare = await createShareStory(user, storyId)
     return responseType({res, status: 201, count:1, data: newShare})
@@ -54,6 +55,7 @@ export const unShareUserStory = (req: RequestProp, res: Response) => {
     const { userId, sharedId } = req.params
     if (!userId || !sharedId) return res.sendStatus(400);
     const user = await getUserById(userId)
+    await autoDeleteOnExpire(userId)
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await unShareStory(userId, sharedId)
     redisClient.DEL(`sharedStory:${sharedId}`)
@@ -68,6 +70,7 @@ export const getSharedStoriesByUser = (req: RequestProp, res: Response) => {
   asyncFunc(res, async() => {
     const {userId} = req.params
     if (!userId) return res.sendStatus(400);
+    await autoDeleteOnExpire(userId)
     const sharedStories = await getCachedResponse({key:`userSharedStories:${userId}`, timeTaken: 1800, cb: async() => {
       const sharedStory = await getUserSharedStories(userId) as SharedProps[]
       return sharedStory;
@@ -83,6 +86,7 @@ export const like_Unlike_SharedStory = async(req: Request, res: Response) => {
     const {userId, sharedId} = req.params
     if (!userId || !sharedId) return res.sendStatus(400);
     const user = await getUserById(userId);
+    await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await likeAndUnlikeSharedStory(userId, sharedId) as Like_Unlike_Shared;

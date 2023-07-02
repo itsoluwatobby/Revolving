@@ -1,6 +1,8 @@
 import { UserProps } from "../../types.js";
+import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
 import { UserModel } from "../models/User.js";
 import { deleteAllUserStories } from "./storyHelpers.js";
+import { getUserTasks } from "./tasksHelper.js";
 
 export const getAllUsers = async() => await UserModel.find().lean();
 
@@ -9,7 +11,13 @@ export const getUserByEmail = async(email: string) => await UserModel.findOne({e
 export const getUserByToken = async(token: string) => await UserModel.findOne({refreshToken: token}).exec();
 export const getUserByVerificationToken = async(token: string) => await UserModel.findOne({verificationToken: token}).exec();
 
-export const createUser = async(user: Partial<UserProps>) => await UserModel.create(user)
+export const createUser = async(user: Partial<UserProps>) => {
+  const newUser = await UserModel.create(user)
+  await TaskBinModel.create({
+    userId: newUser?._id, taskBin: []
+  })
+  return newUser 
+}
 
 export const updateUser = async(userId: string, updatedUser: UserProps) => await UserModel.findByIdAndUpdate({ _id: userId }, {...updatedUser})
 
@@ -32,4 +40,5 @@ export const followOrUnFollow = async(followerId: string, followingId: string): 
 export const deleteAccount = async(userId: string) => {
   await UserModel.findByIdAndDelete({ _id: userId })
   await deleteAllUserStories(userId)
+  await TaskManagerModel.deleteMany({userId})
 }
