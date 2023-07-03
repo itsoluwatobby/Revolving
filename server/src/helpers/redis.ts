@@ -13,7 +13,7 @@ type RedisOptionProps<T>={
 export const redisClient = createClient();
 
 export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}): Promise<T> => {
-  redisClient.on('error', err => console.error('Redis client error: ',err))
+  redisClient.on('error', err => console.error('Redis client error: ', err.logMessage))
   if(!redisClient.isOpen) await redisClient.connect();
   try{
     if(objInstance.isPresent(reqMtd)){
@@ -37,7 +37,7 @@ export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}):
   }
 }
 
-export const getCachedValueResponse = async({key, timeTaken=3600, value}): Promise<string> => {
+export const getCachedValueRespon = async({key, timeTaken=3600, value}): Promise<string> => {
   redisClient.on('error', err => console.error('Redis client error: ',err))
   if(!redisClient.isOpen) await redisClient.connect();
   try{

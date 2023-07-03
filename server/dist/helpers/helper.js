@@ -60,8 +60,9 @@ class UrlsObj {
     }
     pushIn(reqs) {
         this.req = reqs;
-        const conflict = this.urls.filter(url => url.url == this.req.url);
-        !conflict.length ? this.urls.push(this.req) : null;
+        const others = this.urls.filter(url => url.url !== this.req.url);
+        this.urls = others;
+        this.urls.push(this.req);
     }
     pullIt(reqUrl) {
         const otherUrls = this.urls.filter(url => !reqUrl.includes(url.mtd));
@@ -141,26 +142,32 @@ export const pagination = ({ startIndex = 1, endIndex = 1, page = 1, limit = 1, 
     }
 });
 export const autoDeleteOnExpire = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const { minute: aMinuteInMillis } = timeConverterInMillis();
+    const { day } = timeConverterInMillis();
+    const expireAfterThirtyDays = day * 30;
     const currentTime = new Date();
     if (!userId)
         return;
     else {
-        const { updatedAt } = yield TaskBinModel.findOne({ userId });
-        if (!updatedAt)
+        const task = yield TaskBinModel.findOne({ userId });
+        if (!(task === null || task === void 0 ? void 0 : task.updatedAt))
             return;
-        const elaspedTime = +currentTime - +updatedAt;
-        if (elaspedTime > aMinuteInMillis) {
-            console.log('DELETED BRO');
-            yield TaskBinModel.findByIdAndUpdate(userId, { taskBin: [] });
-            return;
-        }
-        else {
-            console.log('IN HERE 3');
+        const elaspedTime = +currentTime - +(task === null || task === void 0 ? void 0 : task.updatedAt);
+        if (elaspedTime > expireAfterThirtyDays) {
+            yield TaskBinModel.findOneAndUpdate({ userId }, { $set: { taskBin: [] } });
             return;
         }
+        return;
     }
 });
+export const mongooseError = (cb) => {
+    try {
+        const data = cb();
+        return data;
+    }
+    catch (error) {
+        console.log('An error occurred');
+    }
+};
 // export function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
 //   const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes)
 //   const otherLikedPosts = entry?.filter(post => Number(post?.likes) < numLikes)

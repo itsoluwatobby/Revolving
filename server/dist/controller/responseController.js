@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { getUserById } from "../helpers/userHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getCommentById, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
 ;
@@ -20,6 +20,7 @@ export const createNewResponse = (req, res) => {
         if (!userId || !commentId || !(newResponse === null || newResponse === void 0 ? void 0 : newResponse.response))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         newResponse = Object.assign(Object.assign({}, newResponse), { author: user === null || user === void 0 ? void 0 : user.username });
@@ -39,6 +40,7 @@ export const updateResponse = (req, res) => {
         if (!userId || !responseId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
@@ -56,6 +58,7 @@ export const deleteResponse = (req, res) => {
         if (!userId || !responseId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
@@ -80,6 +83,7 @@ export const deleteUserResponses = (req, res) => {
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         const adminUser = yield getUserById(adminId);
+        yield autoDeleteOnExpire(userId);
         if (!user || !adminUser)
             return responseType({ res, status: 404, message: 'You do not have an account' });
         if (adminUser === null || adminUser === void 0 ? void 0 : adminUser.isAccountLocked)
@@ -120,6 +124,7 @@ export const userResponses = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return res.sendStatus(404);
+        yield autoDeleteOnExpire(userId);
         // if(user?.isAccountLocked) return res.sendStatus(401)
         const admin = yield getUserById(adminId);
         if (!admin.roles.includes(ROLES.ADMIN))
@@ -166,6 +171,7 @@ export const like_Unlike_Response = (req, res) => __awaiter(void 0, void 0, void
         if (!userId || !responseId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)

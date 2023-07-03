@@ -36,6 +36,8 @@ import commentRouter from './routes/commentRoutes.js';
 
 import { getResponse, getResponseByComment } from './controller/responseController.js';
 import responseRouter from './routes/responseRoutes.js';
+import taskManagerRouter from './routes/taskManagerRoutes.js';
+import { eventLogger } from './middleware/logger.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 
@@ -62,6 +64,7 @@ app.use(cors(corsOptions))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('common'))
+// app.use(eventLogger)
 app.use(helmet())
 app.use(cookieParser())
 
@@ -88,9 +91,6 @@ else{
 
   // CACHING URLS
   app.use(logURLAndMethods)
-
-  // autoDelete bin
-  //app.use(autoDeleteOnExpire)
 
   // ROUTES
   app.use('/revolving/auth', authRouter);
@@ -133,6 +133,9 @@ else{
   
   // response router
   app.use('/revolving/responses', responseRouter);
+
+  // task manager router
+  app.use('/revolving/task', taskManagerRouter);
 
   //app.use(errorLog);
   app.all('*', (req: Request, res: Response) => {

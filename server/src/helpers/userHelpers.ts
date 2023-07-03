@@ -40,5 +40,5 @@ export const followOrUnFollow = async(followerId: string, followingId: string): 
 export const deleteAccount = async(userId: string) => {
   await UserModel.findByIdAndDelete({ _id: userId })
   await deleteAllUserStories(userId)
-  await TaskManagerModel.deleteMany({userId})
+  await TaskManagerModel.deleteOne({userId})
 }

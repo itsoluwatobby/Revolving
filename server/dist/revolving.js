@@ -27,6 +27,7 @@ import { getComment, getStoryComments } from './controller/commentController.js'
 import commentRouter from './routes/commentRoutes.js';
 import { getResponse, getResponseByComment } from './controller/responseController.js';
 import responseRouter from './routes/responseRoutes.js';
+import taskManagerRouter from './routes/taskManagerRoutes.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
@@ -47,6 +48,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('common'));
+// app.use(eventLogger)
 app.use(helmet());
 app.use(cookieParser());
 const server = http.createServer(app);
@@ -67,8 +69,6 @@ else {
     });
     // CACHING URLS
     app.use(logURLAndMethods);
-    // autoDelete bin
-    //app.use(autoDeleteOnExpire)
     // ROUTES
     app.use('/revolving/auth', authRouter);
     app.post('/revolving/auth/logout/:userId', logoutHandler);
@@ -98,6 +98,8 @@ else {
     app.use('/revolving/comments', commentRouter);
     // response router
     app.use('/revolving/responses', responseRouter);
+    // task manager router
+    app.use('/revolving/task', taskManagerRouter);
     //app.use(errorLog);
     app.all('*', (req, res) => {
         res.status(404).json({ status: false, message: 'NOT FOUND' });

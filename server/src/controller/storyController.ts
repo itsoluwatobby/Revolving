@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
-import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
+import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
@@ -38,13 +38,9 @@ export const updateStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await StoryModel.findByIdAndUpdate({ userId, _id: storyId }, {...editedStory, edited: true})
-    .then((data) => {
-      return responseType({res, status: 201, count:1, data})
-    })
-    .catch((error) => {
-      return responseType({res, status: 404, message: 'Story not found'})
-    })
+    const updatedStory = await updateUserStory(storyId, editedStory)
+    if(!updatedStory) return responseType({res, status: 404, message: 'Story not found'})
+    return responseType({res, status: 201, count:1, data: updatedStory})
   })
 }
 

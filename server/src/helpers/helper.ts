@@ -83,8 +83,9 @@ class UrlsObj{
   }
   pushIn(reqs: ReqOpt){
     this.req = reqs
-    const conflict = this.urls.filter(url => url.url == this.req.url)
-    !conflict.length ? this.urls.push(this.req) : null
+    const others = this.urls.filter(url => url.url !== this.req.url)
+    this.urls = others
+    this.urls.push(this.req)
   }
   pullIt(reqUrl: string[]){
     const otherUrls = this.urls.filter(url => !reqUrl.includes(url.mtd))
@@ -180,14 +181,24 @@ export const autoDeleteOnExpire = async(userId: string)=>{
   const currentTime = new Date()
   if(!userId) return
   else{
-    const { updatedAt } = await TaskBinModel.findOne({userId})
-    if(!updatedAt) return
-    const elaspedTime = +currentTime - +updatedAt
+    const task = await TaskBinModel.findOne({userId})
+    if(!task?.updatedAt) return
+    const elaspedTime = +currentTime - +task?.updatedAt
     if(elaspedTime > expireAfterThirtyDays){
-      await TaskBinModel.findByIdAndUpdate(userId, { taskBin: [] })
+      await TaskBinModel.findOneAndUpdate({userId}, {$set: { taskBin: [] }})
       return
     }
     return
+  }
+}
+
+export const mongooseError = <T>(cb: () => T | T[]): T | T[] => {
+  try{
+    const data = cb() as T | T[]
+    return data
+  }
+  catch(error){
+    console.log('An error occurred')
   }
 }
 

@@ -43,6 +43,6 @@ export const followOrUnFollow = (followerId, followingId) => __awaiter(void 0, v
 export const deleteAccount = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     yield UserModel.findByIdAndDelete({ _id: userId });
     yield deleteAllUserStories(userId);
-    yield TaskManagerModel.deleteMany({ userId });
+    yield TaskManagerModel.deleteOne({ userId });
 });
 //# sourceMappingURL=userHelpers.js.map

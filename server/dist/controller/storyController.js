@@ -8,9 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getUserById } from "../helpers/userHelpers.js";
-import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
+import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
 import { getAllSharedByCategories, getAllSharedStories } from "../helpers/sharedHelper.js";
 import { getCachedResponse } from "../helpers/redis.js";
@@ -22,6 +22,7 @@ export const createNewStory = (req, res) => {
         if (!userId || !(newStory === null || newStory === void 0 ? void 0 : newStory.title) || !(newStory === null || newStory === void 0 ? void 0 : newStory.body))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         newStory = Object.assign(Object.assign({}, newStory), { userId, author: user === null || user === void 0 ? void 0 : user.username });
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
@@ -35,6 +36,7 @@ export const updateStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
         const editedStory = req.body;
+        yield autoDeleteOnExpire(userId);
         if (!userId || !storyId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
@@ -42,13 +44,10 @@ export const updateStory = (req, res) => {
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        yield StoryModel.findByIdAndUpdate({ userId, _id: storyId }, Object.assign(Object.assign({}, editedStory), { edited: true }))
-            .then((data) => {
-            return responseType({ res, status: 201, count: 1, data });
-        })
-            .catch((error) => {
+        const updatedStory = yield updateUserStory(storyId, editedStory);
+        if (!updatedStory)
             return responseType({ res, status: 404, message: 'Story not found' });
-        });
+        return responseType({ res, status: 201, count: 1, data: updatedStory });
     }));
 };
 export const deleteStory = (req, res) => {
@@ -59,6 +58,7 @@ export const deleteStory = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
+        yield autoDeleteOnExpire(userId);
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const story = yield getStoryById(storyId);
@@ -83,6 +83,7 @@ export const deleteStoryByAdmin = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'user not found' });
+        yield autoDeleteOnExpire(userId);
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const story = yield getUserStories(userId);
@@ -113,6 +114,7 @@ export const getStory = (req, res) => {
 export const getUserStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
+        yield autoDeleteOnExpire(userId);
         if (!userId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
@@ -168,6 +170,7 @@ export const getStories = (req, res) => {
 export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
+        yield autoDeleteOnExpire(userId);
         if (!userId || !storyId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);

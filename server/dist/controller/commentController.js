@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { getUserById } from "../helpers/userHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { createComment, deleteAllUserComments, deleteAllUserCommentsInStory, deleteSingleComment, editComment, getAllCommentsInStory, getCommentById, getUserComments, getUserCommentsInStory, likeAndUnlikeComment } from "../helpers/commentHelper.js";
 import { getStoryById } from "../helpers/storyHelpers.js";
@@ -21,6 +21,7 @@ export const createNewComment = (req, res) => {
         if (!userId || !storyId || !(newComment === null || newComment === void 0 ? void 0 : newComment.comment))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         newComment = Object.assign(Object.assign({}, newComment), { author: user === null || user === void 0 ? void 0 : user.username });
@@ -40,6 +41,7 @@ export const updateComment = (req, res) => {
         if (!userId || !commentId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
@@ -54,6 +56,7 @@ export const deleteComment = (req, res) => {
         if (!userId || !commentId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
@@ -77,6 +80,7 @@ export const deleteUserComments = (req, res) => {
         if (!userId || !commentId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         const adminUser = yield getUserById(adminId);
         if (!user || !adminUser)
             return responseType({ res, status: 401, message: 'You do not have an account' });
@@ -118,6 +122,7 @@ export const userComments = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return res.sendStatus(404);
+        yield autoDeleteOnExpire(userId);
         // if(user?.isAccountLocked) return res.sendStatus(401)
         const admin = yield getUserById(adminId);
         if (!admin.roles.includes(ROLES.ADMIN))
@@ -136,6 +141,7 @@ export const getUserCommentStory = (req, res) => {
         const { userId, storyId } = req.params;
         if (!userId || !storyId)
             return res.sendStatus(400);
+        yield autoDeleteOnExpire(userId);
         const commentsInStories = yield getCachedResponse({ key: `userCommentsInStories:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const comments = yield getUserCommentsInStory(userId, storyId);
                 return comments;
@@ -165,6 +171,7 @@ export const like_Unlike_Comment = (req, res) => __awaiter(void 0, void 0, void 
         const { userId, commentId } = req.params;
         if (!userId || !commentId)
             return res.sendStatus(400);
+        yield autoDeleteOnExpire(userId);
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });

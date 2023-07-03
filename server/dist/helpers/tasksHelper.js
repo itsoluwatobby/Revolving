@@ -11,19 +11,18 @@ import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
 import { UserModel } from "../models/User.js";
 export const getUserTasks = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskManagerModel.find({ userId }).lean(); });
 export const getTaskById = (taskId) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskManagerModel.findById(taskId).exec(); });
+export const getTaskInBin = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskBinModel.find({ userId }).exec(); });
 export const createNewTask = (userId, task) => __awaiter(void 0, void 0, void 0, function* () {
     const newTask = yield TaskManagerModel.create(Object.assign({}, task));
-    yield UserModel.findByIdAndUpdate(userId, { $push: { taskIds: newTask === null || newTask === void 0 ? void 0 : newTask._id } });
+    yield UserModel.findByIdAndUpdate({ _id: userId }, { $push: { taskIds: newTask === null || newTask === void 0 ? void 0 : newTask._id } });
     return newTask;
 });
-export const updateTask = (task) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskManagerModel.findByIdAndUpdate({ _id: task === null || task === void 0 ? void 0 : task._id }, Object.assign({}, task)); });
+export const updateTask = (task) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskManagerModel.findByIdAndUpdate({ _id: task === null || task === void 0 ? void 0 : task._id }, Object.assign(Object.assign({}, task), { edited: true })); });
 export const deleteTask = (userId, taskId) => __awaiter(void 0, void 0, void 0, function* () {
     const task = yield getTaskById(taskId);
     yield TaskManagerModel.findByIdAndDelete(taskId);
-    yield UserModel.findByIdAndUpdate(userId, { $pull: { taskIds: taskId } });
+    yield UserModel.findByIdAndUpdate({ _id: userId }, { $pull: { taskIds: taskId } });
     yield TaskBinModel.findOneAndUpdate({ userId }, { $push: { taskBin: task } });
 });
-export const emptyTaskBin = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield TaskBinModel.findByIdAndUpdate(userId, { taskBin: [] });
-});
+export const emptyTaskBin = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskBinModel.findOneAndUpdate({ userId }, { $set: { taskBin: [] } }); });
 //# sourceMappingURL=tasksHelper.js.map
