@@ -27,6 +27,7 @@ const USERSCHEMA = new Schema({
     edited: { type: Boolean, default: false },
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     codeName: { type: String, default: '', trim: true },
+    taskIds: { type: Array, default: [] },
     stack: { type: Array, default: [] },
     socialMediaAccounts: { type: Array, default: [] },
     country: { type: Array, default: '' },

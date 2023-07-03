@@ -36,6 +36,8 @@ import commentRouter from './routes/commentRoutes.js';
 
 import { getResponse, getResponseByComment } from './controller/responseController.js';
 import responseRouter from './routes/responseRoutes.js';
+import taskManagerRouter from './routes/taskManagerRoutes.js';
+import { eventLogger } from './middleware/logger.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 
@@ -62,6 +64,7 @@ app.use(cors(corsOptions))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('common'))
+// app.use(eventLogger)
 app.use(helmet())
 app.use(cookieParser())
 
@@ -82,14 +85,13 @@ if (cluster.isPrimary){
   })
 }
 else{
-  console.log(`Worker with PID: ${process.pid} is running`)
-
   app.get('/', (req: Request, res: Response) => {
     res.status(200).json({ status: true, message: 'server up and running' });
   })
 
   // CACHING URLS
   app.use(logURLAndMethods)
+
   // ROUTES
   app.use('/revolving/auth', authRouter);
   app.post('/revolving/auth/logout/:userId', logoutHandler);
@@ -131,6 +133,9 @@ else{
   
   // response router
   app.use('/revolving/responses', responseRouter);
+
+  // task manager router
+  app.use('/revolving/task', taskManagerRouter);
 
   //app.use(errorLog);
   app.all('*', (req: Request, res: Response) => {

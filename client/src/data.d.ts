@@ -31,6 +31,15 @@ interface CommentProps{
   commentResponse: string[]
 }
 
+type InputTaskProp = {
+  value: string, 
+  isTyping?: TypingEvent
+}
+
+type CreatePrompt = 'Hide' | 'Open' | 'Idle' | 'Nil'
+type TypingEvent = 'typing' | 'notTyping'
+type ButtonType = 'EDIT' | 'DELETE'
+type EditTaskOption = 'EDIT' | 'VIEW'
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
@@ -57,6 +66,8 @@ type SubTasks = {
   completed: boolean
 }
 
+type TaskBin = TaskProp[]
+
 interface TaskProp{
   _id: string,
   task: string,
@@ -64,7 +75,7 @@ interface TaskProp{
   subTasks?: SubTasks[]
   edited: boolean,
   createdAt: string,
-  updatedAt?: string
+  updatedAt?: string,
 }
 
 type HoverType = 'unfollow' | 'following'

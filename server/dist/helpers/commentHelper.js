@@ -82,7 +82,8 @@ export const likeAndUnlikeResponse = (userId, responseId) => __awaiter(void 0, v
 export const deleteSingleResponse = (responseId) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield getResponseById(responseId);
     yield CommentResponseModel.findByIdAndDelete({ _id: responseId });
-    (response === null || response === void 0 ? void 0 : response.responseId) ? yield CommentResponseModel.findByIdAndUpdate({ _id: response.responseId }, { $pull: { responseTags: response === null || response === void 0 ? void 0 : response._id } }) : null;
+    (response === null || response === void 0 ? void 0 : response.responseId)
+        ? yield CommentResponseModel.findByIdAndUpdate({ _id: response.responseId }, { $pull: { responseTags: response === null || response === void 0 ? void 0 : response._id } }) : null;
     yield CommentModel.findByIdAndUpdate({ _id: response.commentId }, { $pull: { commentResponse: response === null || response === void 0 ? void 0 : response._id } });
 });
 export const deleteAllUserResponses = (userId) => __awaiter(void 0, void 0, void 0, function* () {

@@ -11,7 +11,7 @@ type TaskType = {
 }
 
 export const ViewSingleTask = ({ theme, viewSingle, setViewSingle }: TaskType) => {
-  const task = useSelector(getTask)
+  const {task} = useSelector(getTask)
 
   return (
     <article 

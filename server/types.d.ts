@@ -28,21 +28,6 @@ interface ClaimProps extends JwtPayload{
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
-// interface StoryType{
-//   userId: Types.ObjectId
-//   title: string
-//   picture: string
-//   body: string
-//   fontFamily: string
-//   storyDate: string
-//   category: Categories
-//   commentIds?: string
-//   isShared?: string
-//   likes: string
-//   edited: false
-//   editDate: string
-// }
-
 type SharedInfo = {
   userId: string,
   sharedId: string
@@ -62,6 +47,25 @@ interface StoryProps extends Document{
   author: string
   createdAt: string
   updatedAt: string
+}
+
+type TaskBin = {
+  userId: string,
+  _id: string,
+  taskBin: TaskProp[],
+  createdAt: Date,
+  updatedAt?: Date,
+}
+
+interface TaskProp{
+  _id: string,
+  userId: string,
+  task: string,
+  completed: boolean,
+  subTasks?: SubTasks[]
+  edited: boolean,
+  createdAt: string,
+  updatedAt?: string,
 }
 
 interface CommentProps{
@@ -127,6 +131,7 @@ interface UserProps extends Document{
   codeName: string,
   stack: string[],
   country: string,
+  taskIds: string[]
   socialMediaAccounts: SocialMediaAccoutProp[],
   createdAt: string,
   updatedAt: string

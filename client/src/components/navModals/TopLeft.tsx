@@ -17,8 +17,9 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const {theme, setFontOption, setOpenComment, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
   const { storyId } = useParams()
+  const { userId } = useParams()
 
-  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
+  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`]
 
   return (
     <>

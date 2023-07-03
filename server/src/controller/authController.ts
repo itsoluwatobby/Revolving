@@ -3,10 +3,11 @@ import { createUser, getUserByEmail, getUserById, getUserByToken, getUserByVerif
 import brcypt from 'bcrypt';
 import { ClaimProps, UserProps } from "../../types.js";
 import { sub } from "date-fns";
-import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken } from "../helpers/helper.js";
+import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken, autoDeleteOnExpire } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 import { redisClient } from "../helpers/redis.js";
 import { ROLES } from "../config/allowedRoles.js";
+import { TaskBinModel } from "../models/TaskManager.js";
 
 interface NewUserProp extends Request{
   username: string,
@@ -113,8 +114,13 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     const accessToken = await signToken({roles, email}, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
     const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
 
-    const { _id, ...rest } = user
+    // create taskBin for user
+    if(!Boolean(await TaskBinModel.exists({userId: user?._id}))){
+      await TaskBinModel.create({ userId: user?._id, taskBin: [] })
+    }
+    await autoDeleteOnExpire(user?._id)
 
+    const { _id, ...rest } = user
     await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false }})
     //authentication: { sessionID: req?.sessionID },
     

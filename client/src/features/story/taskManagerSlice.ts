@@ -1,28 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { CommentProps, TaskProp } from "../../data";
-import { PostType } from "../../posts";
-// import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
+import { EditTaskOption, TaskProp } from "../../data";
 
-// const storyAdapter: EntityAdapter<CommentProps> = createEntityAdapter<CommentProps>({
-//   sortComparer: (prev, next) => next.commentDate.localeCompare(prev.commentDate)
-// })
-
-// const initialState = storyAdapter.getInitialState({
-//   commentLength: 0,
-// })
-
+type TaskEntry = {
+  task: Partial<TaskProp>,
+  option: EditTaskOption
+}
 const initialState = {
   // commentLength: 0,
-  task: {} as Partial<TaskProp> 
+  initState: { 
+    task: {} as Partial<TaskProp>,
+    option: '' as EditTaskOption
+  }
 }
 
 const taskManagerSlice = createSlice({
   name: 'task',
   initialState,
   reducers: {
-    setTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
-      state.task = action.payload
+    setTask: (state, action: PayloadAction<TaskEntry>) => {
+      state.initState = action.payload
     },
     // createTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
     //   state.task = action.payload
@@ -31,7 +28,7 @@ const taskManagerSlice = createSlice({
 })
 
 export const { setTask } = taskManagerSlice.actions
-export const getTask = (state: RootState) => state.task.task
+export const getTask = (state: RootState) => state.task.initState
 
 export default taskManagerSlice.reducer
 

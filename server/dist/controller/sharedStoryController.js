@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { createShareStory, getAllSharedStories, getSharedStoryById, getUserSharedStories, likeAndUnlikeSharedStory, unShareStory } from "../helpers/sharedHelper.js";
 import { getCachedResponse, redisClient } from "../helpers/redis.js";
 import { getUserById } from "../helpers/userHelpers.js";
@@ -44,6 +44,7 @@ export const shareStory = (req, res) => {
         if (!userId || !storyId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const newShare = yield createShareStory(user, storyId);
@@ -56,6 +57,7 @@ export const unShareUserStory = (req, res) => {
         if (!userId || !sharedId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         const result = yield unShareStory(userId, sharedId);
@@ -71,6 +73,7 @@ export const getSharedStoriesByUser = (req, res) => {
         const { userId } = req.params;
         if (!userId)
             return res.sendStatus(400);
+        yield autoDeleteOnExpire(userId);
         const sharedStories = yield getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const sharedStory = yield getUserSharedStories(userId);
                 return sharedStory;
@@ -86,6 +89,7 @@ export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, v
         if (!userId || !sharedId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)

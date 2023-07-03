@@ -4,6 +4,8 @@ import { ClaimProps, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryP
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
 import { Request, Response } from 'express';
+import { TaskBinModel } from '../models/TaskManager.js';
+import { timeConverterInMillis } from './redis.js';
 
 type ReqOpt = {
   mtd: string,
@@ -81,8 +83,9 @@ class UrlsObj{
   }
   pushIn(reqs: ReqOpt){
     this.req = reqs
-    const conflict = this.urls.filter(url => url.url == this.req.url)
-    !conflict.length ? this.urls.push(this.req) : null
+    const others = this.urls.filter(url => url.url !== this.req.url)
+    this.urls = others
+    this.urls.push(this.req)
   }
   pullIt(reqUrl: string[]){
     const otherUrls = this.urls.filter(url => !reqUrl.includes(url.mtd))
@@ -171,6 +174,34 @@ export const pagination = async<T>({startIndex=1, endIndex=1, page=1, limit=1, c
 }
 
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
+
+export const autoDeleteOnExpire = async(userId: string)=>{
+  const {day} = timeConverterInMillis()
+  const expireAfterThirtyDays = day * 30
+  const currentTime = new Date()
+  if(!userId) return
+  else{
+    const task = await TaskBinModel.findOne({userId})
+    if(!task?.updatedAt) return
+    const elaspedTime = +currentTime - +task?.updatedAt
+    if(elaspedTime > expireAfterThirtyDays){
+      await TaskBinModel.findOneAndUpdate({userId}, {$set: { taskBin: [] }})
+      return
+    }
+    return
+  }
+}
+
+export const mongooseError = <T>(cb: () => T | T[]): T | T[] => {
+  try{
+    const data = cb() as T | T[]
+    return data
+  }
+  catch(error){
+    console.log('An error occurred')
+  }
+}
+
 
 // export function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
 //   const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes)

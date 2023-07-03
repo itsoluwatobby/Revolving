@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { deleteAccount, followOrUnFollow, getAllUsers, getUserById, updateUser } from "../helpers/userHelpers.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { ROLES } from "../config/allowedRoles.js";
@@ -28,6 +28,7 @@ export const getUser = (req, res) => {
         const { userId } = req.params;
         const user = yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const current = yield getUserById(userId);
+                yield autoDeleteOnExpire(userId);
                 if (!current)
                     return responseType({ res, status: 404, message: 'User not found' });
                 return current;
@@ -41,6 +42,7 @@ export const followUnFollowUser = (req, res) => {
         if (!followerId || !followingId)
             return res.sendStatus(400);
         const user = yield getUserById(followingId);
+        yield autoDeleteOnExpire(followerId);
         if (!user)
             return responseType({ res, status: 404, message: 'user not found' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
@@ -59,6 +61,7 @@ export const updateUserInfo = (req, res) => {
         if (!userId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)

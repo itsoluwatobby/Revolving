@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
-import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory } from "../helpers/storyHelpers.js";
+import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { asyncFunc, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
 import { getAllSharedByCategories, getAllSharedStories } from "../helpers/sharedHelper.js";
 import { Categories, StoryProps } from "../../types.js";
@@ -20,6 +20,7 @@ export const createNewStory = (req: RequestProp, res: Response) => {
     let newStory = req.body
     if (!userId || !newStory?.title || !newStory?.body) return res.sendStatus(400)
     const user = await getUserById(userId);
+    await autoDeleteOnExpire(userId)
     newStory = {...newStory, userId, author: user?.username} as StoryProps
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
@@ -32,17 +33,14 @@ export const updateStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId, storyId } = req.params;
     const editedStory = req.body
+    await autoDeleteOnExpire(userId)
     if(!userId || !storyId) return res.sendStatus(400)
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await StoryModel.findByIdAndUpdate({ userId, _id: storyId }, {...editedStory, edited: true})
-    .then((data) => {
-      return responseType({res, status: 201, count:1, data})
-    })
-    .catch((error) => {
-      return responseType({res, status: 404, message: 'Story not found'})
-    })
+    const updatedStory = await updateUserStory(storyId, editedStory)
+    if(!updatedStory) return responseType({res, status: 404, message: 'Story not found'})
+    return responseType({res, status: 201, count:1, data: updatedStory})
   })
 }
 
@@ -53,6 +51,7 @@ export const deleteStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     
+    await autoDeleteOnExpire(userId)
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const story = await getStoryById(storyId)
     if(!story) return responseType({res, status: 404, message: 'story not found'})
@@ -74,7 +73,8 @@ export const deleteStoryByAdmin = (req: RequestProp, res: Response) => {
     if(!adminId || !userId || !storyId) return res.sendStatus(400)
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 401, message: 'user not found'})
-    
+
+    await autoDeleteOnExpire(userId)
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const story = await getUserStories(userId)
     if(!story.length) return responseType({res, status: 404, message: 'user does not have a story'})
@@ -105,6 +105,7 @@ export const getStory = (req: RequestProp, res: Response) => {
 export const getUserStory = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId} = req.params
+    await autoDeleteOnExpire(userId)
     if(!userId) return res.sendStatus(400);
     const user = await getUserById(userId)
     if(!user) return res.sendStatus(404)
@@ -167,6 +168,7 @@ export const getStories = (req: Request, res: Response) => {
 export const like_Unlike_Story = async(req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId, storyId} = req.params
+    await autoDeleteOnExpire(userId)
     if (!userId || !storyId) return res.sendStatus(400);
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})

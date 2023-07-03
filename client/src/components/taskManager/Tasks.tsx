@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from 'react'
-import { TaskProp } from '../../data'
+import { ButtonType, EditTaskOption, TaskProp } from '../../data'
 import { reduceLength } from '../../utils/navigator'
 import { format } from 'timeago.js'
 import { CiEdit } from 'react-icons/ci'
@@ -15,8 +15,6 @@ type TaskProps = {
   setViewSingle: React.Dispatch<React.SetStateAction<ChatOption>>
 }
 
-type ButtonType = 'EDIT' | 'DELETE'
-
 function buttonClass(theme: Theme, type: ButtonType){
   return `
   rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-900'}
@@ -29,10 +27,16 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
 
   const handleChecked = (event: ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)
 
-  const viewTask = (taskId: string) => {
-    setViewSingle('Open')
-    const task = tasks.find(task => task._id == taskId) as TaskProp
-    dispatch(setTask(task))
+  const viewTask = (taskId: string, option: EditTaskOption) => {
+    if(option === 'EDIT'){
+      const task = tasks.find(task => task._id == taskId) as TaskProp
+      dispatch(setTask({task, option: 'EDIT'}))
+    }
+    else if(option === 'VIEW'){
+      setViewSingle('Open')
+      const task = tasks.find(task => task._id == taskId) as TaskProp
+      dispatch(setTask({task, option: 'VIEW'}))
+    }
   }
 
   return (
@@ -41,7 +45,7 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
       key={task._id}
       className="flex items-center gap-1 p-0.5 text-sm rounded-md shadow-inner shadow-slate-600"
     >
-      <p className="flex-auto flex flex-col p-1">
+      <p className="flex-auto flex flex-col p-0.5 ">
         <span className="flex items-center gap-3">
           <input 
             type="checkbox" 
@@ -52,8 +56,8 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
           />
           <label 
             htmlFor={`${task?._id}`}
-            onDoubleClick={() => viewTask(task._id)}
-            className={`${isChecked && 'text-gray-400 line-through'}`}
+            onDoubleClick={() => viewTask(task._id, 'VIEW')}
+            className={`${isChecked && 'text-gray-400 line-through'} lead leading-tight`}
           >
             {reduceLength(task.task, 20, 'word')}
           </label>
@@ -61,7 +65,9 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
         <small className="text-right text-gray-400">{format(task.createdAt)}</small>
       </p>
       <p className={`flex-none w-8 shadow-lg rounded-md shadow-slate-600 h-full justify-center flex flex-col gap-1.5 p-0.5 items-center text-base`}>
-        <CiEdit title="Edit" className={buttonClass(theme, 'EDIT')} />
+        <CiEdit 
+          onClick={() => viewTask(task._id, 'EDIT')}
+          title="Edit" className={buttonClass(theme, 'EDIT')} />
         <BsTrash title="Delete" className={buttonClass(theme, 'DELETE')} />
       </p>
     </article>

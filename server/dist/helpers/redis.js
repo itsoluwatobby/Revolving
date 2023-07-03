@@ -11,7 +11,7 @@ import { createClient } from 'redis';
 import { objInstance } from './helper.js';
 export const redisClient = createClient();
 export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) => __awaiter(void 0, void 0, void 0, function* () {
-    redisClient.on('error', err => console.error('Redis client error: ', err));
+    redisClient.on('error', err => console.error('Redis client error: ', err.logMessage));
     if (!redisClient.isOpen)
         yield redisClient.connect();
     try {
@@ -34,7 +34,7 @@ export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) =>
         console.error(error);
     }
 });
-export const getCachedValueResponse = ({ key, timeTaken = 3600, value }) => __awaiter(void 0, void 0, void 0, function* () {
+export const getCachedValueRespon = ({ key, timeTaken = 3600, value }) => __awaiter(void 0, void 0, void 0, function* () {
     redisClient.on('error', err => console.error('Redis client error: ', err));
     if (!redisClient.isOpen)
         yield redisClient.connect();
@@ -53,4 +53,10 @@ export const getCachedValueResponse = ({ key, timeTaken = 3600, value }) => __aw
         console.error(error);
     }
 });
+export const timeConverterInMillis = () => {
+    const minute = 60 * 1000;
+    const hour = minute * 60;
+    const day = hour * 24;
+    return { minute, hour, day };
+};
 //# sourceMappingURL=redis.js.map
