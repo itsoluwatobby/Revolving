@@ -3,7 +3,7 @@ import { TaskBin, TaskProp } from "../../types.js";
 
 const SubTasksSchema: Schema = new Schema(
   {
-    title: { type: String, required: [true, 'Title required'], trim: true },
+    title: { type: String, trim: true, default: '' },
     body: { type: String, trim: true, default: '' }
   },
   {

@@ -10,7 +10,7 @@ export default function ChatHeader({ theme }: ChatHeaderProp) {
   const { setOpenChat } = useThemeContext() as ThemeContextType
   
   return (
-    <header className={`flex-none h-10 shadow-lg p-2 w-full flex items-center justify-between sticky top-0`}>
+    <header className={`flex-none h-10 shadow-lg p-2 pr-0.5 w-full flex items-center justify-between sticky top-0`}>
       <figure className={`rounded-full border border-white bg-slate-700 w-8 h-8 shadow-lg`}>
       <img 
             src={WedgeLoad} 

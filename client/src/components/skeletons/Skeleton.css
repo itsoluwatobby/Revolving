@@ -22,6 +22,10 @@
   width: 50%;
 }
 
+.skeleton.width-10{
+  width: 10%;
+}
+
 .skeleton.profile-cirlce{
   width: 150px;
   height: 150px;

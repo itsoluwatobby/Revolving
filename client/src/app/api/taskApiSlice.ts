@@ -4,14 +4,14 @@ import { apiSlice } from "./apiSlice";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type TaskArgs = {
-  userId: string, taskId?: string, task: TaskProp
+  userId: string, taskId?: string, task: Partial<TaskProp>
 }
 
 type ResponseType = { data: TaskProp[] }
 
 export const taskApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    createTask: builder.mutation<TaskProp, TaskArgs>({
+    createTask: builder.mutation<TaskProp, Partial<TaskArgs>>({
       query: ({userId, task}) => ({
         url: `task/${userId}`,
         method: 'POST',
@@ -21,8 +21,8 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     }),
 
     updateTask: builder.mutation<TaskProp, TaskArgs>({
-      query: ({userId, taskId, task}) => ({
-        url: `task/${userId}/${taskId}`,
+      query: ({userId, task}) => ({
+        url: `task/${userId}`,
         method: 'PUT',
         body: {...task}
       }) as any,
@@ -39,15 +39,15 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     }),
 
     getTask: builder.query<TaskProp, string>({
-      query: (id) => `task/${id}`,
+      query: (taskId) => `task/${taskId}`,
       transformResponse: (baseQueryReturnValue: {data: TaskProp}) => {
         return baseQueryReturnValue?.data
       },
       providesTags: ['TASK']
     }),
 
-    getTasks: builder.query<TaskProp[], void>({
-      query: () => 'task',
+    getUserTasks: builder.query<TaskProp[], string>({
+      query: (userId) => `task/user/${userId}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
         const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response
@@ -56,21 +56,20 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     }),
     
     getTaskBin: builder.query<TaskBin, string>({
-      query: (userId) => `task/taskbin/${userId}`,
+      query: (userId) => `task/bin/${userId}`,
       transformResponse: (baseQueryReturnValue: {data: TaskBin}) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
-        return response
+        return baseQueryReturnValue.data
       }, 
-      providesTags:(result) => providesTag(result as TaskBin, 'TASK')
+      providesTags: ['TASKBIN']
     }),
 
     clearTaskBin: builder.mutation<void, Pick<TaskArgs, 'userId'>>({
       query: (userId) => ({
-        url: `task/${userId}`,
+        url: `task/bin/${userId}`,
         method: 'DELETE',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'TASK', id: 'LIST'}],
+      invalidatesTags: [{ type: 'TASKBIN'}],
     }),
 
   })
@@ -80,7 +79,7 @@ export const {
   useCreateTaskMutation,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
-  useGetTasksQuery,
+  useGetUserTasksQuery,
   useGetTaskQuery,
   useGetTaskBinQuery,
   useClearTaskBinMutation
