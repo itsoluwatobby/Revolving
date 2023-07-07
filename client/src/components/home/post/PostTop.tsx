@@ -42,14 +42,14 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   }
 
 
-
+// users as UserProps[], story?.userId)
   return (
     <>
       <div 
         // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
         <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{
-          reduceLength(userOfPost(users as UserProps[], story?.userId), 15) || 'anonymous'
+          reduceLength(story?.author, 10, 'letter') || 'anonymous'
           }
         </p>
         <span>.</span>
@@ -86,7 +86,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
       <Link to={`/story/${story?._id}`} >
         <p 
           onClick={openText}
-          className={`whitespace-pre-wrap text-sm first-letter:ml-3 first-letter:text-lg first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
+          className={`whitespace-pre-wrap text-justify text-sm first-letter:ml-3 first-letter:text-lg ${theme == 'light' ? 'text-black' : 'text-white'} first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
             {bodyContent}
         </p>
       </Link> 

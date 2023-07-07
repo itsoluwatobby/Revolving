@@ -28,13 +28,7 @@ export default function ChatBase({ theme, input, setInput }: ChatBaseProp) {
   const handleChat = async() => {
     if(!input.length) return
     try{
-      const clientMsg = {
-        _id: nanoid(5),
-        message: input,
-        userId: currentUserId,
-        dateTime
-      }
-
+      const clientMsg = { _id: nanoid(5), message: input, userId: currentUserId, dateTime }
       dispatch(createChatMessage(clientMsg))
       setInput('')
     }
@@ -47,7 +41,7 @@ export default function ChatBase({ theme, input, setInput }: ChatBaseProp) {
   return (
     <section>
       <div
-        className={`flex-none w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-800'}`}>
+        className={`flex-none w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-700' : 'bg-slate-800'}`}>
         <input 
           type="text"
           ref={inputRef}
@@ -55,7 +49,7 @@ export default function ChatBase({ theme, input, setInput }: ChatBaseProp) {
           autoComplete="off"
           placeholder="Say hello"
           onChange={handleChatInput}
-          className={`flex-auto font-serif p-1.5 h-full text-sm w-10/12 focus:outline-none rounded-md ${theme == 'light' ? 'text-black' : 'text-white'} bg-inherit`}
+          className={`flex-auto font-serif p-1.5 h-full text-sm w-10/12 focus:outline-none rounded-md text-white ${theme == 'light' ? '' : ''} bg-inherit`}
         />
         <button 
           onClick={handleChat}

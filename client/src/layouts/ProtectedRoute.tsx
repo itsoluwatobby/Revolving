@@ -8,7 +8,8 @@ export const ProtectedRoute = () => {
 
   return(
     <div>
-      Protected routes</div>
+      Protected routes
+    </div>
   )
 
   // TODO: PROTECT NEWSTORY, EDITSTORY, PERSONAL PROFILE

@@ -37,7 +37,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
         !address.includes(pathname) ?
           <div 
             onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
-            className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-64 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-8`}>  
+            className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-40 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-1`}>  
               <CiSearch className='text-gray-700 text-xl w-8'/>
               <input 
                 type="text"

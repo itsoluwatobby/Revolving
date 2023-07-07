@@ -34,13 +34,15 @@ type PostType = {
 
 type PostContextType = {
   search: string,
+  url?: string,
   filteredStories: PostType[],
   typingEvent: boolean,
   canPost: boolean,
   navPosts: PostType[],
+  uploadToCloudinary: (image: File) => Promise<void>,
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
-  setCanPost: React.Dispatch<React.SetStateAction<boolean>>
-  setSearch: React.Dispatch<React.SetStateAction<string>>
+  setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
+  setSearch: React.Dispatch<React.SetStateAction<string>>,
   setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
 }
 

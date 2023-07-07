@@ -3,13 +3,13 @@ import { RootState } from "../../app/store";
 import { EditTaskOption, TaskProp } from "../../data";
 
 type TaskEntry = {
-  task: Partial<TaskProp>,
+  taskId: string,
   option: EditTaskOption
 }
 const initialState = {
-  // commentLength: 0,
+  tasks: [] as TaskProp[],
   initState: { 
-    task: {} as Partial<TaskProp>,
+    taskId: {} as string,
     option: '' as EditTaskOption
   }
 }
@@ -21,14 +21,18 @@ const taskManagerSlice = createSlice({
     setTask: (state, action: PayloadAction<TaskEntry>) => {
       state.initState = action.payload
     },
-    // createTask: (state, action: PayloadAction<Partial<TaskProp>>) => {
-    //   state.task = action.payload
-    // }
+    setAllTasks: (state, action: PayloadAction<TaskProp[]>) => {
+      state.tasks = action.payload
+    }
   }
 })
 
-export const { setTask } = taskManagerSlice.actions
+export const { setTask, setAllTasks } = taskManagerSlice.actions
 export const getTask = (state: RootState) => state.task.initState
 
+export const singleTask = (state: RootState, taskId: string) => {
+  const task = state?.task?.tasks?.find(task => task._id === taskId)
+  return task
+}
 export default taskManagerSlice.reducer
 

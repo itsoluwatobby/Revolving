@@ -14,10 +14,11 @@ import { format } from 'timeago.js';
 import { reduceLength } from '../utils/navigator.js';
 import LikeStory from './singlePost/LikeStory.js';
 import FollowUnFollow from './singlePost/FollowUnFollow.js';
+import MidModal from './navModals/MidModal.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
-const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1 hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 duration-200 ease-in-out rounded-md';
+const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-0.5 transition-all hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 duration-200 ease-in-out rounded-md';
 
 const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase text-center text-xs hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-sm';
 
@@ -62,36 +63,25 @@ export const Navbar = () => {
 
   return(
     <nav 
-      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative
+      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative mobile:pr-1
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />
 
-      <div className={`flex-auto mobile:hidden grid transition-all place-content-center ${notintersecting === 'Open' ? 'scale-100' : 'scale-0'}`}>
-        <div className={`flex flex-col gap-1 ${pathname !== designatedPath ? 'hidden' : 'block'}`}>
-          <div className='flex items-center gap-2'>
-            <small className='capitalize text-xs cursor-pointer'>{targetStory?.author || 'anonymous'}</small>
-            <span>.</span>
-            <small className='text-xs text-gray-300'>{format(targetStory?.createdAt as string, 'en-US')}</small>
+      <MidModal 
+        targetStory={targetStory as PostType}
+        theme={theme}
+        designatedPath={designatedPath}
+        pathname={pathname}
+        notintersecting={notintersecting}
+      />
 
-            <FollowUnFollow story={targetStory as PostType} position='navbar' />
-
-          </div>
-          <div className='flex items-center gap-4'>
-            <h1 
-              className='whitespace-pre-wrap font-bold uppercase'>{reduceLength(targetStory?.title as string, 5, 'word')}
-            </h1>
-            <LikeStory story={targetStory as PostType} />
-          </div>
-        </div>
-      </div>
-
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 mobile:w-40 ${pathname != `/story/${storyId}` ? 'w-44' : 'w-32'}`}>
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-40' : 'mobile:w-28 mobile:pr-0'}`}>
         <TopRight />
       </div>
      { 
       address.slice(0, 2).includes(pathname) ? (
-          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
+          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md p-1 text-sm ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900' : 'bg-slate-400'}`}>
             {
               Object.entries(custom_fonts).map(([key, options]) => (
                 <li

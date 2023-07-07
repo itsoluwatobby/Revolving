@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 const SubTasksSchema = new Schema({
-    title: { type: String, required: [true, 'Title required'], trim: true },
+    title: { type: String, trim: true, default: '' },
     body: { type: String, trim: true, default: '' }
 }, {
     timestamps: true

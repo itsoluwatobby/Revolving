@@ -38,6 +38,7 @@ import { getResponse, getResponseByComment } from './controller/responseControll
 import responseRouter from './routes/responseRoutes.js';
 import taskManagerRouter from './routes/taskManagerRoutes.js';
 import { eventLogger } from './middleware/logger.js';
+import { getTask, getTasksInBin, getUserTask } from './controller/taskManagerController.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 
@@ -118,6 +119,11 @@ else{
   app.get('/revolving/story/category', getStoryByCategory);
   app.get('/revolving/story/:storyId', getStory);
   app.get('/revolving/story/share/:sharedId', getSingleShared)
+
+  // Task manager
+  app.get('/revolving/task/user/:userId', getUserTask)
+  app.get('/revolving/task/:taskId', getTask)
+  app.get('/revolving/task/bin/:userId', getTasksInBin)
 
   // checks for accesstoken
   app.use(verifyAccessToken);

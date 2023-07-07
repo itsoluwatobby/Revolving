@@ -21,7 +21,7 @@ export default function ChatBody() {
     
     const inputValue = customMessage?.message?.split('') as string[]
     const typedFunc = async() =>{
-      if(currentIndex < inputValue.length - 1){
+      if(currentIndex < inputValue?.length - 1){
         setTypedInput(prev => prev += inputValue[currentIndex-1])
         setTimeout(typedFunc, DELAY)
         currentIndex++
@@ -29,12 +29,15 @@ export default function ChatBody() {
     }
     isMounted ? typedFunc() : null
 
+    return () => {
+      isMounted = false
+    }
   }, [customMessage])
 
   useEffect(() => {
     let isMounted = true
     let customIndex = 0
-    if(getChats.length == 3) customIndex+=2
+    if(getChats.length == 3) {customIndex+=2}
     if(openChat == 'Open'){
       isMounted && setCustomMessage(getChats[customIndex] as ChatProps)
       setTypedInput('')

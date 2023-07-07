@@ -24,7 +24,7 @@ export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
 
   return (
-    <main className={`app relative ${theme == 'light' ? '' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
+    <main className={`app relative ${theme == 'light' ? 'bg-slate-50' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
         <Route path='/' element={<BlogLayout />}>
           

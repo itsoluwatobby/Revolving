@@ -139,9 +139,9 @@ export default function TopRight() {
           {image ?
               <div className='cursor-pointer w-8 h-8 bg-slate-500 rounded-full border-2 border-slate-600'></div>
               :
-            <div className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
+            <figure className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
               <img src={profileImage} alt="dp" className='object-cover h-full w-full rounded-full'/>
-            </div>
+            </figure>
           }
         </div>
         {!address.includes(pathname) ? 

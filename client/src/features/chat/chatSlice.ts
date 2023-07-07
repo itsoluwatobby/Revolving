@@ -5,7 +5,7 @@ import { RootState } from "../../app/store";
 
 //const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
-const defaultMessages = [
+export const defaultMessages = [
   {
     adminId: '1234',
     message: "Welcome USER, how may i help you?",
@@ -14,7 +14,7 @@ const defaultMessages = [
   },
   {
     adminId: '1234',
-    message: "I will get back to you soo, with whatever your request is. Please be patient?",
+    message: "I will get back to you soon, with whatever your request is. Please be patient?",
     image: '',
     _id: nanoid(5)
   }
@@ -32,9 +32,10 @@ const chatSlice = createSlice({
     createChatMessage: (state, action: PayloadAction<ChatProps>) => {
       state.chat = action.payload
       state.chats = [...state.chats, action.payload]
-      if(state.chats.length == 2){
-        state.chats.push(defaultMessages[1])
+      if(state?.chats?.length == 2){
+        state.chats = [...state.chats, defaultMessages[1]]
       }
+      console.log(state.chats)
     },
     setChatMessages: (state, action: PayloadAction<ChatProps[]>) => {
       

@@ -55,9 +55,10 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
       </div>
         <h1 
           ref={headingRef as Element}
-          className='whitespace-pre-wrap font-bold text-3xl uppercase'>{story?.title}</h1>
+          className='whitespace-pre-wrap font-bold text-3xl uppercase'>{story?.title}
+        </h1>
         <p 
-          className={`mt-2 whitespace-pre-wrap tracking-wider text-justify`}>
+          className={`whitespace-pre-wrap font-sans tracking-wider text-justify`}>
             {bodyContent}
         </p>
       <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 

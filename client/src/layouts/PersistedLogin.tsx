@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
-import { useState, useEffect } from 'react'
-import { selectCurrentToken, setCredentials } from '../features/auth/authSlice';
+import { useEffect } from 'react'
+import { persisted, selectCurrentToken, setCredentials } from '../features/auth/authSlice';
 import { useNewAccessTokenQuery } from '../app/api/authApiSlice';
 import { AuthType } from '../data';
 import whiteBGloader from '../assets/whiteloader.svg'
@@ -14,29 +14,32 @@ export const PersistedLogin = () => {
   const location = useLocation()
   const storyId = location.pathname.split('/')[2]
   const pathname = location.pathname
-  const { theme, toggleLeft, setToggleLeft } = useThemeContext() as ThemeContextType
+  const { theme, toggleLeft } = useThemeContext() as ThemeContextType
   const token = useSelector(selectCurrentToken)
-  const persistLogin = JSON.parse(localStorage.getItem('persist-login') as string) as unknown as boolean
+  const persistLogin = useSelector(persisted)
   const dispatch = useDispatch()
   const {data, isLoading, isError, refetch} = useNewAccessTokenQuery()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   useEffect(() => {
-    if(persistLogin && !token){
-      refetch()
+    const getNewToken = async() => {
+      await refetch()
       const res = data as unknown as {data: AuthType}
       dispatch(setCredentials({...res?.data}))
+      console.log('hitting refresh........')
     }
-  }, [token, refetch, data, dispatch, persistLogin])
-
+    !token ? getNewToken() : null
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+console.log({token})
   /*
     flex-grow rounded-lg mt-4 pb-4 md:block ${toggleLeft == 'Hide' ? 'hidden' : 'maxscreen:fixed block z-50 w-full'} md:flex md:w-1/5 h-full border border-l-slate-500 border-b-0 border-slate-600
   */
 
   return (
     <main className={`welcome flex items-center`}>
-      <aside className={`w-1/5 ${address.includes(pathname) ? 'hidden' : ''} mt-5 h-full ${toggleLeft == 'Hide' ? 'maxscreen:hidden' : 'maxscreen:w-11/12 maxscreen:fixed maxscreen:block maxscreen:z-50 maxscreen:top-14'}`}>
+      <aside className={`min-w-[250px] ${address.includes(pathname) ? 'hidden' : 'md:block'} mt-5 h-full ${toggleLeft == 'Hide' ? 'hidden' : 'maxscreen:w-full maxscreen:fixed maxscreen:block maxscreen:z-50 maxscreen:top-14'}`}>
         <LeftSection />
       </aside>
       <div className='h-full w-full'>

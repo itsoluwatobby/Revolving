@@ -1,13 +1,15 @@
 import React, { ChangeEvent, useState } from 'react'
-import { ButtonType, EditTaskOption, TaskProp } from '../../data'
+import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data'
 import { reduceLength } from '../../utils/navigator'
 import { format } from 'timeago.js'
 import { CiEdit } from 'react-icons/ci'
 import { BsTrash } from 'react-icons/bs'
-import { ChatOption, Theme } from '../../posts'
-import { useDispatch } from 'react-redux'
-import { tasks } from '../../tasks'
+import { ChatOption, Theme, ThemeContextType } from '../../posts'
+import { useDispatch } from 'react-redux';
 import { setTask } from '../../features/story/taskManagerSlice'
+import { useUpdateTaskMutation } from '../../app/api/taskApiSlice'
+import { toast } from 'react-hot-toast'
+import { useThemeContext } from '../../hooks/useThemeContext'
 
 type TaskProps = {
   task: TaskProp,
@@ -23,41 +25,83 @@ function buttonClass(theme: Theme, type: ButtonType){
 
 export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
   const [isChecked, setIsChecked] = useState<boolean>(false)
+  const {setLoginPrompt} = useThemeContext() as ThemeContextType
+  const [updateTask, {isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate}] = useUpdateTaskMutation();
   const dispatch = useDispatch()
 
-  const handleChecked = (event: ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)
-
-  const viewTask = (taskId: string, option: EditTaskOption) => {
-    if(option === 'EDIT'){
-      const task = tasks.find(task => task._id == taskId) as TaskProp
-      dispatch(setTask({task, option: 'EDIT'}))
+  const handleChecked = async() => {
+    task = {...task, completed: !task?.completed}
+    try{
+      await updateTask({ userId: task.userId, task: task }).unwrap()
+      //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
-    else if(option === 'VIEW'){
-      setViewSingle('Open')
-      const task = tasks.find(task => task._id == taskId) as TaskProp
-      dispatch(setTask({task, option: 'VIEW'}))
+    catch(err){
+      const errors = errorUpdate as ErrorResponse
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      isErrorUpdate && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
+          background: '#FF0000'
+        }
+      })
     }
   }
 
+  const viewTask = (taskId: string, option: EditTaskOption) => {
+    if(option === 'EDIT'){
+      dispatch(setTask({taskId, option: 'EDIT'}))
+    }
+    else if(option === 'VIEW'){
+      setViewSingle('Open')
+      dispatch(setTask({taskId, option: 'VIEW'}))
+    }
+  }
+
+  const update = async(task: TaskProp) => {
+    // if(!debouncedInput.value?.length) return
+    console.log(task)
+    return
+    const newTask = {
+      userId: task.userId,
+      completed: false,
+      task: task.task
+    } as Partial<TaskProp>
+    try{
+      await updateTask({ userId: task.userId, task: newTask }).unwrap()
+      // setTaskInput('')
+      // setDebouncedInput({value: '', isTyping: 'notTyping'})
+      // setTaskRequest('Hide')
+      // setPrompt('Hide')
+      //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
+    }
+    catch(err){
+      const errors = errorUpdate as ErrorResponse
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      isErrorUpdate && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+        duration: 2000, icon: '💀', style: {
+          background: '#FF0000'
+        }
+      })
+    }
+  }
+
+
   return (
     <article 
-      title="Double tap to view"
       key={task._id}
-      className="flex items-center gap-1 p-0.5 text-sm rounded-md shadow-inner shadow-slate-600"
+      className={`relative flex items-center gap-1 p-0.5 text-sm rounded-md shadow-inner shadow-slate-600 ${isLoadingUpdate ? 'animate-pulse' : ''}`}
     >
       <p className="flex-auto flex flex-col p-0.5 ">
         <span className="flex items-center gap-3">
           <input 
             type="checkbox" 
             id={`${task?._id}`} 
-            checked={isChecked}
+            checked={task.completed}
             onChange={handleChecked}
-            className={`flex-none w-5 bg-blue-700 rounded-md h-5 marker:bg-gray-500`} 
+            className={`flex-none w-4 bg-blue-700 rounded-md h-4 marker:bg-gray-500`} 
           />
           <label 
             htmlFor={`${task?._id}`}
-            onDoubleClick={() => viewTask(task._id, 'VIEW')}
-            className={`${isChecked && 'text-gray-400 line-through'} lead leading-tight`}
+            className={`${task.completed && 'text-gray-400 line-through'} lead leading-tight`}
           >
             {reduceLength(task.task, 20, 'word')}
           </label>
@@ -70,6 +114,9 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
           title="Edit" className={buttonClass(theme, 'EDIT')} />
         <BsTrash title="Delete" className={buttonClass(theme, 'DELETE')} />
       </p>
+      <small 
+        onClick={() => viewTask(task._id, 'VIEW')}
+        className={`absolute bottom-0 text-gray-600 ${task.subTasks?.length ? '' : 'hidden'} cursor-pointer hover:opacity-70 left-1`}>expand</small>
     </article>
   )
 }

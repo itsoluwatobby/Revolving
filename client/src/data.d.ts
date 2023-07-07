@@ -66,10 +66,17 @@ type SubTasks = {
   completed: boolean
 }
 
-type TaskBin = TaskProp[]
+type TaskBin = {
+  userId: string,
+  _id: string,
+  taskBin: TaskProp[],
+  createdAt: Date,
+  updatedAt?: Date,
+}
 
 interface TaskProp{
   _id: string,
+  userId: string,
   task: string,
   completed: boolean,
   subTasks?: SubTasks[]
