@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { ChatOption, ThemeContextType } from "../posts"
 import { useThemeContext } from "../hooks/useThemeContext"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { reduceLength } from "../utils/navigator"
 
 type RouteProps = {
   name: string,
@@ -31,6 +32,7 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
 }
 
 export const LeftSection = () => {
+  const { pathname } = useLocation()
   const [nav, setNav] = useState<string>('')
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, toggleLeft, setToggleLeft, setLoginPrompt  } = useThemeContext() as ThemeContextType
@@ -51,7 +53,7 @@ export const LeftSection = () => {
             <p 
               key={values.name}
               onClick={() => setNav(values.name)}
-              className={`p-2.5 ${values.name == nav ? 'bg-slate-600 shadow-slate-900 shadow-lg' : ''} cursor-pointer hover:bg-slate-600 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
+              className={`p-2.5 ${values.link == pathname ? 'bg-slate-600 shadow-slate-900 shadow-lg' : ''} cursor-pointer hover:bg-slate-600 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
             >
               {
                 (!currentUserId && (values.name == 'Profile Page' || values.name == 'Task Manager')) ?
@@ -71,7 +73,7 @@ export const LeftSection = () => {
         <figure className="rounded-full border shadow-2xl h-10 w-10">
           <img src="" alt="" />
         </figure>
-        <p>usernamename</p>
+        <p>{reduceLength('usernamename', 8, 'letter')}</p>
       </div>
     </section>
   )

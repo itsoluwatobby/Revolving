@@ -25,6 +25,7 @@ const baseQueryWithReAuth = async(args: string, api: BaseQueryApi, extraOptions:
     if(refresh?.data)
     api.dispatch(setCredentials({...refresh?.data} as AuthType))
     // retry the request
+    console.log('Refetching token')
     result = baseQuery(args, api, extraOptions) as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>
   }
   else

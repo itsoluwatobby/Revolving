@@ -13,7 +13,7 @@ export default function SingleComment({ theme, targetComment, closeInput }: Simg
 
   return (
     <>
-      <div className={`sticky top-0 flex mobile:flex-col mobile:gap-0 mobile:ml-4 mobile:w-full items-center ml-16 gap-2 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
+      <div className={`sticky top-0 flex mobile:gap-2 mobile:ml-8 items-center ml-16 gap-2 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
         <p className={`cursor-pointer hover:opacity-70 transition-all text-sm ${theme == 'light' ? '' : 'text-black'}`}> 
           {reduceLength(targetComment?.author, 15)}
         </p>

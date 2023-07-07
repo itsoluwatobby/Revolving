@@ -27,11 +27,12 @@ export const PersistedLogin = () => {
       await refetch()
       const res = data as unknown as {data: AuthType}
       dispatch(setCredentials({...res?.data}))
+      console.log('hitting refresh........')
     }
     !token ? getNewToken() : null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
+console.log({token})
   /*
     flex-grow rounded-lg mt-4 pb-4 md:block ${toggleLeft == 'Hide' ? 'hidden' : 'maxscreen:fixed block z-50 w-full'} md:flex md:w-1/5 h-full border border-l-slate-500 border-b-0 border-slate-600
   */

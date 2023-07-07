@@ -12,10 +12,13 @@ import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
 import { useSelector } from 'react-redux';
 import { getTabCategory } from '../../features/story/navigationSlice';
 import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+
+const REFRESH_RATE = 10_000 as const
 
 export const Posts = () => {
   const getNavigation = useSelector(getTabCategory)
-  const {data, isLoading, isError, error} = useGetStoriesByCategoryQuery(getNavigation)
+  const {data, isLoading, isError, error, refetch} = useGetStoriesByCategoryQuery(getNavigation)
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { openComment, setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
@@ -28,6 +31,16 @@ export const Posts = () => {
       isMounted = false
     }
   }, [error])
+
+  useEffect(() => {
+    let timerId: TimeoutId
+    if(!data?.length && isError && errorMsg?.status != 404){
+      timerId = setInterval(async() => {
+        await refetch()
+      }, REFRESH_RATE)
+    }
+    return () => clearInterval(timerId)
+  }, [data, isError, errorMsg?.status, refetch])
   
   useEffect(() => {
     // mutate()

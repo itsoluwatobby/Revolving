@@ -12,13 +12,16 @@ import { setAllComments } from '../../features/story/commentSlice'
 import { toast } from 'react-hot-toast'
 import { storyApiSlice } from '../../app/api/storyApiSlice'
 import { getTabCategory } from '../../features/story/navigationSlice'
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types'
+
+const REFRESH_RATE = 10_000 as const
 
 export default function CommentBody() {
   const getNavigation = useSelector(getTabCategory)
   const { theme, openComment, setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const [deactivateInputBox, setDeactivateInputBox] = useState<boolean>(false);
   const currentUserId = localStorage.getItem('revolving_userId') as string;
-  const { data, isLoading, isError, error } = useGetCommentsQuery(openComment?.storyId);
+  const { data, isLoading, isError, error, refetch } = useGetCommentsQuery(openComment?.storyId);
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [comment, setComment] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
@@ -82,6 +85,16 @@ export default function CommentBody() {
       isMounted = false
     }
   }, [prompt?.assert])
+
+  useEffect(() => {
+    let timerId: TimeoutId
+    if(!data?.length && isError && errorMsg?.status != 404){
+      timerId = setInterval(async() => {
+        await refetch()
+      }, REFRESH_RATE)
+    }
+    return () => clearInterval(timerId)
+  }, [data, isError, errorMsg?.status, refetch])
 
   useEffect(() => {
     let isMounted = true

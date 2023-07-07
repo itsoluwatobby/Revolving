@@ -38,7 +38,7 @@ export const Post = ({ story }: Props) => {
  
   return (
     <article 
-      className={`${story?.fontFamily} p-2 pl-3 text-xs sm:w-full min-w-[58%]`}>
+      className={`${story?.fontFamily} flex flex-col gap-1 p-2 pl-3 text-xs sm:w-full min-w-[58%]`}>
       <PostTop 
         open={open} setOpen={setOpen} openText={openText}
         bodyContent={bodyContent} story={story}

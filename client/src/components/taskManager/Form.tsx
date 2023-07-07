@@ -26,7 +26,7 @@ export default function Form({ currentUserId }: FormProps) {
   const task = useSelector((state: RootState) => singleTask(state, taskId));
   const [prompt, setPrompt] = useState<CreatePrompt>('Hide');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [inputTask, setTaskInput] = useState<string>();
+  const [inputTask, setTaskInput] = useState<string>('');
   const [createTask, {isLoading, isError, error}] = useCreateTaskMutation();
   const [debouncedInput, setDebouncedInput] = useState<InputTaskProp>({
     value: '', isTyping: 'notTyping'
@@ -37,7 +37,8 @@ export default function Form({ currentUserId }: FormProps) {
 
   useEffect(() => {
     if(option === 'EDIT'){
-      setTaskInput(task?.task)
+      setTaskInput(task?.task as string)
+      console.log('From here last')
       setTaskRequest('Open')
       setPrompt('Hide')
     }
@@ -82,6 +83,7 @@ export default function Form({ currentUserId }: FormProps) {
         timerId =setTimeout(() => {
           setPrompt('Nil')
           setTaskRequest('Hide')
+          console.log('From here last')
           setTaskInput('')
         }, SUB_DELAY);
     }
@@ -172,7 +174,7 @@ export default function Form({ currentUserId }: FormProps) {
           />
         </div>
         :
-        <form onSubmit={createNewTask} className={`flex-none transition-all ${taskRequest == 'Open' ? 'scale-100' : 'scale-0'} shadow-xl ${theme == 'light' ? 'shadow-slate-400 bg-slate-600' : 'shadow-slate-800 bg-slate-700'} sm:w-3/4 w-full h-14 p-1 rounded-md sm:self-center flex items-center`}>
+        <form onSubmit={createNewTask} className={`flex-none transition-all ${taskRequest == 'Open' ? 'scale-100' : 'scale-0'} shadow-xl ${theme == 'light' ? 'shadow-slate-400 bg-slate-600' : 'shadow-slate-800 bg-slate-700'} w-full h-14 p-1 rounded-md flex items-center`}>
           <input
             ref={inputRef}
             type="text"
@@ -197,8 +199,8 @@ export default function Form({ currentUserId }: FormProps) {
           </button>
         </form>
       }
-      <div className={`absolute ${prompt == 'Open' ? 'scale-100' : 'scale-0'} top-0 md:pr-4 md:pl-4 translate-x-1/2 flex w-36 flex-col items-center shadow-xl shadow-slate-600 gap-1 text-xs ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-700'} p-2.5 rounded-md`}>
-        <p className="uppercase text-center font-medium tracking-wide">{stoppedTyping ? 'Continue typing?' : 'create a task?'}</p>
+      <div className={`absolute ${prompt == 'Open' ? 'scale-100' : 'scale-0'} top-0 md:pr-4 md:pl-4 translate-x-1/2 flex w-36 flex-col items-center shadow-xl shadow-slate-600 gap-1 text-xs sm:w-fit ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-700'} p-2.5 rounded-md`}>
+        <p className="uppercase text-center font-medium tracking-wider">{stoppedTyping ? 'Continue typing?' : 'create a task?'}</p>
         <p className="flex items-center gap-1">
           <span 
             onClick={() => setPrompt('Idle')}
@@ -214,6 +216,6 @@ export default function Form({ currentUserId }: FormProps) {
 
 function taskButton(theme: Theme){
   return `
-    rounded-md cursor-pointer p-1 hover:opacity-50 transition-all, w-14 text-center active:opacity-100 ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-600'}
+    rounded-md cursor-pointer p-1 hover:opacity-50 transition-all, w-14 text-center active:opacity-100 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-600'}
   `
 }
