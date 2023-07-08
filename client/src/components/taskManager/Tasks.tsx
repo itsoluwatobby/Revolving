@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data'
 import { reduceLength } from '../../utils/navigator'
 import { format } from 'timeago.js'
@@ -17,17 +17,22 @@ type TaskProps = {
   setViewSingle: React.Dispatch<React.SetStateAction<ChatOption>>
 }
 
-function buttonClass(theme: Theme, type: ButtonType){
-  return `
-  rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-900'}
-  `
-}
+// function buttonClass(theme: Theme, type: ButtonType){
+//   return `
+//   rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-900'}
+//   `
+// }
 
 export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const {setLoginPrompt} = useThemeContext() as ThemeContextType
   const [updateTask, {isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate}] = useUpdateTaskMutation();
   const dispatch = useDispatch()
+  const buttonClass = useCallback((theme: Theme, type: ButtonType) => {
+    return `
+    rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-800' : 'bg-slate-900'}
+    `
+  }, [])
 
   const handleChecked = async() => {
     task = {...task, completed: !task?.completed}

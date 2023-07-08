@@ -3,18 +3,18 @@ import { PostType, Theme, ThemeContextType } from '../../posts'
 import { ErrorResponse, HoverType, PositionType } from '../../data'
 import { toast } from 'react-hot-toast'
 import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from '../../app/api/usersApiSlice'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 type FollowUnFollowProps = {
   story: PostType,
   position: PositionType
 }
 
-function buttonClass(isMutating: boolean, theme?: Theme, position?: PositionType){
-  return `
-  rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
-  `
-}
+// function buttonClass(isMutating: boolean, theme?: Theme, position?: PositionType){
+//   return `
+//   rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
+//   `
+// }
 
 export default function FollowUnFollow({ story, position }: FollowUnFollowProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
@@ -24,6 +24,11 @@ export default function FollowUnFollow({ story, position }: FollowUnFollowProps)
     error: followError,  isError: isFollowError, 
     isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
+  const buttonClass = useCallback((isMutating: boolean, theme?: Theme, position?: PositionType) => {
+    return `
+    rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
+    `
+  }, [])
 
   const followOrUnfollow = async() => {
     try{

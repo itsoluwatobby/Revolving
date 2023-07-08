@@ -14,7 +14,7 @@ export const NAVIGATE: Record<ComponentKey, Components> = {
 type Option = 'letter' | 'word'
 
 export const reduceLength = (content: string, maxLength: number, option: Option = 'letter'): string => {
-  let responseOutput;
+  let responseOutput: string;
   if(option == 'letter'){
     responseOutput = content?.length > maxLength ? content?.substring(0, maxLength) +'...' : content
   }

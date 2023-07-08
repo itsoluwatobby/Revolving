@@ -44,21 +44,12 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
     return () => {
       isMounted  = false
     }
-  }, [getCommentEdit, setWriteReply, openReply])
+  }, [getCommentEdit?.author, getCommentEdit?.comment, setWriteReply, openReply])
 
   const closeInput = () => {
     !writeReply ? setOpenReply({type: 'nil', assert: false}) : setKeepPrompt('Show');
     if(responseRef.current) responseRef?.current.focus()
   }
-
-  // useEffect(() => {
-  //   let isMounted = true
-  //   const username = '@'+getResponseEdit.author+' '
-  //   isMounted ? setWriteReply(username) : null
-  //   return () => {
-  //     isMounted = false
-  //   }
-  // }, [getResponseEdit, setWriteReply])
 
   const updateEditComment = async() => {
     if(!writeReply.length) return

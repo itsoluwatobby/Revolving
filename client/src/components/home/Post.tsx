@@ -5,6 +5,7 @@ import { TextRules } from '../../fonts';
 import PostImage from './post/PostImages';
 import PostTop from './post/PostTop';
 import PostBase from './post/PostBase';
+import { reduceLength } from '../../utils/navigator';
 
 type Props = {
   story: PostType
@@ -19,14 +20,10 @@ export const Post = ({ story }: Props) => {
 
   const currentUserId = localStorage.getItem('revolving_userId') as string
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
-  const tooLong = (): string => {
-    const wordLength = story?.body?.split(' ').length
-    const words = wordLength >= 100 ? story?.body?.substring(0, 280)+'...' : story?.body
-    return words
-  }
+  const adjustedStory = reduceLength(story?.body, 120, 'word')
 
   const watchWords = TextRules.keywords as string[]
-  const bodyContent = story && story?.body ? tooLong().split(' ').map((word, index) => {
+  const bodyContent = story && story?.body ? adjustedStory.split(' ').map((word, index) => {
     return (
       <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'bg-gray-600 rounded-sm text-red-600' : ''}`}>{word}{' '}</span>
     )

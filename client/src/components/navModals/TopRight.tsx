@@ -1,7 +1,7 @@
 import { BsMoonStars } from "react-icons/bs"
 import { FiSun } from "react-icons/fi"
 import { useThemeContext } from "../../hooks/useThemeContext"
-import { PostContextType, PostType, ThemeContextType } from "../../posts"
+import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { FiEdit } from 'react-icons/fi'
 import { IoIosArrowDown, IoIosMore } from 'react-icons/io'
@@ -13,6 +13,7 @@ import { ErrorResponse } from "../../data"
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
 import { useSelector } from "react-redux"
 import { getStoryData } from "../../features/story/storySlice"
+import { nanoid } from "@reduxjs/toolkit"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -21,9 +22,9 @@ const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:sca
 export default function TopRight() {
   const [updateStory, {error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, setRollout, changeTheme, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, setRollout, changeTheme, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost } = usePostContext() as PostContextType
+  const { canPost, inputValue, codeStore, setCodeStore } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData) 
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
@@ -91,6 +92,22 @@ export default function TopRight() {
     return
   }
 
+  const pushIntoStore = () => {
+    const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
+    const isPresent = getStore.find(code => code?.langType === inputValue.langType && code.code == inputValue.code)
+    if(!isPresent){
+      const codeId = nanoid(8)
+      const newEntry = {...inputValue, codeId} as CodeStoreType
+      const newCodeArray = [...getStore, newEntry]
+      setCodeStore(prev => ([...prev, newEntry]))
+      localStorage.setItem('revolving-codeStore', JSON.stringify(newCodeArray))
+    }
+    else{
+      console.log('present') 
+      return
+    }
+  }
+
   return (
     <>
       {
@@ -103,18 +120,29 @@ export default function TopRight() {
         }
           {address.includes(pathname) ? 
             (
-              pathname == '/new_story' ?
-              <button
-                className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
-                onClick={createNewStory}
-                disabled = {!canPost}
-                >Publish
-              </button>
+              pathname == '/new_story' ? (
+                codeEditor ? (
+                  <button
+                    title='Push to store'
+                    className={`text-[13px] rounded-lg pb-0.5 pt-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-2.5 pr-2.5 bg-green-400 hover:text-gray-500  hover:scale-[1.02]`}
+                    onClick={pushIntoStore}
+                    // disabled = {!canPost}
+                    >Push
+                  </button>
+                ) : (
+                  <button
+                    className={`text-[13px] rounded-lg p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    onClick={createNewStory}
+                    disabled = {!canPost}
+                    >Publish
+                  </button>
+                )
+              )
               :
               (
                 pathname != `/story/${storyId}` &&
                   <button
-                    className={`text-[13px] rounded-2xl p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    className={`text-[13px] rounded-lg p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
                       onClick={updatedPost}
                       disabled = {!canPost}
                     >Republish

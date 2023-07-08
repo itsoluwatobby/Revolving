@@ -30,7 +30,11 @@ type PostType = {
 // interface WindowScrollType{
 //   Xscroll: number, Yscroll: number
 // }
-
+type CodeStoreType = {
+  codeId?: string,
+  langType: string,
+  code: string
+}
 
 type PostContextType = {
   search: string,
@@ -39,8 +43,12 @@ type PostContextType = {
   typingEvent: boolean,
   canPost: boolean,
   navPosts: PostType[],
+  inputValue: CodeStoreType,
+  codeStore: CodeStoreType[],
   uploadToCloudinary: (image: File) => Promise<void>,
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
+  setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
+  setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
   setSearch: React.Dispatch<React.SetStateAction<string>>,
   setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
@@ -67,6 +75,7 @@ type ThemeContextType = {
   fontFamily: FontStyle,
   fontOption: boolean,
   rollout: boolean,
+  codeEditor: boolean,
   openComment: CommentOptionProp,
   parseId: string,
   enlarge: EnlargeCompo,
@@ -84,6 +93,7 @@ type ThemeContextType = {
   setNotIntersecting: React.Dispatch<React.SetStateAction<ChatOption>>
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
-  setRollout: React.Dispatch<React.SetStateAction<boolean>>
+  setRollout: React.Dispatch<React.SetStateAction<boolean>>,
+  setCodeEditor: React.Dispatch<React.SetStateAction<boolean>>
 }
 

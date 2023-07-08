@@ -26,3 +26,5 @@ export const Home = () => {
   )
 }
 // min-w-[80%]
+
+// TODO: CREATE A CARD TO PREVIEW USER DETAILS

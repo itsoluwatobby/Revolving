@@ -44,7 +44,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     return () => {
       isMounted  = false
     }
-  }, [getResponseEdit, setWriteReply, openReply])
+  }, [getResponseEdit?.author, getResponseEdit?.response, setWriteReply, openReply])
 
   const closeInput = () => {
     !writeReply ? setOpenReply({type: 'nil', assert: false}) : setKeepPrompt('Show');

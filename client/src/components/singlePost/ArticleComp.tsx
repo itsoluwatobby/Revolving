@@ -62,12 +62,12 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
             {bodyContent}
         </p>
       <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 
-        <div className={`flex flex-wrap items-center justify-between w-full text-gray-300`}>
+        <div className={`flex flex-wrap items-center justify-between w-full text-gray-300 text-xs`}>
           <p>{averageReadingTime} read</p>
                <LikeStory 
                 story={story}
                />
-          {story?.edited && <p className='text-center'>edited {format(story?.updatedAt)}</p>}
+          {story?.edited && <p className='text-center text-xs'>edited {format(story?.updatedAt)}</p>}
         </div>
       </div>
     </>
