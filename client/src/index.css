@@ -23,7 +23,7 @@ textarea::-webkit-scrollbar{
 }
 
 .code_page{
-  height: calc(100vh - 190px);
+  height: calc(100vh - 340px);
 }
 
 .comment_page{
@@ -33,7 +33,6 @@ textarea::-webkit-scrollbar{
 .welcome{
   height: calc(100vh - 64px);
 }
-
 
 .sidebars::-webkit-scrollbar{
   width: 1px;

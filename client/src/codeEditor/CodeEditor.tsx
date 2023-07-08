@@ -1,11 +1,12 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { useThemeContext } from "../hooks/useThemeContext";
-import { ThemeContextType } from "../posts";
+import { PostContextType, ThemeContextType } from "../posts";
 import { BiCodeAlt } from 'react-icons/bi'
 import { TextRules, sensitiveWords } from "../fonts";
 import RevolvingEditor from 'react-monaco-editor';
 import { useDispatch } from "react-redux";
 import { setPresentLanguage } from "../features/story/codeSlice";
+import { usePostContext } from "../hooks/usePostContext";
 
 type CodeType = {
   name: string,
@@ -44,44 +45,53 @@ export default function CodeBlock() {
   const [filename, setFilename] = useState<{name?:string,value?:string}>({
     name: localStorage.getItem('revolving-languageName') || 'python', value: 'print(\'Welcome to python\')'
   });
-  const [value, setValue] = useState<string>('');
+  const { inputValue, codeStore, setInputValue } = usePostContext() as PostContextType
   const dispatch = useDispatch()
   
-  const handleChange = (newValue: string) => setValue(newValue)
-
+  const handleChange = (newValue: string) => setInputValue(prev => ({...prev, code: newValue}))
+console.log(codeStore)
   const editorDidMount = (editor: any, monaco: any) => {
     editor.focus()
   }
 
   useEffect(() => {
+    let isMounted = true
     const getValue = files[filename.name as string].defaultValue
-    if(getValue){
+    if(getValue && isMounted){
       localStorage.setItem(`revolving-${filename.name}`, getValue)
+      console.log(getValue)
+      setInputValue(prev => ({...prev, code: getValue}))
     }
     else return
-  }, [value, filename])
+
+    return () => {
+      isMounted = false
+    }
+  }, [filename.name, setInputValue])
 
   const options = {
     selectOnLineNumbers: true
   };
 
+  // Get code value with the correct lang type
   useEffect(() => {
     const codeName = `revolving-${filename.name}`
     const isPresent = Boolean(localStorage.getItem(codeName))
     if(codeName.split('-')[1] === filename.name && isPresent){
-      setValue(localStorage.getItem(codeName) as string)
+      setInputValue(prev => ({...prev, code: localStorage.getItem(codeName) as string}))
     }
     else{
-      setValue(files[filename.name as keyof FileType].defaultValue)
+      setInputValue(prev => ({...prev, langType: files[filename.name as keyof FileType].defaultValue}))
     }
     localStorage.setItem('revolving-languageName', filename.name as string)
+    setInputValue(prev => ({...prev, langType: filename.name as string}))
     dispatch(setPresentLanguage(filename.name as string))
-  }, [filename.name, dispatch])
+  }, [filename.name, dispatch, setInputValue])
 
   return (
     <section className="code_page w-full sm:w-3/5 sm:m-auto sm:mt-0 sm:mb-0 flex flex-col gap-2">
 
-      <div className="flex items-center w-full shadow-lg justify-evenly border p-0.5 gap-0.5 mb-0 rounded-lg">
+      <div className="flex items-center text-sm w-full shadow-lg justify-evenly border p-0.5 gap-0.5 mb-0 rounded-lg">
         {
           language.map(name => (
             <p 
@@ -93,11 +103,11 @@ export default function CodeBlock() {
         }
       </div>
        <RevolvingEditor 
-        height='80%'
+        height='88%'
         width='100%'
         theme='vs-dark'
         language={filename.name}
-        value={value}
+        value={inputValue.code}
         options={options}
         onChange={handleChange}
         editorDidMount={editorDidMount}

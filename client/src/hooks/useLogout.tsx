@@ -50,6 +50,7 @@ function clearStorage(userId: string, languages: string[]){
   languages.map(language => {
     localStorage.removeItem(`revolving-${language}`)
   })
+  // localStorage.removeItem('revolving-codeStore')
 
   localStorage.removeItem(`editTitle?id=${userId}`)
   localStorage.removeItem(`editBody?id=${userId}`)

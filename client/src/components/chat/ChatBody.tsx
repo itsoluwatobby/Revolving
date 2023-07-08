@@ -32,7 +32,7 @@ export default function ChatBody() {
     return () => {
       isMounted = false
     }
-  }, [customMessage])
+  }, [customMessage?.message])
 
   useEffect(() => {
     let isMounted = true

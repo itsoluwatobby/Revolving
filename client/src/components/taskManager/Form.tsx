@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState  } from "react"
+import { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState  } from "react"
 import { FaHourglassEnd } from "react-icons/fa"
 import { IoIosSend, IoMdAdd } from "react-icons/io"
 import { ChatOption, Theme, ThemeContextType } from "../../posts"
@@ -32,6 +32,11 @@ export default function Form({ currentUserId }: FormProps) {
     value: '', isTyping: 'notTyping'
   });
   const [stoppedTyping, setStoppedTyping] = useState<boolean>(false)
+  const getTaskButtonClass = useCallback((theme: Theme) => {
+    return `
+      rounded-md cursor-pointer p-1 hover:opacity-50 transition-all, w-14 text-center active:opacity-100 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-600'}
+    `
+  }, [])
 
   const handleTaskEntry = (event: ChangeEvent<HTMLInputElement>) => setTaskInput(event.target.value);
 
@@ -42,7 +47,7 @@ export default function Form({ currentUserId }: FormProps) {
       setTaskRequest('Open')
       setPrompt('Hide')
     }
-  }, [option, task])
+  }, [option, task?.task])
 
   // DEBOUNCED INPUT
   useEffect(() => {
@@ -204,18 +209,18 @@ export default function Form({ currentUserId }: FormProps) {
         <p className="flex items-center gap-1">
           <span 
             onClick={() => setPrompt('Idle')}
-            className={taskButton(theme)}>Continue</span>
+            className={getTaskButtonClass(theme)}>Continue</span>
           <span 
             onClick={closePrompt}
-            className={taskButton(theme)}>Exit</span>
-        </p>
+            className={getTaskButtonClass(theme)}>Exit</span>
+        </p> 
       </div>
     </div>
   )
 }
 
-function taskButton(theme: Theme){
-  return `
-    rounded-md cursor-pointer p-1 hover:opacity-50 transition-all, w-14 text-center active:opacity-100 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-600'}
-  `
-}
+// function taskButton(theme: Theme){
+//   return `
+//     rounded-md cursor-pointer p-1 hover:opacity-50 transition-all, w-14 text-center active:opacity-100 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-600'}
+//   `
+// }

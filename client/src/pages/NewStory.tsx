@@ -11,10 +11,11 @@ import CodeBlock from '../codeEditor/CodeEditor';
 import { useGetStoryQuery } from '../app/api/storyApiSlice';
 import { useDispatch } from 'react-redux';
 import { setStoryData } from '../features/story/storySlice';
+import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
 
 export const NewStory = () => {
   const { storyId } = useParams()
-  const { fontFamily } = useThemeContext() as ThemeContextType;
+  const { fontFamily, codeEditor, setCodeEditor } = useThemeContext() as ThemeContextType;
   const { setTypingEvent, setCanPost } = usePostContext() as PostContextType;
   const { data: target } = useGetStoryQuery(storyId as string)
   const { theme } = useThemeContext() as ThemeContextType;
@@ -23,7 +24,6 @@ export const NewStory = () => {
   const [textareaValue, setTextareaValue] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null)
   const [targetStory, setTargetStory] = useState<PostType>()
-  const [codeEditor, setCodeEditor] = useState<boolean>(false);
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
@@ -64,7 +64,7 @@ export const NewStory = () => {
     setInputValue(savedTitle || '')
     setTextareaValue(savedBody || '')
     setTypingEvent(debounceValue?.typing )
-  }, [setTypingEvent, debounceValue.typing, targetStory, currentUserId, storyId, pathname])
+  }, [setTypingEvent, debounceValue.typing, targetStory?.title, targetStory?.body, currentUserId, storyId, pathname])
 
   useEffect(() => {
     if(inputRef.current) inputRef.current.focus()
@@ -109,7 +109,7 @@ export const NewStory = () => {
   } 
 
   return (
-    <section className={`${fontFamily} p-3 h-full flex flex-col gap-2 sm:items-center mt-2`}>
+    <section className={`${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
       {
         codeEditor ? <CodeBlock /> 
         : (
@@ -126,19 +126,19 @@ export const NewStory = () => {
                 name="story" id=""
                 placeholder='Share your story...'
                 value={textareaValue}
-                cols={30} rows={10}
+                cols={30} rows={8}
                 onChange={handleBody}
-                className={`sm:w-3/5 text-xl p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+                className={`sm:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
               />
             </>
           )
         }
       
-      <div className='bg-slate-500 w-1/2 md:w-1/5 p-1.5 rounded-md gap-2 flex items-center'>
+      <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] md:w-1/5'} p-1.5 rounded-md gap-2 flex items-center`}>
         <BiCodeAlt 
           onClick={() => setCodeEditor(prev => !prev)}
-          title='Code Editor' className={`text-3xl cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
-        <div title='Scroll left/right' className={`hidebars flex items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
+          title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
+        <div title='Scroll left/right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
           {
             Object.values(NAVIGATE).map(nav => (
               <p
@@ -151,6 +151,7 @@ export const NewStory = () => {
           }
         </div>
       </div>
+      <CodeSnippets theme={theme} codeEditor={codeEditor} />
     </section>
   )
 }

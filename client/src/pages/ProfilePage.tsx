@@ -13,7 +13,7 @@ export default function ProfilePage() {
 
   const about = 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusamus animi sequi quis aut deserunt recusandae! Molestias assumenda incidunt vel amet magnam repudiandae atque dignissimos, ipsam mollitia quidem sint. Delectus, hic? Quibusdam velit facere odit quidem praesentium quo, quis laboriosam quod numquam tenetur quaerat, sapiente sit. Iste architecto voluptatem minima natus eaque libero recusandae aliquam, inventore, molestias explicabo consequuntur atque delectus!'
 
-  const truncate = about.length > 250 ? about.substring(0, 250)+'...' : about
+  // const truncate = about.length > 250 ? about.substring(0, 250)+'...' : about
 
   // useEffect(() => {
   //   const userLink = async() => {

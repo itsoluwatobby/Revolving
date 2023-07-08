@@ -5,7 +5,7 @@ import { FiMoreVertical } from "react-icons/fi"
 import { Link } from "react-router-dom"
 import { useThemeContext } from "../../../hooks/useThemeContext"
 import { PostType, Theme, ThemeContextType } from "../../../posts"
-import { userOfPost } from "../../../utils/helperFunc"
+import { useCallback } from 'react';
 import { useGetUsersQuery } from "../../../app/api/usersApiSlice"
 import { useDeleteStoryMutation } from "../../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast"
@@ -23,6 +23,9 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   const userId = localStorage.getItem('revolving_userId') as string
   const {data: users} = useGetUsersQuery()
   const [deleteStory, { isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
+  const buttonOptClass = useCallback((theme: Theme) => {
+    return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
+  }, [])
 
   const deleted = async(id: string) => {
     try{
@@ -54,7 +57,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
         </p>
         <span>.</span>
         <p>{format(story?.createdAt)}</p>
-        {userId && (
+        {userId == story?.userId && (
           <FiMoreVertical
             onClick={() => setOpen(prev => !prev)}
             title='Options'
@@ -94,8 +97,8 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   )
 }
 
-function buttonOptClass(theme: Theme){
-  return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
-}
+// function buttonOptClass(theme: Theme){
+//   return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
+// }
 
 

@@ -42,7 +42,7 @@ export default function useRevolvingPostFeed<T>(entry: ObjectUnknown<T>[], post:
       isMounted = false
     }
 
-  }, [post.length])
+  }, [post.length, entry, numLikes])
   
   return filteredFeeds
 }

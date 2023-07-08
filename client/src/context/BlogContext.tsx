@@ -1,14 +1,18 @@
 import { createContext, useEffect, useState } from 'react';
-import { PostType, ChildrenProp, PostContextType } from '../posts';
+import { PostType, ChildrenProp, PostContextType, CodeStoreType } from '../posts';
 
 export const PostContext = createContext<PostContextType | null>(null)
 
+const initState = { langType: '', code: '' }
 export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [search, setSearch] = useState<string>('');
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
   const [canPost, setCanPost] = useState<boolean>(false);
   const [navPosts, setNavPosts] = useState<PostType[]>([])
+
+  const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
+  const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
   const [url, setUrl] = useState<string>()
 
   useEffect(() => {
@@ -45,7 +49,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const value = {
-    filteredStories, url, uploadToCloudinary, search, setSearch, typingEvent, setTypingEvent, canPost, setCanPost, navPosts, setNavPosts
+    filteredStories, url, search, typingEvent, navPosts, canPost, codeStore, inputValue, setInputValue, setCodeStore, uploadToCloudinary, setSearch, setTypingEvent, setCanPost, setNavPosts
   }
 
   return (
