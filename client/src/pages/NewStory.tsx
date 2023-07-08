@@ -2,26 +2,28 @@ import { useLocation, useParams } from 'react-router-dom';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { PostContextType, PostType, ThemeContextType } from '../posts';
+import { ChatOption, PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';
-import { Categories } from '../data';
+import { Categories, OpenSnippet } from '../data';
 import CodeBlock from '../codeEditor/CodeEditor';
 import { useGetStoryQuery } from '../app/api/storyApiSlice';
 import { useDispatch } from 'react-redux';
 import { setStoryData } from '../features/story/storySlice';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
+import { FaRegImages } from 'react-icons/fa';
 
 export const NewStory = () => {
   const { storyId } = useParams()
   const { fontFamily, codeEditor, setCodeEditor } = useThemeContext() as ThemeContextType;
   const { setTypingEvent, setCanPost } = usePostContext() as PostContextType;
   const { data: target } = useGetStoryQuery(storyId as string)
-  const { theme } = useThemeContext() as ThemeContextType;
+  const { theme, isPresent, setIsPresent } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
+  const [snippet, setSnippet] = useState<OpenSnippet>('Nil');
   const inputRef = useRef<HTMLInputElement>(null)
   const [targetStory, setTargetStory] = useState<PostType>()
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
@@ -109,7 +111,7 @@ export const NewStory = () => {
   } 
 
   return (
-    <section className={`${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
+    <section className={`relative ${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
       {
         codeEditor ? <CodeBlock /> 
         : (
@@ -133,25 +135,52 @@ export const NewStory = () => {
             </>
           )
         }
-      
-      <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] md:w-1/5'} p-1.5 rounded-md gap-2 flex items-center`}>
-        <BiCodeAlt 
-          onClick={() => setCodeEditor(prev => !prev)}
-          title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
-        <div title='Scroll left/right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
-          {
-            Object.values(NAVIGATE).map(nav => (
-              <p
-                onClick={() => addCategory(nav)}
-                className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-90 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-800' : ''}`}
-                key={nav}>
-                {nav}
-              </p>
-            ))
-          }
+        <input type="file" hidden id={currentUserId} />
+        <button 
+          title='Add images'
+          role='Add images' 
+          className='absolute right-4 bottom-[47.5%] opacity-30 transition-all active:opacity-30 hover:opacity-50 bg-slate-400 grid place-content-center sm:right-[21%] mobile:bottom-[62%] midmobile:bottom-[52%] w-10 h-10 rounded-md'>
+          <FaRegImages 
+            className={`text-2xl`}
+          />
+        </button>
+      <div className='w-full flex items-center justify-between sm:w-[60%]'>
+
+        <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] sm:w-1/2'} p-1.5 rounded-md gap-2 flex items-center`}>
+          <BiCodeAlt 
+            onClick={() => setCodeEditor(prev => !prev)}
+            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
+          <div title='Scroll left/right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
+            {
+              Object.values(NAVIGATE).map(nav => (
+                <p
+                  onClick={() => addCategory(nav)}
+                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-90 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-800' : ''}`}
+                  key={nav}>
+                  {nav}
+                </p>
+              ))
+            }
+          </div>
         </div>
+
+        <div className={`flex items-center gap-2 p-1 text-sm font-sans bg-slate-500 rounded-md shadow-lg`}>
+          <p 
+            onClick={() => setSnippet('Hide')}
+            className={`${snippet == 'Hide' ? 'bg-slate-800' : ''} rounded-md p-1.5 bg-slate-600 hover:opacity-60 transiton-all cursor-pointer`}>Code snippets</p>
+          <p 
+            onClick={() => setSnippet('Open')}
+            className={`${snippet == 'Open' ? 'bg-slate-800' : ''} rounded-md p-1.5 bg-slate-600 hover:opacity-60 transiton-all cursor-pointer`}>Images</p>
+        </div>
+
       </div>
-      <CodeSnippets theme={theme} codeEditor={codeEditor} />
+
+      <CodeSnippets 
+        theme={theme} 
+        isPresent={isPresent} 
+        codeEditor={codeEditor} 
+        setIsPresent={setIsPresent}
+      />
     </section>
   )
 }

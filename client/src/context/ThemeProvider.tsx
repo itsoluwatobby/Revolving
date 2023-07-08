@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, CommentOptionProp, FontStyle, Theme, ThemeContextType } from '../posts';
+import { ChatOption, ChildrenProp, CommentOptionProp, ConflictType, FontStyle, Theme, ThemeContextType } from '../posts';
 import { EnlargeCompo } from '../data';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
@@ -19,6 +19,8 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
 
   const [parseId, setParseId] = useState<string>('');
   const [codeEditor, setCodeEditor] = useState<boolean>(false);
+  const [isPresent, setIsPresent] = useState<ConflictType>({codeId: '', present: false});
+  
   const [notintersecting, setNotIntersecting] = useState<ChatOption>('Open')
   const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
 
@@ -30,7 +32,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, notintersecting, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenComment,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
+    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenComment,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
   }
   return (
     <ThemeContext.Provider value={ values }>

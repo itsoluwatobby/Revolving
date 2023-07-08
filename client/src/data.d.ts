@@ -36,6 +36,7 @@ type InputTaskProp = {
   isTyping?: TypingEvent
 }
 
+type OpenSnippet = 'Hide' | 'Open' | 'Nil'
 type CreatePrompt = 'Hide' | 'Open' | 'Idle' | 'Nil'
 type TypingEvent = 'typing' | 'notTyping'
 type ButtonType = 'EDIT' | 'DELETE'

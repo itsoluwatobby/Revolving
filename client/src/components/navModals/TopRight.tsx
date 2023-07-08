@@ -22,9 +22,9 @@ const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:sca
 export default function TopRight() {
   const [updateStory, {error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, codeEditor, setRollout, changeTheme, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, setRollout, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, codeStore, setCodeStore } = usePostContext() as PostContextType
+  const { canPost, inputValue, setCodeStore } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData) 
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
@@ -95,16 +95,28 @@ export default function TopRight() {
   const pushIntoStore = () => {
     const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
     const isPresent = getStore.find(code => code?.langType === inputValue.langType && code.code == inputValue.code)
-    if(!isPresent){
+    const edittedCode = getStore.find(code => code?.langType === inputValue.langType && code.code !== inputValue.code && code.codeId == inputValue.codeId)
+    if(!isPresent && edittedCode == null){
       const codeId = nanoid(8)
       const newEntry = {...inputValue, codeId} as CodeStoreType
       const newCodeArray = [...getStore, newEntry]
       setCodeStore(prev => ([...prev, newEntry]))
+      setIsPresent({codeId: '', present: false})
       localStorage.setItem('revolving-codeStore', JSON.stringify(newCodeArray))
+      console.log('not present')
     }
-    else{
-      console.log('present') 
-      return
+    else if(edittedCode){
+      // editted code
+      console.log('editted')
+      const others = getStore.filter(code => code?.codeId !== inputValue.codeId)
+      const edittedCodeArray = [...others, inputValue]
+      setCodeStore([...edittedCodeArray])
+      setIsPresent({codeId: '', present: false})
+      localStorage.setItem('revolving-codeStore', JSON.stringify(edittedCodeArray))
+    }
+    else {
+      console.log('present')
+      setIsPresent({codeId: isPresent?.codeId as string, present: true})
     }
   }
 
