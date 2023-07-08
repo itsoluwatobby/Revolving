@@ -42,14 +42,14 @@ const files: FileType = {
 
 export default function CodeBlock() {
   const { theme } = useThemeContext() as ThemeContextType;
-  const [filename, setFilename] = useState<{name?:string,value?:string}>({
+  const [filename, setFilename] = useState<{name?:string, value?:string}>({
     name: localStorage.getItem('revolving-languageName') || 'python', value: 'print(\'Welcome to python\')'
   });
   const { inputValue, codeStore, setInputValue } = usePostContext() as PostContextType
   const dispatch = useDispatch()
   
   const handleChange = (newValue: string) => setInputValue(prev => ({...prev, code: newValue}))
-console.log(codeStore)
+console.log(inputValue)
   const editorDidMount = (editor: any, monaco: any) => {
     editor.focus()
   }
@@ -87,6 +87,14 @@ console.log(codeStore)
     setInputValue(prev => ({...prev, langType: filename.name as string}))
     dispatch(setPresentLanguage(filename.name as string))
   }, [filename.name, dispatch, setInputValue])
+
+  // useEffect(() => {
+  //   let isMounted = true
+  //   isMounted ? setFilename({name: inputValue?.langType}) : null
+  //   return () => {
+  //     isMounted = false
+  //   }
+  // }, [inputValue.langType])
 
   return (
     <section className="code_page w-full sm:w-3/5 sm:m-auto sm:mt-0 sm:mb-0 flex flex-col gap-2">

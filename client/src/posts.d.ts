@@ -70,12 +70,18 @@ type EnlargeCompo = {
   assert: boolean
 }
 
+type ConflictType = {
+  codeId: string,
+  present: boolean
+}
+
 type ThemeContextType = {
   theme: Theme,
   fontFamily: FontStyle,
   fontOption: boolean,
   rollout: boolean,
   codeEditor: boolean,
+  isPresent: ConflictType,
   openComment: CommentOptionProp,
   parseId: string,
   enlarge: EnlargeCompo,
@@ -94,6 +100,7 @@ type ThemeContextType = {
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
   setCodeEditor: React.Dispatch<React.SetStateAction<boolean>>
 }
 
