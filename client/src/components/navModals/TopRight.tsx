@@ -25,7 +25,7 @@ export default function TopRight() {
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, setCodeStore } = usePostContext() as PostContextType
+  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles, url, setUrl, uploadToCloudinary } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData) 
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
@@ -35,9 +35,14 @@ export default function TopRight() {
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   const createNewStory = async() => {
+    console.log(storyData)
     if(storyData){
+      // await Promise.all(imagesFiles.map(image => {
+      //   uploadToCloudinary(image.image)
+      // }))
       const userId = storyData.userId as string
-      const story = storyData as PostType
+      // const story = {...storyData, picture: [...url as string[]]} as PostType
+      const story = {...storyData} as PostType
       try{
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
@@ -47,7 +52,10 @@ export default function TopRight() {
               duration: 2000, icon: '🔥', 
               style: { background: '#3CB371' }
             }
-          ) 
+          )
+            console.log(url)
+          setImagesFiles([])
+          setUrl([])
           navigate('/')
       }
       catch(err: unknown){
@@ -81,7 +89,6 @@ export default function TopRight() {
       }
       catch(err: unknown){
         const errors = updateError as ErrorResponse
-        console.log(errors)
         errors?.originalStatus == 401 && setLoginPrompt('Open')
         isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
           duration: 2000, icon: '💀', style: {
@@ -105,11 +112,8 @@ export default function TopRight() {
       setCodeStore(prev => ([...prev, newEntry]))
       setIsPresent({codeId: '', present: false})
       localStorage.setItem('revolving-codeStore', JSON.stringify(newCodeArray))
-      console.log('not present')
     }
     else if(edittedCode){
-      // editted code
-      console.log('editted')
       const others = getStore.filter(code => code?.codeId !== inputValue.codeId)
       const edittedCodeArray = [...others, inputValue]
       setCodeStore([...edittedCodeArray])
@@ -119,7 +123,6 @@ export default function TopRight() {
       localStorage.setItem('revolving-codeStore', JSON.stringify(edittedCodeArray))
     }
     else {
-      console.log('present')
       setIsPresent({codeId: isPresent?.codeId as string, present: true})
     }
   }

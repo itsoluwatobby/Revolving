@@ -3,7 +3,7 @@ import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } fro
 
 export const PostContext = createContext<PostContextType | null>(null)
 
-const initState = { langType: '', code: '' }
+const initState = { codeId: '', langType: '', code: '', date: '' }
 export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [search, setSearch] = useState<string>('');
   const [filteredStories, setFilterStories] = useState<PostType[]>([])

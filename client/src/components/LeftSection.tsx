@@ -18,15 +18,15 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
       },
       {
         name: 'Profile Page',
-        link: `profile/${id}`
+        link: `/profile/${id}`
       },
       {
         name: 'Task Manager',
-        link: `taskManager/${id}`
+        link: `/taskManager/${id}`
       },
       {
         name: `About`,
-        link: `about`
+        link: `/about`
       },
     ])
 }
@@ -52,7 +52,6 @@ export const LeftSection = () => {
           routeLinkNames({params: 'Hello', id: currentUserId}).map(values => (
             <p 
               key={values.name}
-              onClick={() => setNav(values.name)}
               className={`p-2.5 ${values.link == pathname ? 'bg-slate-600 shadow-slate-900 shadow-lg' : ''} cursor-pointer hover:bg-slate-600 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
             >
               {

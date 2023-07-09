@@ -1,5 +1,30 @@
 import { ChangeEvent, FormEvent } from "react"
 
+type FontProp = {
+  [index: string] : string
+}
+
+type TextProp = {
+  boldText: string
+  italics: string
+  functions: string
+  highlight: string,
+  inbuilts: string[],
+  dotWords: string[],
+  async: string[],
+  dataTypes: string[],
+  converters: string[],
+  typescript: string[],
+  keywords: string[],
+  codeBlock: {
+    backStrokes: string,
+    quotes: string,
+    singleQuotes: string,
+    operators: string[],
+    comments: string[]
+  }
+}
+
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
 type StoryProps = {
@@ -178,6 +203,25 @@ type AuthType={
   _id: string,
   accessToken: string,
   roles: USERROLES[]
+}
+
+type ApiSliceType = {
+  error?: {
+    originalStatus?: number, 
+    status?: string | number | "PARSING_ERROR", 
+    data?: string
+  }, 
+  data: object, 
+  meta: object
+}
+
+type RefreshTokenType = {
+  data: {
+    data: AuthType
+  }, 
+  status: number | 'FETCH_ERROR' | 'PARSING_ERROR' | 'TIMEOUT_ERROR' | 'CUSTOM_ERROR', 
+  error?: string,
+  originalStatus?: number
 }
 
 type AuthenticationContextType={

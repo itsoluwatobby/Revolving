@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useThemeContext } from "../hooks/useThemeContext";
 import { PostContextType, ThemeContextType } from "../posts";
-import { TextRules, sensitiveWords } from "../fonts";
 import RevolvingEditor from 'react-monaco-editor';
 import { useDispatch } from "react-redux";
 import { setPresentLanguage } from "../features/story/codeSlice";

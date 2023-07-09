@@ -55,7 +55,6 @@ export const NewStory = () => {
           const imageId = nanoid()
           const newImage = { imageId, image: file } as ImageType
           setImagesFiles(prev => ([...prev, newImage]))
-          // await uploadToCloudinary(file)
           setFiles([])
         }
       })
@@ -123,7 +122,6 @@ export const NewStory = () => {
         body: textareaValue,
         category: postCategory,
         userId: currentUserId,
-        picture: [...url as string[]],
         fontFamily
       }
     dispatch(setStoryData(storyData))

@@ -21,6 +21,7 @@ export const createNewStory = (req, res) => {
         let newStory = req.body;
         if (!userId || !(newStory === null || newStory === void 0 ? void 0 : newStory.title) || !(newStory === null || newStory === void 0 ? void 0 : newStory.body))
             return res.sendStatus(400);
+        console.log(userId);
         const user = yield getUserById(userId);
         yield autoDeleteOnExpire(userId);
         newStory = Object.assign(Object.assign({}, newStory), { userId, author: user === null || user === void 0 ? void 0 : user.username });
