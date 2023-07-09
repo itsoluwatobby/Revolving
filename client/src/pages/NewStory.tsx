@@ -8,7 +8,7 @@ import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';
 import { Categories, OpenSnippet } from '../data';
 import CodeBlock from '../codeEditor/CodeEditor';
-import { useGetStoryQuery } from '../app/api/storyApiSlice';
+import { storyApiSlice, useGetStoryQuery } from '../app/api/storyApiSlice';
 import { useDispatch } from 'react-redux';
 import { setStoryData } from '../features/story/storySlice';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
@@ -16,12 +16,11 @@ import { FaRegImages } from 'react-icons/fa';
 import { nanoid } from '@reduxjs/toolkit';
 
 export const NewStory = () => {
-  const MAX_SIZE = 2_535_000 as const // 2mb 
+  const MAX_SIZE = 1_535_000 as const // 2mb 
   const { storyId } = useParams()
-  const { fontFamily, codeEditor, setCodeEditor } = useThemeContext() as ThemeContextType;
-  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, url, uploadToCloudinary } = usePostContext() as PostContextType;
+  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, url } = usePostContext() as PostContextType;
   const { data: target } = useGetStoryQuery(storyId as string)
-  const { theme, isPresent, success, setIsPresent, setSuccess } = useThemeContext() as ThemeContextType;
+  const { theme, isPresent, success, fontFamily, codeEditor, setCodeEditor, setIsPresent, setSuccess } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
@@ -49,7 +48,7 @@ export const NewStory = () => {
       files.slice(0, 3).map(async(file) => {
         if(file.size > MAX_SIZE){
           setFiles([])
-          return alert('MAX ALLOWED FILE SIZE IS 2.53MB')
+          return alert('MAX ALLOWED FILE SIZE IS 1.53MB')
         }
         else{
           const imageId = nanoid()
@@ -64,7 +63,7 @@ export const NewStory = () => {
     return () => {
       isMounted = false
     }
-  }, [files, uploadToCloudinary, setImagesFiles])
+  }, [files, setImagesFiles])
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -98,7 +97,7 @@ export const NewStory = () => {
 
     setInputValue(savedTitle || '')
     setTextareaValue(savedBody || '')
-    setTypingEvent(debounceValue?.typing )
+    setTypingEvent(debounceValue?.typing)
   }, [setTypingEvent, debounceValue.typing, targetStory?.title, targetStory?.body, currentUserId, storyId, pathname])
 
   useEffect(() => {
@@ -110,7 +109,7 @@ export const NewStory = () => {
   }, [targetStory])
 
   useEffect(() => {
-    if(!debounceValue?.typing){
+    if(debounceValue?.typing == 'notTyping'){
       const storyData = targetStory ? {
         ...targetStory,
         title: inputValue,

@@ -82,7 +82,6 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
     }),
-
   })
 })
 

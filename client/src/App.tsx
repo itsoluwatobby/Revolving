@@ -18,6 +18,9 @@ import { BsChatTextFill } from 'react-icons/bs'
 import ChatModal from "./pages/chatAdmin/ChatModal";
 import PrompLogin from "./components/modals/PrompLogin";
 import TaskManager from "./pages/TaskManager";
+import ExpensePlanner from "./pages/ExpensePlanner";
+import AdminPage from "./pages/AdminPage";
+import ResumeBuilder from "./pages/ResumeBuilder";
 
  
 export const App = () => {
@@ -45,6 +48,9 @@ export const App = () => {
             <Route path="edit_story/:storyId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="taskManager/:userId" element={<TaskManager />} />
+            <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
+            <Route path="resumeBuilder/:userId" element={<ResumeBuilder />} />
+            <Route path="adminPage/:userId" element={<AdminPage />} />
             
           </Route>
           

@@ -15,6 +15,7 @@ import { useSelector } from "react-redux"
 import { getStoryData } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
 import { sub } from "date-fns"
+import { it } from "date-fns/locale"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -25,7 +26,7 @@ export default function TopRight() {
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles, url, setUrl, uploadToCloudinary } = usePostContext() as PostContextType
+  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles, url, setUrl, uploadToServer } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData) 
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
@@ -37,12 +38,13 @@ export default function TopRight() {
   const createNewStory = async() => {
     console.log(storyData)
     if(storyData){
-      // await Promise.all(imagesFiles.map(image => {
-      //   uploadToCloudinary(image.image)
-      // }))
+      if(imagesFiles.length >= 1){
+        await Promise.all(imagesFiles.map(image => {
+          uploadToServer(image.image)
+        }))
+      }
       const userId = storyData.userId as string
-      // const story = {...storyData, picture: [...url as string[]]} as PostType
-      const story = {...storyData} as PostType
+      const story = {...storyData, picture: [...url as string[]]} as PostType
       try{
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
@@ -170,7 +172,7 @@ export default function TopRight() {
             )
           :
             <Link to={'/new_story'} >
-              <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-700 duration-200 ease-linear font-normal ml-2'>
+              <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
                 <FiEdit className='text-xl' />
                 <span className=''>Post</span>
               </div>

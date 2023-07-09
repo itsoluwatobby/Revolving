@@ -1,5 +1,5 @@
 import { toast } from "react-hot-toast"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useThemeContext } from "./useThemeContext"
 import { ThemeContextType } from "../posts"
 import { useSignOutMutation } from "../app/api/authApiSlice"
@@ -14,12 +14,13 @@ export default function useLogout() {
   const currentUserId = localStorage.getItem('revolving_userId')
   const [signedOut] = useSignOutMutation()
   const languages = useSelector(getLanguages)
+  const { pathname } = useLocation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const signOut = async(option: SignOutType = 'use') => {
     try{
-      await signedOut(currentUserId as string)
+      if(currentUserId) await signedOut(currentUserId as string)
       dispatch(signUserOut())
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
@@ -28,7 +29,7 @@ export default function useLogout() {
       })
       setRollout(false)
       clearStorage(currentUserId as string, languages)
-      option == 'use' ? navigate('/signIn', { replace: true }) : null
+      option == 'use' ? navigate('/signIn', { state: pathname }) : null
     }catch(err){
       // const errors = error as ErrorResponse
       toast.success('Success!! You logged out', {
@@ -37,7 +38,7 @@ export default function useLogout() {
         }
       })
       clearStorage(currentUserId as string, languages)
-      option == 'use' ? navigate('/signIn', { replace: true }) : null
+      option == 'use' ? navigate('/signIn', { state: pathname }) : null
     }
   }
 

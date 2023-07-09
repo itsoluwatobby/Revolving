@@ -37,8 +37,12 @@ import commentRouter from './routes/commentRoutes.js';
 import { getResponse, getResponseByComment } from './controller/responseController.js';
 import responseRouter from './routes/responseRoutes.js';
 import taskManagerRouter from './routes/taskManagerRoutes.js';
+
 import { eventLogger } from './middleware/logger.js';
 import { getTask, getTasksInBin, getUserTask } from './controller/taskManagerController.js';
+import { upload } from './middleware/imageUpload.js';
+import imageRouter from './routes/imageRoute.js';
+import { getImage } from './controller/imageController.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 
@@ -125,17 +129,23 @@ else{
   app.get('/revolving/task/:taskId', getTask)
   app.get('/revolving/task/bin/:userId', getTasksInBin)
 
+  // get image
+  app.get('/revolving/images/:imageName', getImage)
+  
   // checks for accesstoken
   app.use(verifyAccessToken);
-
+  
   // story router
   app.use('/revolving/story', storyRouter);
   
   // user router
   app.use('/revolving/users', userRouter);
-
+  
   // comment router
   app.use('/revolving/comments', commentRouter);
+  
+  // image upload
+  app.use('/revolving/images', imageRouter)
   
   // response router
   app.use('/revolving/responses', responseRouter);

@@ -43,24 +43,26 @@ type CodeStoreType = {
   date: string
 }
 
+type TypingEvent = 'typing' | 'notTyping'
+
 type PostContextType = {
   search: string,
   url?: string[],
   filteredStories: PostType[],
-  typingEvent: boolean,
+  typingEvent: TypingEvent,
   canPost: boolean,
   navPosts: PostType[],
   inputValue: CodeStoreType,
   imagesFiles: ImageType[]
   codeStore: CodeStoreType[],
-  uploadToCloudinary: (image: File) => Promise<void>,
+  uploadToServer: (image: File) => Promise<void>,
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
   setSearch: React.Dispatch<React.SetStateAction<string>>,
   setUrl: React.Dispatch<React.SetStateAction<string[]>>,
-  setTypingEvent: React.Dispatch<React.SetStateAction<boolean>>
+  setTypingEvent: React.Dispatch<React.SetStateAction<TypingEvent>>
   setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>
 }
 

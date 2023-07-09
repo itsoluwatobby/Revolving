@@ -6,9 +6,10 @@ import { PostContextType, ThemeContextType } from "../../posts";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { useSelector } from "react-redux";
 import { getStoryData } from "../../features/story/storySlice";
+import { TypingEvent } from "../../data";
 
 type TopLeftProp={
-  delayedSaving: boolean
+  delayedSaving: TypingEvent
 }
 
 export default function TopLeft({ delayedSaving }: TopLeftProp) {
@@ -20,7 +21,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { userId } = useParams()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`]
-
+ 
   return (
     <>
       <Link to='/'>
@@ -51,7 +52,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
             : (
                 ((postData?.title || postData?.body) && pathname !== address[2]) && (
                   <div className='flex gap-2 mobile:ml-2'>
-                    <p>{delayedSaving ? 'saving...' : 'saved'}</p>
+                    <p>{delayedSaving == 'typing' ? 'saving...' : 'saved'}</p>
                     <p className='text-gray-500'>Draft</p>
                   </div>
                 )

@@ -11,6 +11,7 @@ import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
 import { useSelector } from 'react-redux';
 import { getTabCategory } from '../features/story/navigationSlice.js';
 import MidModal from './navModals/MidModal.js';
+import { TypingEvent } from '../data.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
@@ -21,12 +22,12 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 export const Navbar = () => {
   const { pathname } = useLocation();
   const getNavigation = useSelector(getTabCategory)
-  const {typingEvent} = usePostContext() as PostContextType
+  const { typingEvent } = usePostContext() as PostContextType
   const {theme, rollout, notintersecting, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { storyId } = useParams()
   const {data} = useGetStoriesByCategoryQuery(getNavigation)
   const [targetStory, setTargetStory] = useState<PostType>()
-  const [delayedSaving, setDelayedSaving] = useState(false)
+  const [delayedSaving, setDelayedSaving] = useState<TypingEvent>('notTyping')
   const [options, setOptions] = useState<string>('')
   const designatedPath =  `/story/${storyId}`
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
@@ -53,7 +54,7 @@ export const Navbar = () => {
   useEffect(() => {
     const responseId = setTimeout(() => {
       setDelayedSaving(typingEvent)
-    }, 1000)
+    }, 1500)
     return () => clearTimeout(responseId)
   }, [typingEvent])
 

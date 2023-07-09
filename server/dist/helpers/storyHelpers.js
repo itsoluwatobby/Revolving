@@ -27,9 +27,7 @@ export const getUserStories = (userId) => __awaiter(void 0, void 0, void 0, func
 export const createUserStory = (story) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { category } = story, rest = __rest(story, ["category"]);
-        console.log(story);
         const newStory = new StoryModel(Object.assign({}, rest));
-        console.log(newStory);
         yield Promise.allSettled(category.map(catVal => {
             newStory.category.push(catVal);
         }));

@@ -4,7 +4,7 @@ import { ApiSliceType, AuthType, RefreshTokenType } from '../../data'
 import { RootState } from '../store'
 import { BaseQueryFn } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
 
-const BASEURL = 'http://localhost:4000/revolving'
+export const BASEURL = 'http://localhost:4000/revolving'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASEURL,
