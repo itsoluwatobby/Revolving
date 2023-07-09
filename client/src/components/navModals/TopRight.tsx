@@ -14,6 +14,7 @@ import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/st
 import { useSelector } from "react-redux"
 import { getStoryData } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
+import { sub } from "date-fns"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -22,7 +23,7 @@ const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:sca
 export default function TopRight() {
   const [updateStory, {error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, codeEditor, setRollout, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
   const { canPost, inputValue, setCodeStore } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData) 
@@ -98,7 +99,8 @@ export default function TopRight() {
     const edittedCode = getStore.find(code => code?.langType === inputValue.langType && code.code !== inputValue.code && code.codeId == inputValue.codeId)
     if(!isPresent && edittedCode == null){
       const codeId = nanoid(8)
-      const newEntry = {...inputValue, codeId} as CodeStoreType
+      const codeDate = sub(new Date(), {minutes: 0}).toString()
+      const newEntry = {...inputValue, codeId, date: codeDate} as CodeStoreType
       const newCodeArray = [...getStore, newEntry]
       setCodeStore(prev => ([...prev, newEntry]))
       setIsPresent({codeId: '', present: false})
@@ -112,6 +114,8 @@ export default function TopRight() {
       const edittedCodeArray = [...others, inputValue]
       setCodeStore([...edittedCodeArray])
       setIsPresent({codeId: '', present: false})
+      setEditing({editing: false, codeId: '', code: '', type: 'NIL'})
+      setSuccess({codeId: edittedCode.codeId as string, res: true})
       localStorage.setItem('revolving-codeStore', JSON.stringify(edittedCodeArray))
     }
     else {
@@ -139,7 +143,7 @@ export default function TopRight() {
                     className={`text-[13px] rounded-lg pb-0.5 pt-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-2.5 pr-2.5 bg-green-400 hover:text-gray-500  hover:scale-[1.02]`}
                     onClick={pushIntoStore}
                     // disabled = {!canPost}
-                    >Push
+                    >{editing.editing ? 'Update' : 'Push'}
                   </button>
                 ) : (
                   <button

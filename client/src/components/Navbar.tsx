@@ -10,10 +10,6 @@ import TopLeft from './navModals/TopLeft.js';
 import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
 import { useSelector } from 'react-redux';
 import { getTabCategory } from '../features/story/navigationSlice.js';
-import { format } from 'timeago.js';
-import { reduceLength } from '../utils/navigator.js';
-import LikeStory from './singlePost/LikeStory.js';
-import FollowUnFollow from './singlePost/FollowUnFollow.js';
 import MidModal from './navModals/MidModal.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']

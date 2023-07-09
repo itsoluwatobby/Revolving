@@ -2,7 +2,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { ChatOption, PostContextType, PostType, ThemeContextType } from '../posts';
+import { ImageType, PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';
@@ -13,17 +13,20 @@ import { useDispatch } from 'react-redux';
 import { setStoryData } from '../features/story/storySlice';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
 import { FaRegImages } from 'react-icons/fa';
+import { nanoid } from '@reduxjs/toolkit';
 
 export const NewStory = () => {
+  const MAX_SIZE = 2_535_000 as const // 2mb 
   const { storyId } = useParams()
   const { fontFamily, codeEditor, setCodeEditor } = useThemeContext() as ThemeContextType;
-  const { setTypingEvent, setCanPost } = usePostContext() as PostContextType;
+  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, url, uploadToCloudinary } = usePostContext() as PostContextType;
   const { data: target } = useGetStoryQuery(storyId as string)
-  const { theme, isPresent, setIsPresent } = useThemeContext() as ThemeContextType;
+  const { theme, isPresent, success, setIsPresent, setSuccess } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
   const [snippet, setSnippet] = useState<OpenSnippet>('Nil');
+  const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null)
   const [targetStory, setTargetStory] = useState<PostType>()
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
@@ -34,6 +37,36 @@ export const NewStory = () => {
 
   const { pathname } = useLocation()
 
+  const handleImages = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = (event.target as HTMLInputElement).files as FileList
+    setFiles([...files])
+  }
+
+  // Check image size
+  useEffect(() => {
+    let isMounted = true
+    const checkSizeAndUpload = () => {
+      files.slice(0, 3).map(async(file) => {
+        if(file.size > MAX_SIZE){
+          setFiles([])
+          return alert('MAX ALLOWED FILE SIZE IS 2.53MB')
+        }
+        else{
+          const imageId = nanoid()
+          const newImage = { imageId, image: file } as ImageType
+          setImagesFiles(prev => ([...prev, newImage]))
+          // await uploadToCloudinary(file)
+          setFiles([])
+        }
+      })
+    }
+    isMounted ? checkSizeAndUpload() : null
+
+    return () => {
+      isMounted = false
+    }
+  }, [files, uploadToCloudinary, setImagesFiles])
+
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setInputValue(value);
@@ -41,6 +74,7 @@ export const NewStory = () => {
       localStorage.setItem(`newTitle?id=${currentUserId}`, value) 
       : localStorage.setItem(`editTitle?id=${currentUserId}`, value)
   }
+
   const handleBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value
     setTextareaValue(value);
@@ -89,6 +123,7 @@ export const NewStory = () => {
         body: textareaValue,
         category: postCategory,
         userId: currentUserId,
+        picture: [...url as string[]],
         fontFamily
       }
     dispatch(setStoryData(storyData))
@@ -97,7 +132,7 @@ export const NewStory = () => {
     return
   }
     setCanPost([inputValue, textareaValue].every(Boolean))
-  }, [setCanPost, currentUserId, dispatch, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
+  }, [setCanPost, currentUserId, dispatch, url, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
   
   const addCategory = (category: Categories) => {
     let categories: Categories[] = [...postCategory];
@@ -108,7 +143,14 @@ export const NewStory = () => {
       categories = categories.filter(cat => cat !== category)
     }
     setPostCategory([...categories])
-  } 
+  }
+
+  const setClickable = (type: OpenSnippet) => {
+    codeStore.length !== 0 
+      ? setSnippet(type) 
+        : imagesFiles.length !== 0 
+          ? setSnippet(type) : setSnippet('Nil')
+  }
 
   return (
     <section className={`relative ${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
@@ -135,15 +177,27 @@ export const NewStory = () => {
             </>
           )
         }
-        <input type="file" hidden id={currentUserId} />
-        <button 
-          title='Add images'
-          role='Add images' 
-          className='absolute right-4 bottom-[47.5%] opacity-30 transition-all active:opacity-30 hover:opacity-50 bg-slate-400 grid place-content-center sm:right-[21%] mobile:bottom-[62%] midmobile:bottom-[52%] w-10 h-10 rounded-md'>
-          <FaRegImages 
-            className={`text-2xl`}
-          />
-        </button>
+        <input 
+          type="file" 
+          hidden 
+          size={MAX_SIZE}
+          multiple
+          id='image-upload' 
+          accept="image/*.{jpg,jpeg,png}" 
+          onChange={handleImages}
+        />
+        <div>
+          <button 
+            title='Add images'
+            role='Add images' 
+            className={`absolute ${codeEditor ? 'scale-0' : 'scale-100'} right-4 bottom-[47.5%] ${theme === 'light' ? 'opacity-50 hover:opacity-60' : 'opacity-30 hover:opacity-50'} transition-all active:opacity-30 bg-slate-400 grid place-content-center sm:right-[21%] mobile:bottom-[62%] midmobile:bottom-[52%] w-10 h-10 rounded-md xl:right-[20.8%] xl:bottom-[49%]`}>
+            <label htmlFor='image-upload' className='cursor-pointer h-full w-full' >
+              <FaRegImages 
+                className={`text-2xl`}
+              />
+            </label>
+          </button>
+        </div>
       <div className='w-full flex items-center justify-between sm:w-[60%]'>
 
         <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] sm:w-1/2'} p-1.5 rounded-md gap-2 flex items-center`}>
@@ -164,22 +218,26 @@ export const NewStory = () => {
           </div>
         </div>
 
-        <div className={`flex items-center gap-2 p-1 text-sm font-sans bg-slate-500 rounded-md shadow-lg`}>
+        <div className={`${(codeStore.length >= 1 || imagesFiles.length >= 1) ? 'scale-100' : 'scale-0'} flex items-center transition-all ${theme == 'light' ? 'text-white bg-slate-300 ' : 'bg-slate-500'} w-fit gap-2 p-1 text-sm font-sans rounded-md shadow-lg`}>
           <p 
-            onClick={() => setSnippet('Hide')}
-            className={`${snippet == 'Hide' ? 'bg-slate-800' : ''} rounded-md p-1.5 bg-slate-600 hover:opacity-60 transiton-all cursor-pointer`}>Code snippets</p>
+            onClick={() => setClickable('Snippet')}
+            className={`${codeStore.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Snippet' ? 'bg-slate-800' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Code snippets</p>
           <p 
-            onClick={() => setSnippet('Open')}
-            className={`${snippet == 'Open' ? 'bg-slate-800' : ''} rounded-md p-1.5 bg-slate-600 hover:opacity-60 transiton-all cursor-pointer`}>Images</p>
+            onClick={() => setClickable('Image')}
+            className={`${imagesFiles.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Image' ? 'bg-slate-800' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Images</p>
         </div>
 
       </div>
 
       <CodeSnippets 
         theme={theme} 
+        snippet={snippet}
         isPresent={isPresent} 
         codeEditor={codeEditor} 
         setIsPresent={setIsPresent}
+        setSnippet={setSnippet}
+        success={success}
+        setSuccess={setSuccess}
       />
     </section>
   )

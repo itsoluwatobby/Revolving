@@ -36,7 +36,7 @@ type SharedInfo = {
 interface StoryProps extends Document{
   userId: Types.ObjectId
   title: string
-  picture: string
+  picture: string[]
   body: string
   fontFamily: string
   category: Categories[]

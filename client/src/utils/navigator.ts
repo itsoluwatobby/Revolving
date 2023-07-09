@@ -1,4 +1,3 @@
-
 export type ComponentKey = 'GENERAL' | 'ENTERTAINMENT' | 'WEB DEVELOPMENT' | 'REACT' | 'NODE' | 'BASH SCRIPTING'
 export type Components = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
@@ -40,3 +39,4 @@ export const checkCount = <T>(content: T[]): string => {
   
   return count
 }
+

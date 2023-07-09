@@ -29,7 +29,7 @@ export const TextRules: TextProp = {
   italics: '_', // italize words
   functions: '()', // watches out for functions
   highlight: '++',
-  keywords: ['null', 'let', 'undefined', 'typeof', 'error', 'var', 'const ', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'enum', 'constructor', 'Pick', 'instanceof', 'prototype', 'Partial', 'boolean', 'booleans', 'number', 'string', 'function'] as string[], 
+  keywords: ['null', 'let', 'undefined', 'typeof', 'error', 'var', 'const ', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'type', 'interface', 'enum', 'constructor', 'Pick', 'instanceof', 'prototype', 'Partial', 'boolean', 'booleans', 'number', 'string', 'function'] as string[], 
   codeBlock: { // code block rules
     backStrokes: '`',
     quotes: '"' as string,

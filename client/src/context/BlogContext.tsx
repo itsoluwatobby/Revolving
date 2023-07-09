@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from 'react';
-import { PostType, ChildrenProp, PostContextType, CodeStoreType } from '../posts';
+import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
 
 export const PostContext = createContext<PostContextType | null>(null)
 
@@ -8,12 +8,14 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [search, setSearch] = useState<string>('');
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<boolean>(false);
+
+  const [imagesFiles, setImagesFiles] = useState<ImageType[]>([]);
   const [canPost, setCanPost] = useState<boolean>(false);
   const [navPosts, setNavPosts] = useState<PostType[]>([])
 
   const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
-  const [url, setUrl] = useState<string>()
+  const [url, setUrl] = useState<string[]>([])
 
   useEffect(() => {
     let isMounted = true
@@ -45,11 +47,11 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
       body: data
     })
     const returnedData = await res.json() as { data: { url: string } }
-    setUrl(returnedData?.data.url)
+    setUrl(prev => ([...prev, returnedData?.data.url]))
   }
 
   const value = {
-    filteredStories, url, search, typingEvent, navPosts, canPost, codeStore, inputValue, setInputValue, setCodeStore, uploadToCloudinary, setSearch, setTypingEvent, setCanPost, setNavPosts
+    filteredStories, url, search, typingEvent, navPosts, canPost, codeStore, inputValue, imagesFiles, setImagesFiles, setUrl, setInputValue, setCodeStore, uploadToCloudinary, setSearch, setTypingEvent, setCanPost, setNavPosts
   }
 
   return (
