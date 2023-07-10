@@ -121,7 +121,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return responseType({ res, status: 403, message: 'Please check your email to activate your account' });
         }
         const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-        const accessToken = yield signToken({ roles, email }, '30m', process.env.ACCESSTOKEN_STORY_SECRET);
+        const accessToken = yield signToken({ roles, email }, '2h', process.env.ACCESSTOKEN_STORY_SECRET);
         const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
         // create taskBin for user
         if (!Boolean(yield TaskBinModel.exists({ userId: user === null || user === void 0 ? void 0 : user._id }))) {

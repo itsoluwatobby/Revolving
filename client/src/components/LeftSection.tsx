@@ -1,5 +1,4 @@
-import { useState } from "react"
-import { ChatOption, ThemeContextType } from "../posts"
+import { ThemeContextType } from "../posts"
 import { useThemeContext } from "../hooks/useThemeContext"
 import { Link, useLocation } from "react-router-dom"
 import { reduceLength } from "../utils/navigator"
@@ -18,27 +17,42 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
       },
       {
         name: 'Profile Page',
-        link: `profile/${id}`
+        link: `/profile/${id}`
       },
       {
         name: 'Task Manager',
-        link: `taskManager/${id}`
+        link: `/taskManager/${id}`
+      },
+      {
+        name: 'Expense Planner',
+        link: `/expensePlanner/${id}`
+      },
+      {
+        name: 'CV/Resume Builder',
+        link: `/resumeBuilder/${id}`
+      },
+      {
+        name: 'Admin Page',
+        link: `/adminPage/${id}`
       },
       {
         name: `About`,
-        link: `about`
+        link: `/about`
+      },
+      {
+        name: 'Logout',
+        link: `/signout/${id}`
       },
     ])
 }
 
 export const LeftSection = () => {
   const { pathname } = useLocation()
-  const [nav, setNav] = useState<string>('')
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, toggleLeft, setToggleLeft, setLoginPrompt  } = useThemeContext() as ThemeContextType
 
   return (
-    <section className={`welcome w-2/5 sm:w-full flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'} p-0.5 pb-2 rounded-md h-[90%] ${toggleLeft == 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'}  maxscreen:pb-4 transition-full`}>
+    <section className={`welcome w-2/5 sm:w-full flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'} p-0.5 pb-2 rounded-md h-[90%] ${toggleLeft == 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'}  maxscreen:pb-4 transition-all`}>
       <div className="relative w-full h-8 flex items-center">
         <button
           onClick={() => setToggleLeft('Hide')}
@@ -52,11 +66,10 @@ export const LeftSection = () => {
           routeLinkNames({params: 'Hello', id: currentUserId}).map(values => (
             <p 
               key={values.name}
-              onClick={() => setNav(values.name)}
-              className={`p-2.5 ${values.link == pathname ? 'bg-slate-600 shadow-slate-900 shadow-lg' : ''} cursor-pointer hover:bg-slate-600 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
+              className={`p-3 ${values.link == pathname ? 'bg-slate-600 shadow-slate-900 shadow-lg' : ''} cursor-pointer hover:bg-slate-600 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
             >
               {
-                (!currentUserId && (values.name == 'Profile Page' || values.name == 'Task Manager')) ?
+                (!currentUserId && (values.name == 'Profile Page' || values.name == 'Task Manager' || values.name == 'Expense Planner' || values.name == 'CV/Resume Builder' || values.name == 'Admin Page')) ?
                   <p
                     onClick={() => setLoginPrompt('Open')}  
                   >{values.name}</p>

@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
 import ForgotPassword from '../components/modals/ForgotPassword'
 import LoginComponent from '../components/modals/LoginComponent'
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { ThemeContextType } from '../posts';
@@ -19,8 +19,11 @@ export default function Login() {
   const [forgot, setForgot] = useState<boolean>(false)
   const [signIn, { isLoading, isError, error }] = useSignInMutation()
   const { theme } = useThemeContext() as ThemeContextType;
+  const location = useLocation()
+  const pathname: string = location.state ? location?.state : '/'
   const navigate = useNavigate()
 
+  console.log(location)
   const handleEmail = (event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)
   const handlePassword = (event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)
   const handleChecked = (event: ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +49,7 @@ export default function Login() {
             style: { background: '#3CB371' }
         }
       )
-      navigate('/')
+      navigate(pathname, { replace: true })
     }
     catch(err: unknown){
       const errors = error as ErrorResponse

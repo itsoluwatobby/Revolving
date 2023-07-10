@@ -50,11 +50,11 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
     else if(verify == 'Expired Token') {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
       user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
-      return responseType({res, status: 401, message: 'Bad Token'})
+      return responseType({res, status: 403, message: 'Expired Token'})
     }
   }
   const roles = Object.values(user?.roles);
-  const newAccessToken = await signToken({roles, email: user?.email}, '35m', process.env.ACCESSTOKEN_STORY_SECRET);
+  const newAccessToken = await signToken({roles, email: user?.email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
   const newRefreshToken = await signToken({roles, email: user?.email}, '12h', process.env.REFRESHTOKEN_STORY_SECRET);
 
   await user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})

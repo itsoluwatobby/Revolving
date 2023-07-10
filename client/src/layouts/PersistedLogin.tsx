@@ -29,7 +29,7 @@ export const PersistedLogin = () => {
       dispatch(setCredentials({...res?.data}))
       console.log('hitting refresh........')
     }
-    !token ? getNewToken() : null
+    (!token && persistLogin) ? getNewToken() : null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 console.log({token})

@@ -23,7 +23,7 @@ textarea::-webkit-scrollbar{
 }
 
 .code_page{
-  height: calc(100vh - 340px);
+  height: calc(100vh - 370px);
 }
 
 .comment_page{
@@ -142,6 +142,22 @@ body {
 }
 
 .stackflow::-webkit-scrollbar-track{
+  background-color: rgba(2, 220, 247, 0.4);
+  border-radius: 10px;
+  box-shadow: 2px 4px 12px rgba(250,250,250,0.4);
+}
+
+.hideCodeBars::-webkit-scrollbar{
+  width: 1px;
+  height: 1px;
+  background-color: rgb(114, 113, 113);
+}
+
+.hideCodeBars::-webkit-scrollbar-thumb{
+  background-color: rgb(114, 113, 113);
+}
+
+.hideCodeBars::-webkit-scrollbar-track{
   background-color: rgba(2, 220, 247, 0.4);
   border-radius: 10px;
   box-shadow: 2px 4px 12px rgba(250,250,250,0.4);

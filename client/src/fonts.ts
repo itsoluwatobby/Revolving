@@ -1,13 +1,4 @@
-type FontProp = {
-  [index: string] : string
-}
-
-type TextProp = {
-  [index: string]: string | string[] | object
-  codeBlock: {
-    [index: string]: string | string[]
-  }
-}
+import { FontProp, TextProp } from "./data";
 
 export const custom_fonts: FontProp = {
   'open_sans': 'Open sans', 
@@ -25,15 +16,22 @@ export const sensitiveWords: Record<string, string> = {
 };
 
 export const TextRules: TextProp = {
-  boldText: '*' || '**', // text bold
+  boldText: '*', // text bold
   italics: '_', // italize words
   functions: '()', // watches out for functions
   highlight: '++',
-  keywords: ['null', 'let', 'undefined', 'typeof', 'error', 'var', 'const ', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'enum', 'constructor', 'Pick', 'instanceof', 'prototype', 'Partial', 'boolean', 'booleans', 'number', 'string', 'function'] as string[], 
+  inbuilts: ['console'],
+  async: ['try{}'],
+  dotWords: ['.slice()', '.log()', '.then()', '.catch()', '.includes()', '.startsWith()', '.endsWith()', '.split()', '.splice()', '.isArray()', '.sort()', '.map()', '.forEach()', '.reduce()', '.find()', '.filter()', '.trim()', '.every()', '.toString()', '.toFixed()'],
+  dataTypes: ['int', 'String', 'Boolean', 'Object', 'double', 'float', 'list', 'dict'],
+  converters: ['parseInt', 'Number', 'Boolean', 'Array'],
+  typescript: ['Partial', 'Exclude', 'Extract', 'Omit', 'type', 'keyof', 'Record', 'Awaited', 'raise', 'string', 'boolean', 'number', 'object', 'const', 'Pick'],
+  keywords: ['null', 'let', 'undefined', 'typeof', 'error', 'var', 'const', 'if (', 'else if (', 'else', 'while (', 'elif', 'switch (', 'class', 'className', 'type', 'interface', 'enum', 'constructor', 'instanceof', 'prototype', 'Partial', 'boolean', 'booleans', 'function'] as string[], 
   codeBlock: { // code block rules
     backStrokes: '`',
     quotes: '"' as string,
-    operators: ['!', '{', '}', '(', ')', '=', '==', '!=', '<', '>', '[', ']', ':', ';', '+', '-', '/', '?', '^', '*', '%', '$', '`', '&', '||','+=', '-=', '/=', '++', '=>', '--'],
+    singleQuotes: "'" as string,
+    operators: ['!', '{', '}', '(', ')', '=', '==', '!=', '<', '>', '[', ']', ':', ';', '+', '-', '/', '?', '^', '*', '%', '$', '`', '&', '||','+=', '-=', '/=', '++', '>=', '<=', '--'],
     comments: ['//', '/*', '*\\']
   }
  // creates a code-like background

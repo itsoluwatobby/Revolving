@@ -1,10 +1,10 @@
-import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react'
 import { setCredentials, signUserOut } from '../../features/auth/authSlice'
-import { AuthType } from '../../data'
+import { ApiSliceType, AuthType, RefreshTokenType } from '../../data'
 import { RootState } from '../store'
-import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
+import { BaseQueryFn } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
 
-const BASEURL = 'http://localhost:4000/revolving'
+export const BASEURL = 'http://localhost:4000/revolving'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASEURL,
@@ -19,22 +19,24 @@ const baseQuery = fetchBaseQuery({
 })
 
 const baseQueryWithReAuth = async(args: string, api: BaseQueryApi, extraOptions: object) => {
-  let result = await baseQuery(args, api, extraOptions)
-  if (result?.error?.status === 403){
-    const refresh = await baseQuery('/auth/new_access_token', api, extraOptions)
-    if(refresh?.data)
-    api.dispatch(setCredentials({...refresh?.data} as AuthType))
+  let result = await baseQuery(args, api, extraOptions) as ApiSliceType
+
+  if (result?.error?.originalStatus === 403 || result?.error?.status === 'PARSING_ERROR'){
+    const refresh = await baseQuery('/auth/new_access_token', api, extraOptions) as RefreshTokenType
+    if(refresh?.data?.data)
+    api.dispatch(setCredentials({...refresh?.data?.data} as AuthType))
     // retry the request
-    console.log('Refetching token')
-    result = baseQuery(args, api, extraOptions) as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>
+    result = baseQuery(args, api, extraOptions) as ApiSliceType
+    // QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>
   }
-  else
+  else if(result?.error?.originalStatus === 401 || result?.error?.status === 401) {
     api.dispatch(signUserOut())
+  }
   return result;
 }
 
 export const apiSlice = createApi({
-  baseQuery: baseQueryWithReAuth,
+  baseQuery: baseQueryWithReAuth as unknown as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, object, FetchBaseQueryMeta>,
   tagTypes: ['USERS', 'STORY', 'COMMENT', 'RESPONSE', 'TASK', 'TASKBIN'],
   endpoints: builder => ({})
 })

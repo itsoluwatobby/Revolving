@@ -29,6 +29,8 @@ import { getResponse, getResponseByComment } from './controller/responseControll
 import responseRouter from './routes/responseRoutes.js';
 import taskManagerRouter from './routes/taskManagerRoutes.js';
 import { getTask, getTasksInBin, getUserTask } from './controller/taskManagerController.js';
+import imageRouter from './routes/imageRoute.js';
+import { getImage } from './controller/imageController.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
@@ -93,6 +95,8 @@ else {
     app.get('/revolving/task/user/:userId', getUserTask);
     app.get('/revolving/task/:taskId', getTask);
     app.get('/revolving/task/bin/:userId', getTasksInBin);
+    // get image
+    app.get('/revolving/images/:imageName', getImage);
     // checks for accesstoken
     app.use(verifyAccessToken);
     // story router
@@ -101,6 +105,8 @@ else {
     app.use('/revolving/users', userRouter);
     // comment router
     app.use('/revolving/comments', commentRouter);
+    // image upload
+    app.use('/revolving/images', imageRouter);
     // response router
     app.use('/revolving/responses', responseRouter);
     // task manager router

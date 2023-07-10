@@ -14,6 +14,8 @@ import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/st
 import { useSelector } from "react-redux"
 import { getStoryData } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
+import { sub } from "date-fns"
+import { it } from "date-fns/locale"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -22,9 +24,9 @@ const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:sca
 export default function TopRight() {
   const [updateStory, {error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, codeEditor, setRollout, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, setCodeStore } = usePostContext() as PostContextType
+  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles, url, setUrl, uploadToServer } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData) 
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
@@ -34,9 +36,15 @@ export default function TopRight() {
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   const createNewStory = async() => {
+    console.log(storyData)
     if(storyData){
+      if(imagesFiles.length >= 1){
+        await Promise.all(imagesFiles.map(image => {
+          uploadToServer(image.image)
+        }))
+      }
       const userId = storyData.userId as string
-      const story = storyData as PostType
+      const story = {...storyData, picture: [...url as string[]]} as PostType
       try{
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
@@ -46,7 +54,10 @@ export default function TopRight() {
               duration: 2000, icon: '🔥', 
               style: { background: '#3CB371' }
             }
-          ) 
+          )
+            console.log(url)
+          setImagesFiles([])
+          setUrl([])
           navigate('/')
       }
       catch(err: unknown){
@@ -80,7 +91,6 @@ export default function TopRight() {
       }
       catch(err: unknown){
         const errors = updateError as ErrorResponse
-        console.log(errors)
         errors?.originalStatus == 401 && setLoginPrompt('Open')
         isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
           duration: 2000, icon: '💀', style: {
@@ -98,24 +108,23 @@ export default function TopRight() {
     const edittedCode = getStore.find(code => code?.langType === inputValue.langType && code.code !== inputValue.code && code.codeId == inputValue.codeId)
     if(!isPresent && edittedCode == null){
       const codeId = nanoid(8)
-      const newEntry = {...inputValue, codeId} as CodeStoreType
+      const codeDate = sub(new Date(), {minutes: 0}).toString()
+      const newEntry = {...inputValue, codeId, date: codeDate} as CodeStoreType
       const newCodeArray = [...getStore, newEntry]
       setCodeStore(prev => ([...prev, newEntry]))
       setIsPresent({codeId: '', present: false})
       localStorage.setItem('revolving-codeStore', JSON.stringify(newCodeArray))
-      console.log('not present')
     }
     else if(edittedCode){
-      // editted code
-      console.log('editted')
       const others = getStore.filter(code => code?.codeId !== inputValue.codeId)
       const edittedCodeArray = [...others, inputValue]
       setCodeStore([...edittedCodeArray])
       setIsPresent({codeId: '', present: false})
+      setEditing({editing: false, codeId: '', code: '', type: 'NIL'})
+      setSuccess({codeId: edittedCode.codeId as string, res: true})
       localStorage.setItem('revolving-codeStore', JSON.stringify(edittedCodeArray))
     }
     else {
-      console.log('present')
       setIsPresent({codeId: isPresent?.codeId as string, present: true})
     }
   }
@@ -139,7 +148,7 @@ export default function TopRight() {
                     className={`text-[13px] rounded-lg pb-0.5 pt-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-2.5 pr-2.5 bg-green-400 hover:text-gray-500  hover:scale-[1.02]`}
                     onClick={pushIntoStore}
                     // disabled = {!canPost}
-                    >Push
+                    >{editing.editing ? 'Update' : 'Push'}
                   </button>
                 ) : (
                   <button
@@ -163,7 +172,7 @@ export default function TopRight() {
             )
           :
             <Link to={'/new_story'} >
-              <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-700 duration-200 ease-linear font-normal ml-2'>
+              <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
                 <FiEdit className='text-xl' />
                 <span className=''>Post</span>
               </div>

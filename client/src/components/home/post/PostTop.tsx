@@ -51,12 +51,12 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
       <div 
         // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
-        <p className='capitalize cursor-pointer hover:opacity-90 transition-all'>{
+        <p className='capitalize font-sans cursor-pointer hover:opacity-90 transition-all'>{
           reduceLength(story?.author, 10, 'letter') || 'anonymous'
           }
         </p>
         <span>.</span>
-        <p>{format(story?.createdAt)}</p>
+        <p className="font-sans">{format(story?.createdAt)}</p>
         {userId == story?.userId && (
           <FiMoreVertical
             onClick={() => setOpen(prev => !prev)}

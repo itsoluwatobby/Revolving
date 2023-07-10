@@ -1,8 +1,6 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useThemeContext } from "../hooks/useThemeContext";
 import { PostContextType, ThemeContextType } from "../posts";
-import { BiCodeAlt } from 'react-icons/bi'
-import { TextRules, sensitiveWords } from "../fonts";
 import RevolvingEditor from 'react-monaco-editor';
 import { useDispatch } from "react-redux";
 import { setPresentLanguage } from "../features/story/codeSlice";
@@ -41,25 +39,23 @@ const files: FileType = {
 }
 
 export default function CodeBlock() {
-  const { theme } = useThemeContext() as ThemeContextType;
+  const { theme, editing, setEditing } = useThemeContext() as ThemeContextType;
   const [filename, setFilename] = useState<{name?:string, value?:string}>({
     name: localStorage.getItem('revolving-languageName') || 'python', value: 'print(\'Welcome to python\')'
   });
-  const { inputValue, codeStore, setInputValue } = usePostContext() as PostContextType
+  const { inputValue, setInputValue } = usePostContext() as PostContextType
   const dispatch = useDispatch()
   
   const handleChange = (newValue: string) => setInputValue(prev => ({...prev, code: newValue}))
-console.log(inputValue)
   const editorDidMount = (editor: any, monaco: any) => {
     editor.focus()
   }
 
   useEffect(() => {
     let isMounted = true
-    const getValue = files[filename.name as string].defaultValue
+    const getValue = editing.editing ? editing.code : files[filename.name as string].defaultValue
     if(getValue && isMounted){
       localStorage.setItem(`revolving-${filename.name}`, getValue)
-      console.log(getValue)
       setInputValue(prev => ({...prev, code: getValue}))
     }
     else return
@@ -67,7 +63,7 @@ console.log(inputValue)
     return () => {
       isMounted = false
     }
-  }, [filename.name, setInputValue])
+  }, [filename.name, setInputValue, editing?.code, editing.editing, setEditing])
 
   const options = {
     selectOnLineNumbers: true
@@ -88,13 +84,22 @@ console.log(inputValue)
     dispatch(setPresentLanguage(filename.name as string))
   }, [filename.name, dispatch, setInputValue])
 
-  // useEffect(() => {
-  //   let isMounted = true
-  //   isMounted ? setFilename({name: inputValue?.langType}) : null
-  //   return () => {
-  //     isMounted = false
-  //   }
-  // }, [inputValue.langType])
+  useEffect(() => {
+    let isMounted = true
+    if(editing.editing){
+      isMounted ? setFilename({name: inputValue?.langType}) : null
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [inputValue?.langType, editing.editing])
+
+  const toggleLanguage = (name: string) => {
+    setFilename({name: name})
+    if(editing.editing){
+      setEditing({editing: false, codeId: '', code: '', type: 'NIL'})
+    }
+  }
 
   return (
     <section className="code_page w-full sm:w-3/5 sm:m-auto sm:mt-0 sm:mb-0 flex flex-col gap-2">
@@ -103,7 +108,7 @@ console.log(inputValue)
         {
           language.map(name => (
             <p 
-              onClick={() => setFilename({name: name})}
+              onClick={() => toggleLanguage(name)}
               className={`cursor-pointer text-center w-full mobile:text-xs mobile:font-bold border border-t-0 border-b-0 px-6 border-l-0 last:border-r-0 capitalize rounded-lg shadow-2xl font-mono shadow-slate-900 ${theme == 'light' ? 'bg-slate-300' : '' } ${name == filename.name ? 'bg-slate-500' : ''}`}
               key={name}>{name}
             </p>
@@ -123,19 +128,3 @@ console.log(inputValue)
     </section>
   )
 }
-
-{/*
-  <textarea 
-          className='editor' 
-          role='Code Editor' 
-          onChange={handleChange}
-          spellCheck={true}
-          aria-label='Code Editor'
-        />
-        <div 
-          className='editorsss' 
-          role='Code Editor'
-        >
-          {element}
-        </div>
-*/}
