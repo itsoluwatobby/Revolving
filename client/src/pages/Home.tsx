@@ -14,11 +14,11 @@ export const Home = () => {
       <div className={`md:max-w-full flex`}>
         <div 
           onClick={() => setRollout(false)}
-          className="flex-grow flex flex-col h-fit gap-3 md:w-full min-w-[80%]">
+          className="flex-grow flex flex-col h-fit gap-3 md:w-full min-w-[70%] mt-1.5">
           <TopHome />
           <Posts />
         </div>
-        <aside className="mt-4 flex-grow hidden md:flex w-1/3 h-full border border-b-0 border-l-slate-300 border-slate-600">
+        <aside className="mt-4 flex-grow hidden md:flex w-1/3 h-full border border-b-0 border-t-0 shadow-xl shadow-slate-200 border-l-slate-300 border-slate-600">
           <RightSection />
         </aside>
       </div>

@@ -3,7 +3,7 @@ import { createTask, deleteUserTask, emptyBin, getTask, getTasksInBin, getUserTa
 import { verifyRoles } from "../middleware/verifyRoles.js";
 import { ROLES } from "../config/allowedRoles.js";
 
-const taskManagerRouter = Router()
+const taskManagerRouter: Router = Router()
 
 taskManagerRouter.post('/:userId', verifyRoles([ROLES.USER]), createTask)
 taskManagerRouter.put('/:userId', verifyRoles([ROLES.USER]), updateTasks)

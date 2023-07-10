@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { persisted, selectCurrentToken, setCredentials } from '../features/auth/authSlice';
-import { useNewAccessTokenQuery } from '../app/api/authApiSlice';
+import { useNewAccessTokenMutation } from '../app/api/authApiSlice';
 import { AuthType } from '../data';
 import whiteBGloader from '../assets/whiteloader.svg'
 import darkBGloader from '../assets/darkLoader.svg'
@@ -18,31 +18,26 @@ export const PersistedLogin = () => {
   const token = useSelector(selectCurrentToken)
   const persistLogin = useSelector(persisted)
   const dispatch = useDispatch()
-  const {data, isLoading, isError, refetch} = useNewAccessTokenQuery()
+  const [getNewAccessToken, { data, isLoading, isError }] = useNewAccessTokenMutation()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   useEffect(() => {
     const getNewToken = async() => {
-      await refetch()
+      await getNewAccessToken()
       const res = data as unknown as {data: AuthType}
       dispatch(setCredentials({...res?.data}))
-      console.log('hitting refresh........')
     }
     (!token && persistLogin) ? getNewToken() : null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-console.log({token})
-  /*
-    flex-grow rounded-lg mt-4 pb-4 md:block ${toggleLeft == 'Hide' ? 'hidden' : 'maxscreen:fixed block z-50 w-full'} md:flex md:w-1/5 h-full border border-l-slate-500 border-b-0 border-slate-600
-  */
 
   return (
     <main className={`welcome flex items-center`}>
       <aside className={`min-w-[250px] ${address.includes(pathname) ? 'hidden' : 'md:block'} mt-5 h-full ${toggleLeft == 'Hide' ? 'hidden' : 'maxscreen:w-full maxscreen:fixed maxscreen:block maxscreen:z-50 maxscreen:top-14'}`}>
         <LeftSection />
       </aside>
-      <div className='h-full w-full'>
+      <div className='h-full w-full md:w-full '>
         {
           !token ? 
             <Outlet />

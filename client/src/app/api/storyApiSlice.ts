@@ -1,5 +1,5 @@
 import { Categories } from "../../data";
-import { PostType } from "../../posts";
+import { ImageRes, PostType } from "../../posts";
 import { providesTag } from "../../utils/helperFunc";
 import { apiSlice } from "./apiSlice";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
@@ -19,6 +19,25 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         body: {...story}
       }) as any,
       invalidatesTags: [{ type: 'STORY' }],
+    }),
+    
+    uploadImage: builder.mutation<ImageRes, FormData>({
+      query: (imageData) => ({
+        url: `images/upload`,
+        method: 'POST',
+        body: imageData
+      }) as any,
+      transformResponse: (baseQueryReturnValue: {data: ImageRes}) => {
+        return baseQueryReturnValue?.data
+      },
+    }),
+
+    deleteImage: builder.mutation<ImageRes, string>({
+      query: (imageName) => ({
+        url: `images/${imageName}`,
+        method: 'DELETE',
+        body: imageName
+      }) as any,
     }),
 
     updateStory: builder.mutation<PostType, StoryArgs>({
@@ -54,6 +73,13 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         return baseQueryReturnValue?.data
       },
       providesTags: ['STORY']
+    }),
+
+    getStoryCond: builder.mutation<PostType, string>({
+      query: (id) => `story/${id}`,
+      transformResponse: (baseQueryReturnValue: {data: PostType}) => {
+        return baseQueryReturnValue?.data
+      }
     }),
   
     getStoriesByCategory: builder.query<PostType[], Categories>({
@@ -93,7 +119,10 @@ export const {
   useGetStoriesByCategoryQuery,
   useGetStoriesQuery,
   useGetStoryQuery,
-  useGetUserStoriesQuery
+  useGetUserStoriesQuery,
+  useGetStoryCondMutation,
+  useUploadImageMutation,
+  useDeleteImageMutation,
 } = storyApiSlice
 
 // //returns query result object 

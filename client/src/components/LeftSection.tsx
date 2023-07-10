@@ -52,7 +52,7 @@ export const LeftSection = () => {
   const { theme, toggleLeft, setToggleLeft, setLoginPrompt  } = useThemeContext() as ThemeContextType
 
   return (
-    <section className={`welcome w-2/5 sm:w-full flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'} p-0.5 pb-2 rounded-md h-[90%] ${toggleLeft == 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'}  maxscreen:pb-4 transition-all`}>
+    <section className={`welcome md:w-full top-20 mt-1 w-2/5 sm:w-full flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'} p-0.5 pb-2 rounded-md h-[90%] ${toggleLeft == 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'}  maxscreen:pb-4 transition-all`}>
       <div className="relative w-full h-8 flex items-center">
         <button
           onClick={() => setToggleLeft('Hide')}

@@ -10,12 +10,12 @@ import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data"
-import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
-import { useSelector } from "react-redux"
-import { getStoryData } from "../../features/story/storySlice"
+import { useCreateStoryMutation, useUpdateStoryMutation, useUploadImageMutation } from "../../app/api/storyApiSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { getStoryData, getUrl, resetUrl, setUrl } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
 import { sub } from "date-fns"
-import { it } from "date-fns/locale"
+import { delayedPromise } from "../../hooks/useDebounceHook"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -26,25 +26,40 @@ export default function TopRight() {
   const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles, url, setUrl, uploadToServer } = usePostContext() as PostContextType
-  const storyData = useSelector(getStoryData) 
+  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles } = usePostContext() as PostContextType
+  const storyData = useSelector(getStoryData)
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const url = useSelector(getUrl)
   const { storyId } = useParams()
+  const dispatch = useDispatch()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
-
+  console.log(url)
   const createNewStory = async() => {
-    console.log(storyData)
+    if(!storyData.userId) return setLoginPrompt('Open')
     if(storyData){
-      if(imagesFiles.length >= 1){
-        await Promise.all(imagesFiles.map(image => {
-          uploadToServer(image.image)
-        }))
-      }
+      // if(imagesFiles.length >= 1){
+      //   await Promise.all(imagesFiles.map(async(image) => {
+      //     const imageData = new FormData()
+      //     imageData.append('image', image.image)
+      //     await uploadToServer(imageData).unwrap()
+      //     .then((data) => {
+      //       const res = data as unknown as { url: string }
+      //       dispatch(setUrl(res.url))
+      //     }).catch(error => {
+      //       const errors = error as ErrorResponse
+      //       errors?.originalStatus == 401 && setLoginPrompt('Open')
+      //     })
+      //   }))
+      // }
+      // delayedPromise()
+      // console.log(url)
+      // if(!url.length) return
+      const urls = url.map(ur => ur.url)
       const userId = storyData.userId as string
-      const story = {...storyData, picture: [...url as string[]]} as PostType
+      const story = {...storyData, picture: [...urls]} as PostType
       try{
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
@@ -55,9 +70,8 @@ export default function TopRight() {
               style: { background: '#3CB371' }
             }
           )
-            console.log(url)
+          dispatch(resetUrl())
           setImagesFiles([])
-          setUrl([])
           navigate('/')
       }
       catch(err: unknown){

@@ -1,20 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { CommentProps } from "../../data";
-import { PostType } from "../../posts";
-// import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
-
-// const storyAdapter: EntityAdapter<CommentProps> = createEntityAdapter<CommentProps>({
-//   sortComparer: (prev, next) => next.commentDate.localeCompare(prev.commentDate)
-// })
-
-// const initialState = storyAdapter.getInitialState({
-//   commentLength: 0,
-// })
+import { ImageUrlsType, PostType } from "../../posts";
 
 const initialState = {
-  // commentLength: 0,
-  storyData: {} as Partial<PostType> 
+  storyData: {} as Partial<PostType>,
+  url: [] as ImageUrlsType[]
 }
 
 const storySlice = createSlice({
@@ -23,12 +13,19 @@ const storySlice = createSlice({
   reducers: {
     setStoryData: (state, action: PayloadAction<Partial<PostType>>) => {
       state.storyData = action.payload
+    },
+    setUrl: (state, action: PayloadAction<ImageUrlsType>) => {
+      state.url.push(action.payload)
+    },
+    resetUrl: (state) => {
+      state.url = []
     }
   }
 })
 
-export const { setStoryData } = storySlice.actions
+export const { setStoryData, setUrl, resetUrl } = storySlice.actions
 export const getStoryData = (state: RootState) => state.story.storyData
+export const getUrl = (state: RootState) => state.story.url
 
 export default storySlice.reducer
 

@@ -3,7 +3,7 @@ import { verifyRoles } from "../middleware/verifyRoles.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { createNewComment, deleteComment, deleteUserComments, getUserCommentStory, like_Unlike_Comment, updateComment, userComments } from "../controller/commentController.js";
 
-const commentRouter = Router();
+const commentRouter: Router = Router();
 
 commentRouter.post('/:userId/:storyId', verifyRoles([ROLES.USER]), createNewComment)
 commentRouter.get('/user/:userId/:storyId', verifyRoles([ROLES.USER]), getUserCommentStory)

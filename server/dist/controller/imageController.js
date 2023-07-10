@@ -8,19 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { asyncFunc, responseType } from "../helpers/helper.js";
-import { randomUUID } from 'crypto';
+import { v4 as uuidV4 } from 'uuid';
 import fsPromises from 'fs/promises';
 export const uploadImages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const uploadedFile = req.file;
-        const uniqueId = randomUUID();
+        const uniqueId = uuidV4();
         const filename = uploadedFile.originalname;
-        const fileext = filename.split('.')[1];
-        const newName = `${uniqueId}.${fileext}`;
+        const fileext = filename.substring(filename.lastIndexOf('.'));
+        const newName = `${uniqueId}${fileext}`;
         const newPath = `fileUpload/${newName}`;
-        yield fsPromises.rename(uploadedFile.path, newPath);
-        const imageUrl = `${process.env.IMAGELINK}/${newName}`;
-        return responseType({ res, status: 201, message: 'image uploaded', count: 1, data: { url: imageUrl } });
+        yield fsPromises.rename(uploadedFile.path, newPath)
+            .then(() => {
+            const imageUrl = `${process.env.IMAGELINK}/${newName}`;
+            responseType({ res, status: 201, message: 'image uploaded', count: 1, data: { url: imageUrl } });
+        })
+            .catch((err) => {
+            console.log(err.message);
+        });
     }));
 });
 export const getImage = (req, res) => {
@@ -28,6 +33,14 @@ export const getImage = (req, res) => {
         const { imageName } = req.params;
         const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
         res.sendFile(pathname);
+    }));
+};
+export const deleteImage = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { imageName } = req.params;
+        const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
+        yield fsPromises.unlink(pathname);
+        responseType({ res, status: 204, message: 'image deleted' });
     }));
 };
 //# sourceMappingURL=imageController.js.map
