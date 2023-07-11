@@ -1,19 +1,19 @@
 // import { useEffect } from "react";
 // import { axiosPrivate } from "../api/axiosPost";
-// import useAuthenticationContext from "./useAuthenticationContext";
-// import useRefreshToken from "./useRefreshToken";
-// import { AuthenticationContextType } from "../data";
-
+// import { useSelector } from "react-redux";
+// import { selectCurrentToken } from "../features/auth/authSlice";
+// import { useNewAccessTokenMutation } from "../app/api/authApiSlice";
+// import { AuthType } from "../data";
 
 // export default function useAxiosPrivate() {
-//   const { auth } = useAuthenticationContext() as AuthenticationContextType
-//   const getRefreshToken = useRefreshToken()
+//   const token = useSelector(selectCurrentToken)
+//   const [getRefreshToken, { data }] = useNewAccessTokenMutation()
 
 //   useEffect(() => {
 //     const requestInterceptors: number = axiosPrivate.interceptors.request.use(
 //       config => {
 //         if(!config.headers['Authorization']){
-//           config.headers['Authorization'] = `Bearer ${auth?.accessToken}`
+//           config.headers['Authorization'] = `Bearer ${token}`
 //         }
 //         return config
 //       }, (error) => Promise.reject(error)
@@ -25,7 +25,8 @@
 //         const prevRequest = error?.config
 //         if(error?.response?.status == 403 && !prevRequest?.sent){
 //           prevRequest.sent = true;
-//           const newAccessToken = await getRefreshToken();
+//           await getRefreshToken()
+//           const newAccessToken = data as unknown as {data: AuthType}
 //           prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
 //           return axiosPrivate(prevRequest)
 //         }
@@ -37,7 +38,7 @@
 //       axiosPrivate.interceptors.response.eject(requestInterceptors)
 //       axiosPrivate.interceptors.response.eject(responseInterceptors)
 //     }
-//   }, [auth, getRefreshToken])
+//   }, [token, getRefreshToken])
 
 //   return axiosPrivate
 // }

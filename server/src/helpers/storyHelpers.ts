@@ -13,9 +13,7 @@ export const getUserStories = async(userId: string) => await StoryModel.find({ u
 export const createUserStory = async(story: StoryProps) => {
   try{
     const {category, ...rest} = story;
-    console.log(story)
     const newStory = new StoryModel({ ...rest })
-    console.log(newStory)
     await Promise.allSettled(category.map(catVal => {
       newStory.category.push(catVal)
       }

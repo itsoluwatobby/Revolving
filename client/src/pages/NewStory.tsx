@@ -2,36 +2,39 @@ import { useLocation, useParams } from 'react-router-dom';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { usePostContext } from '../hooks/usePostContext';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { ImageType, PostContextType, PostType, ThemeContextType } from '../posts';
+import { ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { BiCodeAlt } from 'react-icons/bi'
 import { Components, NAVIGATE } from '../utils/navigator';
-import { Categories, OpenSnippet } from '../data';
+import { Categories, ErrorResponse, OpenSnippet } from '../data';
 import CodeBlock from '../codeEditor/CodeEditor';
-import { storyApiSlice, useGetStoryQuery } from '../app/api/storyApiSlice';
-import { useDispatch } from 'react-redux';
-import { setStoryData } from '../features/story/storySlice';
+import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUrl, setStoryData, setUrl } from '../features/story/storySlice';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
 import { FaRegImages } from 'react-icons/fa';
 import { nanoid } from '@reduxjs/toolkit';
 
+let uploaded = [] as string[]
 export const NewStory = () => {
   const MAX_SIZE = 1_535_000 as const // 2mb 
   const { storyId } = useParams()
-  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, url } = usePostContext() as PostContextType;
-  const { data: target } = useGetStoryQuery(storyId as string)
-  const { theme, isPresent, success, fontFamily, codeEditor, setCodeEditor, setIsPresent, setSuccess } = useThemeContext() as ThemeContextType;
+  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore } = usePostContext() as PostContextType;
+  const [getStoryCond, { data: target, isLoading, isError }] = useGetStoryCondMutation()
+  const { theme, isPresent, success, fontFamily, codeEditor, setCodeEditor, setIsPresent, setLoginPrompt, setSuccess } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
   const [textareaValue, setTextareaValue] = useState<string>('');
   const [snippet, setSnippet] = useState<OpenSnippet>('Nil');
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null)
+  const [uploadToServer] = useUploadImageMutation()
   const [targetStory, setTargetStory] = useState<PostType>()
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
-    1000) as DebounceProps
+    1000) as DebounceProps;
+  const url = useSelector(getUrl);
   const dispatch = useDispatch();
 
   const { pathname } = useLocation()
@@ -40,6 +43,12 @@ export const NewStory = () => {
     const files = (event.target as HTMLInputElement).files as FileList
     setFiles([...files])
   }
+
+  useEffect(() => {
+    if (storyId) {
+      getStoryCond(storyId);
+    }
+  }, [storyId, getStoryCond])
 
   // Check image size
   useEffect(() => {
@@ -64,6 +73,38 @@ export const NewStory = () => {
       isMounted = false
     }
   }, [files, setImagesFiles])
+
+  // reset uploaded container
+  useEffect(() => {
+    if(uploaded.length && !url.length){
+      uploaded = []
+      console.log('EMPTIED.....')
+    }
+  }, [url])
+
+  useEffect(() => {
+    const uploadImages = async() => {
+      await Promise.all(imagesFiles.map(async(image) => {
+        if(uploaded.includes(image.imageId)) return
+        // else{
+          const imageData = new FormData()
+          imageData.append('image', image.image)
+          await uploadToServer(imageData).unwrap()
+          .then((data) => {
+            const res = data as unknown as { url: string }
+            const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
+            dispatch(setUrl(composed))
+            uploaded.push(image.imageId)
+          }).catch(error => {
+            const errors = error as ErrorResponse
+            errors?.originalStatus == 401 && setLoginPrompt('Open')
+          })
+        //}
+      }))
+      console.log('images added')
+    }
+    imagesFiles.length >= 1 ? uploadImages() : null
+  }, [imagesFiles, dispatch, setLoginPrompt, uploadToServer])
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -129,7 +170,7 @@ export const NewStory = () => {
     return
   }
     setCanPost([inputValue, textareaValue].every(Boolean))
-  }, [setCanPost, currentUserId, dispatch, url, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
+  }, [setCanPost, currentUserId, dispatch, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
   
   const addCategory = (category: Categories) => {
     let categories: Categories[] = [...postCategory];
@@ -161,7 +202,7 @@ export const NewStory = () => {
                 placeholder='Title'
                 value={inputValue}
                 onChange={handleTitle}
-                className={`sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
               />
               <textarea 
                 name="story" id=""
@@ -169,7 +210,7 @@ export const NewStory = () => {
                 value={textareaValue}
                 cols={30} rows={8}
                 onChange={handleBody}
-                className={`sm:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
               />
             </>
           )
@@ -185,13 +226,14 @@ export const NewStory = () => {
         />
         <div>
           <button 
-            title='Add images'
-            role='Add images' 
-            className={`absolute ${codeEditor ? 'scale-0' : 'scale-100'} right-4 bottom-[47.5%] ${theme === 'light' ? 'opacity-50 hover:opacity-60' : 'opacity-30 hover:opacity-50'} transition-all active:opacity-30 bg-slate-400 grid place-content-center sm:right-[21%] mobile:bottom-[62%] midmobile:bottom-[52%] w-10 h-10 rounded-md xl:right-[20.8%] xl:bottom-[49%]`}>
-            <label htmlFor='image-upload' className='cursor-pointer h-full w-full' >
+            title={imagesFiles.length < 4 ? 'Add images' : 'MAX'}
+            role='Add images'
+            className={`absolute ${codeEditor ? 'scale-0' : 'scale-100'} right-4 bottom-[47.5%] ${theme === 'light' ? 'bg-opacity-50 hover:opacity-60' : 'hover:opacity-50'} transition-all active:opacity-30 ${imagesFiles.length < 4 ? 'bg-slate-400 bg-opacity-30' : 'bg-red-500'} grid place-content-center sm:right-[21%] mobile:bottom-[62%] midmobile:bottom-[52%] w-10 h-10 rounded-md xl:right-[20.8%] xl:bottom-[49%]`}>
+            <label htmlFor={imagesFiles.length < 4 ? 'image-upload' : ''} className='relative cursor-pointer h-full w-full' >
               <FaRegImages 
                 className={`text-2xl`}
               />
+            <span className={`absolute ${imagesFiles.length ? 'scale-100' : 'scale-0'} transition-all bottom-0 rounded-full bg-slate-950 text-white font-bold right-0 w-4 grid place-content-center h-4 p-1`}>{imagesFiles.length}</span>
             </label>
           </button>
         </div>

@@ -10,7 +10,7 @@ import {
   shareStory, unShareUserStory 
 } from "../controller/sharedStoryController.js";
 
-const storyRouter = Router();
+const storyRouter: Router = Router();
 
 storyRouter.post('/:userId', verifyRoles([ROLES.USER]), createNewStory)
 storyRouter.get('/user/:userId', verifyRoles([ROLES.USER]), getUserStory)

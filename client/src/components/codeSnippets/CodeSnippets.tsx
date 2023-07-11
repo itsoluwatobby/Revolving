@@ -52,23 +52,27 @@ export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess
 
     return () => clearTimeout(timerId)
   }, [isPresent.present, setIsPresent, success.res, setSuccess])
+  
+// ${(snippet == 'Image' && imagesFiles.length < 3) ? 'bg-slate-900' : (snippet == 'Image' && imagesFiles.length == 3) ? 'bg-red-400 animate-pulse' : 'bg-red-500'}
 
   return (
     <section className={`stackflow ${theme == 'light' ? 'bg-slate-700' : 'bg-slate-900'} ${codeStore?.length >= 1 ? 'scale-100' : 'scale-0'} transition-all self-center ${codeEditor ? '' : 'mt-4'} max-w-[90%] w-fit p-1.5 h-48 shadow-2xl shadow-slate-500 rounded-md overflow-x-scroll flex items-center gap-2`}>
       {
         snippet === 'Snippet' ? (
-          sortedStoreCode?.map(code => (
+          sortedStoreCode?.map((code, index) => (
             <CodeCard key={code.codeId}
               code={code}
               setCodeStore={setCodeStore} 
               setInputValue={setInputValue}
+              count={index}
             />
           ))
         ) : (
-          imagesFiles?.map(image => (
+          imagesFiles?.map((image, index) => (
             <ImageCard key={image.imageId} 
               image={image} 
               theme={theme}
+              count={index}
               imagesFiles={imagesFiles}
               setImagesFiles={setImagesFiles}
             />

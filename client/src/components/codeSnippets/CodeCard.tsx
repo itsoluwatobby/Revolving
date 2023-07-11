@@ -8,11 +8,12 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 
 type CodeCardProps = {
   code: CodeStoreType,
+  count: number,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>
 }
 
-export default function CodeCard({ code, setCodeStore, setInputValue }: CodeCardProps) {
+export default function CodeCard({ code, count, setCodeStore, setInputValue }: CodeCardProps) {
   const { editing, isPresent, codeEditor, theme, success, setEditing } = useThemeContext() as ThemeContextType
   const nodeRef = useCallback((node: HTMLElement) => {
     node ? node.scrollIntoView({behavior: 'smooth'}) : null
@@ -79,6 +80,7 @@ export default function CodeCard({ code, setCodeStore, setInputValue }: CodeCard
         </p>
         ) : null
       }
+      <span className="absolute bottom-0 rounded-full left-0 bg-green-950 w-4 grid place-content-center h-4 text-xs p-1">{++count}</span>
     </article>
   )
 }

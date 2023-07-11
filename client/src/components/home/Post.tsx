@@ -14,8 +14,6 @@ type Props = {
 export const Post = ({ story }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
   let averageReadingTime = useWordCount(story?.body) as string;
-
-  const [imageLength, setImageLenth] = useState<boolean>(false)
   const end = averageReadingTime.split(' ')[1]
 
   const currentUserId = localStorage.getItem('revolving_userId') as string
@@ -41,7 +39,7 @@ export const Post = ({ story }: Props) => {
         bodyContent={bodyContent} story={story}
       />
 
-      <PostImage imageLength={imageLength} />
+      <PostImage story={story} />
       
       <PostBase 
         story={story as MakeToButtom}

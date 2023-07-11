@@ -1,9 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
-import { BASEURL } from '../app/api/apiSlice';
 import { TypingEvent } from '../data';
-import { selectCurrentToken } from '../features/auth/authSlice';
-import { useSelector } from 'react-redux';
 
 export const PostContext = createContext<PostContextType | null>(null)
 
@@ -19,9 +16,6 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
 
   const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
-  const [url, setUrl] = useState<string[]>([])
-
-  const token = useSelector(selectCurrentToken)
 
   useEffect(() => {
     let isMounted = true
@@ -42,25 +36,8 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     }
   }, [search, navPosts])
 
-  const uploadToServer = async (image: File) => {
-    const imageData = new FormData()
-    imageData.append('image', image)
-
-    const res = await fetch(`${BASEURL}/images/upload`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`
-      },
-      body: imageData
-    })
-    const data = await res.json() as { data: { url: string } }
-    setUrl(prev => ([...prev, data?.data.url]))
-    console.log(data)
-  }
-
   const value = {
-    filteredStories, url, search, typingEvent, navPosts, canPost, codeStore, inputValue, imagesFiles, setImagesFiles, setUrl, setInputValue, setCodeStore, uploadToServer, setSearch, setTypingEvent, setCanPost, setNavPosts
+    filteredStories, search, typingEvent, navPosts, canPost, codeStore, inputValue, imagesFiles, setImagesFiles, setInputValue, setCodeStore, setSearch, setTypingEvent, setCanPost, setNavPosts
   }
 
   return (

@@ -36,6 +36,17 @@ type ImageType = {
   image: File
 }
 
+type ImageRes = { 
+  data: { 
+    url: string 
+  }
+}
+
+type ImageUrlsType = {
+  imageId: string,
+  url: string
+}
+
 type CodeStoreType = {
   codeId?: string,
   langType: string,
@@ -47,7 +58,6 @@ type TypingEvent = 'typing' | 'notTyping'
 
 type PostContextType = {
   search: string,
-  url?: string[],
   filteredStories: PostType[],
   typingEvent: TypingEvent,
   canPost: boolean,
@@ -55,13 +65,11 @@ type PostContextType = {
   inputValue: CodeStoreType,
   imagesFiles: ImageType[]
   codeStore: CodeStoreType[],
-  uploadToServer: (image: File) => Promise<void>,
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
   setSearch: React.Dispatch<React.SetStateAction<string>>,
-  setUrl: React.Dispatch<React.SetStateAction<string[]>>,
   setTypingEvent: React.Dispatch<React.SetStateAction<TypingEvent>>
   setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>
 }

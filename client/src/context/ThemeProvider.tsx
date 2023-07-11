@@ -22,8 +22,9 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [success, setSuccess] = useState<UpdateSuccess>({
     codeId: '', res: false
   });
-  const [isPresent, setIsPresent] = useState<ConflictType>({codeId: '', present: false});
   
+  const [isPresent, setIsPresent] = useState<ConflictType>({codeId: '', present: false});
+
   const [editing, setEditing] = useState<EditingProp>({editing: false, codeId: ''});
   const [notintersecting, setNotIntersecting] = useState<ChatOption>('Open')
   const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
