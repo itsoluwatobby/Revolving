@@ -19,10 +19,10 @@ type PostTopProps = {
 }
 
 export default function PostTop({ story, bodyContent, openText, open, setOpen }: PostTopProps) {
-  const { theme } = useThemeContext() as ThemeContextType
+  const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const {data: users} = useGetUsersQuery()
-  const [deleteStory, { isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
+  const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
   const buttonOptClass = useCallback((theme: Theme) => {
     return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
   }, [])
@@ -36,6 +36,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
     }
     catch(err: unknown){
       const errors = deleteError as ErrorResponse
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
       isDeleteError && toast.error(`${errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
@@ -47,7 +48,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
 
 // users as UserProps[], story?.userId)
   return (
-    <>
+    <div className={`${isDeleteLoading ? 'animate-pulse' : ''}`}>
       <div 
         // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
@@ -93,7 +94,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
             {bodyContent}
         </p>
       </Link> 
-    </>
+    </div>
   )
 }
 

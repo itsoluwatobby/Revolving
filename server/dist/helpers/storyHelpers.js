@@ -19,6 +19,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { StoryModel } from "../models/Story.js";
+import fsPromises from 'fs/promises';
 import { CommentModel } from "../models/CommentModel.js";
 import { deleteSingleComment } from "./commentHelper.js";
 export const getAllStories = () => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.find().lean(); });
@@ -65,24 +66,42 @@ export const likeAndUnlikeStory = (userId, storyId) => __awaiter(void 0, void 0,
     }
 });
 export const deleteUserStory = (storyId) => __awaiter(void 0, void 0, void 0, function* () {
+    const story = yield getStoryById(storyId);
     try {
         yield StoryModel.findByIdAndDelete({ _id: storyId });
         const commentInStory = yield CommentModel.find({ storyId }).lean();
         yield Promise.all(commentInStory.map(comment => {
             deleteSingleComment(comment._id, false);
         }));
+        const picturesArray = story.picture;
+        yield Promise.all(picturesArray.map((pictureLink) => __awaiter(void 0, void 0, void 0, function* () {
+            const imageName = pictureLink.substring(pictureLink.indexOf('4000/') + 5);
+            const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
+            yield fsPromises.unlink(pathname)
+                .then(() => console.log('DELETED'))
+                .catch(error => console.log(error.message));
+        })));
     }
     catch (error) {
         console.log(error.messages);
     }
 });
 export const deleteAllUserStories = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const stories = yield getUserStories(userId);
     try {
         yield StoryModel.deleteMany({ userId });
         const userComments = yield CommentModel.find({ userId }).lean();
         yield Promise.all(userComments.map(comment => {
             deleteSingleComment(comment._id, false);
         }));
+        yield Promise.all(stories.map((story) => __awaiter(void 0, void 0, void 0, function* () {
+            const picturesArray = story.picture;
+            yield Promise.all(picturesArray.map((pictureLink) => __awaiter(void 0, void 0, void 0, function* () {
+                const imageName = pictureLink.substring(pictureLink.indexOf('4000/') + 5);
+                const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
+                yield fsPromises.unlink(pathname);
+            })));
+        })));
     }
     catch (error) {
         console.log(error.messages);

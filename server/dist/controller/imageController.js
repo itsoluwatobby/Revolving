@@ -28,6 +28,7 @@ export const uploadImages = (req, res) => __awaiter(void 0, void 0, void 0, func
         });
     }));
 });
+// Using express-static middleware to serve my images
 export const getImage = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { imageName } = req.params;
@@ -37,10 +38,19 @@ export const getImage = (req, res) => {
 };
 export const deleteImage = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const { imageName } = req.params;
+        const name = req.url;
+        const imageName = name.substring(1);
         const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
-        yield fsPromises.unlink(pathname);
-        responseType({ res, status: 204, message: 'image deleted' });
+        console.log(pathname);
+        yield fsPromises.unlink(pathname)
+            .then(() => {
+            console.log('DELETED');
+            responseType({ res, status: 204, message: 'image deleted' });
+        })
+            .catch(error => {
+            console.log(error.message);
+            responseType({ res, status: 404, message: 'error deleting' });
+        });
     }));
 };
 //# sourceMappingURL=imageController.js.map

@@ -16,7 +16,7 @@ export default function MidModal({ targetStory, theme, notintersecting, designat
 
   return (
     <div className={`flex-auto grid transition-all place-content-center ${notintersecting === 'Open' ? 'scale-100' : 'scale-0'}`}>
-      <div className={`flex flex-col gap-1 ${pathname !== designatedPath ? 'hidden' : 'block'}`}>
+      <div className={`flex flex-col gap-1 minmobile:gap-0 minmobile:pl-1.5 ${pathname !== designatedPath ? 'hidden' : 'block'}`}>
         <div className='flex items-center gap-2'>
           <small className='capitalize text-xs cursor-pointer'>{reduceLength(targetStory?.author, 7, 'letter') || 'anonymous'}</small>
           <span>.</span>
@@ -29,7 +29,7 @@ export default function MidModal({ targetStory, theme, notintersecting, designat
           <h1 
             className='whitespace-pre-wrap font-bold uppercase mobile:line-clamp-1'>{reduceLength(targetStory?.title, 5, 'word')}
           </h1>
-          <LikeStory story={targetStory} />
+          <LikeStory story={targetStory} position='navbar' />
         </div>
       </div>
     </div>

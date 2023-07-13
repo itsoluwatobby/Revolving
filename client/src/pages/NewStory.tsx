@@ -15,7 +15,7 @@ import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
 import { FaRegImages } from 'react-icons/fa';
 import { nanoid } from '@reduxjs/toolkit';
 
-let uploaded = [] as string[]
+let uploadedImageIds = [] as string[]
 export const NewStory = () => {
   const MAX_SIZE = 1_535_000 as const // 2mb 
   const { storyId } = useParams()
@@ -74,18 +74,17 @@ export const NewStory = () => {
     }
   }, [files, setImagesFiles])
 
-  // reset uploaded container
+  // reset uploadedImageIds container
   useEffect(() => {
-    if(uploaded.length && !url.length){
-      uploaded = []
-      console.log('EMPTIED.....')
+    if(uploadedImageIds.length && !url.length){
+      uploadedImageIds = []
     }
   }, [url])
 
   useEffect(() => {
     const uploadImages = async() => {
       await Promise.all(imagesFiles.map(async(image) => {
-        if(uploaded.includes(image.imageId)) return
+        if(uploadedImageIds.includes(image.imageId)) return
         // else{
           const imageData = new FormData()
           imageData.append('image', image.image)
@@ -94,14 +93,13 @@ export const NewStory = () => {
             const res = data as unknown as { url: string }
             const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
             dispatch(setUrl(composed))
-            uploaded.push(image.imageId)
+            uploadedImageIds.push(image.imageId)
           }).catch(error => {
             const errors = error as ErrorResponse
             errors?.originalStatus == 401 && setLoginPrompt('Open')
           })
         //}
       }))
-      console.log('images added')
     }
     imagesFiles.length >= 1 ? uploadImages() : null
   }, [imagesFiles, dispatch, setLoginPrompt, uploadToServer])
@@ -169,7 +167,7 @@ export const NewStory = () => {
   else{
     return
   }
-    setCanPost([inputValue, textareaValue].every(Boolean))
+    setCanPost(Boolean(textareaValue))
   }, [setCanPost, currentUserId, dispatch, targetStory, postCategory, fontFamily, inputValue, textareaValue, debounceValue?.typing])
   
   const addCategory = (category: Categories) => {

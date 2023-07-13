@@ -22,18 +22,14 @@ export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}):
       objInstance.pullIt(reqMtd)
     }
     const data = await redisClient.get(key)
-    if(data) {
-      console.log('Cache Hit')
-      return JSON.parse(data)
-    }
+    if(data) return JSON.parse(data)
 
     const freshData = await cb()
-    console.log('Cache Miss')
     redisClient.setEx(key, timeTaken, JSON.stringify(freshData))
     return freshData
   }
   catch(error){
-    console.error(error)
+    console.error(error?.message)
   }
 }
 
@@ -51,7 +47,7 @@ export const getCachedValueRespon = async({key, timeTaken=3600, value}): Promise
     return;
   }
   catch(error){
-    console.error(error)
+    console.error(error?.message)
   }
 }
 

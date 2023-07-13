@@ -3,6 +3,7 @@ import http from 'http';
 import cors from 'cors';
 
 import cookieParser from 'cookie-parser';
+import process from 'process';
 import dotenv from 'dotenv';
 dotenv.config()
 
@@ -40,7 +41,6 @@ import taskManagerRouter from './routes/taskManagerRoutes.js';
 
 import { eventLogger } from './middleware/logger.js';
 import { getTask, getTasksInBin, getUserTask } from './controller/taskManagerController.js';
-import { upload } from './middleware/imageUpload.js';
 import imageRouter from './routes/imageRoute.js';
 import { getImage } from './controller/imageController.js';
 
@@ -63,10 +63,11 @@ const speedLimiter = SlowDown({
   delayMs: 500, // adds a 500ms delay per request after delay limit is reached
   maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
 })
-
+const staticPath = process.cwd() + '\\fileUpload'
 app.use(requestLimiter, speedLimiter)
 app.use(cors(corsOptions))
 app.use(express.json());
+app.use(express.static(staticPath))
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('common'))
 // app.use(eventLogger)
@@ -130,7 +131,7 @@ else{
   app.get('/revolving/task/bin/:userId', getTasksInBin)
 
   // get image
-  app.get('/revolving/images/:imageName', getImage)
+  //app.get('/revolving/images/:imageName', getImage)
   
   // checks for accesstoken
   app.use(verifyAccessToken);
