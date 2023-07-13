@@ -1,6 +1,6 @@
 import { StoryProps } from "../../types.js";
 import { StoryModel } from "../models/Story.js";
-import { CommentResponseModel } from "../models/CommentResponse.js";
+import fsPromises from 'fs/promises'
 import { CommentModel } from "../models/CommentModel.js";
 import { deleteSingleComment } from "./commentHelper.js";
 
@@ -55,11 +55,20 @@ export const likeAndUnlikeStory = async(userId: string, storyId: string): Promis
 export type Like_Unlike = Awaited<ReturnType<typeof likeAndUnlikeStory>>
 
 export const deleteUserStory = async(storyId: string) =>{
+  const story = await getStoryById(storyId)
   try{
     await StoryModel.findByIdAndDelete({ _id: storyId })
     const commentInStory = await CommentModel.find({ storyId }).lean()
     await Promise.all(commentInStory.map(comment => {
       deleteSingleComment(comment._id, false)
+    }))
+    const picturesArray = story.picture
+    await Promise.all(picturesArray.map(async(pictureLink) => {
+      const imageName = pictureLink.substring(pictureLink.indexOf('4000/') + 5)
+      const pathname = process.cwd()+`\\fileUpload\\${imageName}`
+      await fsPromises.unlink(pathname)
+      .then(() => console.log('DELETED'))
+      .catch(error => console.log(error.message))
     }))
   }
   catch(error){
@@ -68,11 +77,20 @@ export const deleteUserStory = async(storyId: string) =>{
 }
 
 export const deleteAllUserStories = async(userId: string) => {
+  const stories = await getUserStories(userId)
   try{
     await StoryModel.deleteMany({ userId })
     const userComments = await CommentModel.find({ userId }).lean()
     await Promise.all(userComments.map(comment => {
       deleteSingleComment(comment._id, false)
+    }))
+    await Promise.all(stories.map(async(story) => {
+      const picturesArray = story.picture
+      await Promise.all(picturesArray.map(async(pictureLink) => {
+        const imageName = pictureLink.substring(pictureLink.indexOf('4000/') + 5)
+        const pathname = process.cwd()+`\\fileUpload\\${imageName}`
+        await fsPromises.unlink(pathname)
+      }))
     }))
   }
   catch(error){

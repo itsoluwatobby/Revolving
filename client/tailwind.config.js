@@ -23,6 +23,7 @@ export default {
       maxscreen: {'max': '640px'},
       mobile: {'max': '480px'},
       midmobile: {'max': '380px'},
+      minmobile: {'max': '280px'}
     }
   },
   plugins: [

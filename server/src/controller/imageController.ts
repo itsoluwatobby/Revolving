@@ -24,6 +24,7 @@ export const uploadImages = async(req: Request, res: Response) => {
   })
 }
 
+// Using express-static middleware to serve my images
 export const getImage = (req: Request, res: Response) => {
   asyncFunc(res, async() => {
     const {imageName} = req.params
@@ -34,9 +35,15 @@ export const getImage = (req: Request, res: Response) => {
 
 export const deleteImage = (req: Request, res: Response) => {
   asyncFunc(res, async() => {
-    const {imageName} = req.params
+    const name = req.url
+    const imageName = name.substring(1)
     const pathname = process.cwd()+`\\fileUpload\\${imageName}`
     await fsPromises.unlink(pathname)
-    responseType({res, status: 204, message: 'image deleted'})
+    .then(() => {
+      responseType({res, status: 204, message: 'image deleted'})
+    })
+    .catch(error => {
+      responseType({res, status: 404, message: 'error deleting'})
+    })
   })
 }

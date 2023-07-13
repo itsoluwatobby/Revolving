@@ -21,7 +21,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { userId } = useParams()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`]
- 
+  const exclude = ['/signIn', '/signUp', 'new_password']
   return (
     <>
       <Link to='/'>
@@ -35,7 +35,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
           />
         </Link>
       {
-        !address.includes(pathname) ?
+        (!address.includes(pathname) && !exclude.includes(pathname)) ?
           <div 
             onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
             className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-40 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-1`}>  
@@ -50,7 +50,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
                 />
             </div>
             : (
-                ((postData?.title || postData?.body) && pathname !== address[2]) && (
+                ((postData?.title || postData?.body) && pathname !== address[2] && !exclude.includes(pathname)) && (
                   <div className='flex gap-2 mobile:ml-2'>
                     <p>{delayedSaving == 'typing' ? 'saving...' : 'saved'}</p>
                     <p className='text-gray-500'>Draft</p>

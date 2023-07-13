@@ -36,7 +36,6 @@ export const checkCount = <T>(content: T[]): string => {
     count = (content?.length / 1000_000).toString() + 'M'
   else if(content?.length > 999_999_999)
     count = (content?.length / 1000_000_000).toString() + 'B'
-  
   return count
 }
 

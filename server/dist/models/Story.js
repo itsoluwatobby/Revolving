@@ -4,7 +4,7 @@ const STORYSCHEMA = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users', required: [true, 'you need to provide a user ID']
     },
-    title: { type: String, required: [true, 'story title is required'], trim: true },
+    title: { type: String, trim: true },
     picture: { type: Array, default: [] },
     body: { type: String, required: [true, 'story body is required'], trim: true },
     commentIds: { type: Array, default: [] },

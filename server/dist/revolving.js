@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import process from 'process';
 import dotenv from 'dotenv';
 dotenv.config();
 import mongoose from 'mongoose';
@@ -30,7 +31,6 @@ import responseRouter from './routes/responseRoutes.js';
 import taskManagerRouter from './routes/taskManagerRoutes.js';
 import { getTask, getTasksInBin, getUserTask } from './controller/taskManagerController.js';
 import imageRouter from './routes/imageRoute.js';
-import { getImage } from './controller/imageController.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
 dbConfig(null, null, null);
 const app = express();
@@ -46,9 +46,11 @@ const speedLimiter = SlowDown({
     delayMs: 500,
     maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
 });
+const staticPath = process.cwd() + '\\fileUpload';
 app.use(requestLimiter, speedLimiter);
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.static(staticPath));
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('common'));
 // app.use(eventLogger)
@@ -96,7 +98,7 @@ else {
     app.get('/revolving/task/:taskId', getTask);
     app.get('/revolving/task/bin/:userId', getTasksInBin);
     // get image
-    app.get('/revolving/images/:imageName', getImage);
+    //app.get('/revolving/images/:imageName', getImage)
     // checks for accesstoken
     app.use(verifyAccessToken);
     // story router

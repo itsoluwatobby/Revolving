@@ -60,7 +60,7 @@ export const Navbar = () => {
 
   return(
     <nav 
-      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative mobile:pr-1
+      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 z-50 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative mobile:pr-1 minmobile:pr-0 minmobile:pl-2
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />
@@ -73,7 +73,7 @@ export const Navbar = () => {
         notintersecting={notintersecting}
       />
 
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-40' : 'mobile:w-28 mobile:pr-0'}`}>
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-40' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
         <TopRight />
       </div>
      { 

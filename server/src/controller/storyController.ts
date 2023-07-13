@@ -18,7 +18,7 @@ export const createNewStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { userId } = req.params
     let newStory = req.body
-    if (!userId || !newStory?.title || !newStory?.body) return res.sendStatus(400)
+    if (!userId || !newStory?.body) return res.sendStatus(400)
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     newStory = {...newStory, userId, author: user?.username} as StoryProps

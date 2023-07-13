@@ -3,15 +3,16 @@ import { PostType, ThemeContextType } from "../../posts"
 import { checkCount } from "../../utils/navigator"
 import { storyApiSlice, useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice"
 import { useDispatch } from "react-redux"
-import { ErrorResponse } from "../../data"
+import { ErrorResponse, PositionType } from "../../data"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { toast } from "react-hot-toast"
 
 type LikeStoryProps = {
-  story: PostType
+  story: PostType,
+  position: PositionType
 }
 
-export default function LikeStory({ story }: LikeStoryProps) {
+export default function LikeStory({ story, position }: LikeStoryProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation();
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
@@ -47,7 +48,7 @@ export default function LikeStory({ story }: LikeStoryProps) {
           :
           <BsHandThumbsUp
             title='like' 
-            className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
+            className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} `} />
       }
         <span className={`font-mono text-base ${theme == 'dark' && 'text-white'}`}>
           {story?.sharedLikes ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}

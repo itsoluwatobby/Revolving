@@ -10,23 +10,22 @@ import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data"
-import { useCreateStoryMutation, useUpdateStoryMutation, useUploadImageMutation } from "../../app/api/storyApiSlice"
+import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
 import { useDispatch, useSelector } from "react-redux"
-import { getStoryData, getUrl, resetUrl, setUrl } from "../../features/story/storySlice"
+import { getStoryData, getUrl, resetUrl } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
 import { sub } from "date-fns"
-import { delayedPromise } from "../../hooks/useDebounceHook"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 export default function TopRight() {
-  const [updateStory, {error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
-  const [createStory, {error: createError, isError: isCreateError}] = useCreateStoryMutation()
+  const [updateStory, {isLoading: isLoadingUpdate, error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
+  const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, setCodeStore, imagesFiles, setImagesFiles } = usePostContext() as PostContextType
+  const { canPost, inputValue, setCodeStore, setImagesFiles } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData)
   const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
@@ -36,27 +35,10 @@ export default function TopRight() {
   const dispatch = useDispatch()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
-  console.log(url)
+
   const createNewStory = async() => {
     if(!storyData.userId) return setLoginPrompt('Open')
     if(storyData){
-      // if(imagesFiles.length >= 1){
-      //   await Promise.all(imagesFiles.map(async(image) => {
-      //     const imageData = new FormData()
-      //     imageData.append('image', image.image)
-      //     await uploadToServer(imageData).unwrap()
-      //     .then((data) => {
-      //       const res = data as unknown as { url: string }
-      //       dispatch(setUrl(res.url))
-      //     }).catch(error => {
-      //       const errors = error as ErrorResponse
-      //       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      //     })
-      //   }))
-      // }
-      // delayedPromise()
-      // console.log(url)
-      // if(!url.length) return
       const urls = url.map(ur => ur.url)
       const userId = storyData.userId as string
       const story = {...storyData, picture: [...urls]} as PostType
@@ -166,9 +148,9 @@ export default function TopRight() {
                   </button>
                 ) : (
                   <button
-                    className={`text-[13px] rounded-lg p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
                     onClick={createNewStory}
-                    disabled = {!canPost}
+                    disabled = {!canPost && !isLoadingCreate}
                     >Publish
                   </button>
                 )
@@ -177,9 +159,9 @@ export default function TopRight() {
               (
                 pathname != `/story/${storyId}` &&
                   <button
-                    className={`text-[13px] rounded-lg p-0.5 shadow-lg active:scale-[0.98] duration-200 ease-in-out pl-1.5 pr-1.5 ${canPost ? 'bg-green-400 hover:text-gray-500  hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingUpdate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
                       onClick={updatedPost}
-                      disabled = {!canPost}
+                      disabled = {!canPost && !isLoadingUpdate}
                     >Republish
                   </button>
               )

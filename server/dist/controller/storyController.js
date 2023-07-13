@@ -19,7 +19,7 @@ export const createNewStory = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         let newStory = req.body;
-        if (!userId || !(newStory === null || newStory === void 0 ? void 0 : newStory.title) || !(newStory === null || newStory === void 0 ? void 0 : newStory.body))
+        if (!userId || !(newStory === null || newStory === void 0 ? void 0 : newStory.body))
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         yield autoDeleteOnExpire(userId);
