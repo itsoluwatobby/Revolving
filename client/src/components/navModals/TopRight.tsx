@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data"
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
 import { useDispatch, useSelector } from "react-redux"
-import { getStoryData, getUrl, resetUrl } from "../../features/story/storySlice"
+import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
 import { sub } from "date-fns"
 
@@ -39,6 +39,7 @@ export default function TopRight() {
   const createNewStory = async() => {
     if(!storyData.userId) return setLoginPrompt('Open')
     if(storyData){
+      dispatch(setLoading(isLoadingCreate))
       const urls = url.map(ur => ur.url)
       const userId = storyData.userId as string
       const story = {...storyData, picture: [...urls]} as PostType
@@ -54,6 +55,7 @@ export default function TopRight() {
           )
           dispatch(resetUrl())
           setImagesFiles([])
+          dispatch(setLoading(isLoadingCreate))
           navigate('/')
       }
       catch(err: unknown){
@@ -65,12 +67,16 @@ export default function TopRight() {
           }
         })
       }
+      finally{
+        dispatch(setLoading(false))
+      }
     }
     return
   }
 
   const updatedPost = async() => {
     if(storyData){
+      dispatch(setLoading(isLoadingUpdate))
       const userId = storyData.userId as string
       const story = storyData as PostType
       try{
@@ -93,6 +99,9 @@ export default function TopRight() {
             background: '#FF0000'
           }
         })
+      }
+      finally {
+        dispatch(setLoading(false))
       }
     }
     return
@@ -122,6 +131,7 @@ export default function TopRight() {
     }
     else {
       setIsPresent({codeId: isPresent?.codeId as string, present: true})
+      console.log('present')
     }
   }
 
@@ -150,7 +160,7 @@ export default function TopRight() {
                   <button
                     className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
                     onClick={createNewStory}
-                    disabled = {!canPost && !isLoadingCreate}
+                    disabled = {isCreateError ? isCreateError : isLoadingCreate ? isLoadingCreate : !canPost}
                     >Publish
                   </button>
                 )
@@ -161,7 +171,7 @@ export default function TopRight() {
                   <button
                     className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingUpdate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
                       onClick={updatedPost}
-                      disabled = {!canPost && !isLoadingUpdate}
+                      disabled = {isUpdateError ? isUpdateError : isLoadingUpdate ? isLoadingUpdate : !canPost}
                     >Republish
                   </button>
               )

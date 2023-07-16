@@ -9,11 +9,12 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 type CodeCardProps = {
   code: CodeStoreType,
   count: number,
+  codeStore: CodeStoreType[],
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>
 }
 
-export default function CodeCard({ code, count, setCodeStore, setInputValue }: CodeCardProps) {
+export default function CodeCard({ code, count, codeStore, setCodeStore, setInputValue }: CodeCardProps) {
   const { editing, isPresent, codeEditor, theme, success, setEditing } = useThemeContext() as ThemeContextType
   const nodeRef = useCallback((node: HTMLElement) => {
     node ? node.scrollIntoView({behavior: 'smooth'}) : null
@@ -49,7 +50,7 @@ export default function CodeCard({ code, count, setCodeStore, setInputValue }: C
     <article 
       ref={nodeRef as React.LegacyRef<HTMLElement>}
       key={code.codeId}
-      className={`relative ${theme == 'light' ? '' : ''} ${editing?.codeId == code.codeId ? 'bg-slate-700' : 'bg-slate-950'} shadow-inner text-white flex flex-col p-1.5 h-full max-w-[160px] min-w-[160px] shadow-slate-400 rounded-md`}>
+      className={`relative ${theme == 'light' ? '' : ''} ${editing?.codeId == code.codeId ? 'bg-slate-700' : 'bg-slate-950'} ${codeStore.length ? 'scale-100' : 'scale-0'} transition-all shadow-inner text-white flex flex-col p-1.5 h-full max-w-[160px] min-w-[160px] shadow-slate-400 rounded-md`}>
         <div className="flex items-center justify-between">
           <p className="capitalize bg-slate-800 pl-1 pr-1 rounded-md">{code.langType}</p>
           <div className="flex items-center gap-0.5">

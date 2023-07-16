@@ -21,17 +21,14 @@ export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) =>
             objInstance.pullIt(reqMtd);
         }
         const data = yield redisClient.get(key);
-        if (data) {
-            console.log('Cache Hit');
+        if (data)
             return JSON.parse(data);
-        }
         const freshData = yield cb();
-        console.log('Cache Miss');
         redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
         return freshData;
     }
     catch (error) {
-        console.error(error);
+        console.error(error === null || error === void 0 ? void 0 : error.message);
     }
 });
 export const getCachedValueRespon = ({ key, timeTaken = 3600, value }) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,7 +47,7 @@ export const getCachedValueRespon = ({ key, timeTaken = 3600, value }) => __awai
         return;
     }
     catch (error) {
-        console.error(error);
+        console.error(error === null || error === void 0 ? void 0 : error.message);
     }
 });
 export const timeConverterInMillis = () => {

@@ -54,7 +54,7 @@ export const Navbar = () => {
   useEffect(() => {
     const responseId = setTimeout(() => {
       setDelayedSaving(typingEvent)
-    }, 1500)
+    }, 300)
     return () => clearTimeout(responseId)
   }, [typingEvent])
 

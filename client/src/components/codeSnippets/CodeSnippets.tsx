@@ -23,7 +23,7 @@ export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess
   const { codeStore, imagesFiles, setImagesFiles, setCodeStore, setInputValue } = usePostContext() as PostContextType;
 
   const sortedStoreCode = codeStore.slice().sort((a, b) => b.date.localeCompare(a.date))
-  
+
   useEffect(() => {
     if(codeStore.length !== prevCodeLength) {
       setSnippet('Snippet')
@@ -42,6 +42,13 @@ export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess
   }, [codeStore, imagesFiles, setSnippet])
 
   useEffect(() => {
+    if(isPresent.present && snippet == 'Image') {
+      setSnippet('Snippet')
+      setIsPresent({codeId: '', present: false})
+    }
+  }, [snippet, setSnippet, setIsPresent, isPresent.present])
+
+  useEffect(() => {
     let timerId: TimeoutId;
     if(isPresent.present || success.res){
       timerId = setTimeout(() => {
@@ -49,25 +56,23 @@ export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess
         setSuccess({codeId: '', res: false})
       }, 5000);
     }
-
     return () => clearTimeout(timerId)
   }, [isPresent.present, setIsPresent, success.res, setSuccess])
   
-// ${(snippet == 'Image' && imagesFiles.length < 3) ? 'bg-slate-900' : (snippet == 'Image' && imagesFiles.length == 3) ? 'bg-red-400 animate-pulse' : 'bg-red-500'}
-
   return (
-    <section className={`stackflow ${theme == 'light' ? 'bg-slate-700' : 'bg-slate-900'} ${codeStore?.length >= 1 ? 'scale-100' : 'scale-0'} transition-all self-center ${codeEditor ? '' : 'mt-4'} max-w-[90%] w-fit p-1.5 h-48 shadow-2xl shadow-slate-500 rounded-md overflow-x-scroll flex items-center gap-2`}>
+    <section className={`stackflow ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-900'} ${codeStore?.length >= 1 ? 'scale-100' : 'scale-0'} transition-all self-center ${codeEditor ? '' : 'mt-4'} max-w-[90%] w-fit p-1.5 h-48 shadow-md shadow-slate-500 rounded-md overflow-x-scroll flex items-center gap-2`}>
       {
-        snippet === 'Snippet' ? (
+        snippet !== 'Image' ? (
           sortedStoreCode?.map((code, index) => (
             <CodeCard key={code.codeId}
               code={code}
+              codeStore={codeStore}
               setCodeStore={setCodeStore} 
               setInputValue={setInputValue}
               count={index}
             />
           ))
-        ) : (
+        ) : ( 
           imagesFiles?.map((image, index) => (
             <ImageCard key={image.imageId} 
               image={image} 

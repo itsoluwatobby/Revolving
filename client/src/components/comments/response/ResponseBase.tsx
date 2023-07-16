@@ -85,7 +85,7 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
         <p className="flex items-center gap-1.5">
           <MdOutlineInsertComment 
             title='responses'
-            onClick={() => expandResponse(response._id, true)}
+            //onClick={() => expandResponse(response._id, true)}
             className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
           />
           <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
