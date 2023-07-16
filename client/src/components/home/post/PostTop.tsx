@@ -30,6 +30,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   const {data: users} = useGetUsersQuery()
   const [revealCard, setRevealCard] = useState<ChatOption>('Hide')
   const [hovering, setHovering] = useState<boolean>(false)
+  const [onCard, setOnCard] = useState<boolean>(false)
   const dispatch = useDispatch()
   const cardRef = useRef<HTMLElement>(null)
   const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
@@ -66,18 +67,18 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
         setRevealCard('Open')
       }, 1000);
     }
-    else if(!hovering && !cardRef.current){
-      setRevealCard('Hide')
+    else if(!hovering && !onCard){
+      timerId = setTimeout(() => {
+        setRevealCard('Hide')
+      }, 300);
     }
     return () => clearTimeout(timerId)
-  }, [revealCard, hovering])
-cardRef?.current ? console.log('se') : null
+  }, [revealCard, hovering, onCard])
+
   const closeUserCard = () => {
     if(cardRef?.current){
       setRevealCard('Open')
-    }
-    else{
-      setRevealCard('Hide')
+      setOnCard(true)
     }
   }
 
@@ -135,6 +136,7 @@ cardRef?.current ? console.log('se') : null
           revealCard={revealCard}    
           setHovering={setHovering}
           closeUserCard={closeUserCard}
+          setOnCard={setOnCard}
         />  
       </div>
         <p 
