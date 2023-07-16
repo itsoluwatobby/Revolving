@@ -43,6 +43,17 @@ type StoryProps = {
   updatedAt: string
 }
 
+interface SharedProps extends Document{
+  _id: string,
+  sharerId: string,
+  storyId: string,
+  sharedLikes: string[],
+  author: string,
+  sharedStory: StoryProps,
+  createdAt: string,
+  updatedAt: string
+}
+
 interface CommentProps{
   _id: string,
   storyId: string,

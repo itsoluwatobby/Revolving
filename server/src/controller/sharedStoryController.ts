@@ -17,7 +17,7 @@ export const fetchSharedStories = (req: Request, res: Response) => {
     const allSharedStories = await getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
       const sharedStories = await getAllSharedStories();
       return sharedStories
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (SharedProps[] | string)
 
     if(!allSharedStories?.length) return responseType({res, status: 404, message: 'No shared stories available'})
     return responseType({res, status: 200, count: allSharedStories?.length, data: allSharedStories})

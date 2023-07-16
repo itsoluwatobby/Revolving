@@ -41,14 +41,11 @@ export const deleteImage = (req, res) => {
         const name = req.url;
         const imageName = name.substring(1);
         const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
-        console.log(pathname);
         yield fsPromises.unlink(pathname)
             .then(() => {
-            console.log('DELETED');
             responseType({ res, status: 204, message: 'image deleted' });
         })
             .catch(error => {
-            console.log(error.message);
             responseType({ res, status: 404, message: 'error deleting' });
         });
     }));

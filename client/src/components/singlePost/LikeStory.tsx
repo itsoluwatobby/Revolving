@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux"
 import { ErrorResponse, PositionType } from "../../data"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { toast } from "react-hot-toast"
+import { sharedStoryApiSlice, useLikeAndUnlikeSharedStoryMutation } from "../../app/api/sharedStorySlice"
 
 type LikeStoryProps = {
   story: PostType,
@@ -15,19 +16,23 @@ type LikeStoryProps = {
 export default function LikeStory({ story, position }: LikeStoryProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation();
+  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, error: sharedLikeError, isError: isSharedLikeError, isUninitialized: isSharedUninitialzed }] = useLikeAndUnlikeSharedStoryMutation()
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const dispatch = useDispatch()
 
   const likeUnlikeStory = async() => {
     try{
-      const { _id } = story
-      await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
+      const { _id, sharedId } = story
+      sharedId 
+          ? await likeAndUnlikeSharedStory({userId: currentUserId, sharedId}).unwrap() 
+              : await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
       dispatch(storyApiSlice.util.invalidateTags(['STORY']))
+      dispatch(sharedStoryApiSlice.util.invalidateTags(['SHAREDSTORY']))
     }
     catch(err: unknown){
-      const errors = likeError as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+      const errors = isLikeError ? likeError as Partial<ErrorResponse> : sharedLikeError as Partial<ErrorResponse>
+      (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
+      (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
@@ -38,7 +43,7 @@ export default function LikeStory({ story, position }: LikeStoryProps) {
   return (
     <p 
       onClick={likeUnlikeStory}
-      className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
+      className={`flex items-center gap-1 ${(isLikeLoading || isSharedLikeLoading) && 'animate-bounce'}`}>
       {
         (story?.sharedLikes ? story?.sharedLikes?.includes(currentUserId) : story?.likes?.includes(currentUserId)) 
           ?

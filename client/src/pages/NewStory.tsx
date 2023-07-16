@@ -10,15 +10,16 @@ import { Categories, ErrorResponse, OpenSnippet } from '../data';
 import CodeBlock from '../codeEditor/CodeEditor';
 import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUrl, setStoryData, setUrl } from '../features/story/storySlice';
+import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
 import { FaRegImages } from 'react-icons/fa';
 import { nanoid } from '@reduxjs/toolkit';
 
 let uploadedImageIds = [] as string[]
 export const NewStory = () => {
-  const MAX_SIZE = 1_535_000 as const // 2mb 
+  const MAX_SIZE = 1_535_000 as const // 1.53mb 
   const { storyId } = useParams()
+  const loading = useSelector(getLoading)
   const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore } = usePostContext() as PostContextType;
   const [getStoryCond, { data: target, isLoading, isError }] = useGetStoryCondMutation()
   const { theme, isPresent, success, fontFamily, codeEditor, setCodeEditor, setIsPresent, setLoginPrompt, setSuccess } = useThemeContext() as ThemeContextType;
@@ -62,8 +63,16 @@ export const NewStory = () => {
         else{
           const imageId = nanoid()
           const newImage = { imageId, image: file } as ImageType
-          setImagesFiles(prev => ([...prev, newImage]))
-          setFiles([])
+          console.log(imagesFiles.length)
+          if(imagesFiles.length < 5){
+            //  if(uploadedImageIds.includes(newImage.imageId)) return
+            setImagesFiles(prev => ([...prev, newImage]))
+            setFiles([])
+          }
+          else{
+            setFiles([])
+            console.log('filled')
+          }
         }
       })
     }
@@ -72,7 +81,7 @@ export const NewStory = () => {
     return () => {
       isMounted = false
     }
-  }, [files, setImagesFiles])
+  }, [files, imagesFiles, setImagesFiles])
 
   // reset uploadedImageIds container
   useEffect(() => {
@@ -83,9 +92,10 @@ export const NewStory = () => {
 
   useEffect(() => {
     const uploadImages = async() => {
+      console.log(imagesFiles)
       await Promise.all(imagesFiles.map(async(image) => {
         if(uploadedImageIds.includes(image.imageId)) return
-        // else{
+        console.log('running')
           const imageData = new FormData()
           imageData.append('image', image.image)
           await uploadToServer(imageData).unwrap()
@@ -181,15 +191,16 @@ export const NewStory = () => {
     setPostCategory([...categories])
   }
 
-  const setClickable = (type: OpenSnippet) => {
+  const activateSnippet = (type: OpenSnippet) => {
     codeStore.length !== 0 
       ? setSnippet(type) 
         : imagesFiles.length !== 0 
           ? setSnippet(type) : setSnippet('Nil')
   }
-
+  
+console.log({loading})
   return (
-    <section className={`relative ${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
+    <section className={`relative ${loading ? 'animate-pulse bg-opacity-20' : ''} ${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
       {
         codeEditor ? <CodeBlock /> 
         : (
@@ -200,7 +211,7 @@ export const NewStory = () => {
                 placeholder='Title'
                 value={inputValue}
                 onChange={handleTitle}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
               />
               <textarea 
                 name="story" id=""
@@ -208,7 +219,7 @@ export const NewStory = () => {
                 value={textareaValue}
                 cols={30} rows={8}
                 onChange={handleBody}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : ''}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
               />
             </>
           )
@@ -257,11 +268,11 @@ export const NewStory = () => {
 
         <div className={`${(codeStore.length >= 1 || imagesFiles.length >= 1) ? 'scale-100' : 'scale-0'} flex items-center transition-all ${theme == 'light' ? 'text-white bg-slate-300 ' : 'bg-slate-500'} w-fit gap-2 p-1 text-sm font-sans rounded-md shadow-lg`}>
           <p 
-            onClick={() => setClickable('Snippet')}
-            className={`${codeStore.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Snippet' ? 'bg-slate-800' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Code snippets</p>
+            onClick={() => activateSnippet('Snippet')}
+            className={`${codeStore.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Snippet' ? 'bg-slate-700' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Code snippets</p>
           <p 
-            onClick={() => setClickable('Image')}
-            className={`${imagesFiles.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Image' ? 'bg-slate-800' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Images</p>
+            onClick={() => activateSnippet('Image')}
+            className={`${imagesFiles.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Image' ? 'bg-slate-700' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Images</p>
         </div>
 
       </div>
