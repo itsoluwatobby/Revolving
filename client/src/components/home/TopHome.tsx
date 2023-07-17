@@ -26,7 +26,7 @@ export const TopHome = () => {
     <header
       onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
       className={`sticky top-0 z-30 max-w-full overflow-hidden flex-none flex items-center bg-inherit mt-2.5 mobile:mt-4 border $ border-l-0 border-r-0 border-t-1 duration-300 border-b-1 pl-2 pr-2 ${theme == 'dark' ? 'border-gray-700 dark:bg-slate-800' : 'border-gray-200 bg-white'}`}>
-      <div className={`sm:hidden ${toggleLeft == 'Open' ? 'hidden' : ''} h-14 w-10 grid place-content-center z-50`}>
+      <div className={`md:hidden ${toggleLeft == 'Open' ? 'hidden' : ''} h-14 w-10 grid place-content-center z-50`}>
         <GiHamburgerMenu 
           onClick={() => setToggleLeft('Open')}
           className={arrow_class} />

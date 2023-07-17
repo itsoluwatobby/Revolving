@@ -7,7 +7,7 @@ import { BsTrash } from 'react-icons/bs'
 import { ChatOption, Theme, ThemeContextType } from '../../posts'
 import { useDispatch } from 'react-redux';
 import { setTask } from '../../features/story/taskManagerSlice'
-import { useUpdateTaskMutation } from '../../app/api/taskApiSlice'
+import { useDeleteTaskMutation, useUpdateTaskMutation } from '../../app/api/taskApiSlice'
 import { toast } from 'react-hot-toast'
 import { useThemeContext } from '../../hooks/useThemeContext'
 
@@ -27,10 +27,11 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const {setLoginPrompt} = useThemeContext() as ThemeContextType
   const [updateTask, {isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate}] = useUpdateTaskMutation();
+  const [deleteTask, {isLoading: isLoadingDelete, isError: isErrorDelete, error: errorDelete}] = useDeleteTaskMutation();
   const dispatch = useDispatch()
   const buttonClass = useCallback((theme: Theme, type: ButtonType) => {
     return `
-    rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-800' : 'bg-slate-900'}
+    rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-900'}
     `
   }, [])
 
@@ -61,27 +62,15 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
     }
   }
 
-  const update = async(task: TaskProp) => {
-    // if(!debouncedInput.value?.length) return
-    console.log(task)
-    return
-    const newTask = {
-      userId: task.userId,
-      completed: false,
-      task: task.task
-    } as Partial<TaskProp>
+  const deleteOneTask = async() => {
     try{
-      await updateTask({ userId: task.userId, task: newTask }).unwrap()
-      // setTaskInput('')
-      // setDebouncedInput({value: '', isTyping: 'notTyping'})
-      // setTaskRequest('Hide')
-      // setPrompt('Hide')
+      await deleteTask({ userId: task.userId, taskId: task._id }).unwrap()
       //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
     catch(err){
-      const errors = errorUpdate as ErrorResponse
+      const errors = errorDelete as ErrorResponse
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorUpdate && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+      isErrorDelete && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }
@@ -89,11 +78,10 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
     }
   }
 
-
   return (
     <article 
       key={task._id}
-      className={`relative flex items-center gap-1 p-0.5 text-sm rounded-md shadow-inner shadow-slate-600 ${isLoadingUpdate ? 'animate-pulse' : ''}`}
+      className={`relative flex items-center gap-1 p-0.5 pl-1.5 text-sm rounded-md shadow-inner shadow-slate-600 ${(isLoadingUpdate || isLoadingDelete) ? 'animate-pulse' : ''}`}
     >
       <p className="flex-auto flex flex-col p-0.5 ">
         <span className="flex items-center gap-3">
@@ -117,11 +105,13 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
         <CiEdit 
           onClick={() => viewTask(task._id, 'EDIT')}
           title="Edit" className={buttonClass(theme, 'EDIT')} />
-        <BsTrash title="Delete" className={buttonClass(theme, 'DELETE')} />
+        <BsTrash
+          onClick={deleteOneTask} 
+          title="Delete" className={buttonClass(theme, 'DELETE')} />
       </p>
       <small 
         onClick={() => viewTask(task._id, 'VIEW')}
-        className={`absolute bottom-0 text-gray-600 ${task.subTasks?.length ? '' : 'hidden'} cursor-pointer hover:opacity-70 left-1`}>expand</small>
+        className={`absolute bottom-0 text-gray-600 ${(task.task?.length > 130 ||task.subTasks?.length) ? '' : 'hidden'} cursor-pointer hover:opacity-70 left-1`}>expand</small>
     </article>
   )
 }

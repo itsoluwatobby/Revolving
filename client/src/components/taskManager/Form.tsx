@@ -4,9 +4,9 @@ import { IoIosSend, IoMdAdd } from "react-icons/io"
 import { ChatOption, Theme, ThemeContextType } from "../../posts"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
 import { CreatePrompt, ErrorResponse, InputTaskProp, TaskProp } from "../../data"
-import { useSelector } from "react-redux"
-import { getTask, singleTask } from "../../features/story/taskManagerSlice"
-import { useCreateTaskMutation } from "../../app/api/taskApiSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { getTask, setTask, singleTask } from "../../features/story/taskManagerSlice"
+import { useCreateTaskMutation, useUpdateTaskMutation } from "../../app/api/taskApiSlice"
 import { RootState } from "../../app/store"
 import { toast } from "react-hot-toast"
 import { useThemeContext } from "../../hooks/useThemeContext"
@@ -25,9 +25,12 @@ export default function Form({ currentUserId }: FormProps) {
   const [taskRequest, setTaskRequest] = useState<ChatOption>('Hide');
   const task = useSelector((state: RootState) => singleTask(state, taskId));
   const [prompt, setPrompt] = useState<CreatePrompt>('Hide');
+  const [noActivity, setNoActivity] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [inputTask, setTaskInput] = useState<string>('');
+  const [taskInput, setTaskInput] = useState<string>('');
+  const dispatch = useDispatch()
   const [createTask, {isLoading, isError, error}] = useCreateTaskMutation();
+  const [updateTask, {isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate}] = useUpdateTaskMutation();
   const [debouncedInput, setDebouncedInput] = useState<InputTaskProp>({
     value: '', isTyping: 'notTyping'
   });
@@ -43,30 +46,30 @@ export default function Form({ currentUserId }: FormProps) {
   useEffect(() => {
     if(option === 'EDIT'){
       setTaskInput(task?.task as string)
-      console.log('From here last')
       setTaskRequest('Open')
       setPrompt('Hide')
     }
   }, [option, task?.task])
 
-  // DEBOUNCED INPUT
+  // DEBOUNCED INPUT.
   useEffect(() => {
     let isMounted = true
     isMounted && setDebouncedInput(prev => ({...prev, isTyping: 'typing'}))
     const timerId = setTimeout(() => {
-      setDebouncedInput({value: inputTask as string, isTyping: 'notTyping'})
+      setDebouncedInput({value: taskInput as string, isTyping: 'notTyping'})
     }, DEBOUNCEDTIMEOUT);
     return () => {
       isMounted = false
       clearTimeout(timerId)
     }
-  }, [inputTask])
+  }, [taskInput])
 
+  // focus cursor on task request
   useEffect(() => {
     if(taskRequest == 'Open' && inputRef?.current) inputRef?.current.focus()
   }, [taskRequest, prompt])
 
-  // TYPING PAUSED
+  // WHEN TYPING IS PAUSED
   useEffect(() => {
     let timerId: TimeoutId
     if(debouncedInput.isTyping === 'notTyping' && debouncedInput.value?.length >= 1){
@@ -83,63 +86,67 @@ export default function Form({ currentUserId }: FormProps) {
   // NO ACTIVITY && CLOSE PROMPT
   useEffect(() => {
     let timerId: TimeoutId
-    const result = prompt === 'Idle' && taskRequest == 'Open' && inputTask?.length == 0
+    const result = prompt === 'Idle' && taskRequest == 'Open' && taskInput?.length == 0
     if(result){
         timerId =setTimeout(() => {
           setPrompt('Nil')
           setTaskRequest('Hide')
-          console.log('From here last')
           setTaskInput('')
         }, SUB_DELAY);
     }
-
-    return () => {
-      clearTimeout(timerId)
-    }
-  }, [prompt, inputTask, taskRequest])
+    return () => clearTimeout(timerId)
+  }, [prompt, taskInput, taskRequest])
   
+  // task request is open and no entry is been made
   useEffect(() => {
     let timerId: TimeoutId
-    const result = (prompt !== 'Nil' && prompt !== 'Idle' && taskRequest == 'Open') && (inputTask == undefined || inputTask?.length == 0)
+    const result = (prompt !== 'Nil' && prompt !== 'Idle' && taskRequest == 'Open') && (taskInput == undefined || taskInput?.length == 0)
     if(result){
         timerId =setTimeout(() => {
           setPrompt('Open')
         }, SUB_DELAY);
     }
-
-    return () => {
-      clearTimeout(timerId)
-    }
-  }, [prompt, inputTask, taskRequest])
+    return () => clearTimeout(timerId)
+  }, [prompt, taskInput, taskRequest])
 
   useEffect(() => {
     let timerId: TimeoutId
-    const result = (prompt !== 'Open' && taskRequest == 'Open') && (inputTask == undefined || inputTask?.length == 0)
+    const result = (prompt !== 'Open' && taskRequest == 'Open') && (taskInput == undefined || taskInput?.length == 0)
     if(result){
         timerId =setTimeout(() => {
           setTaskRequest('Hide')
           setPrompt('Hide')
         }, DELAY);
     }
-    return () => {
-      clearTimeout(timerId)
-    }
-  }, [inputTask, taskRequest, prompt])
+    return () => clearTimeout(timerId)
+  }, [taskInput, taskRequest, prompt])
 
+
+  // for creating and editing tasks
   const createNewTask = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if(!debouncedInput.value?.length) return
-    const newTask = {
-      userId: currentUserId,
-      completed: false,
-      task: debouncedInput.value
-    } as Partial<TaskProp>
+    const newTask = option !== 'EDIT' ? 
+          {
+            userId: currentUserId,
+            completed: false,
+            task: debouncedInput.value
+          } as Partial<TaskProp> 
+          :
+          {
+            ...task,
+            task: debouncedInput.value,
+            completed: task?.completed
+          }
     try{
-      await createTask({ userId: currentUserId, task: newTask }).unwrap()
+      option !== 'EDIT' 
+          ? await createTask({ userId: currentUserId, task: newTask }).unwrap() 
+              : await updateTask({ userId: currentUserId, task: newTask }).unwrap()
       setTaskInput('')
       setDebouncedInput({value: '', isTyping: 'notTyping'})
       setTaskRequest('Hide')
       setPrompt('Hide')
+      dispatch(setTask({taskId: '', option: 'NIL'}))
       //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
     catch(err){
@@ -152,30 +159,59 @@ export default function Form({ currentUserId }: FormProps) {
       })
     }
   }
-  
+
+  // no activity after 30 seconds
+  useEffect(() => {
+    let timerId: TimeoutId
+    if(!stoppedTyping && (prompt == 'Nil' || prompt == 'Hide') && taskRequest == 'Hide'){
+      timerId =setTimeout(() => {
+        setNoActivity(true)
+      }, DELAY);
+    }
+    return () => clearTimeout(timerId)
+  }, [prompt, taskRequest, stoppedTyping])
+
+  // not activity after stoppedTyping prompt
+  useEffect(() => {
+    let timerId: TimeoutId
+    if(stoppedTyping){
+        timerId =setTimeout(() => {
+          setTaskInput('')
+          setPrompt('Nil')
+          setTaskRequest('Hide')
+          setStoppedTyping(false)
+          setDebouncedInput({value: '', isTyping: 'notTyping'})
+          dispatch(setTask({taskId: '', option: 'NIL'}))
+        }, DELAY);
+    }
+    return () => clearTimeout(timerId)
+  }, [stoppedTyping, dispatch])
 
   const closePrompt = () => {
     setTaskInput('')
     setPrompt('Nil')
     setTaskRequest('Hide')
     setStoppedTyping(false)
+    setDebouncedInput({value: '', isTyping: 'notTyping'})
+    dispatch(setTask({taskId: '', option: 'NIL'}))
   }
 
-  const canSubmit = Boolean(inputTask)
+  const canSubmit = Boolean(taskInput)
 
   return (
     <div className="relative">
       {
         taskRequest == 'Hide' ?
-        <div className={`transition-all ${taskRequest == 'Hide' ? 'block' : 'scale-0'} ${prompt == 'Open' ? 'animate-none' : 'animate-pulse transition-all'} bg-slate-600 flex items-center h-14 rounded-md an`}>
+        <div className={`transition-all ${taskRequest == 'Hide' ? 'block' : 'scale-0'} ${prompt == 'Open' ? 'animate-none' : (!noActivity && 'animate-pulse')} ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-600'} flex items-center h-14 rounded-md an`}>
           <p className={`flex-grow text-center text-lg font-serif`}>Create a new task</p>
           <IoMdAdd 
             title="Add task" 
             onClick={() => {
               setTaskRequest('Open')
               setPrompt('Hide')
+              setNoActivity(false)
             }}
-          className={`flex-none w-10 text-center h-full rounded-md text-sm bg-slate-500 hover:opacity-50 cursor-pointer`}
+          className={`flex-none w-12 text-center h-full rounded-md text-sm ${theme == 'light' ? 'bg-slate-400' : 'bg-slate-500'} hover:opacity-50 cursor-pointer`}
           />
         </div>
         :
@@ -187,7 +223,7 @@ export default function Form({ currentUserId }: FormProps) {
             key={`task/${currentUserId}`}
             id={`task/${currentUserId}`}
             placeholder="Your new task"
-            value={inputTask}
+            value={taskInput}
             onChange={handleTaskEntry}
             className={`placeholder:text-xl placeholder:font-serif text-xl rounded-md w-full h-full focus:outline-none pl-2 pr-2 ${theme == 'light' ? '' : 'text-black'}`}
           />
@@ -196,7 +232,7 @@ export default function Form({ currentUserId }: FormProps) {
             disabled={!canSubmit}
             className={`w-12 grid place-content-center text-2xl ${canSubmit ? 'hover:opacity-50' : ''} text-green-400`}
           >
-            {isLoading ?
+            {(isLoading || isLoadingUpdate) ?
               <FaHourglassEnd className="animate-spin"/>
               :
               <IoIosSend />

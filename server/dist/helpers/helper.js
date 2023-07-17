@@ -55,7 +55,11 @@ class UrlsObj {
         this.urls = [];
     }
     isPresent(reqUrl) {
-        const present = this.urls.find(url => reqUrl.includes(url.mtd));
+        let present = this.urls.map(url => reqUrl.includes(url.mtd)).find(seen => seen == true);
+        if (!present) {
+            const cumtomUrls = ['POST', 'PUT', 'PATCH', 'DELETE'];
+            present = cumtomUrls.map(cumtomUrl => reqUrl.includes(cumtomUrl)).find(seen => seen == true);
+        }
         return present ? true : false;
     }
     pushIn(reqs) {

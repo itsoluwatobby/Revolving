@@ -1,6 +1,8 @@
 export type ComponentKey = 'GENERAL' | 'ENTERTAINMENT' | 'WEB DEVELOPMENT' | 'REACT' | 'NODE' | 'BASH SCRIPTING'
 export type Components = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
+export const REFRESH_RATE = 15_000 as const
+
 export const NAVIGATE: Record<ComponentKey, Components> = {
   'GENERAL': 'General',
   'ENTERTAINMENT': 'Entertainment',

@@ -19,7 +19,7 @@ type ArticleProps = {
 export default function ArticleComp({ isError, story, bodyContent, sidebar, averageReadingTime, isLoading }: ArticleProps) {
   const { theme, notintersecting, setNotIntersecting } = useThemeContext() as ThemeContextType
   const observerRef = useRef<IntersectionObserver>(null)
-  const headingRef = useCallback((node: Element) => {
+  const headingRef = useCallback((node: HTMLHeadingElement) => {
     if(observerRef.current) observerRef.current.disconnect()
     observerRef.current = new IntersectionObserver(entries => {
       if(entries[0].isIntersecting){
@@ -50,11 +50,11 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
         <span>.</span>
         <p>{format(story?.createdAt, 'en-US')}</p>
 
-        <FollowUnFollow story={story} position='others' />
+        <FollowUnFollow userId={story?.userId} position='others' />
       
       </div>
         <h1 
-          ref={headingRef as Element}
+          ref={headingRef as React.LegacyRef<HTMLHeadingElement>}
           className='whitespace-pre-wrap font-bold text-3xl uppercase'>{story?.title}
         </h1>
         <p 
