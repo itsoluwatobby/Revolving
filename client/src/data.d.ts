@@ -76,7 +76,7 @@ type OpenSnippet = 'Snippet' | 'Image' | 'Nil'
 type CreatePrompt = 'Hide' | 'Open' | 'Idle' | 'Nil'
 type TypingEvent = 'typing' | 'notTyping'
 type ButtonType = 'EDIT' | 'DELETE'
-type EditTaskOption = 'EDIT' | 'VIEW'
+type EditTaskOption = 'EDIT' | 'VIEW' | 'NIL'
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{

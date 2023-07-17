@@ -17,7 +17,6 @@ export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}):
   if(!redisClient.isOpen) await redisClient.connect();
   try{
     if(objInstance.isPresent(reqMtd)){
-      //redisClient.DEL(key)
       redisClient.flushAll()
       objInstance.pullIt(reqMtd)
     }

@@ -6,7 +6,7 @@ import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from '../../app/ap
 import { useState, useCallback } from 'react'
 
 type FollowUnFollowProps = {
-  story: PostType,
+  userId: string,
   position: PositionType
 }
 
@@ -16,7 +16,7 @@ type FollowUnFollowProps = {
 //   `
 // }
 
-export default function FollowUnFollow({ story, position }: FollowUnFollowProps) {
+export default function FollowUnFollow({ userId, position }: FollowUnFollowProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const {data: user, refetch} = useGetUserByIdQuery(currentUserId)
@@ -32,7 +32,6 @@ export default function FollowUnFollow({ story, position }: FollowUnFollowProps)
 
   const followOrUnfollow = async() => {
     try{
-      const {userId} = story
       const requestIds = { followerId: currentUserId, followedId: userId }
     
       await followUnfollowUser(requestIds).unwrap()
@@ -57,8 +56,8 @@ export default function FollowUnFollow({ story, position }: FollowUnFollowProps)
   return (
     <>
       {
-        (currentUserId && currentUserId !== story?.userId) ? (
-          !user?.followings?.includes(story?.userId) ? (
+        (currentUserId && currentUserId !== userId) ? (
+          !user?.followings?.includes(userId) ? (
             <button 
               onClick={followOrUnfollow}
               className={buttonClass(isMutating, theme, position)}>

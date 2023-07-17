@@ -1,12 +1,11 @@
 import { format } from "timeago.js"
-import { ErrorResponse, UserProps } from "../../../data"
+import { ErrorResponse } from "../../../data"
 import { reduceLength } from "../../../utils/navigator"
 import { FiMoreVertical } from "react-icons/fi"
 import { Link } from "react-router-dom"
 import { useThemeContext } from "../../../hooks/useThemeContext"
 import { ChatOption, PostType, Theme, ThemeContextType } from "../../../posts"
 import { useCallback } from 'react';
-import { useGetUsersQuery } from "../../../app/api/usersApiSlice"
 import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast"
 import { useEffect, useState, useRef } from 'react';
@@ -14,7 +13,6 @@ import { useDeleteSharedStoryMutation } from "../../../app/api/sharedStorySlice"
 import { useDispatch } from "react-redux"
 import UserCard from "../../UserCard"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
-import { current } from "@reduxjs/toolkit"
 
 type PostTopProps = {
   story: PostType,
@@ -27,10 +25,10 @@ type PostTopProps = {
 export default function PostTop({ story, bodyContent, openText, open, setOpen }: PostTopProps) {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
-  const {data: users} = useGetUsersQuery()
   const [revealCard, setRevealCard] = useState<ChatOption>('Hide')
   const [hovering, setHovering] = useState<boolean>(false)
   const [onCard, setOnCard] = useState<boolean>(false)
+  const [intersect, setIntersect] = useState<boolean>(false)
   const dispatch = useDispatch()
   const cardRef = useRef<HTMLElement>(null)
   const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
@@ -38,6 +36,22 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   const buttonOptClass = useCallback((theme: Theme) => {
     return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
   }, [])
+  const observerRef = useRef<HTMLDivElement>(null)
+  // const headingRef = useCallback((node: HTMLDivElement) => {
+  //   if(observerRef.current) observerRef.current.disconnect()
+  //   observerRef.current = new IntersectionObserver(entries => {
+  //     if(entries[0].isIntersecting){
+  //       setIntersect(true)
+  //     }
+  //     else setIntersect(false)
+  //   },
+  //   { threshold: 0,
+  //     //rootMargin: '-180px'
+  //   }
+  //   )
+  //   if(node) observerRef.current.observe(node as unknown as Element)
+  // }, [])
+
 
   const deleted = async(id: string) => {
     try{
@@ -83,7 +97,9 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   }
 
   return (
-    <div className={`${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
+    <div 
+      ref={observerRef as React.LegacyRef<HTMLDivElement>}
+      className={`${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
       <div 
         // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
@@ -133,8 +149,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           userId={story.userId}
           cardRef={cardRef as React.LegacyRef<HTMLElement>}
           setRevealCard={setRevealCard}
-          revealCard={revealCard}    
-          setHovering={setHovering}
+          revealCard={revealCard}
           closeUserCard={closeUserCard}
           setOnCard={setOnCard}
         />  

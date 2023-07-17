@@ -1,10 +1,8 @@
-import { useState } from "react";
-import { LeftSection } from "../components/LeftSection";
 import { Posts } from "../components/home/Posts"
 import RightSection from "../components/home/RightSection";
 import { TopHome } from "../components/home/TopHome"
 import { useThemeContext } from "../hooks/useThemeContext";
-import { ChatOption, ThemeContextType } from "../posts";
+import { ThemeContextType } from "../posts";
 
 export const Home = () => {
   const { setRollout, theme } = useThemeContext() as ThemeContextType
@@ -18,7 +16,7 @@ export const Home = () => {
           <TopHome />
           <Posts />
         </div>
-        <aside className="mt-4 flex-grow hidden md:flex w-1/3 h-full border border-b-0 border-t-0 shadow-xl shadow-slate-200 border-l-slate-300 border-slate-600">
+        <aside className="mt-4 flex-grow hidden md:flex min-w-[45%] w-1/3 h-full border border-b-0 border-t-0 shadow-xl shadow-slate-200 border-l-slate-300 border-slate-600">
           <RightSection />
         </aside>
       </div>

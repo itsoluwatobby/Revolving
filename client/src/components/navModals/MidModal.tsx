@@ -22,7 +22,7 @@ export default function MidModal({ targetStory, theme, notintersecting, designat
           <span>.</span>
           <small className={`text-xs ${theme == 'light' ? 'text-gray-500' : 'text-gray-300'}`}>{format(targetStory?.createdAt, 'en-US')}</small>
 
-          <FollowUnFollow story={targetStory} position='navbar' />
+          <FollowUnFollow userId={targetStory?.userId} position='navbar' />
 
         </div>
         <div className='flex items-center gap-4'>

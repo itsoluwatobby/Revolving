@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { getUserById } from "../helpers/userHelpers.js";
-import { createNewTask, deleteTask, emptyTaskBin, getTaskById, getTaskInBin, getUserTasks, updateTask } from "../helpers/tasksHelper.js";
+import { createNewTask, deletePermanentlyFromBin, deleteTask, emptyTaskBin, getTaskById, getTaskInBin, getUserTasks, restoreTaskFromBin, updateTask } from "../helpers/tasksHelper.js";
 import { getCachedResponse } from "../helpers/redis.js";
 export const createTask = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
@@ -21,6 +21,8 @@ export const createTask = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
+        if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
+            return responseType({ res, status: 403, message: 'Not you resource' });
         const newTask = yield createNewTask(userId, task);
         return responseType({ res, count: 1, data: newTask });
     }));
@@ -35,6 +37,8 @@ export const updateTasks = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'unauthorized' });
+        if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
+            return responseType({ res, status: 403, message: 'Not you resource' });
         const updatedTask = yield updateTask(task);
         return responseType({ res, status: 201, count: 1, data: updatedTask });
     }));
@@ -51,8 +55,15 @@ export const deleteUserTask = (req, res) => {
         const task = yield getTaskById(taskId);
         if (!task)
             return responseType({ res, status: 404, message: 'task not found' });
-        yield deleteTask(userId, taskId);
-        return responseType({ res, status: 204, message: 'task deleted' });
+        if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
+            return responseType({ res, status: 403, message: 'Not you resource' });
+        yield deleteTask(userId, taskId)
+            .then(() => {
+            return responseType({ res, status: 204, message: 'task deleted' });
+        })
+            .catch((error) => {
+            console.log(error.messages);
+        });
     }));
 };
 export const emptyBin = (req, res) => {
@@ -104,6 +115,7 @@ export const getTask = (req, res) => {
 };
 export const getTasksInBin = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         const { userId } = req.params;
         if (!userId)
             return responseType({ res, status: 400, message: 'userId required' });
@@ -113,7 +125,46 @@ export const getTasksInBin = (req, res) => {
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
         if (!userTask)
             return responseType({ res, status: 404, message: 'task not found' });
-        return responseType({ res, count: 1, data: userTask });
+        const binLength = (_b = (_a = userTask[0]) === null || _a === void 0 ? void 0 : _a.taskBin) === null || _b === void 0 ? void 0 : _b.length;
+        return responseType({ res, count: binLength, data: userTask });
+    }));
+};
+export const restoreTasks = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId } = req.params;
+        const { taskIds } = req.body;
+        if (!Array.isArray(taskIds) || !taskIds.length || !userId)
+            return responseType({ res, status: 400, message: 'all inputs are required in right format' });
+        const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
+        if (!user)
+            return responseType({ res, status: 403, message: 'You do not have an account' });
+        yield restoreTaskFromBin(taskIds, userId)
+            .then(() => {
+            responseType({ res, status: 201, message: 'Tasks restored' });
+        })
+            .catch((error) => {
+            responseType({ res, status: 404, message: `${error.message}\n${error.messages}` });
+        });
+    }));
+};
+export const deletePeranently = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId } = req.params;
+        const { taskIds } = req.body;
+        if (!Array.isArray(taskIds) || !taskIds.length || !userId)
+            return responseType({ res, status: 400, message: 'all inputs are required in right format' });
+        const user = yield getUserById(userId);
+        yield autoDeleteOnExpire(userId);
+        if (!user)
+            return responseType({ res, status: 403, message: 'You do not have an account' });
+        yield deletePermanentlyFromBin(taskIds, userId)
+            .then(() => {
+            responseType({ res, status: 204, message: 'Tasks deleted permanently' });
+        })
+            .catch((error) => {
+            responseType({ res, status: 404, message: `${error.message}\n${error.messages}` });
+        });
     }));
 };
 //# sourceMappingURL=taskManagerController.js.map

@@ -7,6 +7,10 @@ type TaskArgs = {
   userId: string, taskId?: string, task: Partial<TaskProp>
 }
 
+type AdvancedTaskArgs = {
+  userId: string, taskIds: string[]
+}
+
 type ResponseType = { data: TaskProp[] }
 
 export const taskApiSlice = apiSlice.injectEndpoints({
@@ -35,7 +39,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }) as any,
-      invalidatesTags: [{ type: 'TASK', id: 'LIST'}],
+      invalidatesTags: [{ type: 'TASK', id: 'LIST'}, { type: 'TASKBIN' }]
     }),
 
     getTask: builder.query<TaskProp, string>({
@@ -57,19 +61,39 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     
     getTaskBin: builder.query<TaskBin, string>({
       query: (userId) => `task/bin/${userId}`,
-      transformResponse: (baseQueryReturnValue: {data: TaskBin}) => {
-        return baseQueryReturnValue.data
+      transformResponse: (baseQueryReturnValue: {data: TaskBin[]}) => {
+        return baseQueryReturnValue.data[0]
       }, 
       providesTags: ['TASKBIN']
     }),
 
-    clearTaskBin: builder.mutation<void, Pick<TaskArgs, 'userId'>>({
+    clearTaskBin: builder.mutation<void, string>({
       query: (userId) => ({
         url: `task/bin/${userId}`,
         method: 'DELETE',
         body: userId
       }) as any,
       invalidatesTags: [{ type: 'TASKBIN'}],
+    }),
+    
+    // retore tasks
+    restoreTasks: builder.mutation<void, AdvancedTaskArgs>({
+      query: ({taskIds, userId}) => ({
+        url: `task/restore/${userId}`,
+        method: 'POST',
+        body: {...taskIds}
+      }) as any,
+      invalidatesTags: [{ type: 'TASKBIN'}, { type: 'TASK' }]
+    }),
+    
+    // delete tasks permanently
+    permanentlyDeleteTasks: builder.mutation<void, AdvancedTaskArgs>({
+      query: ({taskIds, userId}) => ({
+        url: `task/delete/${userId}`,
+        method: 'DELETE',
+        body: {...taskIds}
+      }) as any,
+      invalidatesTags: [{ type: 'TASKBIN'}]
     }),
 
   })
@@ -82,7 +106,9 @@ export const {
   useGetUserTasksQuery,
   useGetTaskQuery,
   useGetTaskBinQuery,
-  useClearTaskBinMutation
+  useClearTaskBinMutation,
+  useRestoreTasksMutation,
+  usePermanentlyDeleteTasksMutation,
 } = taskApiSlice
 
 // //returns query result object 

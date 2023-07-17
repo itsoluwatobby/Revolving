@@ -12,9 +12,9 @@ import { useDispatch } from "react-redux"
 import { setAllTasks } from "../features/story/taskManagerSlice"
 import { useParams } from "react-router-dom"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
-// import { tasks } from "../tasks"
+import Taskbin from "../components/taskManager/Taskbin"
+import { REFRESH_RATE } from "../utils/navigator"
 
-const REFRESH_RATE = 10_000 as const
 
 export default function TaskManager() {
   const { theme } = useThemeContext() as ThemeContextType
@@ -36,13 +36,13 @@ export default function TaskManager() {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!tasks?.length && isError && errorMsg?.status != 404){
+    if(!data?.length && isError && errorMsg?.status != 404){
       timerId = setInterval(async() => {
         await refetch()
       }, REFRESH_RATE)
     }
     return () => clearInterval(timerId)
-  }, [tasks, isError, errorMsg?.status, refetch])
+  }, [data, isError, errorMsg?.status, refetch])
 
   useEffect(() => {
     let isMounted = true
@@ -83,27 +83,32 @@ export default function TaskManager() {
     </>
   )
 
-
   return (
-    <main className={`w-full h-full flex flex-col`}>
-      <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-full flex flex-col gap-3 h-4/6`}>
+    <main className={`single_page w-full flex flex-col`}>
+      <section className="flex-grow flex justify-between p-2">
+        <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-full flex flex-col gap-3 h-4/6`}>
 
-        <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
-        <section className="hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-3/5 sm:w-1/2 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400">
-          <Form 
-            currentUserId={userId as string}
-          />
-          <div className={`taskbars overflow-y-scroll p-1 flex flex-col gap-2 h-full`}>
-            {taskContent}
-          </div>
-          <ViewSingleTask 
-            theme={theme}
-            viewSingle={viewSingle}
-            setViewSingle={setViewSingle} 
-          />
-        </section>
-      </div>
-      <div>Recycle bin</div>
+          <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
+          <section className="hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-4/5 sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400">
+            <Form 
+              currentUserId={userId as string}
+            />
+            <div className={`taskbars overflow-y-scroll p-1 flex flex-col gap-2 h-full w-full`}>
+              {taskContent}
+            </div>
+            <ViewSingleTask 
+              theme={theme}
+              viewSingle={viewSingle}
+              setViewSingle={setViewSingle} 
+            />
+          </section>
+        </div>
+
+        <Taskbin 
+          userId={userId as string}
+        />
+
+      </section>
       <Footer />
     </main>
   )

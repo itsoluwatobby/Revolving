@@ -26,9 +26,9 @@
   width: 10%;
 }
 
-.skeleton.profile-cirlce{
-  width: 150px;
-  height: 150px;
+.skeleton.profile-circle{
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
 }
 

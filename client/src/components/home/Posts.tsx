@@ -13,8 +13,9 @@ import { useSelector } from 'react-redux';
 import { getTabCategory } from '../../features/story/navigationSlice';
 import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import { REFRESH_RATE } from '../../utils/navigator';
 
-const REFRESH_RATE = 10_000 as const
+
 
 export const Posts = () => {
   const getNavigation = useSelector(getTabCategory)

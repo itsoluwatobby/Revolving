@@ -13,8 +13,8 @@ import { toast } from 'react-hot-toast'
 import { storyApiSlice } from '../../app/api/storyApiSlice'
 import { getTabCategory } from '../../features/story/navigationSlice'
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types'
+import { REFRESH_RATE } from '../../utils/navigator'
 
-const REFRESH_RATE = 10_000 as const
 
 export default function CommentBody() {
   const getNavigation = useSelector(getTabCategory)
