@@ -40,7 +40,7 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
       else return responseType({res, status: 200, message: 'Please check your email to activate your account'})
     }
     const hashedPassword = await brcypt.hash(password, 10);
-    const dateTime = sub(new Date, { minutes: 0 }).toISOString();
+    const dateTime = new Date().toString()
     const user = {
       username, email,
       authentication:{ password: hashedPassword }, 
@@ -120,7 +120,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     }
     await autoDeleteOnExpire(user?._id)
 
-    const { _id, ...rest } = user
+    const { _id } = user
     await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false }})
     //authentication: { sessionID: req?.sessionID },
     .then(() => {

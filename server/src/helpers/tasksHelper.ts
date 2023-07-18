@@ -39,7 +39,7 @@ export const restoreTaskFromBin = async(taskIds: string[], userId: string) => {
   // Restore back into task model
   await Promise.all(tasksToRestore.map(async(taskToRestore) => {
     const { userId, task, completed, updatedAt, createdAt } = taskToRestore
-    const restoreTask = { userId, task, completed, updatedAt, createdAt }
+    const restoreTask = { userId, task, completed, updatedAt, createdAt, dateRestored: new Date().toString() }
     await createNewTask(userId, restoreTask)
   }))
   // save the modified taskbin without the restored tasks

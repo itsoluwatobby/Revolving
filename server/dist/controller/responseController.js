@@ -29,8 +29,9 @@ export const createNewResponse = (req, res) => {
             return responseType({ res, status: 404, message: 'Comment not found' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        const response = yield createResponse(Object.assign({}, newResponse));
-        return responseType({ res, status: 201, count: 1, data: response });
+        yield createResponse(Object.assign({}, newResponse))
+            .then((response) => responseType({ res, status: 201, count: 1, data: response }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const updateResponse = (req, res) => {
@@ -48,8 +49,9 @@ export const updateResponse = (req, res) => {
         const responseExist = yield getResponseById(responseId);
         if (!responseExist)
             return responseType({ res, status: 404, message: 'Response not found' });
-        const response = yield editResponse(userId, responseId, editedResponse);
-        return responseType({ res, status: 201, count: 1, data: response });
+        yield editResponse(userId, responseId, editedResponse)
+            .then((response) => responseType({ res, status: 201, count: 1, data: response }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const deleteResponse = (req, res) => {
@@ -65,13 +67,15 @@ export const deleteResponse = (req, res) => {
             return responseType({ res, status: 423, message: 'Account locked' });
         const response = yield getResponseById(responseId);
         if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
-            yield deleteSingleResponse(responseId);
-            return res.sendStatus(204);
+            yield deleteSingleResponse(responseId)
+                .then(() => res.sendStatus(204))
+                .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
         if ((response === null || response === void 0 ? void 0 : response.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
             return res.sendStatus(401);
-        yield deleteSingleResponse(responseId);
-        return res.sendStatus(204);
+        yield deleteSingleResponse(responseId)
+            .then(() => res.sendStatus(204))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 // ADMIN USER
@@ -90,12 +94,14 @@ export const deleteUserResponses = (req, res) => {
             return responseType({ res, status: 423, message: 'Account locked' });
         if (adminUser === null || adminUser === void 0 ? void 0 : adminUser.roles.includes(ROLES.ADMIN)) {
             if ((option === null || option === void 0 ? void 0 : option.command) == 'onlyInComment') {
-                yield deleteAllUserResponseInComment(userId, option === null || option === void 0 ? void 0 : option.commentId);
-                return responseType({ res, status: 201, message: 'All user responses in comment deleted' });
+                yield deleteAllUserResponseInComment(userId, option === null || option === void 0 ? void 0 : option.commentId)
+                    .then(() => responseType({ res, status: 201, message: 'All user responses in comment deleted' }))
+                    .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
             else if ((option === null || option === void 0 ? void 0 : option.command) == 'allUserResponse') {
-                yield deleteAllUserResponses(userId);
-                return responseType({ res, status: 201, message: 'All user responses deleted' });
+                yield deleteAllUserResponses(userId)
+                    .then(() => responseType({ res, status: 201, message: 'All user responses deleted' }))
+                    .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
         }
         return responseType({ res, status: 401, message: 'unauthorized' });
@@ -106,13 +112,15 @@ export const getResponse = (req, res) => {
         const { responseId } = req.params;
         if (!responseId)
             return res.sendStatus(400);
-        const userResponse = yield getCachedResponse({ key: `singleResponse:${responseId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `singleResponse:${responseId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield getResponseById(responseId);
                 return response;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!userResponse)
-            return responseType({ res, status: 404, message: 'response not found' });
-        responseType({ res, status: 200, count: 1, data: userResponse });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((userResponse) => {
+            if (!userResponse)
+                return responseType({ res, status: 404, message: 'response not found' });
+            responseType({ res, status: 200, count: 1, data: userResponse });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 // FOR ADMIN PAGE
@@ -129,13 +137,15 @@ export const userResponses = (req, res) => {
         const admin = yield getUserById(adminId);
         if (!admin.roles.includes(ROLES.ADMIN))
             return res.sendStatus(401);
-        const userResponses = yield getCachedResponse({ key: `userResponses:${userId}/${responseId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `userResponses:${userId}/${responseId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const userResponse = yield getUserResponses(userId, responseId);
                 return userResponse;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!(userResponses === null || userResponses === void 0 ? void 0 : userResponses.length))
-            return responseType({ res, status: 404, message: 'User have no response' });
-        return responseType({ res, status: 200, count: userResponses === null || userResponses === void 0 ? void 0 : userResponses.length, data: userResponses });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((userResponses) => {
+            if (!(userResponses === null || userResponses === void 0 ? void 0 : userResponses.length))
+                return responseType({ res, status: 404, message: 'User have no response' });
+            return responseType({ res, status: 200, count: userResponses === null || userResponses === void 0 ? void 0 : userResponses.length, data: userResponses });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const getResponseByComment = (req, res) => {
@@ -143,13 +153,15 @@ export const getResponseByComment = (req, res) => {
         const { commentId } = req.params;
         if (!commentId)
             return res.sendStatus(400);
-        const responsesInStories = yield getCachedResponse({ key: `responseInComment:${commentId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `responseInComment:${commentId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const responses = yield getAllCommentsResponse(commentId);
                 return responses;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!(responsesInStories === null || responsesInStories === void 0 ? void 0 : responsesInStories.length))
-            return responseType({ res, status: 404, message: 'No responses available' });
-        return responseType({ res, status: 200, count: responsesInStories === null || responsesInStories === void 0 ? void 0 : responsesInStories.length, data: responsesInStories });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((responsesInStories) => {
+            if (!(responsesInStories === null || responsesInStories === void 0 ? void 0 : responsesInStories.length))
+                return responseType({ res, status: 404, message: 'No responses available' });
+            return responseType({ res, status: 200, count: responsesInStories === null || responsesInStories === void 0 ? void 0 : responsesInStories.length, data: responsesInStories });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 ///////////////////////////////////////////
@@ -176,8 +188,9 @@ export const like_Unlike_Response = (req, res) => __awaiter(void 0, void 0, void
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        const result = yield likeAndUnlikeResponse(userId, responseId);
-        responseType({ res, status: 201, message: result });
+        yield likeAndUnlikeResponse(userId, responseId)
+            .then((result) => responseType({ res, status: 201, message: result }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 });
 //# sourceMappingURL=responseController.js.map

@@ -39,7 +39,7 @@ export const restoreTaskFromBin = (taskIds, userId) => __awaiter(void 0, void 0,
     // Restore back into task model
     yield Promise.all(tasksToRestore.map((taskToRestore) => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, task, completed, updatedAt, createdAt } = taskToRestore;
-        const restoreTask = { userId, task, completed, updatedAt, createdAt };
+        const restoreTask = { userId, task, completed, updatedAt, createdAt, dateRestored: new Date().toString() };
         yield createNewTask(userId, restoreTask);
     })));
     // save the modified taskbin without the restored tasks

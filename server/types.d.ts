@@ -53,8 +53,8 @@ type TaskBin = {
   userId: string,
   _id: string,
   taskBin: TaskProp[],
-  createdAt: Date,
-  updatedAt?: Date,
+  createdAt: string,
+  updatedAt?: string,
 }
 
 interface TaskProp{
@@ -62,7 +62,8 @@ interface TaskProp{
   userId: string,
   task: string,
   completed: boolean,
-  subTasks?: SubTasks[]
+  subTasks?: SubTasks[],
+  dateRestored: string,
   edited: boolean,
   createdAt: string,
   updatedAt?: string,
