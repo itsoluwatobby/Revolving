@@ -8,7 +8,7 @@ type TaskArgs = {
 }
 
 type AdvancedTaskArgs = {
-  userId: string, taskIds: string[]
+  userId: string, taskIds:  {taskIds: string[]}
 }
 
 type ResponseType = { data: TaskProp[] }
@@ -81,7 +81,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
       query: ({taskIds, userId}) => ({
         url: `task/restore/${userId}`,
         method: 'POST',
-        body: {...taskIds}
+        body: taskIds
       }) as any,
       invalidatesTags: [{ type: 'TASKBIN'}, { type: 'TASK' }]
     }),
@@ -91,7 +91,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
       query: ({taskIds, userId}) => ({
         url: `task/delete/${userId}`,
         method: 'DELETE',
-        body: {...taskIds}
+        body: taskIds
       }) as any,
       invalidatesTags: [{ type: 'TASKBIN'}]
     }),

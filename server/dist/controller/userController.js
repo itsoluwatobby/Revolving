@@ -14,13 +14,18 @@ import { ROLES } from "../config/allowedRoles.js";
 import bcrypt from 'bcrypt';
 export const getUsers = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const users = yield getCachedResponse({ key: `allUsers`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `allUsers`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const allUsers = yield getAllUsers();
                 if (!(allUsers === null || allUsers === void 0 ? void 0 : allUsers.length))
                     return responseType({ res, status: 404, message: 'No users available' });
                 return allUsers;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        return responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((users) => {
+            return responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users });
+        })
+            .catch((error) => {
+            responseType({ res, status: 404, message: `${error.message}` });
+        });
     }));
 };
 export const getUser = (req, res) => {

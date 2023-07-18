@@ -17,11 +17,6 @@ type TaskProps = {
   setViewSingle: React.Dispatch<React.SetStateAction<ChatOption>>
 }
 
-// function buttonClass(theme: Theme, type: ButtonType){
-//   return `
-//   rounded-md ${type === 'EDIT' ? 'text-2xl' : 'text-[22px]'} cursor-pointer transition-all shadow-lg p-0.5 hover:opacity-70 transition-shadow duration-150 active:opacity-100 border ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-900'}
-//   `
-// }
 
 export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
   const [isChecked, setIsChecked] = useState<boolean>(false)

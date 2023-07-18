@@ -4,6 +4,13 @@ type FontProp = {
   [index: string] : string
 }
 
+type Button = 'RESTORE' | 'DELETE';
+type Position = 'NAV' | 'NORM';
+type FunctionOption = {
+  type: 'SINGLE' | 'MULTI',
+  taskId?: string
+}
+
 type TextProp = {
   boldText: string
   italics: string

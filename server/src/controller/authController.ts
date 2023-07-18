@@ -123,10 +123,10 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     const { _id, ...rest } = user
     await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false }})
     //authentication: { sessionID: req?.sessionID },
-    
-    res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
-
-    return responseType({res, status: 200, count:1, data:{_id, roles, accessToken}})
+    .then(() => {
+      res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
+      return responseType({res, status: 200, count:1, data:{_id, roles, accessToken}})
+    }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }
 
@@ -171,7 +171,8 @@ export const forgetPassword = async(req: Request, res: Response) => {
       if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
     })
     await user.updateOne({$set: { isResetPassword: true, verificationToken: passwordResetToken }})
-    return responseType({res, status:201, message:'Please check your email'})
+    .then(() => responseType({res, status:201, message:'Please check your email'}))
+    .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }
 
@@ -188,7 +189,8 @@ export const passwordResetRedirectLink = async(req: QueryProps, res: Response) =
     if (verify?.email != user?.email) return res.sendStatus(400)
 
     await user.updateOne({$set: { verificationToken: '' }})
-    res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`)
+    .then(() => res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`))
+    .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }
 
@@ -222,15 +224,17 @@ export const toggleAdminRole = (req: Request, res: Response) => {
     if(admin?.roles.includes(ROLES.ADMIN)) {
       if(!user?.roles.includes(ROLES.ADMIN)) {
         user.roles = [...user.roles, ROLES.ADMIN]
-        user.save()
-        const userAd = await getUserById(userId);
-        return responseType({res, status:201, count: 1, message: 'admin role assigned', data: userAd})
+        await user.save()
+        await getUserById(userId)
+        .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role assigned', data: userAd}))
+        .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }
       else{
         user.roles = [ROLES.USER]
-        user.save()
-        const userAd = await getUserById(userId);
-        return responseType({res, status:201, count: 1, message:'admin role removed', data: userAd})
+        await user.save()
+         await getUserById(userId)
+        .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role removed', data: userAd}))
+        .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }
     }
     else return responseType({res, status:401, message:'unauthorised'})

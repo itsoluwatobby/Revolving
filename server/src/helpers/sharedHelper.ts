@@ -27,7 +27,7 @@ export const unShareStory = async(userId: string, sharedId: string) => {
   const story = await getStoryById(sharedStory?.storyId)
   const verifyUser = story?.isShared.map(targetShare => targetShare?.userId === userId && targetShare?.sharedId === sharedId).find(res => res = true)
   if(!verifyUser) return 'unauthorized'
-  await sharedStory.deleteOne();
+  await sharedStory.deleteOne()
   await story?.updateOne({ $pull: { isShared: { userId, sharedId } } });
 }
 

@@ -44,13 +44,15 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
     if(verify == 'Bad Token') {
       // TODO: account hacked, send email to user
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
-      user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
-      return res.sendStatus(401);
+      await user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
+      .then(() => res.sendStatus(401))
+      .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     }
     else if(verify == 'Expired Token') {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
-      user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
-      return responseType({res, status: 403, message: 'Expired Token'})
+      await user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
+      .then(() => responseType({res, status: 403, message: 'Expired Token'}))
+      .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     }
   }
   const roles = Object.values(user?.roles);
@@ -59,9 +61,10 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
 
   await user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
     //authentication: { sessionID: req?.sessionID },
-    
-  res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
-  return responseType({res, status: 200, data:{_id: user?._id, roles, accessToken: newAccessToken}})
+  .then(() => {
+    res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
+    return responseType({res, status: 200, data:{_id: user?._id, roles, accessToken: newAccessToken}})
+  }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
 }
 
 // TODO: add secure option to cookies
