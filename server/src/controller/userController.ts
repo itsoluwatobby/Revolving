@@ -79,16 +79,40 @@ export const deleteUserAccount = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId} = req.params
     const {adminId} = req.query
-    if (!userId) return res.sendStatus(400);
+    if (!userId || !adminId) return res.sendStatus(400);
     const user = await getUserById(userId);
     const admin = await getUserById(adminId as string);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    if(user || admin.roles.includes(ROLES.ADMIN)){
+    if(admin.roles.includes(ROLES.ADMIN)){
       await deleteAccount(userId)
       .then(() => responseType({res, status: 204}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
-    return responseType({res, status: 401, message: 'unauthorized'});
+    else return responseType({res, status: 401, message: 'unauthorized'});
   })
 }
+
+export const lockAndUnlockUserAccount = (req: Request, res: Response) => {
+  asyncFunc(res, async () => {
+    const {userId} = req.params
+    const {adminId} = req.query
+    if (!userId || !adminId) return res.sendStatus(400);
+    const user = await getUserById(userId);
+    const admin = await getUserById(adminId as string);
+    if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
+    if(admin?.roles.includes(ROLES.ADMIN)){
+      if(!user.isAccountLocked){
+        await user.updateOne({$set: { isAccountLocked: true }})
+        .then(() => responseType({res, status: 201, message: 'user account LOCKED successfully'}))
+        .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+      }
+      else {
+        await user.updateOne({$set: { isAccountLocked: false }})
+        .then(() => responseType({res, status: 201, message: 'user account UNLOCKED successfully'}))
+        .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+      }
+    }
+    else return responseType({res, status: 401, message: 'unauthorized'});
+  })
+}
+

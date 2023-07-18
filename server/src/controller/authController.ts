@@ -22,11 +22,27 @@ interface EmailProps extends Request{
   resetPass: string
 }
 
+const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
+const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
+
+
 export const registerUser = async(req: NewUserProp, res: Response) => {
   asyncFunc(res, async () => {
     const {username, email, password} = req.body
     if (!username || !email || !password) return res.sendStatus(400);
-
+    if(!emailRegex.test(email) || !passwordRegex.test(password)) return responseType({res, status: 400, message: 'Invalid email or Password format', data: {
+      requirement:  {
+        password: {
+          "a": 'Should atleast contain a symbol and number', 
+          "b": 'An uppercase and a lowerCase letter', 
+          "c": 'And a minimum of nine characters'
+        },
+        email: {
+          "a": 'Should be a valid email address', 
+          "b": 'Verification link will be sent to the provided email for account verification'
+        }
+      }
+    }})
     const duplicateEmail = await UserModel.findOne({email}).select('+authentication.password').exec();
     if(duplicateEmail) {
       if (duplicateEmail?.isAccountActivated) {

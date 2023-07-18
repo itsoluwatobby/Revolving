@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { getUserByToken } from "../helpers/userHelpers.js";
+import { getUserByEmail, getUserByToken } from "../helpers/userHelpers.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
-import { ClaimProps, USERROLES } from "../../types.js";
+import { ClaimProps, USERROLES, UserProps } from "../../types.js";
+import { getCachedResponse } from "../helpers/redis.js";
 
 
 interface TokenProp extends Request{
@@ -15,6 +16,14 @@ interface CookieProp extends Request{
   }
 }
 
+const activatedAccount = async(email: string): Promise<UserProps> => {
+  const userData = await getCachedResponse({key: `user:${email}`, cb: async() => {
+    const user = await getUserByEmail(email)
+    return user
+  }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE']}) as UserProps
+  return userData
+}
+
 export const verifyAccessToken = async(req: TokenProp, res: Response, next: NextFunction) => {
   const auth = req.headers['authorization']
   if(!auth || !auth.startsWith('Bearer ')) return res.sendStatus(401)
@@ -26,9 +35,15 @@ export const verifyAccessToken = async(req: TokenProp, res: Response, next: Next
     else if(verify == 'Expired Token') return res.sendStatus(403)
   }
   else if(typeof verify == 'object'){
-    req.email = verify?.email
-    req.roles = verify?.roles
-    next()
+    // check if user account is activated
+    await activatedAccount(verify?.email)
+    .then((user) => {
+      if(!user.isAccountActivated) return responseType({res, status: 403, message: 'Account not activated'})
+      if(user.isAccountLocked) return responseType({res, status: 403, message: 'Account Locked, Please contact support'})
+      req.email = verify?.email
+      req.roles = verify?.roles
+      next()
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   }
 }
 

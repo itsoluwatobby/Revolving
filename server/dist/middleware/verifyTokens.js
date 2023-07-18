@@ -7,8 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getUserByToken } from "../helpers/userHelpers.js";
+import { getUserByEmail, getUserByToken } from "../helpers/userHelpers.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
+import { getCachedResponse } from "../helpers/redis.js";
+const activatedAccount = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = yield getCachedResponse({ key: `user:${email}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield getUserByEmail(email);
+            return user;
+        }), reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] });
+    return userData;
+});
 export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const auth = req.headers['authorization'];
     if (!auth || !auth.startsWith('Bearer '))
@@ -22,9 +30,17 @@ export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, v
             return res.sendStatus(403);
     }
     else if (typeof verify == 'object') {
-        req.email = verify === null || verify === void 0 ? void 0 : verify.email;
-        req.roles = verify === null || verify === void 0 ? void 0 : verify.roles;
-        next();
+        // check if user account is activated
+        yield activatedAccount(verify === null || verify === void 0 ? void 0 : verify.email)
+            .then((user) => {
+            if (!user.isAccountActivated)
+                return responseType({ res, status: 403, message: 'Account not activated' });
+            if (user.isAccountLocked)
+                return responseType({ res, status: 403, message: 'Account Locked, Please contact support' });
+            req.email = verify === null || verify === void 0 ? void 0 : verify.email;
+            req.roles = verify === null || verify === void 0 ? void 0 : verify.roles;
+            next();
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }
 });
 export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

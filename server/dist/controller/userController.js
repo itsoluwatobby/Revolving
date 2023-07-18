@@ -89,20 +89,45 @@ export const deleteUserAccount = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         const { adminId } = req.query;
-        if (!userId)
+        if (!userId || !adminId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         const admin = yield getUserById(adminId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
-        if (user || admin.roles.includes(ROLES.ADMIN)) {
+        if (admin.roles.includes(ROLES.ADMIN)) {
             yield deleteAccount(userId)
                 .then(() => responseType({ res, status: 204 }))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
-        return responseType({ res, status: 401, message: 'unauthorized' });
+        else
+            return responseType({ res, status: 401, message: 'unauthorized' });
+    }));
+};
+export const lockAndUnlockUserAccount = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId } = req.params;
+        const { adminId } = req.query;
+        if (!userId || !adminId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        const admin = yield getUserById(adminId);
+        if (!user)
+            return responseType({ res, status: 403, message: 'You do not have an account' });
+        if (admin === null || admin === void 0 ? void 0 : admin.roles.includes(ROLES.ADMIN)) {
+            if (!user.isAccountLocked) {
+                yield user.updateOne({ $set: { isAccountLocked: true } })
+                    .then(() => responseType({ res, status: 201, message: 'user account LOCKED successfully' }))
+                    .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+            }
+            else {
+                yield user.updateOne({ $set: { isAccountLocked: false } })
+                    .then(() => responseType({ res, status: 201, message: 'user account UNLOCKED successfully' }))
+                    .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+            }
+        }
+        else
+            return responseType({ res, status: 401, message: 'unauthorized' });
     }));
 };
 //# sourceMappingURL=userController.js.map
