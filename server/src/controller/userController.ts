@@ -8,25 +8,27 @@ import bcrypt from 'bcrypt'
 
 export const getUsers = (req: Request, res: Response) => {
   asyncFunc(res, async() => { 
-    const users = await getCachedResponse({key:`allUsers`, cb: async() => {
+    await getCachedResponse({key:`allUsers`, cb: async() => {
       const allUsers = await getAllUsers()
       if(!allUsers?.length) return responseType({res, status: 404, message: 'No users available'})
       return allUsers
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']}) as UserProps[];
-    return responseType({res, status: 200, count: users?.length, data: users})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
+    .then((users: UserProps[]) => responseType({res, status: 200, count: users?.length, data: users}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
 export const getUser = (req: Request, res: Response) => {
   asyncFunc(res, async() => { 
     const {userId} = req.params
-    const user = await getCachedResponse({key: `user:${userId}`, cb: async() => {
+    await getCachedResponse({key: `user:${userId}`, cb: async() => {
       const current = await getUserById(userId)
       await autoDeleteOnExpire(userId)
       if(!current) return responseType({res, status: 404, message: 'User not found'})
       return current;
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']}) as UserProps;
-    return responseType({res, status: 200, count: 1, data: user})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
+    .then((user: UserProps) => responseType({res, status: 200, count: 1, data: user}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -67,9 +69,7 @@ export const updateUserInfo = (req: Request, res: Response) => {
     }
     else{
       await updateUser(userId, userInfo)
-      .then(updatedInfo => {
-        return responseType({res, status: 201, message: 'success', data: updatedInfo});
-      })
+      .then(updatedInfo => responseType({res, status: 201, message: 'success', data: updatedInfo}))
       .catch(error => responseType({res, status: 400, message: error.message}))
     }    
   })
@@ -85,8 +85,9 @@ export const deleteUserAccount = (req: Request, res: Response) => {
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     if(user || admin.roles.includes(ROLES.ADMIN)){
-      await deleteAccount(userId);
-      return responseType({res, status: 204})
+      await deleteAccount(userId)
+      .then(() => responseType({res, status: 204}))
+      .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
     return responseType({res, status: 401, message: 'unauthorized'});
   })

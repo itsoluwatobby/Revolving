@@ -5,7 +5,6 @@ import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.j
 import { CommentResponseProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
 import { Like_Unlike_Response, createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getCommentById, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../helpers/commentHelper.js";
-import { CommentModel } from "../models/CommentModel.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -26,8 +25,9 @@ export const createNewResponse = (req: RequestProp, res: Response) => {
     const comment = await getCommentById(commentId)
     if(!comment) return responseType({res, status: 404, message: 'Comment not found'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const response = await createResponse({...newResponse});
-    return responseType({res, status: 201, count:1, data: response})
+    await createResponse({...newResponse})
+    .then((response) => responseType({res, status: 201, count:1, data: response}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -42,8 +42,9 @@ export const updateResponse = (req: RequestProp, res: Response) => {
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const responseExist = await getResponseById(responseId)
     if(!responseExist) return responseType({res, status: 404, message: 'Response not found'})
-    const response = await editResponse(userId, responseId, editedResponse)
-    return responseType({res, status: 201, count:1, data: response})
+    await editResponse(userId, responseId, editedResponse)
+    .then((response) => responseType({res, status: 201, count:1, data: response}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -58,11 +59,13 @@ export const deleteResponse = (req: RequestProp, res: Response) => {
     const response = await getResponseById(responseId) as CommentResponseProps
     if(user?.roles.includes(ROLES.ADMIN)) {
       await deleteSingleResponse(responseId)
-      return res.sendStatus(204)
+      .then(() => res.sendStatus(204))
+      .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
     if(response?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
     await deleteSingleResponse(responseId)
-    return res.sendStatus(204)
+    .then(() => res.sendStatus(204))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -81,11 +84,13 @@ export const deleteUserResponses = (req: RequestProp, res: Response) => {
     if(adminUser?.roles.includes(ROLES.ADMIN)) {
       if(option?.command == 'onlyInComment'){
         await deleteAllUserResponseInComment(userId, option?.commentId)
-        return responseType({res, status: 201, message: 'All user responses in comment deleted'})
+        .then(() => responseType({res, status: 201, message: 'All user responses in comment deleted'}))
+        .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
       else if(option?.command == 'allUserResponse'){
         await deleteAllUserResponses(userId)
-        return responseType({res, status: 201, message: 'All user responses deleted'})
+        .then(() => responseType({res, status: 201, message: 'All user responses deleted'}))
+        .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
     }
     return responseType({res, status: 401, message: 'unauthorized'})
@@ -96,13 +101,14 @@ export const getResponse = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const {responseId} = req.params
     if(!responseId) return res.sendStatus(400);
-    const userResponse = await getCachedResponse({key:`singleResponse:${responseId}`, timeTaken: 1800, cb: async() => {
+    await getCachedResponse({key:`singleResponse:${responseId}`, timeTaken: 1800, cb: async() => {
       const response = await getResponseById(responseId)
       return response;
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as CommentResponseProps;
-    
-    if(!userResponse) return responseType({res, status: 404, message: 'response not found'})
-    responseType({res, status: 200, count:1, data: userResponse})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((userResponse: CommentResponseProps) => {
+      if(!userResponse) return responseType({res, status: 404, message: 'response not found'})
+      responseType({res, status: 200, count:1, data: userResponse})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -117,13 +123,14 @@ export const userResponses = (req: Request, res: Response) => {
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const admin = await getUserById(adminId)
     if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
-    const userResponses = await getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
+    await getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
       const userResponse = await getUserResponses(userId, responseId) 
       return userResponse
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (CommentResponseProps[] | string);
-    
-    if(!userResponses?.length) return responseType({res, status: 404, message: 'User have no response'})
-    return responseType({res, status: 200, count: userResponses?.length, data: userResponses})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((userResponses: CommentResponseProps[] | string) => {
+      if(!userResponses?.length) return responseType({res, status: 404, message: 'User have no response'})
+      return responseType({res, status: 200, count: userResponses?.length, data: userResponses})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -131,13 +138,14 @@ export const getResponseByComment = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { commentId } = req.params;
     if(!commentId) return res.sendStatus(400);
-    const responsesInStories = await getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
+    await getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
       const responses = await getAllCommentsResponse(commentId);
       return responses
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (CommentResponseProps[] | string)
-
-    if(!responsesInStories?.length) return responseType({res, status: 404, message: 'No responses available'})
-    return responseType({res, status: 200, count: responsesInStories?.length, data: responsesInStories})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((responsesInStories: CommentResponseProps[] | string) => {
+      if(!responsesInStories?.length) return responseType({res, status: 404, message: 'No responses available'})
+      return responseType({res, status: 200, count: responsesInStories?.length, data: responsesInStories})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -165,8 +173,9 @@ export const like_Unlike_Response = async(req: Request, res: Response) => {
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const result = await likeAndUnlikeResponse(userId, responseId) as Like_Unlike_Response;
-    responseType({res, status: 201, message: result})
+    await likeAndUnlikeResponse(userId, responseId)
+    .then((result: Like_Unlike_Response) => responseType({res, status: 201, message: result}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 

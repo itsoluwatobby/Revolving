@@ -24,8 +24,9 @@ export const createNewStory = (req: RequestProp, res: Response) => {
     newStory = {...newStory, userId, author: user?.username} as StoryProps
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const story = await createUserStory({...newStory});
-    return responseType({res, status: 201, count:1, data: story})
+    await createUserStory({...newStory})
+    .then((story) => responseType({res, status: 201, count:1, data: story}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -38,9 +39,11 @@ export const updateStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const updatedStory = await updateUserStory(storyId, editedStory)
-    if(!updatedStory) return responseType({res, status: 404, message: 'Story not found'})
-    return responseType({res, status: 201, count:1, data: updatedStory})
+    await updateUserStory(storyId, editedStory)
+    .then((updatedStory) => {
+      if(!updatedStory) return responseType({res, status: 404, message: 'Story not found'})
+      return responseType({res, status: 201, count:1, data: updatedStory})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -58,11 +61,13 @@ export const deleteStory = (req: RequestProp, res: Response) => {
 
     if(user?.roles.includes(ROLES.ADMIN)) {
       await deleteUserStory(storyId)
-      return res.sendStatus(204)
+      .then(() => res.sendStatus(204))
+      .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
     if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
     await deleteUserStory(storyId)
-    return res.sendStatus(204)
+    .then(() => res.sendStatus(204))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -81,7 +86,8 @@ export const deleteStoryByAdmin = (req: RequestProp, res: Response) => {
 
     if(user?.roles.includes(ROLES.ADMIN)) {
       await deleteAllUserStories(userId)
-      return responseType({res, status: 201, message: 'All user stories deleted'})
+      .then(() => responseType({res, status: 201, message: 'All user stories deleted'}))
+      .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     } 
     return responseType({res, status: 401, message: 'unauthorized'})
   })
@@ -91,13 +97,14 @@ export const getStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const {storyId} = req.params
     if(!storyId) return res.sendStatus(400);
-    const userStory = await getCachedResponse({key:`singleStory:${storyId}`, timeTaken: 1800, cb: async() => {
+    await getCachedResponse({key:`singleStory:${storyId}`, timeTaken: 1800, cb: async() => {
       const story = await getStoryById(storyId)
       return story;
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as StoryProps;
-    
-    if(!userStory) return responseType({res, status: 404, message: 'story not found'})
-    responseType({res, status: 200, count:1, data: userStory})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((userStory: StoryProps) => {
+      if(!userStory) return responseType({res, status: 404, message: 'story not found'})
+      responseType({res, status: 200, count:1, data: userStory})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -110,13 +117,14 @@ export const getUserStory = (req: Request, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return res.sendStatus(404)
     // if(user?.isAccountLocked) return res.sendStatus(401)
-    const userStories = await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
+    await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
       const userStory = await getUserStories(userId) 
       return userStory
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })  as (StoryProps[] | string);
-    
-    if(!userStories?.length) return responseType({res, status: 404, message: 'You have no stories'})
-    return responseType({res, status: 200, count: userStories?.length, data: userStories})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((userStories: StoryProps[] | string) => {
+      if(!userStories?.length) return responseType({res, status: 404, message: 'You have no stories'})
+      return responseType({res, status: 200, count: userStories?.length, data: userStories})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -124,7 +132,7 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async() => {
     const {category} = req.query
     if(!category) return res.sendStatus(400);
-    const storyCategory = await getCachedResponse({key:`story:${category}`, cb: async() => {
+    await getCachedResponse({key:`story:${category}`, cb: async() => {
       const categoryStory = await StoryModel.find({category: {$in: [category]}})
       const sharedCategoryStory = await getAllSharedByCategories(category as string)
       const reMoulded = sharedCategoryStory.map(share => {
@@ -136,16 +144,17 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
       })
       const refactoredModel = [...categoryStory, ...reMoulded]
       return refactoredModel
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
-    
-    if(!storyCategory?.length) return responseType({res, status: 404, message: 'You have no stories'});
-    return responseType({res, status: 200, count: storyCategory?.length, data: storyCategory})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((storyCategory: StoryProps[] | string) => {
+      if(!storyCategory?.length) return responseType({res, status: 404, message: 'You have no stories'});
+      return responseType({res, status: 200, count: storyCategory?.length, data: storyCategory})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
 export const getStories = (req: Request, res: Response) => {
   asyncFunc(res, async () => {
-    const allStories = await getCachedResponse({key:'allStories', cb: async() => {
+    await getCachedResponse({key:'allStories', cb: async() => {
       const stories = await getAllStories();
       const sharedStories = await getAllSharedStories();
       const reMoulded = sharedStories.map(share => {
@@ -158,10 +167,11 @@ export const getStories = (req: Request, res: Response) => {
       })
       const everyStories = [...stories, ...reMoulded]
       return everyStories
-    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] }) as (StoryProps[] | string)
-
-    if(!allStories?.length) return responseType({res, status: 404, message: 'No stories available'})
-    return responseType({res, status: 200, count: allStories?.length, data: allStories})
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((allStories: StoryProps[] | string) => {
+      if(!allStories?.length) return responseType({res, status: 404, message: 'No stories available'})
+      return responseType({res, status: 200, count: allStories?.length, data: allStories})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 
@@ -173,8 +183,9 @@ export const like_Unlike_Story = async(req: Request, res: Response) => {
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    const result = await likeAndUnlikeStory(userId, storyId) as Like_Unlike;
-    responseType({res, status: 201, message: result})
+    await likeAndUnlikeStory(userId, storyId)
+    .then((result: Like_Unlike) => responseType({res, status: 201, message: result}))
+    .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
 

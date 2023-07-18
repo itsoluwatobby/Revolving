@@ -23,8 +23,13 @@ export const createTask = (req, res) => {
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
             return responseType({ res, status: 403, message: 'Not you resource' });
-        const newTask = yield createNewTask(userId, task);
-        return responseType({ res, count: 1, data: newTask });
+        yield createNewTask(userId, task)
+            .then((newTask) => {
+            return responseType({ res, count: 1, data: newTask });
+        })
+            .catch((error) => {
+            responseType({ res, status: 404, message: `${error.message}` });
+        });
     }));
 };
 export const updateTasks = (req, res) => {
@@ -39,8 +44,13 @@ export const updateTasks = (req, res) => {
             return responseType({ res, status: 401, message: 'unauthorized' });
         if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
             return responseType({ res, status: 403, message: 'Not you resource' });
-        const updatedTask = yield updateTask(task);
-        return responseType({ res, status: 201, count: 1, data: updatedTask });
+        yield updateTask(task)
+            .then((updatedTask) => {
+            return responseType({ res, status: 201, count: 1, data: updatedTask });
+        })
+            .catch((error) => {
+            responseType({ res, status: 404, message: `${error.message}` });
+        });
     }));
 };
 export const deleteUserTask = (req, res) => {
@@ -62,7 +72,7 @@ export const deleteUserTask = (req, res) => {
             return responseType({ res, status: 204, message: 'task deleted' });
         })
             .catch((error) => {
-            console.log(error.messages);
+            responseType({ res, status: 404, message: `${error.message}` });
         });
     }));
 };
@@ -77,8 +87,13 @@ export const emptyBin = (req, res) => {
         const task = yield getTaskInBin(userId);
         if (!task)
             return responseType({ res, status: 404, message: 'bin not found' });
-        yield emptyTaskBin(userId);
-        return responseType({ res, status: 201, message: 'task bin emptied' });
+        yield emptyTaskBin(userId)
+            .then(() => {
+            return responseType({ res, status: 201, message: 'task bin emptied' });
+        })
+            .catch((error) => {
+            responseType({ res, status: 404, message: `${error.message}` });
+        });
     }));
 };
 export const getUserTask = (req, res) => {
@@ -144,7 +159,7 @@ export const restoreTasks = (req, res) => {
             responseType({ res, status: 201, message: 'Tasks restored' });
         })
             .catch((error) => {
-            responseType({ res, status: 404, message: `${error.message}\n${error.messages}` });
+            responseType({ res, status: 404, message: `${error.message}` });
         });
     }));
 };
@@ -163,7 +178,7 @@ export const deletePeranently = (req, res) => {
             responseType({ res, status: 204, message: 'Tasks deleted permanently' });
         })
             .catch((error) => {
-            responseType({ res, status: 404, message: `${error.message}\n${error.messages}` });
+            responseType({ res, status: 404, message: `${error.message}` });
         });
     }));
 };

@@ -12,9 +12,8 @@ import { useDispatch } from "react-redux"
 import { setAllTasks } from "../features/story/taskManagerSlice"
 import { useParams } from "react-router-dom"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
-import Taskbin from "../components/taskManager/Taskbin"
+import Taskbin from "../components/taskManager/TaskBin/Taskbin"
 import { REFRESH_RATE } from "../utils/navigator"
-
 
 export default function TaskManager() {
   const { theme } = useThemeContext() as ThemeContextType
@@ -57,7 +56,7 @@ export default function TaskManager() {
   loadingTasks ? taskContent = (
     <SkeletonTask />
   ) : isError ? taskContent = (
-    <p className='text-center mt-5 text-sm'>
+    <p className='text-center mt-5 text-sm whitespace-pre-wrap'>
     {
       errorMsg?.status == 404 ? 
         <span className='flex flex-col gap-2 font-serif'>

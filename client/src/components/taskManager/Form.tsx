@@ -10,6 +10,7 @@ import { useCreateTaskMutation, useUpdateTaskMutation } from "../../app/api/task
 import { RootState } from "../../app/store"
 import { toast } from "react-hot-toast"
 import { useThemeContext } from "../../hooks/useThemeContext"
+import { ErrorStyle } from "../../utils/navigator"
 
 type FormProps = {
   currentUserId: string
@@ -152,11 +153,7 @@ export default function Form({ currentUserId }: FormProps) {
     catch(err){
       const errors = error as ErrorResponse
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

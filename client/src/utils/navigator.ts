@@ -14,6 +14,16 @@ export const NAVIGATE: Record<ComponentKey, Components> = {
 
 type Option = 'letter' | 'word'
 
+export const ErrorStyle = {
+  duration: 10000, 
+  icon: '💀', 
+  style: {
+    background: '#FF0000', 
+    color: '#FFFFFF',
+    fontSize: '13px'
+  }
+}
+
 export const reduceLength = (content: string, maxLength: number, option: Option = 'letter'): string => {
   let responseOutput: string;
   if(option == 'letter'){

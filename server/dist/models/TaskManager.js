@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, now } from "mongoose";
 const SubTasksSchema = new Schema({
     title: { type: String, trim: true, default: '' },
     body: { type: String, trim: true, default: '' }
@@ -11,6 +11,7 @@ const TaskManagerSchema = new Schema({
     completed: { type: Boolean, default: false },
     edited: { type: Boolean, default: false },
     subTasks: [SubTasksSchema],
+    dateRestored: { type: Date, default: now() },
 }, {
     minimize: false,
     timestamps: true
