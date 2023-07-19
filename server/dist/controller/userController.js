@@ -20,25 +20,22 @@ export const getUsers = (req, res) => {
                     return responseType({ res, status: 404, message: 'No users available' });
                 return allUsers;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
-            .then((users) => {
-            return responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users });
-        })
-            .catch((error) => {
-            responseType({ res, status: 404, message: `${error.message}` });
-        });
+            .then((users) => responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const getUser = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
-        const user = yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const current = yield getUserById(userId);
                 yield autoDeleteOnExpire(userId);
                 if (!current)
                     return responseType({ res, status: 404, message: 'User not found' });
                 return current;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        return responseType({ res, status: 200, count: 1, data: user });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((user) => responseType({ res, status: 200, count: 1, data: user }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const followUnFollowUser = (req, res) => {
@@ -83,9 +80,7 @@ export const updateUserInfo = (req, res) => {
         }
         else {
             yield updateUser(userId, userInfo)
-                .then(updatedInfo => {
-                return responseType({ res, status: 201, message: 'success', data: updatedInfo });
-            })
+                .then(updatedInfo => responseType({ res, status: 201, message: 'success', data: updatedInfo }))
                 .catch(error => responseType({ res, status: 400, message: error.message }));
         }
     }));
@@ -94,19 +89,45 @@ export const deleteUserAccount = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         const { adminId } = req.query;
-        if (!userId)
+        if (!userId || !adminId)
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         const admin = yield getUserById(adminId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
-        if (user || admin.roles.includes(ROLES.ADMIN)) {
-            yield deleteAccount(userId);
-            return responseType({ res, status: 204 });
+        if (admin.roles.includes(ROLES.ADMIN)) {
+            yield deleteAccount(userId)
+                .then(() => responseType({ res, status: 204 }))
+                .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
-        return responseType({ res, status: 401, message: 'unauthorized' });
+        else
+            return responseType({ res, status: 401, message: 'unauthorized' });
+    }));
+};
+export const lockAndUnlockUserAccount = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId } = req.params;
+        const { adminId } = req.query;
+        if (!userId || !adminId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        const admin = yield getUserById(adminId);
+        if (!user)
+            return responseType({ res, status: 403, message: 'You do not have an account' });
+        if (admin === null || admin === void 0 ? void 0 : admin.roles.includes(ROLES.ADMIN)) {
+            if (!user.isAccountLocked) {
+                yield user.updateOne({ $set: { isAccountLocked: true } })
+                    .then(() => responseType({ res, status: 201, message: 'user account LOCKED successfully' }))
+                    .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+            }
+            else {
+                yield user.updateOne({ $set: { isAccountLocked: false } })
+                    .then(() => responseType({ res, status: 201, message: 'user account UNLOCKED successfully' }))
+                    .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+            }
+        }
+        else
+            return responseType({ res, status: 401, message: 'unauthorized' });
     }));
 };
 //# sourceMappingURL=userController.js.map

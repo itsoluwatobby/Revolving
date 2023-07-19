@@ -93,7 +93,7 @@ export const deleteUserComments = (req: RequestProp, res: Response) => {
         .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }
     }
-    return responseType({res, status: 401, message: 'unauthorized'})
+    else return responseType({res, status: 401, message: 'unauthorized'})
   })
 }
 

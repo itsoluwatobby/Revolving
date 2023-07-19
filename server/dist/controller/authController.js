@@ -7,31 +7,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../helpers/userHelpers.js";
 import brcypt from 'bcrypt';
-import { sub } from "date-fns";
 import { asyncFunc, mailOptions, responseType, signToken, transporter, objInstance, verifyToken, autoDeleteOnExpire } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
 import { redisClient } from "../helpers/redis.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { TaskBinModel } from "../models/TaskManager.js";
+const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
+const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         const { username, email, password } = req.body;
         if (!username || !email || !password)
             return res.sendStatus(400);
+        if (!emailRegex.test(email) || !passwordRegex.test(password))
+            return responseType({ res, status: 400, message: 'Invalid email or Password format', data: {
+                    requirement: {
+                        password: {
+                            "a": 'Should atleast contain a symbol and number',
+                            "b": 'An uppercase and a lowerCase letter',
+                            "c": 'And a minimum of nine characters'
+                        },
+                        email: {
+                            "a": 'Should be a valid email address',
+                            "b": 'Verification link will be sent to the provided email for account verification'
+                        }
+                    }
+                } });
         const duplicateEmail = yield UserModel.findOne({ email }).select('+authentication.password').exec();
         if (duplicateEmail) {
             if (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountActivated) {
@@ -46,7 +50,7 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return responseType({ res, status: 200, message: 'Please check your email to activate your account' });
         }
         const hashedPassword = yield brcypt.hash(password, 10);
-        const dateTime = sub(new Date, { minutes: 0 }).toISOString();
+        const dateTime = new Date().toString();
         const user = {
             username, email,
             authentication: { password: hashedPassword },
@@ -128,11 +132,13 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
             yield TaskBinModel.create({ userId: user === null || user === void 0 ? void 0 : user._id, taskBin: [] });
         }
         yield autoDeleteOnExpire(user === null || user === void 0 ? void 0 : user._id);
-        const { _id } = user, rest = __rest(user, ["_id"]);
-        yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false } });
-        //authentication: { sessionID: req?.sessionID },
-        res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
-        return responseType({ res, status: 200, count: 1, data: { _id, roles, accessToken } });
+        const { _id } = user;
+        yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false } })
+            //authentication: { sessionID: req?.sessionID },
+            .then(() => {
+            res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
+            return responseType({ res, status: 200, count: 1, data: { _id, roles, accessToken } });
+        }).catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 });
 export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -177,8 +183,9 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
             if (err)
                 return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
         });
-        yield user.updateOne({ $set: { isResetPassword: true, verificationToken: passwordResetToken } });
-        return responseType({ res, status: 201, message: 'Please check your email' });
+        yield user.updateOne({ $set: { isResetPassword: true, verificationToken: passwordResetToken } })
+            .then(() => responseType({ res, status: 201, message: 'Please check your email' }))
+            .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 });
 export const passwordResetRedirectLink = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -196,8 +203,9 @@ export const passwordResetRedirectLink = (req, res) => __awaiter(void 0, void 0,
             return res.sendStatus(400);
         if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
             return res.sendStatus(400);
-        yield user.updateOne({ $set: { verificationToken: '' } });
-        res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`);
+        yield user.updateOne({ $set: { verificationToken: '' } })
+            .then(() => res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`))
+            .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 });
 export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -234,15 +242,17 @@ export const toggleAdminRole = (req, res) => {
         if (admin === null || admin === void 0 ? void 0 : admin.roles.includes(ROLES.ADMIN)) {
             if (!(user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN))) {
                 user.roles = [...user.roles, ROLES.ADMIN];
-                user.save();
-                const userAd = yield getUserById(userId);
-                return responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: userAd });
+                yield user.save();
+                yield getUserById(userId)
+                    .then((userAd) => responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: userAd }))
+                    .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
             }
             else {
                 user.roles = [ROLES.USER];
-                user.save();
-                const userAd = yield getUserById(userId);
-                return responseType({ res, status: 201, count: 1, message: 'admin role removed', data: userAd });
+                yield user.save();
+                yield getUserById(userId)
+                    .then((userAd) => responseType({ res, status: 201, count: 1, message: 'admin role removed', data: userAd }))
+                    .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
             }
         }
         else

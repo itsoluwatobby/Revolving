@@ -64,7 +64,7 @@ export const deleteStory = (req: RequestProp, res: Response) => {
       .then(() => res.sendStatus(204))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
-    if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
+    else if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
     await deleteUserStory(storyId)
     .then(() => res.sendStatus(204))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))

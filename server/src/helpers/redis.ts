@@ -32,18 +32,16 @@ export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}):
   }
 }
 
-export const getCachedValueRespon = async({key, timeTaken=3600, value}): Promise<string> => {
+export const getCachedValueResponse = async<T>({key, timeTaken=3600, cb}): Promise<T> => {
   redisClient.on('error', err => console.error('Redis client error: ',err))
   if(!redisClient.isOpen) await redisClient.connect();
   try{
     const data = await redisClient.get(key)
-    if(data) return data
-    const freshData = value
-    if(freshData != null){
-      redisClient.setEx(key, timeTaken, freshData)
-      return freshData
-    }
-    return;
+    if(data) return JSON.parse(data) as T
+    
+    const freshData = await cb() as T
+    redisClient.setEx(key, timeTaken, JSON.stringify(freshData))
+    return freshData
   }
   catch(error){
     console.error(error?.message)

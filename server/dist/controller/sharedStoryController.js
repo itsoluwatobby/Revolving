@@ -15,13 +15,15 @@ import { getUserById } from "../helpers/userHelpers.js";
 // Only for admin page
 export const fetchSharedStories = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        const allSharedStories = yield getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const sharedStories = yield getAllSharedStories();
                 return sharedStories;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!(allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length))
-            return responseType({ res, status: 404, message: 'No shared stories available' });
-        return responseType({ res, status: 200, count: allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length, data: allSharedStories });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((allSharedStories) => {
+            if (!(allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length))
+                return responseType({ res, status: 404, message: 'No shared stories available' });
+            return responseType({ res, status: 200, count: allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length, data: allSharedStories });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const getSingleShared = (req, res) => {
@@ -29,13 +31,15 @@ export const getSingleShared = (req, res) => {
         const { sharedId } = req.params;
         if (!sharedId)
             return res.sendStatus(400);
-        const sharedStory = yield getCachedResponse({ key: `sharedStory:${sharedId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `sharedStory:${sharedId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const shared = yield getSharedStoryById(sharedId);
                 return shared;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!sharedStory)
-            return responseType({ res, status: 404, message: 'story not found' });
-        responseType({ res, status: 200, count: 1, data: sharedStory });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((sharedStory) => {
+            if (!sharedStory)
+                return responseType({ res, status: 404, message: 'story not found' });
+            responseType({ res, status: 200, count: 1, data: sharedStory });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const shareStory = (req, res) => {
@@ -47,8 +51,9 @@ export const shareStory = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        const newShare = yield createShareStory(user, storyId);
-        return responseType({ res, status: 201, count: 1, data: newShare });
+        yield createShareStory(user, storyId)
+            .then((newShare) => responseType({ res, status: 201, count: 1, data: newShare }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const unShareUserStory = (req, res) => {
@@ -74,13 +79,15 @@ export const getSharedStoriesByUser = (req, res) => {
         if (!userId)
             return res.sendStatus(400);
         yield autoDeleteOnExpire(userId);
-        const sharedStories = yield getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        yield getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const sharedStory = yield getUserSharedStories(userId);
                 return sharedStory;
-            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
-        if (!(sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length))
-            return responseType({ res, status: 404, message: 'No shared stories available' });
-        return responseType({ res, status: 200, count: sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length, data: sharedStories });
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((sharedStories) => {
+            if (!(sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length))
+                return responseType({ res, status: 404, message: 'No shared stories available' });
+            return responseType({ res, status: 200, count: sharedStories === null || sharedStories === void 0 ? void 0 : sharedStories.length, data: sharedStories });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -94,8 +101,9 @@ export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, v
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
-        const result = yield likeAndUnlikeSharedStory(userId, sharedId);
-        responseType({ res, status: 201, message: result });
+        yield likeAndUnlikeSharedStory(userId, sharedId)
+            .then((result) => responseType({ res, status: 201, message: result }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 });
 //# sourceMappingURL=sharedStoryController.js.map

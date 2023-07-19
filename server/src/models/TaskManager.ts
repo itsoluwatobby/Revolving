@@ -18,7 +18,7 @@ const TaskManagerSchema: Schema = new Schema(
     completed: { type: Boolean, default: false },
     edited: { type: Boolean, default: false },
     subTasks: [SubTasksSchema],
-    dateRestored: { type: Date, default: now() },
+    dateRestored: { type: String },
   },
   {
     minimize: false,

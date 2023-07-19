@@ -22,10 +22,7 @@ export const uploadImages = (req, res) => __awaiter(void 0, void 0, void 0, func
             .then(() => {
             const imageUrl = `${process.env.IMAGELINK}/${newName}`;
             responseType({ res, status: 201, message: 'image uploaded', count: 1, data: { url: imageUrl } });
-        })
-            .catch((err) => {
-            console.log(err.message);
-        });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 });
 // Using express-static middleware to serve my images
@@ -42,12 +39,8 @@ export const deleteImage = (req, res) => {
         const imageName = name.substring(1);
         const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
         yield fsPromises.unlink(pathname)
-            .then(() => {
-            responseType({ res, status: 204, message: 'image deleted' });
-        })
-            .catch(error => {
-            responseType({ res, status: 404, message: 'error deleting' });
-        });
+            .then(() => responseType({ res, status: 204, message: 'image deleted' }))
+            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
 //# sourceMappingURL=imageController.js.map
