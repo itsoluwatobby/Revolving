@@ -47,8 +47,7 @@ export const followUnFollowUser = (req, res) => {
         yield autoDeleteOnExpire(followerId);
         if (!user)
             return responseType({ res, status: 404, message: 'user not found' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const result = yield followOrUnFollow(followerId, followingId);
         result != 'duplicate' ?
             responseType({ res, status: 201, message: result })
@@ -66,8 +65,7 @@ export const updateUserInfo = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         if ((_a = userInfo === null || userInfo === void 0 ? void 0 : userInfo.authentication) === null || _a === void 0 ? void 0 : _a.password) {
             const newPassword = (_b = userInfo === null || userInfo === void 0 ? void 0 : userInfo.authentication) === null || _b === void 0 ? void 0 : _b.password;
             const conflictingPassword = yield bcrypt.compare(newPassword, (_c = user === null || user === void 0 ? void 0 : user.authentication) === null || _c === void 0 ? void 0 : _c.password);

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data'
 import { reduceLength } from '../../utils/navigator'
 import { format } from 'timeago.js'
@@ -19,7 +19,6 @@ type TaskProps = {
 
 
 export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
-  const [isChecked, setIsChecked] = useState<boolean>(false)
   const {setLoginPrompt} = useThemeContext() as ThemeContextType
   const [updateTask, {isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate}] = useUpdateTaskMutation();
   const [deleteTask, {isLoading: isLoadingDelete, isError: isErrorDelete, error: errorDelete}] = useDeleteTaskMutation();
@@ -106,7 +105,7 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
       </p>
       <small 
         onClick={() => viewTask(task._id, 'VIEW')}
-        className={`absolute bottom-0 text-gray-600 ${(task.task?.length > 130 ||task.subTasks?.length) ? '' : 'hidden'} cursor-pointer hover:opacity-70 left-1`}>expand</small>
+        className={`absolute bottom-0 ${(task.task?.length > 130 ||task.subTasks?.length) ? '' : 'hidden'} ${theme == 'light' ? ' hover:opacity-70 text-gray-600' : 'text-gray-400 hover:opacity-90'} cursor-pointer left-1`}>expand</small>
     </article>
   )
 }

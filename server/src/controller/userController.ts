@@ -39,7 +39,7 @@ export const followUnFollowUser = (req: Request, res: Response) => {
     const user = await getUserById(followingId);
     await autoDeleteOnExpire(followerId)
     if(!user) return responseType({res, status: 404, message: 'user not found'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await followOrUnFollow(followerId, followingId);
     result != 'duplicate' ? 
         responseType({res, status: 201, message: result}) 
@@ -55,7 +55,7 @@ export const updateUserInfo = (req: Request, res: Response) => {
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
     if(userInfo?.authentication?.password){
       const newPassword = userInfo?.authentication?.password

@@ -29,6 +29,7 @@ const authSlice = createSlice({
 })
 
 export const selectCurrentUser = (state: RootState) => state.auth._id
+export const selectCurrentRoles = (state: RootState) => state.auth.roles
 export const selectCurrentToken = (state: RootState) => state.auth.accessToken
 export const persisted = (state: RootState) => state?.auth?.persistedLogin
 

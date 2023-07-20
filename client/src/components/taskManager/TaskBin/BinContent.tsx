@@ -17,15 +17,15 @@ export default function BinContent({ task, theme, taskIdsToDelete, restoreTasks,
   
   return (
     <article
-      className={`hidebars relative text-[13px] flex flex-col rounded p-1.5 pb-0 w-full md-1/2 shadow-md max-h-24 min-h-[75px] overflow-y-scroll ${taskIdsToDelete.includes(task._id) ? theme == 'light' ? 'bg-slate-300' : 'bg-slate-900' : ''}`}
+      className={`hidebars relative text-[13px] flex flex-col border border-dotted rounded p-1.5 pb-0 w-full shadow-md max-h-24 min-h-[75px] overflow-y-scroll ${taskIdsToDelete.includes(task._id) ? theme == 'light' ? 'bg-slate-300' : 'bg-slate-400' : ''}`}
     > 
       <div 
         title="mark"
         onClick={() => handleChecked(task._id)}
-        className="flex-grow cursor-pointer">
-        <p className={`${task?.completed ? 'line-through' : ''} pr-2`}>{task?.task}</p>
+        className={`flex-grow cursor-pointer shadow-inner text-xs pr-2 pl-2 text-justify whitespace-pre-wrap tracking-tight ${theme == 'light' ? '' : 'bg-slate-900'}`}>
+        <p className={`${task?.completed ? 'line-through' : ''}`}>{task?.task}</p>
       </div>
-      <div className="sticky flex-none bottom-0 w-full pr-1.5 pt-0.5 flex items-center justify-between">
+      <div className={`sticky ${theme == 'light' ? 'bg-white' : 'bg-slate-800'} flex-none bottom-0 w-full pr-1.5 pt-0.5 rounded-tl-sm rounded-tr-sm flex items-center justify-between`}>
         <p className="flex items-center gap-2.5 text-sm pl-1 pr-1 rounded-sm">
           <MdOutlineRestore 
             title="restore"

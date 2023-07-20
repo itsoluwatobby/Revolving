@@ -2,6 +2,7 @@ import { Home } from "./pages/Home"
 import { useThemeContext } from "./hooks/useThemeContext"
 import { ThemeContextType } from "./posts";
 import { Routes, Route } from 'react-router-dom';
+import { useSelector } from "react-redux";
 import { BlogLayout } from "./layouts/BlogLayout";
 import { NewStory } from "./pages/NewStory";
 import NotFound from "./pages/NotFound";
@@ -21,10 +22,13 @@ import TaskManager from "./pages/TaskManager";
 import ExpensePlanner from "./pages/ExpensePlanner";
 import AdminPage from "./pages/AdminPage";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import { selectCurrentRoles } from "./features/auth/authSlice";
+import { ProtectedRoute } from "./layouts/ProtectedRoute";
 
  
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
+  const userRoles = useSelector(selectCurrentRoles)
 
   return (
     <main className={`app relative ${theme == 'light' ? 'bg-slate-50' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
@@ -46,11 +50,16 @@ export const App = () => {
             <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
-            <Route path="profile/:userId" element={<ProfilePage />} />
-            <Route path="taskManager/:userId" element={<TaskManager />} />
-            <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
-            <Route path="resumeBuilder/:userId" element={<ResumeBuilder />} />
-            <Route path="adminPage/:userId" element={<AdminPage />} />
+
+            <Route element={<ProtectedRoute roles={userRoles}/>}>
+
+              <Route path="profile/:userId" element={<ProfilePage />} />
+              <Route path="taskManager/:userId" element={<TaskManager />} />
+              <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
+              <Route path="resumeBuilder/:userId" element={<ResumeBuilder />} />
+              <Route path="adminPage/:userId" element={<AdminPage />} />
+            
+            </Route>
             
           </Route>
           

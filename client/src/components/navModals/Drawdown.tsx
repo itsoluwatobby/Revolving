@@ -20,66 +20,66 @@ export default function Drawdown({ rollout }: DrawdownProps) {
   const excludeRoute = ['/new_story', `/edit_story`, `/story`]
 
   return (
-    <ul className={`absolute rounded-md tracking-widest ${rollout ? '' : '-translate-y-96'} right-6 maxscreen:right-0 maxscreen:w-full maxscreen:bg-opacity-90 maxscreen:flex maxscreen:flex-col maxscreen:items-center maxscreen:top-12 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-gray-50' : 'bg-gray-600'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'}`}>
+    <div 
+      onClick={() => setRollout(false)}
+      className={`absolute rounded-md tracking-widest ${rollout ? '' : '-translate-y-96'} right-6 maxscreen:right-0 maxscreen:w-full maxscreen:bg-opacity-90 maxscreen:flex maxscreen:flex-col maxscreen:items-center maxscreen:top-12 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-800'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'}`}>
     {
       !userId && 
         (pathname != '/signIn' &&
-          <li 
-            onClick={() => setRollout(false)}
-            className={modalClass(theme)}>
-            <Link to={`/signIn`}>
+          <Link to={`/signIn`}
+            className={modalClass(theme)}
+          >
               sign In
-            </Link>
-          </li>
+          </Link>
         )
     }
     {
       userId && 
         (
-          <li className={modalClass(theme)}>
-            <Link to={`/profile/${userId}`}>
-              profile
-            </Link>
-          </li>
+          <Link to={`/profile/${userId}`}
+             className={modalClass(theme)}
+          >
+            profile
+          </Link>
         )
     }
     {
       userId && 
       (
-        <li className={modalClass(theme)}>
-          <Link to={`/account/${userId}`}>
-            Account
-          </Link>
-        </li>
+        <Link to={`/account/${userId}`}
+           className={modalClass(theme)}
+        >
+          Account
+        </Link>
       )
     }
     {
       userId && 
-        <li 
+        <button 
           onClick={() => signOut('use')}
           className={modalClass(theme)}>
             sign Out
-        </li>
+        </button>
     }
     {
       !userId && 
         (pathname != '/signUp' &&
-          <li className={modalClass(theme)}>
-            <Link to={`/signUp`}>
-              sign Up
-            </Link>
-          </li>
+          <Link to={`/signUp`}
+              className={modalClass(theme)}
+          >
+            sign Up
+          </Link>
         )
     }               
-      <li className={modalClass(theme)}>
-        <Link to={`/about`}>
-          about
-        </Link>
-      </li>
-      <li className={modalClass(theme)}>
+      <Link to={`/about`}
+          className={modalClass(theme)}
+      >
+        about
+      </Link>
+      <button className={modalClass(theme)}>
         contact
-      </li>                                
-    </ul>
+      </button>                                
+    </div>
   // ) : <p></p>
   )
 }

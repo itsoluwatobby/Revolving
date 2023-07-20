@@ -114,8 +114,8 @@ type TaskBin = {
   userId: string,
   _id: string,
   taskBin: TaskProp[],
-  createdAt: Date,
-  updatedAt?: Date,
+  createdAt: string,
+  updatedAt?: string,
 }
 
 interface TaskProp{
@@ -144,7 +144,6 @@ type ObjectUnknown<K>={
 }
 
 type USERROLES = number
-type ALLOWEDROLES = Record<string, USERROLES>
 
 interface SharedProps{
   sharerId: string,
@@ -198,9 +197,9 @@ type ChatProps = {
   adminId?: string,
   message: string,
   userId: string,
-  dateTime?: string,
+  dateTime?: string, // delete later
   image?: string,
-  createdAt?: string
+  createdAt?: string,
   updatedAt?: string
 }
 
