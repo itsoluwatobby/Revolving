@@ -1,10 +1,9 @@
 import { useClearTaskBinMutation, useGetTaskBinQuery, usePermanentlyDeleteTasksMutation, useRestoreTasksMutation } from "../../../app/api/taskApiSlice"
-import { useState, useEffect, useCallback, ChangeEvent } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button, ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data"
-import { ChatOption, Theme, ThemeContextType } from "../../../posts"
+import { Theme, ThemeContextType } from "../../../posts"
 import { toast } from "react-hot-toast"
 import { useThemeContext } from "../../../hooks/useThemeContext"
-import { MdOutlineDeleteForever, MdOutlineRestore } from "react-icons/md"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
 import { ErrorStyle, REFRESH_RATE } from "../../../utils/navigator"
 import BinContent from "./BinContent"
@@ -26,7 +25,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
   const taskbinButton = useCallback((theme: Theme, type: Button, position: Position='NORM') => {
     return (
-      `cursor-pointer ${theme == 'light' ? 'hover:text-gray-500' : 'hover:text-gray-300'} text-lg active:text-gray-100 transition-all ${(restoreLoading && type == 'RESTORE') ? 'animate-spin' : 'animate-none'} ${(permanentlyDeleteLoading && type == 'DELETE') ? 'animate-bounce' : 'animate-none'} ${(taskIdsToDelete.length && position == 'NORM') ? 'scale-0' : (!taskIdsToDelete.length && position == 'NAV') ? 'scale-0' : 'scale-100'}`
+      `cursor-pointer ${theme == 'light' ? 'hover:text-gray-500' : 'hover:text-gray-300'} text-base active:text-gray-100 transition-all ${(restoreLoading && type == 'RESTORE') ? 'animate-spin' : 'animate-none'} ${(permanentlyDeleteLoading && type == 'DELETE') ? 'animate-bounce' : 'animate-none'} ${(taskIdsToDelete.length && position == 'NORM') ? 'scale-0' : (!taskIdsToDelete.length && position == 'NAV') ? 'scale-0 hidden' : 'scale-100'}`
     )
   }, [permanentlyDeleteLoading, restoreLoading, taskIdsToDelete])
 
@@ -129,7 +128,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
           </p>
         )
         : binContent = (
-          <div className={`flex flex-wrap w-full h-full p-1 gap-1 ${clearBinLoading ? 'animate-pulse' : 'animate-none'}`}>
+          <div className={`flex flex-col md:flex-row md:justify-between md:flex-wrap w-full h-full p-1 gap-1 ${clearBinLoading ? 'animate-pulse' : 'animate-none'}`}>
             {
               tasksInBin?.taskBin?.length ?
                 sortedTasks?.map(task => (
@@ -149,7 +148,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
 
 
   return (
-    <div className="hidebars relative shadow-md h-[60%] rounded-md border w-1/2 overflow-y-scroll">
+    <div className="hidebars relative shadow-md h-full rounded-md w-full overflow-y-scroll">
       <BinTop 
         theme={theme}
         restoreTasks={restoreTasks}
@@ -157,6 +156,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
         taskIdsToDelete={taskIdsToDelete}
         taskbinButton={taskbinButton}
         setConfirmDelete={setConfirmDelete}
+        taskCount={tasksInBin as TaskBin}
       />
       
       {binContent}

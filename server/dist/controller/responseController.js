@@ -27,8 +27,7 @@ export const createNewResponse = (req, res) => {
         const comment = yield getCommentById(commentId);
         if (!comment)
             return responseType({ res, status: 404, message: 'Comment not found' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield createResponse(Object.assign({}, newResponse))
             .then((response) => responseType({ res, status: 201, count: 1, data: response }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
@@ -44,8 +43,7 @@ export const updateResponse = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const responseExist = yield getResponseById(responseId);
         if (!responseExist)
             return responseType({ res, status: 404, message: 'Response not found' });
@@ -63,8 +61,7 @@ export const deleteResponse = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const response = yield getResponseById(responseId);
         if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
             yield deleteSingleResponse(responseId)
@@ -104,7 +101,8 @@ export const deleteUserResponses = (req, res) => {
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
         }
-        return responseType({ res, status: 401, message: 'unauthorized' });
+        else
+            return responseType({ res, status: 401, message: 'unauthorized' });
     }));
 };
 export const getResponse = (req, res) => {
@@ -186,8 +184,7 @@ export const like_Unlike_Response = (req, res) => __awaiter(void 0, void 0, void
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield likeAndUnlikeResponse(userId, responseId)
             .then((result) => responseType({ res, status: 201, message: result }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));

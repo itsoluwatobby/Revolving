@@ -28,8 +28,7 @@ export const createNewComment = (req, res) => {
         const story = yield getStoryById(storyId);
         if (!story)
             return responseType({ res, status: 404, message: 'Story not found' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield createComment(Object.assign({}, newComment))
             .then((comment) => responseType({ res, status: 201, count: 1, data: comment }))
             .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
@@ -45,8 +44,7 @@ export const updateComment = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield editComment(userId, commentId, editedComment)
             .then((comment) => responseType({ res, status: 201, count: 1, data: comment }))
             .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
@@ -61,8 +59,7 @@ export const deleteComment = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const comment = yield getCommentById(commentId);
         if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
             yield deleteSingleComment(commentId)
@@ -102,7 +99,8 @@ export const deleteUserComments = (req, res) => {
                     .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
             }
         }
-        return responseType({ res, status: 401, message: 'unauthorized' });
+        else
+            return responseType({ res, status: 401, message: 'unauthorized' });
     }));
 };
 export const getComment = (req, res) => {

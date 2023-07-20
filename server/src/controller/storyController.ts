@@ -23,7 +23,7 @@ export const createNewStory = (req: RequestProp, res: Response) => {
     await autoDeleteOnExpire(userId)
     newStory = {...newStory, userId, author: user?.username} as StoryProps
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await createUserStory({...newStory})
     .then((story) => responseType({res, status: 201, count:1, data: story}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
@@ -38,7 +38,7 @@ export const updateStory = (req: RequestProp, res: Response) => {
     if(!userId || !storyId) return res.sendStatus(400)
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await updateUserStory(storyId, editedStory)
     .then((updatedStory) => {
       if(!updatedStory) return responseType({res, status: 404, message: 'Story not found'})
@@ -55,7 +55,7 @@ export const deleteStory = (req: RequestProp, res: Response) => {
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     
     await autoDeleteOnExpire(userId)
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const story = await getStoryById(storyId)
     if(!story) return responseType({res, status: 404, message: 'story not found'})
 
@@ -80,7 +80,7 @@ export const deleteStoryByAdmin = (req: RequestProp, res: Response) => {
     if(!user) return responseType({res, status: 401, message: 'user not found'})
 
     await autoDeleteOnExpire(userId)
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const story = await getUserStories(userId)
     if(!story.length) return responseType({res, status: 404, message: 'user does not have a story'})
 
@@ -182,7 +182,7 @@ export const like_Unlike_Story = async(req: Request, res: Response) => {
     if (!userId || !storyId) return res.sendStatus(400);
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await likeAndUnlikeStory(userId, storyId)
     .then((result: Like_Unlike) => responseType({res, status: 201, message: result}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))

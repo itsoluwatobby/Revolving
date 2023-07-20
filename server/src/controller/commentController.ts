@@ -25,7 +25,7 @@ export const createNewComment = (req: RequestProp, res: Response) => {
     newComment = {...newComment, author: user?.username}
     const story = await getStoryById(storyId)
     if(!story) return responseType({res, status: 404, message: 'Story not found'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await createComment({...newComment})
     .then((comment) => responseType({res, status: 201, count:1, data: comment}))
     .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
@@ -40,7 +40,7 @@ export const updateComment = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await editComment(userId, commentId, editedComment)
     .then((comment) => responseType({res, status: 201, count:1, data: comment}))
     .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
@@ -54,7 +54,7 @@ export const deleteComment = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
-    if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
+    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
     const comment = await getCommentById(commentId) as CommentProps
     if(user?.roles.includes(ROLES.ADMIN)) {

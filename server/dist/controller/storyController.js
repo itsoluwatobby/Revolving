@@ -26,8 +26,7 @@ export const createNewStory = (req, res) => {
         newStory = Object.assign(Object.assign({}, newStory), { userId, author: user === null || user === void 0 ? void 0 : user.username });
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield createUserStory(Object.assign({}, newStory))
             .then((story) => responseType({ res, status: 201, count: 1, data: story }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
@@ -43,8 +42,7 @@ export const updateStory = (req, res) => {
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield updateUserStory(storyId, editedStory)
             .then((updatedStory) => {
             if (!updatedStory)
@@ -62,8 +60,7 @@ export const deleteStory = (req, res) => {
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         yield autoDeleteOnExpire(userId);
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const story = yield getStoryById(storyId);
         if (!story)
             return responseType({ res, status: 404, message: 'story not found' });
@@ -72,7 +69,7 @@ export const deleteStory = (req, res) => {
                 .then(() => res.sendStatus(204))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
-        if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
+        else if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
             return res.sendStatus(401);
         yield deleteUserStory(storyId)
             .then(() => res.sendStatus(204))
@@ -89,8 +86,7 @@ export const deleteStoryByAdmin = (req, res) => {
         if (!user)
             return responseType({ res, status: 401, message: 'user not found' });
         yield autoDeleteOnExpire(userId);
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const story = yield getUserStories(userId);
         if (!story.length)
             return responseType({ res, status: 404, message: 'user does not have a story' });
@@ -190,8 +186,7 @@ export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0,
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
-            return responseType({ res, status: 423, message: 'Account locked' });
+        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield likeAndUnlikeStory(userId, storyId)
             .then((result) => responseType({ res, status: 201, message: result }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));

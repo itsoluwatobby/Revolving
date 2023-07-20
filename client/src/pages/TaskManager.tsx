@@ -83,12 +83,12 @@ export default function TaskManager() {
   )
 
   return (
-    <main className={`single_page w-full flex flex-col`}>
+    <main className={`taskManager_page w-full flex flex-col pt-2`}>
       <section className="flex-grow flex justify-between p-2">
-        <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-full flex flex-col gap-3 h-4/6`}>
+        <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-[75%] flex flex-col maxscreen:items-center gap-3 h-[28rem] box-border`}>
 
           <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
-          <section className="hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-4/5 sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400">
+          <section className="hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400">
             <Form 
               currentUserId={userId as string}
             />
@@ -103,12 +103,17 @@ export default function TaskManager() {
           </section>
         </div>
 
-        <Taskbin 
-          userId={userId as string}
-        />
+        <div className="flex-none p-2 rounded-md w-[40%] h-[28rem]">
+          <Taskbin 
+            userId={userId as string}
+          />
+        </div>
 
       </section>
-      <Footer />
+      <Footer 
+        tasks={tasks}
+        userId={userId as string}
+      />
     </main>
   )
 }

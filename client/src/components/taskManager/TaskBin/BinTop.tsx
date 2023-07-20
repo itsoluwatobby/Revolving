@@ -1,17 +1,19 @@
-import { Button, FunctionOption, Position } from '../../../data'
+import { Button, FunctionOption, Position, TaskBin } from '../../../data'
 import { MdOutlineDeleteForever, MdOutlineRestore } from 'react-icons/md'
 import { Theme } from '../../../posts'
+import { checkCount } from '../../../utils/navigator'
 
 type BinTopProps = {
   theme: Theme,
   restoreTasks: ({taskId, type}: FunctionOption) => void,
   permanentlyDelete: ({taskId, type}: FunctionOption) => void,
   taskIdsToDelete: string[],
+  taskCount: TaskBin,
   taskbinButton: (theme: Theme, type: Button, position: Position) => string,
   setConfirmDelete: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function BinTop({ theme, restoreTasks, permanentlyDelete, taskIdsToDelete, taskbinButton, setConfirmDelete }: BinTopProps) {
+export default function BinTop({ theme, restoreTasks, permanentlyDelete, taskIdsToDelete, taskCount, taskbinButton, setConfirmDelete }: BinTopProps) {
 
   return (
     <nav className={`sticky top-0 z-40 flex items-center justify-between ${theme == 'light' ? 'bg-white' : 'bg-slate-800'} w-full p-0.5 ${taskIdsToDelete.length ? '' : ''}`}>
@@ -20,7 +22,12 @@ export default function BinTop({ theme, restoreTasks, permanentlyDelete, taskIds
         onClick={() => restoreTasks({type: 'MULTI'})}  
         className={taskbinButton(theme, 'RESTORE', 'NAV')} 
       />
-      <h2 className="text-center font-bold">Task Bin</h2>
+      <h2 className="text-center font-bold">
+        Task Bin 
+      &nbsp;
+      <span title='bin count' className='text-gray-300 font-mono ml-1'>{taskIdsToDelete?.length ? checkCount(taskIdsToDelete) : checkCount(taskCount?.taskBin)}</span>
+      
+      </h2>
     
       <MdOutlineDeleteForever 
         title="trash marked"

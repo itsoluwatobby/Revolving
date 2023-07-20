@@ -22,6 +22,10 @@ textarea::-webkit-scrollbar{
   height: calc(100vh - 64px);
 }
 
+.taskManager_page{
+  height: calc(100vh - 70px);
+}
+
 .code_page{
   height: calc(100vh - 370px);
 }
@@ -32,6 +36,10 @@ textarea::-webkit-scrollbar{
 
 .welcome{
   height: calc(100vh - 64px);
+}
+
+.left_container{
+  height: calc(100vh - 80px);
 }
 
 .sidebars::-webkit-scrollbar{
