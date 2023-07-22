@@ -15,11 +15,13 @@ import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/type
 import Taskbin from "../components/taskManager/TaskBin/Taskbin"
 import { REFRESH_RATE } from "../utils/navigator"
 
+type TogglerPosition = 'LEFT' | 'RIGHT'
 export default function TaskManager() {
   const { theme } = useThemeContext() as ThemeContextType
   const { userId } = useParams()
   const {data, isLoading: loadingTasks, isError, error, refetch} = useGetUserTasksQuery(userId as string)
   const [viewSingle, setViewSingle] = useState<ChatOption>('Hide')
+  const [toggleButton, setToggleButton] = useState<TogglerPosition>('LEFT')
   const [tasks, setTasks] = useState<TaskProp[]>([])
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
   const dispatch = useDispatch()
@@ -35,7 +37,7 @@ export default function TaskManager() {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length && isError && errorMsg?.status != 404){
+    if(!data?.length || (isError && errorMsg?.status != 404)){
       timerId = setInterval(async() => {
         await refetch()
       }, REFRESH_RATE)
@@ -84,11 +86,11 @@ export default function TaskManager() {
 
   return (
     <main className={`taskManager_page w-full flex flex-col pt-2`}>
-      <section className="flex-grow flex justify-between p-2">
-        <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-[75%] flex flex-col maxscreen:items-center gap-3 h-[28rem] box-border`}>
+      <section className="relative flex-grow flex justify-between p-2">
+        <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-[75%] ${toggleButton === 'LEFT' ? 'flex mobile:flex' : 'flex mobile:hidden'} flex-col maxscreen:items-center gap-3 h-[28rem] box-border`}>
 
           <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
-          <section className="hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400">
+          <section className={`hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400`}>
             <Form 
               currentUserId={userId as string}
             />
@@ -103,12 +105,20 @@ export default function TaskManager() {
           </section>
         </div>
 
-        <div className="flex-none p-2 rounded-md w-[40%] h-[28rem]">
+        <div className={`flex-none p-2 pt-6 mobile:pt-14 mobile:w-[95%] mobile:translate-x-2 mobile:items-center rounded-md w-[40%] h-[28rem] ${toggleButton === 'RIGHT' ? 'flex mobile:flex' : 'flex mobile:hidden'}`}>
           <Taskbin 
             userId={userId as string}
           />
         </div>
-
+      {/* Toggler Button */}
+      <div 
+        className={`absolute hidden mobile:flex w-14 h-7 p-0.5 rounded-full left-5 top-7 items-center ${toggleButton === 'LEFT' ? 'justify-start bg-slate-500' : 'justify-end bg-green-700'} transition-all`}>
+        <p 
+          title={toggleButton === 'LEFT' ? 'View Bin' : 'View Tasks'}
+          onClick={() => setToggleButton(prev => prev === 'LEFT' ? prev = 'RIGHT' : prev = 'LEFT')}  
+          className={`w-1/2 h-full ${toggleButton === 'LEFT' ? 'bg-white' : 'bg-gray-200'} shadow-2xl cursor-pointer transition-all hover:bg-opacity-80 active:bg-opacity-100 rounded-full`}
+        />
+      </div>
       </section>
       <Footer 
         tasks={tasks}

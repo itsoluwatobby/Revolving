@@ -8,7 +8,7 @@ import storyReducer from '../features/story/storySlice';
 import codeReducer from '../features/story/codeSlice';
 import taskReducer from '../features/story/taskManagerSlice';
 import chatReducer from '../features/chat/chatSlice';
-//import userReducer from '../features/auth/userSlice'
+import userReducer from '../features/auth/userSlice'
 
 export const store = configureStore({
   reducer: {
@@ -20,7 +20,7 @@ export const store = configureStore({
     chat: chatReducer,
     code: codeReducer,
     task: taskReducer,
-    //user: userReducer,
+    user: userReducer,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(apiSlice.middleware),
   devTools: true

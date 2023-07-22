@@ -11,19 +11,20 @@ export default function LoginComponent({
  }: LoginProps) {
   const {theme} = useThemeContext() as ThemeContextType
   const persistLogin = useSelector(persisted)
-
+//translate-x-1/2
   const canSubmit = [email, password].every(Boolean)
   return (
-    <article className={`absolute md:w-1/4 w-1/2 border shadow-2xl ${theme == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-x-1/2 translate-y-12 z-30 rounded-md`}>
+    <article className={`absolute md:w-1/3 lg:w-3/5 w-[40%] maxscreen:w-1/2 border shadow-2xl ${theme == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} translate-y-12 z-30 rounded-md`}>
           <form 
             onSubmit={handleSubmit}
-            className={`flex flex-col p-2 w-full h-full gap-2 ${loading && 'bg-gray-400 animate-pulse'}`}
+            className={`flex flex-col p-4 pr-2 pl-2 w-full h-full gap-4 ${loading && 'bg-gray-400 animate-pulse'}`}
             >
               <h2 className='open_sans text-center font-extrabold drop-shadow-xl'>SIGN IN</h2>
-            <label htmlFor="email">
-            <span className='flex items-center text-sm'>
+
+            <div className="flex flex-col w-full p-2 pt-0 pb-0 gap-1">
+              <label  htmlFor="email" className='flex items-center text-sm'>
                 Email address
-              </span>
+              </label>
               <input 
                 type="email" 
                 value={email}
@@ -35,11 +36,12 @@ export default function LoginComponent({
                 onChange={handleEmail}
                 className='w-full rounded-md p-2 focus:outline-none border-none text-black'
               />
-            </label>
-            <label htmlFor="password" className='relative'>
-              <span className='flex items-center text-sm'>
+            </div>
+
+            <div className='relative flex flex-col pt-0 pb-0 w-full p-2 gap-1'>
+              <label htmlFor="password" className='flex items-center text-sm'>
                 Password
-              </span>
+              </label>
               <input 
                 type={revealPassword ? "text" : "password"} 
                 value={password}
@@ -62,8 +64,9 @@ export default function LoginComponent({
                             onClick={() => setRevealPassword(true)}
                             className={`absolute cursor-pointer hover:opacity-90 text-slate-700 right-2 duration-100 bottom-2 text-2xl`} />
               }
-            </label>
-            <label htmlFor="persist-login" className='pl-2 flex items-center gap-2'>
+            </div>
+
+            <div className='pl-2 flex items-center gap-2'>
               <input 
                 type="checkbox" 
                 checked={persistLogin}
@@ -71,15 +74,17 @@ export default function LoginComponent({
                 onChange={handleChecked}
                 className='focus:outline-none h-4 w-4 border-none cursor-pointer'
               />
-            <span className="text-sm">Trust Device</span>
-            </label>
+             <label htmlFor="persist-login" className="text-sm">Trust This Device</label>
+            </div>
+
             <button 
               type='submit'
               disabled={!canSubmit && !loading}
-              className={`w-full rounded-md p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center rounded-md p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
               {!loading ? 'Sign In' : 'Signing In...'}
             </button>
+
             <div className='flex flex-col text-sm gap-2'>
               <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2'
               onClick={() => setForgot(true)}
@@ -90,6 +95,7 @@ export default function LoginComponent({
                 </Link>
               </p>
             </div>
+
           </form>
       </article>
   )

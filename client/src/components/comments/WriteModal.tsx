@@ -9,6 +9,7 @@ import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted 
 import { commentApiSlice, useUpdateCommentMutation } from '../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
 import { useCreateResponseMutation } from '../../app/api/responseApiSlice';
+import { ErrorStyle } from '../../utils/navigator'
 
 type WriteProp={
   writeReply: string,
@@ -25,7 +26,6 @@ type WriteProp={
 }
 
 // TODO: When Prompt is up, disable textarea
-
 export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const getCommentEdit = useSelector(getEditComments)
@@ -66,13 +66,9 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
         enlarged ? dispatch(setEditComment({...updatedComment, comment: ''})) : null
     }
     catch(err){
-      const errors = errorComment as ErrorResponse
+      const errors = (errorComment as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

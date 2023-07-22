@@ -22,7 +22,7 @@ export default function Drawdown({ rollout }: DrawdownProps) {
   return (
     <div 
       onClick={() => setRollout(false)}
-      className={`absolute rounded-md tracking-widest ${rollout ? '' : '-translate-y-96'} right-6 maxscreen:right-0 maxscreen:w-full maxscreen:bg-opacity-90 maxscreen:flex maxscreen:flex-col maxscreen:items-center maxscreen:top-12 top-10 z-50 shadow-2xl text-sm border ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-800'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'}`}>
+      className={`absolute rounded-md tracking-widest ${rollout ? '' : '-translate-y-96'} right-6 maxscreen:right-0 maxscreen:w-full maxscreen:bg-opacity-90 maxscreen:flex maxscreen:flex-col maxscreen:items-center maxscreen:top-12 top-10 z-20 shadow-2xl text-sm border ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-800'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'}`}>
     {
       !userId && 
         (pathname != '/signIn' &&

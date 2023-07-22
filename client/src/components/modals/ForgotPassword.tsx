@@ -40,31 +40,31 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
   const canSubmit = Boolean(email)
 
   return (
-    <article className={`absolute md:w-1/4 w-1/2 border shadow-2xl ${themeMode == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-x-1/2 translate-y-12 z-30 rounded-md`}>
+    <article className={`absolute md:w-1/3 lg:w-3/5 pt-4 pb-4 w-[40%] maxscreen:w-1/2 border shadow-2xl ${themeMode == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-y-12 z-30 rounded-md`}>
         <form 
           onSubmit={handleResetRequest}
-          className={`flex flex-col p-2 w-full h-full gap-2 ${isLoading && 'bg-gray-400 animate-pulse'}`}
+          className={`flex flex-col w-full h-full gap-4 ${isLoading && 'bg-gray-400 animate-pulse'}`}
           >
             <h2 className='open_sans text-center font-extrabold drop-shadow-xl'>SEND REQUEST</h2>
-          <label htmlFor="email">
-          <span className='flex items-center text-sm'>
+          <div className="flex flex-col w-full p-2 pt-0 pb-0 gap-0.5">
+            <label htmlFor="email" className='flex items-center text-sm'>
               Email address
-            </span>
+            </label>
             <input 
               type="email" value={email} required
               id='email' placeholder='iamuser@mail.com'
               autoComplete='off' onChange={handleEmail}
               className='w-full rounded-md p-2 focus:outline-none border-none text-black'
             />
-          </label>
+          </div>
           <button 
             type='submit'
             disabled={!canSubmit}
-            className={`w-full rounded-md p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            className={`w-[95%] self-center rounded-md p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
             {isLoading ? 'requesting 🚀' : isSuccess ? 'Link sent to mail' : 'Request'}
           </button>
-          <div className='flex flex-col text-sm gap-2'>
+          <div className='flex flex-col p-2 pt-0 pb-0 text-sm gap-2'>
             <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2 w-fit'
             onClick={() => setForgot(false)}
             >Back to login?</p>

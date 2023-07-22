@@ -7,7 +7,7 @@ import WriteModal from './WriteModal';
 import { useEffect } from 'react';
 import { commentApiSlice, useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
-import { checkCount } from '../../utils/navigator';
+import { ErrorStyle, checkCount } from '../../utils/navigator';
 import { setEditComment } from '../../features/story/commentSlice';
 import { useDispatch } from 'react-redux';
 
@@ -64,13 +64,9 @@ export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, 
       dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err: unknown){
-      const errors = likeError as ErrorResponse
+      const errors = (likeError as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

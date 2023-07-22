@@ -87,14 +87,14 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
   )
 
   return (
-    <article 
+    <article
       ref={cardRef}
       onMouseOver={closeUserCard}
       onMouseLeave={() => {
         setOnCard(false)
         setRevealCard('Hide')
       }}
-      className={`absolute ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2 z-10 top-5 max-h-40 shadow-2xl md:w-1/3 w-1/2 ${theme == 'light' ? 'bg-white' : ''}`}>
+      className={`absolute ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2 z-10 top-5 max-h-40 shadow-2xl md:w-1/3 w-1/2 ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
       {content}
     </article>
   )

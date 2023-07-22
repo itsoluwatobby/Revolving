@@ -1,29 +1,25 @@
-import { FaGithub, FaTwitter, FaHandshake } from 'react-icons/fa'
-import { AiOutlineLinkedin, AiOutlineMail } from 'react-icons/ai'
 import { TaskProp, UserProps } from '../data'
 import { checkCount } from '../utils/navigator'
 import { useGetUserStoriesQuery } from '../app/api/storyApiSlice';
 import { useEffect, useState, useCallback } from 'react';
-import { PostType } from '../posts';
+import { PostType, Theme, ThemeContextType } from '../posts';
 import { useGetUserByIdQuery } from '../app/api/usersApiSlice';
-
-const footer_list = "cursor-pointer text-2xl flex flex-col items-center"
-const icon_style = "hover:text-gray-500 active:scale-[1.2] transition-all duration-200 ease-in-out"
-const top_border = "border w-1/3 pt-2.5 bg-slate-100 rounded-t-3xl border-slate-400 border-l-0 border-r-0 border-b-0"
+import { useThemeContext } from '../hooks/useThemeContext';
 
 type FooterProps = {
   tasks: TaskProp[],
   userId: string
 }
 export const Footer = ({ tasks, userId }: FooterProps) => {
-  const completedTasks = tasks.filter(task => task.completed)
+  const { theme } = useThemeContext() as ThemeContextType
+  const completedTasks = tasks?.filter(task => task.completed)
+  const activeTasks = tasks.some(task => !task?.completed)
   const {data} = useGetUserStoriesQuery(userId)
   const {data: userData} = useGetUserByIdQuery(userId)
   const [userStories, setUserStories] = useState<PostType[]>([])
   const [user, setUser] = useState<UserProps>()
-  const countStyle = useCallback(() => {
-    return (`
-    font-bold mr-1 text-gray-300
+  const countStyle = useCallback((theme: Theme, property:'MAIN'|'NUM'='MAIN') => {
+    return (`text-white ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} ${property === 'MAIN' ? 'rounded-md bg-black tracking-wide mb-0.5 w-fit p-1 pt-0.5 pb-0.5' : 'font-bold mr-1'}
     `)
   }, [])
 
@@ -44,21 +40,22 @@ export const Footer = ({ tasks, userId }: FooterProps) => {
   }, [userData])
 
   return (
-    <footer className='flex-none h-20 w-full flex flex-col'>
+    <footer className='flex-none h-20 w-full flex flex-col shadow-inner text-sm p-1'>
+      <h2 className='text-center font-mono text-base font-bold'>ANALYTICS</h2>
       <div className={`flex items-end justify-evenly`}>
         <div className='flex flex-col'>
-          <span>Active Todos: false</span>
+          <span className={countStyle(theme, 'MAIN')}>Active Tasks:  &nbsp;<span className={`${countStyle(theme, 'NUM')} capitalize`}>{activeTasks.toString()}</span></span>
           <p className='flex items-center gap-4'>
-            <span>Todos done &nbsp;<span className={countStyle()}>{checkCount(completedTasks)}</span></span>
-            <span>Total Todos &nbsp;<span className={countStyle()}>{checkCount(tasks)}</span></span>
+            <span className={countStyle(theme, 'MAIN')}>Tasks completed: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(completedTasks)}</span></span>
+            <span className={countStyle(theme, 'MAIN')}>Total Tasks: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(tasks)}</span></span>
           </p>
         </div>
         <p className='flex flex-col'>
-          <span>Followers &nbsp;<span className={countStyle()}>{checkCount(user?.followers as string[
+          <span className={countStyle(theme, 'MAIN')}>Followers: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(user?.followers as string[
             
           ])}</span></span>
-          <span>Stories &nbsp;<span className={countStyle()}>{checkCount(userStories)}</span></span>
-          <span>Total likes </span>
+          <span className={countStyle(theme, 'MAIN')}>Stories: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(userStories)}</span></span>
+          <span className={countStyle(theme, 'MAIN')}>Total likes </span>
         </p>
       </div>
     </footer>

@@ -8,6 +8,7 @@ import { storyApiSlice } from "../../app/api/storyApiSlice";
 import { getTabCategory } from "../../features/story/navigationSlice";
 import BodyComponent from "./BodyComponent";
 import { useSelector } from "react-redux";
+import { ErrorStyle } from "../../utils/navigator";
 
 type CommentType = {
   comment: CommentProps,
@@ -22,7 +23,6 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const [writeReply, setWriteReply] = useState<string>('');
   const [expand, setExpand] = useState<boolean>(false)
-  // const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const { setLoginPrompt } = useThemeContext() as ThemeContextType
   const responseRef = useRef<HTMLTextAreaElement>();
   const [deleteComment, { isLoading, isError, isSuccess: isSuccessDeleted, 
@@ -38,13 +38,9 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
       await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err: unknown){
-      const errors = error as ErrorResponse
+      const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
@@ -73,8 +69,6 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
         setWriteReply={setWriteReply} 
         openReply={openReply} 
         setOpenReply={setOpenReply}
-        // keepPrompt={keepPrompt} 
-        // setKeepPrompt={setKeepPrompt}
         setPrompt={setPrompt}  
         deleteSingleComment={deleteSingleComment}
         setExpand={setExpand} 

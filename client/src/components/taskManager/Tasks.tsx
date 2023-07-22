@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data'
-import { reduceLength } from '../../utils/navigator'
+import { ErrorStyle, reduceLength } from '../../utils/navigator'
 import { format } from 'timeago.js'
 import { CiEdit } from 'react-icons/ci'
 import { BsTrash } from 'react-icons/bs'
@@ -16,7 +16,6 @@ type TaskProps = {
   theme: Theme, 
   setViewSingle: React.Dispatch<React.SetStateAction<ChatOption>>
 }
-
 
 export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
   const {setLoginPrompt} = useThemeContext() as ThemeContextType
@@ -36,13 +35,9 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
       //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
     catch(err){
-      const errors = errorUpdate as ErrorResponse
+      const errors = (errorUpdate as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorUpdate && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isErrorUpdate && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
@@ -62,38 +57,31 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
       //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
     catch(err){
-      const errors = errorDelete as ErrorResponse
+      const errors = (errorDelete as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorDelete && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isErrorDelete && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
   return (
     <article 
       key={task._id}
-      className={`relative flex items-center gap-1 p-0.5 pl-1.5 text-sm rounded-md shadow-inner shadow-slate-600 ${(isLoadingUpdate || isLoadingDelete) ? 'animate-pulse' : ''}`}
+      className={`relative flex items-center mobile:text-sm text-xs gap-1 p-0.5 pl-1.5 pb-2 rounded-md shadow-inner shadow-slate-600 ${(isLoadingUpdate || isLoadingDelete) ? 'animate-pulse' : ''}`}
     >
-      <p className="flex-auto flex flex-col p-0.5 ">
-        <span className="flex items-center gap-3">
-          <input 
-            type="checkbox" 
-            id={`${task?._id}`} 
-            checked={task.completed}
-            onChange={handleChecked}
-            className={`flex-none w-4 bg-blue-700 rounded-md h-4 marker:bg-gray-500`} 
-          />
-          <label 
-            htmlFor={`${task?._id}`}
-            className={`${task.completed && 'text-gray-400 line-through'} lead leading-tight`}
-          >
-            {reduceLength(task.task, 20, 'word')}
-          </label>
-        </span>
-        <small className="text-right text-gray-400">{format(task.createdAt)}</small>
+      <input 
+        type="checkbox" 
+        id={`${task?._id}`} 
+        checked={task.completed}
+        onChange={handleChecked}
+        className={`absolute top-1.5 flex-none w-4 bg-blue-700 h-4 marker:bg-gray-500 cursor-pointer rounded-lg`} 
+      />
+      <p className="relative flex-auto flex items-center gap-3 p-0.5 pt-0 self-start max-h-14">
+        <label 
+          htmlFor={`${task?._id}`}
+          className={`${task.completed && 'text-gray-400 line-through'} leading-tight pl-5`}
+        >
+          {reduceLength(task.task, 20, 'word')}
+        </label>
       </p>
       <p className={`flex-none w-8 shadow-lg rounded-md shadow-slate-600 h-full justify-center flex flex-col gap-1.5 p-0.5 items-center text-base`}>
         <CiEdit 
@@ -106,6 +94,7 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
       <small 
         onClick={() => viewTask(task._id, 'VIEW')}
         className={`absolute bottom-0 ${(task.task?.length > 130 ||task.subTasks?.length) ? '' : 'hidden'} ${theme == 'light' ? ' hover:opacity-70 text-gray-600' : 'text-gray-400 hover:opacity-90'} cursor-pointer left-1`}>expand</small>
+        <small className="absolute right-10 bottom-0 text-gray-400 text-[10px]">{format(task.createdAt)}</small>
     </article>
   )
 }

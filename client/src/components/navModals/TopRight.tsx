@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice"
 import { nanoid } from "@reduxjs/toolkit"
 import { sub } from "date-fns"
+import { ErrorStyle, SuccessStyle } from "../../utils/navigator"
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -47,25 +48,17 @@ export default function TopRight() {
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
           localStorage.removeItem(`newBody?id=${userId}`)
-          
-          toast.success('Success!! Post added',{
-              duration: 2000, icon: '🔥', 
-              style: { background: '#3CB371' }
-            }
-          )
+          console.log('loading')
+          toast.success('Success!! Post added', SuccessStyle)
           dispatch(resetUrl())
           setImagesFiles([])
           dispatch(setLoading(isLoadingCreate))
           navigate('/')
       }
       catch(err: unknown){
-        const errors = createError as ErrorResponse
+        const errors = (createError as ErrorResponse) ?? (err as ErrorResponse)
         errors?.originalStatus == 401 && setLoginPrompt('Open')
-        isCreateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-          duration: 2000, icon: '💀', style: {
-            background: '#FF0000'
-          }
-        })
+        isCreateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
       }
       finally{
         dispatch(setLoading(false))
@@ -84,21 +77,13 @@ export default function TopRight() {
         localStorage.removeItem(`editTitle?id=${userId}`)
         localStorage.removeItem(`editBody?id=${userId}`)
         
-        toast.success('Success!! Post Updated',{
-            duration: 2000, icon: '🔥', 
-            style: { background: '#3CB371' }
-          }
-        )  
+        toast.success('Success!! Post Updated', SuccessStyle)  
         navigate('/')
       }
       catch(err: unknown){
-        const errors = updateError as ErrorResponse
+        const errors = (updateError as ErrorResponse) ?? (err as ErrorResponse)
         errors?.originalStatus == 401 && setLoginPrompt('Open')
-        isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-          duration: 2000, icon: '💀', style: {
-            background: '#FF0000'
-          }
-        })
+        isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
       }
       finally {
         dispatch(setLoading(false))
@@ -158,7 +143,7 @@ export default function TopRight() {
                   </button>
                 ) : (
                   <button
-                    className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    className={`text-[13px] rounded-md p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
                     onClick={createNewStory}
                     disabled = {isCreateError ? isCreateError : isLoadingCreate ? isLoadingCreate : !canPost}
                     >Publish
@@ -178,7 +163,7 @@ export default function TopRight() {
             )
           :
             <Link to={'/new_story'} >
-              <div className='flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
+              <div className='flex items-center cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
                 <FiEdit className='text-xl' />
                 <span className=''>Post</span>
               </div>
@@ -202,7 +187,7 @@ export default function TopRight() {
         {!address.includes(pathname) ? 
                 <IoIosArrowDown 
                   onClick={() => setRollout(prev => !prev)}
-                  className={`sm:-ml-6 -ml-4 font-thin ${arrow_class}`} /> : null}
+                  className={`sm:-ml-6 -ml-3 font-thin ${arrow_class}`} /> : null}
     </>
   )
 }

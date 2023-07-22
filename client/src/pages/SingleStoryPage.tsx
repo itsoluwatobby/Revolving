@@ -10,8 +10,6 @@ import ArticleComp from "../components/singlePost/ArticleComp";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
 import { useThemeContext } from "../hooks/useThemeContext";
 
-// const specialFont = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left"
-
 export default function SingleStoryPage() {
   const { storyId } = useParams() as {storyId: string}
   const [sidebar, setSidebar] = useState<boolean>(false);
@@ -22,7 +20,7 @@ export default function SingleStoryPage() {
   const [targetStory, setTargetStory] = useState<PostType>();
 
   let averageReadingTime = useWordCount(targetStory?.body as string)
-  const watchWords = TextRules.keywords as string
+  const watchWords = TextRules.keywords as string[]
 
   const end = averageReadingTime.split(' ')[1]
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end;

@@ -18,7 +18,6 @@ export default function CodeCard({ code, count, codeStore, setCodeStore, setInpu
   const { editing, isPresent, codeEditor, theme, success, setEditing } = useThemeContext() as ThemeContextType
   const nodeRef = useCallback((node: HTMLElement) => {
     node ? node.scrollIntoView({behavior: 'smooth'}) : null
-    // isPresent.present ? node.scrollIntoView({behavior: 'smooth'}) : node.nodeName
   }, []);
   const buttonClass = useCallback((theme: Theme, type: ButtonType) => {
     return `

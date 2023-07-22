@@ -73,18 +73,4 @@ export const PersistedLogin = () => {
   )
 }
 
- // (theme == 'light' ?
-//   <figure className='border-none'>
-//     <img src={whiteBGloader} 
-//       alt="Loading..." 
-//       className='bg-inherit border-none m-auto translate-y-40'
-//     />
-//   </figure>
-//   :
-//   <figure className='border-none'>
-//     <img src={darkBGloader} 
-//       alt="Loading..." 
-//       className='bg-inherit border-none m-auto translate-y-40'
-//     />
-//   </figure>
-// )
+ 

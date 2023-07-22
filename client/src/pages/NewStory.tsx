@@ -63,7 +63,6 @@ export const NewStory = () => {
         else{
           const imageId = nanoid()
           const newImage = { imageId, image: file } as ImageType
-          console.log(imagesFiles.length)
           if(imagesFiles.length < 5){
             //  if(uploadedImageIds.includes(newImage.imageId)) return
             setImagesFiles(prev => ([...prev, newImage]))
@@ -71,7 +70,6 @@ export const NewStory = () => {
           }
           else{
             setFiles([])
-            console.log('filled')
           }
         }
       })
@@ -92,10 +90,8 @@ export const NewStory = () => {
 
   useEffect(() => {
     const uploadImages = async() => {
-      console.log(imagesFiles)
       await Promise.all(imagesFiles.map(async(image) => {
         if(uploadedImageIds.includes(image.imageId)) return
-        console.log('running')
           const imageData = new FormData()
           imageData.append('image', image.image)
           await uploadToServer(imageData).unwrap()
@@ -104,7 +100,7 @@ export const NewStory = () => {
             const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
             dispatch(setUrl(composed))
             uploadedImageIds.push(image.imageId)
-          }).catch(error => {
+          }).catch((error: unknown) => {
             const errors = error as ErrorResponse
             errors?.originalStatus == 401 && setLoginPrompt('Open')
           })
@@ -198,7 +194,6 @@ export const NewStory = () => {
           ? setSnippet(type) : setSnippet('Nil')
   }
   
-console.log({loading})
   return (
     <section className={`relative ${loading ? 'animate-pulse bg-opacity-20' : ''} ${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
       {

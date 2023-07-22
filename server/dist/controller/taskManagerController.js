@@ -149,7 +149,7 @@ export const restoreTasks = (req, res) => {
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
-export const deletePeranently = (req, res) => {
+export const deletePermanently = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
         const { taskIds } = req.body;

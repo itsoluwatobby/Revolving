@@ -130,7 +130,7 @@ export const restoreTasks = (req: Request, res: Response) => {
   })
 }
 
-export const deletePeranently = (req: Request, res: Response) => {
+export const deletePermanently = (req: Request, res: Response) => {
   asyncFunc(res, async() => {
     const { userId } = req.params
     const { taskIds }: {taskIds: string[]} = req.body

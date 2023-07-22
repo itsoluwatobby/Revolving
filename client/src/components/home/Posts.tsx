@@ -35,7 +35,7 @@ export const Posts = () => {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length && isError && errorMsg?.status != 404){
+    if(!data?.length || (isError && errorMsg?.status != 404)){
       timerId = setInterval(async() => {
         await refetch()
       }, REFRESH_RATE)
