@@ -17,7 +17,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     createTask: builder.mutation<TaskProp, Partial<TaskArgs>>({
       query: ({userId, task}) => ({
-        url: `task/${userId}`,
+        url: `task/${userId}/tasks`,
         method: 'POST',
         body: {...task}
       }) as any,
@@ -26,7 +26,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
 
     updateTask: builder.mutation<TaskProp, TaskArgs>({
       query: ({userId, task}) => ({
-        url: `task/${userId}`,
+        url: `task/${userId}/tasks/update`,
         method: 'PUT',
         body: {...task}
       }) as any,
@@ -35,7 +35,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     
     deleteTask: builder.mutation<void, Omit<TaskArgs, 'task'>>({
       query: ({userId, taskId}) => ({
-        url: `task/${userId}/${taskId}`,
+        url: `task/${userId}/tasks/${taskId}`,
         method: 'DELETE',
         body: userId
       }) as any,
@@ -69,8 +69,8 @@ export const taskApiSlice = apiSlice.injectEndpoints({
 
     clearTaskBin: builder.mutation<void, string>({
       query: (userId) => ({
-        url: `task/bin/${userId}`,
-        method: 'DELETE',
+        url: `task/${userId}/bin`,
+        method: 'PUT',
         body: userId
       }) as any,
       invalidatesTags: [{ type: 'TASKBIN'}],
@@ -79,7 +79,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     // retore tasks
     restoreTasks: builder.mutation<void, AdvancedTaskArgs>({
       query: ({taskIds, userId}) => ({
-        url: `task/restore/${userId}`,
+        url: `/task/${userId}/bin/restore`,
         method: 'POST',
         body: taskIds
       }) as any,
@@ -89,7 +89,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
     // delete tasks permanently
     permanentlyDeleteTasks: builder.mutation<void, AdvancedTaskArgs>({
       query: ({taskIds, userId}) => ({
-        url: `task/delete/${userId}`,
+        url: `/task/${userId}/bin/permanent`,
         method: 'DELETE',
         body: taskIds
       }) as any,

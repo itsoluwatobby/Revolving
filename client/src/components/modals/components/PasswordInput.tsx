@@ -37,11 +37,11 @@ export default function PasswordInput({
 
   return (
     <>
-      <label htmlFor="password" className='relative'>
-        <span className='flex items-center gap-2 font-medium text-sm'>
+      <div className='relative flex flex-col w-full p-2 pt-0 pb-0 gap-0.5'>
+        <label htmlFor='password' className='flex items-center gap-2 font-medium text-sm'>
           Password
           {password && (passwordRegex.test(password) ? <BsCheck className='text-green-600 text-2xl'/> : <FaTimes className='ml-1 text-red-500' />)}
-        </span>
+        </label>
           <input 
             type={revealPassword ? "text" : "password"} 
             value={password}
@@ -65,13 +65,13 @@ export default function PasswordInput({
                       onClick={() => setRevealPassword(true)}
                       className={`absolute cursor-pointer hover:opacity-90 text-slate-700 right-2 duration-100 bottom-2 text-2xl`} />
           }
-      </label>
+      </div>
       {(password && correct) ? <PasswordChecker password={password} /> : null}
-      <label htmlFor="confirm-pwd" className='relative'>
-        <span className='flex items-center gap-2 font-medium text-sm'>
+      <div className='relative flex flex-col w-full p-2 pt-0 pb-0 gap-0.5'>
+        <label htmlFor='confirm-pwd' className='flex items-center gap-2 font-medium text-sm'>
           Confirm password
           {!confirmPassword ? null : match ? <BsCheck className='text-green-600 text-2xl'/> : <FaTimes className='text-red-600' />}
-        </span>
+        </label>
           <input 
             type={revealPassword ? "text" : "password"} 
             value={confirmPassword}
@@ -83,7 +83,7 @@ export default function PasswordInput({
             onChange={handleConfirmPassword}
             className='relative w-full rounded-md p-1.5 focus:outline-none border-none text-black'
           />
-      </label>
+      </div>
     </>
   )
 }

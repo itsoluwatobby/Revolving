@@ -1,6 +1,6 @@
 import { format } from "timeago.js"
 import { ErrorResponse } from "../../../data"
-import { reduceLength } from "../../../utils/navigator"
+import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator"
 import { FiMoreVertical } from "react-icons/fi"
 import { Link } from "react-router-dom"
 import { useThemeContext } from "../../../hooks/useThemeContext"
@@ -31,8 +31,8 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   const [intersect, setIntersect] = useState<boolean>(false)
   const dispatch = useDispatch()
   const cardRef = useRef<HTMLElement>(null)
-  const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError, error: deleteError }] = useDeleteStoryMutation()
-  const [deleteSharedStory, { isLoading: isSharedDeleteLoading, isError: isSharedDeleteError, error: sharedDeleteError }] = useDeleteSharedStoryMutation()
+  const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError }] = useDeleteStoryMutation()
+  const [deleteSharedStory, { isLoading: isSharedDeleteLoading, isError: isSharedDeleteError }] = useDeleteSharedStoryMutation()
   const buttonOptClass = useCallback((theme: Theme) => {
     return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
   }, [])
@@ -59,18 +59,12 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           ? await deleteSharedStory({userId, sharedId: story?.sharedId}).unwrap() 
               : await deleteStory({userId, storyId: id}).unwrap()
       story?.sharedId && dispatch(storyApiSlice.util.invalidateTags(['STORY']))
-      toast.success('Success!! Post deleted', {
-        duration: 2000, icon: '💀', style: { background: '#FA2B50'}
-      })
+      toast.success('Success!! Post deleted', SuccessStyle)
     }
     catch(err: unknown){
-      const errors = isDeleteError ? deleteError as ErrorResponse : sharedDeleteError as ErrorResponse;
+      const errors = (err as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 ? setLoginPrompt('Open') : null;
-      (isDeleteError || isSharedDeleteError) && toast.error(`${errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      (isDeleteError || isSharedDeleteError) && toast.error(`${errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

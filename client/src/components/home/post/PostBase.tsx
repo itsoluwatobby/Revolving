@@ -7,7 +7,7 @@ import { AiOutlineRetweet } from "react-icons/ai"
 import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../../data"
-import { checkCount } from "../../../utils/navigator"
+import { ErrorStyle, SuccessStyle, checkCount } from "../../../utils/navigator"
 import { useLikeAndUnlikeSharedStoryMutation, useShareStoryMutation } from "../../../app/api/sharedStorySlice"
 
 type PostButtomProps = {
@@ -18,21 +18,9 @@ type PostButtomProps = {
 export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme,  setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType
-  const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError, isUninitialized }] = useLikeAndUnlikeStoryMutation()
-  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, error: sharedLikeError, isError: isSharedLikeError, isUninitialized: isSharedUninitialzed }] = useLikeAndUnlikeSharedStoryMutation()
-  const [shareStory, { isLoading: isSharedLoading, error: sharedError, isError: isSharedError }] = useShareStoryMutation()
-  // const { data: commentData, isLoading, 
-  //   isError: isCommentError,
-  // } = useGetCommentsQuery(story?._id)
-  // const [comments, setComments] = useState<CommentProps[]>([])
-
-  // useEffect(() => {
-  //   let isMounted = true
-  //   isMounted && setComments(commentData as CommentProps[])
-  //   return () => {
-  //     isMounted = false
-  //   }
-  // }, [commentData])
+  const [likeAndUnlikeStory, { isLoading: isLikeLoading, isError: isLikeError, isUninitialized }] = useLikeAndUnlikeStoryMutation()
+  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, isError: isSharedLikeError, isUninitialized: isSharedUninitialzed }] = useLikeAndUnlikeSharedStoryMutation()
+  const [shareStory, { isLoading: isSharedLoading, error: sharedError, isError: isSharedError }] = useShareStoryMutation();
 
   const likeUnlikeStory = async() => {
     try{
@@ -42,13 +30,9 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
               : await likeAndUnlikeStory({userId: currentUserId, storyId: _id}).unwrap()
     }
     catch(err: unknown){
-      const errors = isLikeError ? likeError as Partial<ErrorResponse> : sharedLikeError as Partial<ErrorResponse>
+      const errors = err as ErrorResponse
       (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
-      (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`,ErrorStyle)
     }
   }
 
@@ -56,19 +40,12 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
     try{
       const { _id } = story
       await shareStory({userId: currentUserId, storyId: _id}).unwrap()
-      toast.success('Story shared successfully', {
-        duration: 2000, icon: '🔥', 
-          style: { background: '#3CB371' }
-      })
+      toast.success('Story shared successfully', SuccessStyle)
     }
     catch(err: unknown){
       const errors = sharedError as Partial<ErrorResponse>
       (!errors || errors?.originalStatus == 401) && setLoginPrompt('Open')
-      isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

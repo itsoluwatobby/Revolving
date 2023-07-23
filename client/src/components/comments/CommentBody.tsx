@@ -13,8 +13,7 @@ import { toast } from 'react-hot-toast'
 import { storyApiSlice } from '../../app/api/storyApiSlice'
 import { getTabCategory } from '../../features/story/navigationSlice'
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types'
-import { REFRESH_RATE } from '../../utils/navigator'
-
+import { ErrorStyle, REFRESH_RATE } from '../../utils/navigator'
 
 export default function CommentBody() {
   const getNavigation = useSelector(getTabCategory)
@@ -47,13 +46,9 @@ export default function CommentBody() {
       await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err){
-      const errors = errorComment as ErrorResponse
+      const errors = (errorComment as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
@@ -88,7 +83,7 @@ export default function CommentBody() {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length && isError && errorMsg?.status != 404){
+    if(!data?.length || (isError && errorMsg?.status != 404)){
       timerId = setInterval(async() => {
         await refetch()
       }, REFRESH_RATE)

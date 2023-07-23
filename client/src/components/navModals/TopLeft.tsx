@@ -38,7 +38,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
         (!address.includes(pathname) && !exclude.includes(pathname)) ?
           <div 
             onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
-            className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-40 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-1`}>  
+            className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-32 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-0`}>  
               <CiSearch className='text-gray-700 text-xl w-8'/>
               <input 
                 type="text"
@@ -46,18 +46,18 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
                 placeholder='Search Stories'
                 value = {search}
                 onChange={e => setSearch(e.target.value)}
-                className={`placeholder:text-sm w-full rounded-md placeholder:font-normal font-sans flex-auto focus:outline-none h-full p-1 bg-inherit box-border ${theme == 'dark' ? 'placeholder:text-gray-200' : ''}`}
+                className={`placeholder:text-sm mobile:text-xs w-full rounded-md placeholder:font-normal font-sans flex-auto focus:outline-none h-full p-0.5 bg-inherit box-border ${theme == 'dark' ? 'placeholder:text-gray-200' : ''}`}
                 />
             </div>
-            : (
-                ((postData?.title || postData?.body) && pathname !== address[2] && !exclude.includes(pathname)) && (
-                  <div className='flex gap-2 mobile:ml-2'>
-                    <p>{delayedSaving == 'typing' ? 'saving...' : 'saved'}</p>
-                    <p className='text-gray-500'>Draft</p>
-                  </div>
-                )
+          : (
+              ((postData?.title || postData?.body) && pathname !== address[2] && !exclude.includes(pathname)) && (
+                <div className='flex gap-2 mobile:ml-2'>
+                  <p>{delayedSaving == 'typing' ? 'saving...' : 'saved'}</p>
+                  <p className='text-gray-500'>Draft</p>
+                </div>
               )
-          }
+            )
+        }
     </>
   )
 }

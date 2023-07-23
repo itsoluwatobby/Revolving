@@ -6,7 +6,7 @@ import { useThemeContext } from '../../../hooks/useThemeContext';
 import WriteModal from './WriteModal';
 import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { checkCount } from '../../../utils/navigator';
+import { ErrorStyle, checkCount } from '../../../utils/navigator';
 import { setEditResponse } from '../../../features/story/commentSlice';
 import { useDispatch } from 'react-redux';
 import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
@@ -65,13 +65,9 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
       await likeAndUnlikeResponse({userId, responseId: _id}).unwrap()
     }
     catch(err: unknown){
-      const errors = likeError as ErrorResponse
+      const errors = (likeError as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

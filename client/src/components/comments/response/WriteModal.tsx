@@ -9,6 +9,7 @@ import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted 
 import { commentApiSlice } from '../../../app/api/commentApiSlice';
 import { toast } from 'react-hot-toast';
 import { useCreateResponseMutation, useUpdateResponseMutation } from '../../../app/api/responseApiSlice';
+import { ErrorStyle } from '../../../utils/navigator'
 
 type WriteProp={
   writeReply: string,
@@ -25,7 +26,6 @@ type WriteProp={
 }
 
 // TODO: When Prompt is up, disable textarea
-
 export default function WriteModal({ keepPrompt, setKeepPrompt, comment, response, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const getResponseEdit = useSelector(getEditResponse)
@@ -66,13 +66,9 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
         dispatch(setEditResponse({...updatedResponse, response: ''}))
     }
     catch(err){
-      const errors = errorResponse as ErrorResponse
+      const errors = (errorResponse as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
@@ -93,13 +89,9 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
       dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err){
-      const errors = error as ErrorResponse
+      const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
@@ -157,5 +149,9 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     </article>
   )
 
-  return content
+  return (
+    <>
+      {content}
+    </>
+  )
 }

@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import RegistrationForm from '../components/modals/RegistrationForm';
 import { ErrorResponse } from '../data';
 import { useSignUpMutation } from '../app/api/authApiSlice';
+import { ErrorStyle, SuccessStyle } from '../utils/navigator';
 
 
 export default function RegisterModal() {
@@ -49,11 +50,7 @@ export default function RegisterModal() {
     event.preventDefault()
     try{
       const res = await signUp({username, email, password}).unwrap() as unknown as { data: { meta: { message: string } } };
-
-      !isLoading && toast.success(res?.data?.meta?.message, {duration: 10000, icon: '🔥', 
-                    style: { background: '#6B7F81' }
-                    }
-                  )
+      !isLoading && toast.success(res?.data?.meta?.message, SuccessStyle)
       setEmail('')
       setUsername('')
       setPassword('')
@@ -61,18 +58,14 @@ export default function RegisterModal() {
     }
     catch(err: unknown){
       const errors = error as ErrorResponse
-      isError && toast.error(`${errors?.data?.meta?.message}`, {
-        duration: 10000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isError && toast.error(`${errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
   return (
     <div 
       onClick={() => setRollout(false)}
-      className={`welcome w-full ${theme == 'light' ? 'bg-slate-100' : ''}`}>
+      className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-100' : ''}`}>
       <RegistrationForm 
         handleSubmit={handleSubmit} handleEmail={handleEmail} handleUsername={handleUsername} 
         username={username} email={email} password={password} match={match} 

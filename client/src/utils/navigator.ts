@@ -24,6 +24,14 @@ export const ErrorStyle = {
   }
 }
 
+export const SuccessStyle = {
+  duration: 2000, 
+  icon: '🔥', 
+  style: { 
+    background: '#3CB371' 
+  }
+}
+
 export const reduceLength = (content: string, maxLength: number, option: Option = 'letter'): string => {
   let responseOutput: string;
   if(option == 'letter'){

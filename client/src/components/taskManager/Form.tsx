@@ -31,7 +31,7 @@ export default function Form({ currentUserId }: FormProps) {
   const [taskInput, setTaskInput] = useState<string>('');
   const dispatch = useDispatch()
   const [createTask, {isLoading, isError, error}] = useCreateTaskMutation();
-  const [updateTask, {isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate}] = useUpdateTaskMutation();
+  const [updateTask, {isLoading: isLoadingUpdate}] = useUpdateTaskMutation();
   const [debouncedInput, setDebouncedInput] = useState<InputTaskProp>({
     value: '', isTyping: 'notTyping'
   });
@@ -145,33 +145,33 @@ export default function Form({ currentUserId }: FormProps) {
               : await updateTask({ userId: currentUserId, task: newTask }).unwrap()
       setTaskInput('')
       setDebouncedInput({value: '', isTyping: 'notTyping'})
-      setTaskRequest('Hide')
+      setTaskRequest('Open')
       setPrompt('Hide')
       dispatch(setTask({taskId: '', option: 'NIL'}))
       //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
     catch(err){
-      const errors = error as ErrorResponse
+      const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+      err && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
   // no activity after 30 seconds
   useEffect(() => {
     let timerId: TimeoutId
-    if(!stoppedTyping && (prompt == 'Nil' || prompt == 'Hide') && taskRequest == 'Hide'){
+    if(!stoppedTyping && !isLoading && !isLoadingUpdate && (prompt == 'Nil' || prompt == 'Hide') && taskRequest == 'Hide'){
       timerId =setTimeout(() => {
         setNoActivity(true)
       }, DELAY);
     }
     return () => clearTimeout(timerId)
-  }, [prompt, taskRequest, stoppedTyping])
-
+  }, [prompt, taskRequest, stoppedTyping, isLoading, isLoadingUpdate])
+console.log(isLoading)
   // not activity after stoppedTyping prompt
   useEffect(() => {
     let timerId: TimeoutId
-    if(stoppedTyping){
+    if(stoppedTyping && !isLoading && !isLoadingUpdate){
         timerId =setTimeout(() => {
           setTaskInput('')
           setPrompt('Nil')
@@ -182,7 +182,7 @@ export default function Form({ currentUserId }: FormProps) {
         }, DELAY);
     }
     return () => clearTimeout(timerId)
-  }, [stoppedTyping, dispatch])
+  }, [stoppedTyping, dispatch, isLoading, isLoadingUpdate])
 
   const closePrompt = () => {
     setTaskInput('')
@@ -199,16 +199,17 @@ export default function Form({ currentUserId }: FormProps) {
     <div className="relative">
       {
         taskRequest == 'Hide' ?
-        <div className={`transition-all ${taskRequest == 'Hide' ? 'block' : 'scale-0'} ${prompt == 'Open' ? 'animate-none' : (!noActivity && 'animate-pulse')} ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-600'} flex items-center h-14 rounded-md an`}>
-          <p className={`flex-grow text-center text-lg font-serif`}>Create a new task</p>
+        <div 
+          onClick={() => {
+            setTaskRequest('Open')
+            setPrompt('Hide')
+            setNoActivity(false)
+          }}
+          className={`transition-all ${taskRequest == 'Hide' ? 'block' : 'scale-0'} ${prompt == 'Open' ? 'animate-none' : (!noActivity && 'animate-pulse')} ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-600'} flex items-center h-14 rounded-md an`}>
+          <p className={`flex-grow text-center text-lg font-serif cursor-default`}>Create a new task</p>
           <IoMdAdd 
-            title="Add task" 
-            onClick={() => {
-              setTaskRequest('Open')
-              setPrompt('Hide')
-              setNoActivity(false)
-            }}
-          className={`flex-none w-12 text-center h-full rounded-md text-sm ${theme == 'light' ? 'bg-slate-400' : 'bg-slate-500'} hover:opacity-50 cursor-pointer`}
+            title="Add task"
+            className={`flex-none w-12 text-center h-full rounded-md text-sm ${theme == 'light' ? 'bg-slate-400' : 'bg-slate-500'} hover:opacity-50 cursor-pointer`}
           />
         </div>
         :

@@ -73,7 +73,7 @@ export const Navbar = () => {
         notintersecting={notintersecting}
       />
 
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-40' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
+      <div className={`relative mobile:flex-none flex items-center sm:gap-1 justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-36' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
         <TopRight />
       </div>
      { 

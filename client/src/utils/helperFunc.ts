@@ -16,6 +16,15 @@ export function providesTag<R extends { _id: string | number }, T extends string
   )
 }
 
+// thumb event
+export function simulateThumbEvent(element: HTMLElement){
+  const thumbEvent = new CustomEvent('thumb', {
+    bubbles: true, // Alllow the event to bubble up to the DOM
+    cancelable: true
+  })
+  element.dispatchEvent(thumbEvent)
+}
+
 export const dateFormat = (dateTime: string) => {
   const constructDate = new Date(dateTime)
   const date = new Intl.DateTimeFormat('en-US', {

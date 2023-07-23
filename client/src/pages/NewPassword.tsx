@@ -6,6 +6,7 @@ import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../data";
+import { SuccessStyle } from "../utils/navigator";
 
 export default function NewPassword() {
   const [password, setPassword] = useState<string>('')
@@ -13,7 +14,8 @@ export default function NewPassword() {
   const [confirmPassword, setConfirmPassword] = useState<string>('')
   const [match, setMatch] = useState<boolean>(false)
   const location = useLocation()
-  const [newPassword, {isLoading, isSuccess, isError, error}] = useNewPasswordMutation()
+  const [newPassword, {isLoading, isSuccess, isError
+  }] = useNewPasswordMutation()
   const { theme } = useThemeContext() as ThemeContextType
   const email = location?.search?.split('=')[1]
 
@@ -32,15 +34,10 @@ export default function NewPassword() {
       await newPassword({ email, resetPass: password }).unwrap();
       setPassword('')
       setConfirmPassword('')
-      !isLoading && toast.success('Password reset successful', {
-            duration: 10000, icon: '🔥', 
-            style: { background: '#3CB371' }
-        }
-      )
+      !isLoading && toast.success('Password reset successful', SuccessStyle)
     }
     catch(err: unknown){
-      const errors = error as ErrorResponse
-      console.log(error)
+      const errors = err as ErrorResponse
       const msg = errors?.data ? errors?.data?.meta?.message : 'No Network'
       isError && toast.error(`${msg}`, {
         duration: 10000, icon: '💀', style: {

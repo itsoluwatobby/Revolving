@@ -1,6 +1,6 @@
 import { format } from "timeago.js";
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from "../../../data";
-import { reduceLength } from "../../../utils/navigator";
+import { ErrorStyle, reduceLength } from "../../../utils/navigator";
 import { PromptLiterals, Theme, ThemeContextType } from "../../../posts";
 import { useState, useRef } from 'react';
 import { MdOutlineExpandMore } from "react-icons/md";
@@ -52,16 +52,11 @@ export const ResponseBody = ({ response, prompt, setPrompt, userId, targetCommen
     try{
       await deleteResponse({ userId, responseId: response?._id}).unwrap()
       dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
-      //await commentApiSlice.useGetCommentQuery(parseId).refetch()
     }
     catch(err: unknown){
-      const errors = error as ErrorResponse
+      const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 2000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 

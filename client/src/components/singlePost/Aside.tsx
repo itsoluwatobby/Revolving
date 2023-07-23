@@ -43,7 +43,7 @@ export default function Aside({ stories, setSidebar, sidebar }: AsideProps) {
               recentStories?.map(story => (
                 <li 
                   key={story?._id}
-                  className={` hover:scale-[1.01] rounded-lg transition-all shadow-lg shadow-slate-600 ${theme == 'light' ? 'bg-gray-100' : 'bg-slate-800'} p-2`}
+                  className={` hover:scale-[1.01] rounded-md rounded-tr-none rounded-bl-none transition-all shadow-md ${theme == 'light' ? 'bg-gray-100 shadow-slate-300' : 'shadow-slate-600  bg-slate-800'} p-2`}
                 >
                   <Link to={`/story/${story?._id}`}>
                     <p className="text-center font-serif uppercase font-medium underline underline-offset-4">{reduceLength(story?.title, 3, 'word')}</p>
