@@ -1,6 +1,6 @@
 import { useClearTaskBinMutation, useGetTaskBinQuery, usePermanentlyDeleteTasksMutation, useRestoreTasksMutation } from "../../../app/api/taskApiSlice"
 import { useState, useEffect, useCallback } from "react"
-import { Button, ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data"
+import { ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data"
 import { Theme, ThemeContextType } from "../../../posts"
 import { toast } from "react-hot-toast"
 import { useThemeContext } from "../../../hooks/useThemeContext"
@@ -23,11 +23,11 @@ export default function Taskbin({ userId }: TaskBinProp) {
   const {setLoginPrompt, theme } = useThemeContext() as ThemeContextType
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
-  const taskbinButtonClass = (theme:Theme, position:Position='NORM') => {
+  const taskbinButtonClass = useCallback((theme:Theme, position:Position='NORM') => {
     return (
       `cursor-pointer ${theme == 'light' ? 'hover:text-gray-500' : 'hover:text-gray-300'} text-base active:text-gray-100 transition-all ${(taskIdsToDelete.length && position == 'NORM') ? 'scale-0' : (!taskIdsToDelete.length && position == 'NAV') ? 'scale-0 hidden' : 'scale-100'} mobile:text-2xl`
     )
-  }
+  }, [taskIdsToDelete])
 
   const sortedTasks = tasksInBin?.taskBin?.slice().sort((a, b) => b?.createdAt.localeCompare(a?.createdAt))
 
