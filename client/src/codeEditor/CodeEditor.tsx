@@ -73,11 +73,11 @@ export default function CodeBlock() {
   useEffect(() => {
     const codeName = `revolving-${filename.name}`
     const isPresent = Boolean(localStorage.getItem(codeName))
-    if(codeName.split('-')[1] === filename.name && isPresent){
+    if(codeName?.split('-')[1] === filename?.name && isPresent){
       setInputValue(prev => ({...prev, code: localStorage.getItem(codeName) as string}))
     }
     else{
-      setInputValue(prev => ({...prev, langType: files[filename.name as keyof FileType].defaultValue}))
+      setInputValue(prev => ({...prev, langType: files[filename?.name as keyof FileType].defaultValue}))
     }
     localStorage.setItem('revolving-languageName', filename.name as string)
     setInputValue(prev => ({...prev, langType: filename.name as string}))

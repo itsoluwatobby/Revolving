@@ -7,7 +7,8 @@ export default function Wave() {
   return (
     <div 
       onClick={() => setOpenChat('Hide')}
-      className="ocean">
+      className="ocean"
+    >
       <div className="wave" />
       <div className="wave" />
     </div>
