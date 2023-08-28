@@ -57,11 +57,11 @@ export default function PasswordInput({
           {
             revealPassword ? 
               <AiFillEye 
-                title='Show' 
+                title='Hide' 
                 onClick={() => setRevealPassword(false)}
                 className={`absolute cursor-pointer hover:opacity-90 text-slate-700 right-2 duration-100 bottom-2 text-2xl`} /> 
                   : <AiFillEyeInvisible 
-                      title='Hide' 
+                      title='Show' 
                       onClick={() => setRevealPassword(true)}
                       className={`absolute cursor-pointer hover:opacity-90 text-slate-700 right-2 duration-100 bottom-2 text-2xl`} />
           }

@@ -46,7 +46,6 @@ export const shareStory = (req: RequestProp, res: Response) => {
     if (!userId || !storyId) return res.sendStatus(400);
     const user = await getUserById(userId)
     await autoDeleteOnExpire(userId)
-    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await createShareStory(user, storyId)
     .then((newShare) => responseType({res, status: 201, count:1, data: newShare}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
@@ -57,9 +56,7 @@ export const unShareUserStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async() => {
     const { userId, sharedId } = req.params
     if (!userId || !sharedId) return res.sendStatus(400);
-    const user = await getUserById(userId)
     await autoDeleteOnExpire(userId)
-    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const result = await unShareStory(userId, sharedId)
     redisClient.DEL(`sharedStory:${sharedId}`)
     return result == 'not found' 
@@ -92,7 +89,6 @@ export const like_Unlike_SharedStory = async(req: Request, res: Response) => {
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     await likeAndUnlikeSharedStory(userId, sharedId)
     .then((result: Like_Unlike_Shared) => responseType({res, status: 201, message: result}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))

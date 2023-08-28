@@ -52,14 +52,14 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   //   if(node) observerRef.current.observe(node as unknown as Element)
   // }, [])
 
-
   const deleted = async(id: string) => {
     try{
       story?.sharedId 
           ? await deleteSharedStory({userId, sharedId: story?.sharedId}).unwrap() 
               : await deleteStory({userId, storyId: id}).unwrap()
       story?.sharedId && dispatch(storyApiSlice.util.invalidateTags(['STORY']))
-      toast.success('Success!! Post deleted', SuccessStyle)
+      const promptMessage = story?.sharedId ? 'Success!! Story unshared' : 'Success!! Post deleted'
+      toast.success(promptMessage, SuccessStyle)
     }
     catch(err: unknown){
       const errors = (err as ErrorResponse) ?? (err as ErrorResponse)
@@ -101,13 +101,13 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           className='capitalize font-sans cursor-pointer hover:opacity-90 transition-all'>{
-          reduceLength(story?.author, 10, 'letter') || 'anonymous'
+          reduceLength(story?.sharedId ? (story?.sharedAuthor as string) :  story?.author, 10, 'letter') || 'anonymous'
           }
          
         </p>
         <span>.</span>
         <p className="font-sans flex items-center gap-2">
-          {format(story?.createdAt)}
+          {story?.sharedId ? format(story?.sharedDate as string) : format(story?.createdAt)}
           {story?.sharedId ? <Link to={`/story/${story?._id}`} title="link to story" className="text-gray-400 cursor-pointer">shared</Link> : null}
         </p>
         {userId == story?.userId && (
@@ -118,7 +118,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
           />
           )
         }
-        {/* MAKE THIS MORE ATTRACTIVE */}
+      
         {(userId == story?.userId || userId == story?.sharedId) &&
           <p className={`absolute ${open ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-3 top-4 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'bg-slate-500 text-white' : 'border-gray-500 shadow-slate-800 bg-slate-900'}`}>
               {!story?.sharedId &&
@@ -134,29 +134,65 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
               onClick={() => deleted(story?._id)}
               title='Delete post'
               className={buttonOptClass(theme)}>
-              Delete
+              {story?.sharedId ? 'Unshare' : 'Delete'}
             </span>
           </p>
         }
        
         <UserCard 
-          userId={story.userId}
+          userId={story?.sharedId ? (story?.sharerId as string) : story.userId}
           cardRef={cardRef as React.LegacyRef<HTMLElement>}
           setRevealCard={setRevealCard}
           revealCard={revealCard}
           closeUserCard={closeUserCard}
           setOnCard={setOnCard}
-        />  
+        />
+        
       </div>
-        <p 
-          className='whitespace-pre-wrap font-bold capitalize text-lg'>{story?.title}</p>
-      <Link to={`/story/${story?._id}`} >
-        <p 
-          onClick={openText}
-          className={`whitespace-pre-wrap text-justify text-sm first-letter:ml-3 first-letter:text-lg ${theme == 'light' ? 'text-black' : 'text-white'} first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
-            {bodyContent}
-        </p>
-      </Link> 
+      
+      <div className={`flex flex-col w-full ${story?.sharedId ? 'shadow-inner shadow-slate-300 rounded-md p-1 pt-2' : ''} ${theme === 'light' ? 'shadow-slate-300' : 'dark:shadow-slate-700'}`}>
+
+        <div 
+          // onClick={() => setOpen(false)}
+          className={`relative ${story?.sharedId ? 'flex' : 'hidden'} items-center gap-3`}>
+          <p 
+            onMouseEnter={() => !story?.sharedAuthor ? setHovering(true) : null}
+            onMouseLeave={() => !story?.sharedAuthor ? setHovering(false) : null}
+            className='capitalize font-sans cursor-pointer hover:opacity-90 transition-all'>{
+            reduceLength(story?.author, 10, 'letter') || 'anonymous'
+            }
+          
+          </p>
+
+          <span>.</span>
+
+          <p className="font-sans flex items-center gap-2">{format(story?.createdAt)}</p>
+        
+          {!story?.sharedAuthor ?
+            <UserCard 
+              userId={story.userId}
+              cardRef={cardRef as React.LegacyRef<HTMLElement>}
+              setRevealCard={setRevealCard}
+              revealCard={revealCard}
+              closeUserCard={closeUserCard}
+              setOnCard={setOnCard}
+            />
+            : null 
+          } 
+        </div>
+
+        <p className='whitespace-pre-wrap font-bold capitalize text-lg'>{story?.title}</p>
+
+        <Link to={`/story/${story?._id}`} >
+          <p 
+            onClick={openText}
+            className={`whitespace-pre-wrap text-justify text-sm first-letter:ml-3 first-letter:text-lg ${theme == 'light' ? 'text-black' : 'text-white'} first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
+              {bodyContent}
+          </p>
+        </Link> 
+        
+      </div>
+
     </div>
   )
 }

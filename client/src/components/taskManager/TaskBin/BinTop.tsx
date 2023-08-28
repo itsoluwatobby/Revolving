@@ -18,7 +18,7 @@ type BinTopProps = {
 export default function BinTop({ theme, restoreTasks, restoreLoading, permanentlyDeleteLoading, permanentlyDelete, taskIdsToDelete, taskCount, setConfirmDelete, taskbinButtonClass }: BinTopProps) {
 
   return (
-    <nav className={`sticky top-0 z-40 mobile:text-lg flex items-center justify-between ${theme == 'light' ? 'bg-white' : 'bg-slate-800'} w-full p-0.5 ${taskIdsToDelete.length ? '' : ''}`}>
+    <nav className={`sticky top-0 z-10 mobile:text-lg flex items-center justify-between ${theme == 'light' ? 'bg-white' : 'bg-slate-800'} w-full p-0.5 ${taskIdsToDelete.length ? '' : ''}`}>
       <MdOutlineRestore 
         title="restore marked"
         onClick={() => restoreTasks({type: 'MULTI'})}  

@@ -46,6 +46,8 @@ type StoryProps = {
   likes: string[]
   edited: false
   author: string
+  sharedAuthor: string
+  sharedDate: string
   createdAt: string,
   updatedAt: string
 }
@@ -55,7 +57,7 @@ interface SharedProps extends Document{
   sharerId: string,
   storyId: string,
   sharedLikes: string[],
-  author: string,
+  sharedAuthor: string,
   sharedStory: StoryProps,
   createdAt: string,
   updatedAt: string
@@ -131,6 +133,7 @@ interface TaskProp{
 
 type HoverType = 'unfollow' | 'following'
 type PositionType = 'navbar' | 'others'
+type OptionType = 'EMAIL' | 'DIRECT'
 
 type EnlargeCompo = {
   type: 'open' | 'enlarge',
@@ -174,7 +177,7 @@ interface UserProps{
   isAccountActivated: boolean,
   isAccountLocked: boolean,
   isResetPassword: boolean,
-  verificationToken: string,
+  verificationToken: { type: string, token: string, createdAt: string },
   dateLocked: string,
   followers?: string[],
   followings?: string[],
@@ -205,9 +208,13 @@ type ChatProps = {
 
 type DeleteCommentByAdmin = 'onlyInStory' | 'allUserComment'
 type DeleteResponseByAdmin = 'onlyInComment' | 'allUserResponse'
+type ConfirmationMethodType = 'LINK' | 'OTP'
+type DataType = { otp: string, expiresIn: string }
+type UserDataType = { _id: string, email: string, roles: USERROLES[] }
 
 interface ErrorResponse{
   status: number | string,
+  message?: string,
   data: {
     meta: {
       message: string
@@ -269,8 +276,10 @@ interface RegistrationProps extends UserInfoProps{
   confirmPassword: string,
   validEmail: boolean,
   validPassword: boolean,
+  confirmationBy: ConfirmationMethodType,
   handleUsername: (event: ChangeEvent<HTMLInputElement>) => void,
   handleConfirmPassword: (event: ChangeEvent<HTMLInputElement>) => void,
   setValidEmail: React.Dispatch<React.SetStateAction<boolean>>,
   setValidPassword: React.Dispatch<React.SetStateAction<boolean>>
+  setConfirmationBy: React.Dispatch<React.SetStateAction<ConfirmationMethodType>>
 }

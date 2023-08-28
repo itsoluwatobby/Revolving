@@ -20,9 +20,9 @@ export default function RightSection() {
   }, [data])
 
   return (
-    <section className={`hidebars fixed h-full text-sm overflow-y-scroll pb-24`}>
-      <div className={`sticky top-0 w-full mb-1 z-50 ${theme == 'light' ? 'bg-gray-300' : 'bg-slate-800'} flex justify-between items-center`}>
-        <p className="font-medium p-1.5 w-full text-center text-sm drop-shadow-2xl font-serif uppercase shadow-lg">Recents</p>
+    <section className={`hidebars fixed w-full h-full text-sm overflow-y-scroll pb-24`}>
+      <div className={`sticky top-0 w-full h-20 mb-1 z-50 ${theme == 'light' ? 'bg-white' : 'bg-slate-800'} flex justify-between items-center`}>
+        <p className="font-medium text-black p-1.5 w-full text-center text-sm drop-shadow-2xl font-serif uppercase shadow-lg">Recents</p>
         {/* <button 
           className='absolute sm:hidden block right-0 shadow-lg text-white border dark:bg-slate-600 border-slate-700 bg-opacity-40 cursor-pointer p-1 rounded-md text-sm hover:bg-slate-600 transition-all active:bg-slate-700'>
           close
@@ -34,8 +34,8 @@ export default function RightSection() {
             {
               stories?.map(story => (
                 <li 
-                  key={story?._id}
-                  className={`hover:scale-[1.01] rounded-sm transition-all shadow-lg ${theme == 'light' ? 'bg-gray-100 shadow-slate-300' : 'bg-slate-600 shadow-slate-700 '} p-2`}
+                  key={story?.sharedId ? story?.sharedId : story?._id}
+                  className={`hover:scale-y-90 rounded-sm transition-all shadow-lg ${theme == 'light' ? 'bg-gray-100 shadow-slate-300' : 'bg-slate-600 shadow-slate-700 '} p-2`}
                 >
                   <Link to={`/story/${story?._id}`}>
                     <p className="text-center text-xs font-serif uppercase font-medium underline underline-offset-4">{reduceLength(story?.title, 3, 'word')}</p>

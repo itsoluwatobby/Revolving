@@ -167,7 +167,7 @@ export default function Form({ currentUserId }: FormProps) {
     }
     return () => clearTimeout(timerId)
   }, [prompt, taskRequest, stoppedTyping, isLoading, isLoadingUpdate])
-console.log(isLoading)
+
   // not activity after stoppedTyping prompt
   useEffect(() => {
     let timerId: TimeoutId

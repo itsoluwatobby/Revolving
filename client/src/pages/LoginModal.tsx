@@ -51,7 +51,8 @@ export default function Login() {
       const errors = err as ErrorResponse
       isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'Please Check Your Network' : errors?.data?.meta?.message}`, {
         duration: 10000, icon: '💀', style: {
-          background: errors?.status == 403 ? 'A6BCE2' : '#FF0000'
+          background: errors?.status == 403 ? 'A6BCE2' : '#FF0000',
+          color: '#FFFFFF'
         }
       })
     }

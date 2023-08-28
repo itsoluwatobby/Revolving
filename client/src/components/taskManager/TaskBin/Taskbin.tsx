@@ -15,9 +15,9 @@ type TaskBinProp = {
 
 export default function Taskbin({ userId }: TaskBinProp) {
   const {data, isLoading, isError: isErrorBin, error, refetch} = useGetTaskBinQuery(userId as string)
-  const[clearTaskBin, {isLoading: clearBinLoading, error: clearBinError, isError: isClearBinError}] = useClearTaskBinMutation()
-  const[restoreTask, {isLoading: restoreLoading, error: restoreError, isError: isRestoreError}] = useRestoreTasksMutation()
-  const[permanentlyDeleteTask, {isLoading: permanentlyDeleteLoading, error: permanentlyDeleteError, isError: isPermanentlyDeleteError}] = usePermanentlyDeleteTasksMutation();
+  const [clearTaskBin, {isLoading: clearBinLoading, error: clearBinError, isError: isClearBinError}] = useClearTaskBinMutation()
+  const [restoreTask, {isLoading: restoreLoading, error: restoreError, isError: isRestoreError}] = useRestoreTasksMutation()
+  const [permanentlyDeleteTask, {isLoading: permanentlyDeleteLoading, error: permanentlyDeleteError, isError: isPermanentlyDeleteError}] = usePermanentlyDeleteTasksMutation();
   const [taskIdsToDelete, setTaskIdsToDelete] = useState<string[]>([]);
   const [tasksInBin, setTasksInBin] = useState<TaskBin>()
   const {setLoginPrompt, theme } = useThemeContext() as ThemeContextType
@@ -171,7 +171,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
       
       {binContent}
 
-      <div className={`absolute ${clearBinLoading ? 'animate-pulse' : 'animate-none'} left-5 top-10 ${confirmDelete ? 'flex' : 'hidden'} rounded-md shadow-xl w-[80%] text-sm md:w-[35%] border bg-white h-14 items-center gap-2 justify-center z-30`}>
+      <div className={`absolute ${clearBinLoading ? 'animate-pulse' : 'animate-none'} left-5 top-10 ${confirmDelete ? 'flex' : 'hidden'} rounded-md shadow-xl text-sm w-fit px-1.5 border bg-white h-14 items-center gap-2 justify-center z-30`}>
         <button 
           onClick={clearTasks}
           className="p-0.5 text-white bg-red-500 rounded-md pl-2 pr-2 hover:bg-red-600 transition-all active:bg-red-500">Confirm</button>

@@ -11,27 +11,27 @@ type AllowedRolesProp={
 export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
   const { pathname } = useLocation()
   const getPermission = useSelector(grantedPermission)
-  const delayed = () => new Promise(resolve => setTimeout(() => resolve, 1500))
   const dispatch = useDispatch()
-
 console.log(roles)
-
   useEffect(() => {
+    let isMounted = true
     const permitted = () => {
       const ALLOWEDROLES = [1120, 1159]
-      const grantPermission = roles.some(allowed => ALLOWEDROLES.includes(allowed))
+      const grantPermission = roles?.some(allowed => ALLOWEDROLES?.includes(allowed))
       dispatch(setGrantedPermission(grantPermission ? 'ALLOWED' : 'FORBIDDEN'))
-      console.log({grantPermission})
     }
-    permitted()
+    isMounted ? permitted() : null
+
+    return () => {
+      isMounted = false
+    }
   }, [roles, pathname, dispatch])
 
- console.log({getPermission})
   return(
     <>
       {
-         getPermission === 'ALLOWED' ?
-        <Outlet /> : <Navigate to={'/signin'} state={pathname}/>
+        getPermission === 'ALLOWED' ?
+            <Outlet /> : <Navigate to={'/signin'} state={pathname}/>
       }
     </>
   )

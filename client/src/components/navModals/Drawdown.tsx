@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import useLogout from "../../hooks/useLogout"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { Theme, ThemeContextType } from "../../posts"
+import { selectCurrentRoles } from "../../features/auth/authSlice";
+import { useSelector } from "react-redux";
 
 type DrawdownProps = {
   rollout: boolean
@@ -13,6 +15,7 @@ function modalClass(theme: Theme){
 
 export default function Drawdown({ rollout }: DrawdownProps) {
   const userId = localStorage.getItem('revolving_userId')
+  const userRoles = useSelector(selectCurrentRoles)
   const signOut = useLogout()
   const {pathname} = useLocation()
   const home = '/'
@@ -24,7 +27,7 @@ export default function Drawdown({ rollout }: DrawdownProps) {
       onClick={() => setRollout(false)}
       className={`absolute rounded-md tracking-widest ${rollout ? '' : '-translate-y-96'} right-6 maxscreen:right-0 maxscreen:w-full maxscreen:bg-opacity-90 maxscreen:flex maxscreen:flex-col maxscreen:items-center maxscreen:top-12 top-10 z-20 shadow-2xl text-sm border ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-800'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'}`}>
     {
-      !userId && 
+      !userRoles?.length && 
         (pathname != '/signIn' &&
           <Link to={`/signIn`}
             className={modalClass(theme)}
@@ -34,7 +37,7 @@ export default function Drawdown({ rollout }: DrawdownProps) {
         )
     }
     {
-      userId && 
+      userRoles?.length && 
         (
           <Link to={`/profile/${userId}`}
              className={modalClass(theme)}
@@ -43,7 +46,7 @@ export default function Drawdown({ rollout }: DrawdownProps) {
           </Link>
         )
     }
-    {
+    {/* {
       userId && 
       (
         <Link to={`/account/${userId}`}
@@ -52,9 +55,9 @@ export default function Drawdown({ rollout }: DrawdownProps) {
           Account
         </Link>
       )
-    }
+    } */}
     {
-      userId && 
+      userRoles?.length && 
         <button 
           onClick={() => signOut('use')}
           className={modalClass(theme)}>

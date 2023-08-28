@@ -40,7 +40,7 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
   const canSubmit = Boolean(email)
 
   return (
-    <article className={`absolute md:w-1/3 lg:w-3/5 pt-4 pb-4 w-[40%] maxscreen:w-1/2 border shadow-2xl ${themeMode == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-y-12 z-30 rounded-md`}>
+    <article className={`absolute sm:w-[50%] md:w-[40%] lg:w-[30%] maxscreen:w-[65%] mobile:w-3/4 border shadow-2xl text-white ${themeMode == 'light' ? 'bg-gradient-to-r from-indigo-600 via-purple-900 to-pink-500 shadow-zinc-800' : 'dark:bg-gradient-to-r dark:from-slate-800 dark:via-slate-900 dark:to-slate-700 shadow-zinc-700'} md:m-auto translate-y-12 z-10 rounded-md`}>
         <form 
           onSubmit={handleResetRequest}
           className={`flex flex-col w-full h-full gap-4 ${isLoading && 'bg-gray-400 animate-pulse'}`}

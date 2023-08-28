@@ -50,3 +50,7 @@ _BEFORE REDIS_
 _AFTER REDIS_
 
 ![after redis implementation](./assets/after-redis.png)
+---
+> OTP and Link
+
+Signing up has two account confirmation options, either by link or OTP, choosen option is being to sent to user email for proper verification
