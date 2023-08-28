@@ -13,7 +13,13 @@
 * Feature to download any post in pdf format
 ----
 
-![Preview](./client/src/images/preview.png)
+![Preview](./client/src/images/revolving-home-full.png)
+![SignUp Darkmode](./client/src/images/darkMode-signUp.png)
+![Single page](./client/src/images/single-mini.png)
+![Mini view](./client/src/images/mini-view.png)
+![OTP page](./client/src/images/otp-page.png)
+![Task Manager](./client/src/images/taskManager.png)
+![Task Manager Full view](./client/src/images/taskManager-full.png)
 
 ---
 

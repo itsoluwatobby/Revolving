@@ -9,7 +9,7 @@ export const getAllUsers = async() => await UserModel.find().lean();
 export const getUserById = async(id: string) => await UserModel.findById(id).exec();
 export const getUserByEmail = async(email: string) => await UserModel.findOne({email}).exec();
 export const getUserByToken = async(token: string) => await UserModel.findOne({refreshToken: token}).exec();
-export const getUserByVerificationToken = async(token: string) => await UserModel.findOne({verificationToken: token}).exec();
+export const getUserByVerificationToken = async(token: string) => await UserModel.findOne({ verificationToken: { token } }).exec();
 
 export const createUser = async(user: Partial<UserProps>) => {
   const newUser = await UserModel.create(user)

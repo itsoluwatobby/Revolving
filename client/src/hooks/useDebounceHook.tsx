@@ -21,8 +21,8 @@ export const useDebounceHook = ({ savedTitle, savedBody, savedFontFamily }: Part
   return debounceValue
 }
 
-export const delayedPromise = () => {
+export const delayedPromise = (DELAY=1000) => {
   return () => new Promise(resolve => {
-    return setTimeout(() => resolve, 1000)
+    return setTimeout(() => resolve, DELAY)
   })
 }

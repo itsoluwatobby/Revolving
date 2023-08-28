@@ -1,6 +1,14 @@
 # REVOLVING
 
 > Description **Let your world always be about you. A web app that's definetely about all you will ever wish for. You are your world and you define what you want in it**
+---
+
+> Tech stack
+* ReactJS
+* socket.io/client
+* redux-toolkit
+* Tailwindcss
+
 
 #### _**FEATURES**_
 ---
@@ -14,15 +22,22 @@
 * Feature to download any post in pdf format
 ----
 
-![Preview](./src/images/preview.png)
+![Text Editor](./src/images/preview1.png)
+
+![Preview](./src/images/revolving-home-full.png)
+
+![SignUp Darkmode](./src/images/darkMode-signUp.png)
+
+![Single page](./src/images/single-mini.png)
+
+![Mini view](./src/images/mini-view.png)
+
+![OTP page](./src/images/otp-page.png)
+
+![Task Manager](./src/images/taskManager.png)
+
+![Task Manager Full view](./src/images/taskManager-full.png)
 
 ---
-![Preview](./src/images/preview1.png)
 
 ---
-
-> Tech stack
-* ReactJS
-* socket.io/client
-* redux-toolkit
-* Tailwindcss

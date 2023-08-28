@@ -1,6 +1,6 @@
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken'
-import { ClaimProps, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
+import { ClaimProps, ConfirmationMethodType, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
 import { Request, Response } from 'express';
@@ -22,6 +22,13 @@ type UrlObj={
 
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
+/**
+ * @description function to sign tokens
+ * @param claim user data to attach to token
+ * @param expires expiration date
+ * @param secret token secret
+ * @returns 
+ */
 export const signToken = async(claim: ClaimProps, expires: string, secret: string) => {
     const token = jwt.sign(
       {
@@ -35,6 +42,12 @@ export const signToken = async(claim: ClaimProps, expires: string, secret: strin
   return token
 }
 
+/**
+ * @description function to verify jwt tokens
+ * @param token 
+ * @param secret 
+ * @returns 
+ */
 export const verifyToken = async(token: string, secret: string): Promise<string | ClaimProps> => {
   let response: string | ClaimProps;  
   jwt.verify(
@@ -59,6 +72,11 @@ export const verifyToken = async(token: string, secret: string): Promise<string 
 //   message: string,
 //   data?: object
 // }
+/**
+ * @description general response body
+ * @param param0 
+ * @returns 
+ */
 export const responseType = ({res, status=200, count=0, message='success', data={}, pages={}}): ResponseType => {
   return (
     data ? 
@@ -67,6 +85,9 @@ export const responseType = ({res, status=200, count=0, message='success', data=
   )
 }
 
+/**
+ * @class an object to keep track of the request methods to enable effect caching
+ */
 class UrlsObj{
 
   private req: ReqOpt;
@@ -116,27 +137,57 @@ export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTra
 })
 
 type OptionsType = 'account' | 'password'
-export const mailOptions = (receiver: string, username: string, verificationLink: string, option: OptionsType = 'account') => {
+
+/**
+ * @description email template
+ * @param receiver name
+ * @param username sender name
+ * @param verificationLink 
+ * @param option mail type (account | password)
+ * @param  type (LINK | OTP)
+ * @returns 
+ */
+export const mailOptions = (receiver: string, username: string, verificationLink: string, option: OptionsType = 'account', type: ConfirmationMethodType='LINK') => {
+  const messageHeader = `${type == 'OTP' ? 'Action Required: One Time Activation Code' : `Tap the Link below To ${option == 'account' ?  'Activate Your Account' : 'Reset Your Password'}`}`
+  const year = new Date().getFullYear()
   return {
     to: receiver,
     from: process.env.REVOLVING_MAIL,
     subject: `ACCOUNT CONFIRMATION FOR ${username}`,
-    html: `<div style='padding: 5px; background-color: #696969; border-radius: 5px; box-shadow: 2px 4px 16px rgba(0,0,0,0.4);'>
-            <h2 style='text-decoration: underline; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);'>Tap the Link below To ${option == 'account' ? 'Activate Your Account' : 'Reset Your Password'}</h2><br/>
-                <p>Link expires in 30 minutes, please confirm now!!</p>
-                <a href=${verificationLink} target=_blank style='text-decoration:none;'>
-                   <button style='padding:1rem; padding-left:2rem; padding-right:2rem; cursor:pointer; background-color: teal; border:none; border-radius:10px; font-size: 18px'>
-                      ${option == 'account' ? 'Account Verification' : 'Reset Password'}
-                   </button>
-                </a>
-                <p>Or copy the link below to your browser</p>
-                <p style='word-break: break-all;'>${verificationLink}</p><br/>
-                <span>Keep link private, it contains some sensitive information about you.</span>
-            </div>      
+    html: `<div style='background-color: rgba(0,0,0,0.9); color: white; border-radius: 5px; border: 2px dashed gray; box-shadow: 2px 4px 16px rgba(0,0,0,0.4);'>
+            <div style="padding: 2px 10px 5px 10px;">
+                <h2 style='text-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center;'>REVOLVING IS ALL ABOUT YOU</h2>
+                <h3 style='text-decoration: underline; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);'>${messageHeader}</h3>
+                    <p>${type === 'LINK' ? 'Link expires in 30 minutes, please confirm now!!' : 'OTP expires in 30 minutes'}</p>
+                      ${
+                        type === 'LINK' ?
+                        `<a href=${verificationLink} target=_blank style='text-decoration:none;'>
+                          <button style='padding:1rem; padding-left:2rem; padding-right:2rem; cursor:pointer; background-color: blue; border:none; color: white; border-radius:10px; font-size: 18px'>
+                              ${option == 'account' ? 'Account Verification' : 'Reset Password'}
+                          </button>
+                        </a>`
+                      :
+                      `<h1>${verificationLink}</h1>`
+                      }
+                      ${
+                        type === 'LINK' ?
+                          `<p>Or copy the link below to your browser</p>
+                          <p style='word-break: break-all;'>${verificationLink}</p><br/>
+                          <span>Keep link private, it contains some sensitive information about you.</span>`
+                        : ''
+                      }
+              </div>
+                <footer style="background-color: rgba(0,0,0,0.8); padding: 2px; text-align: center; color: black;">Copyright &copy; ${year}</footer>
+          </div>
           `
   }
 }
 
+/**
+ * @description general reusable async function
+ * @param res the responseBody
+ * @param callback callback function
+ */
 export const asyncFunc = (res: Response, callback: () => void) => {
   try{
     callback()
@@ -179,6 +230,11 @@ export const pagination = async<T>({startIndex=1, endIndex=1, page=1, limit=1, c
 
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
 
+/**
+ * @description function to autodelete a taskbin when expired
+ * @param userId 
+ * @returns null
+ */
 export const autoDeleteOnExpire = async(userId: string)=>{
   const {day} = timeConverterInMillis()
   const expireAfterThirtyDays = day * 30
@@ -194,6 +250,29 @@ export const autoDeleteOnExpire = async(userId: string)=>{
     }
     return
   }
+}
+
+/**
+ * @description function to generate otp
+ * @param MAXLENGTH size of otp
+ * @returns otp
+ */
+export function generateOTP(MAXLENGTH=6){
+  let generatedOTP = ''
+  const numberOriginator = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  for(let i = 0; i < MAXLENGTH; i++){
+    const randomIndex: number = Math.ceil(Math.random() * numberOriginator?.length - 1)
+    generatedOTP += numberOriginator[randomIndex]
+  }
+  return generatedOTP
+}
+
+export function checksExpiration(createdTime:string): boolean {
+  const EXPIRES_IN_30_MINUTES = 30 * 60 * 1000 // 30 minutes
+  const presentTime = new Date()
+  if(!createdTime) return
+  const elaspedTime = +presentTime - +createdTime
+  return elaspedTime > EXPIRES_IN_30_MINUTES ? true : false
 }
 
 export const mongooseError = <T>(cb: () => T | T[]): T | T[] => {

@@ -45,6 +45,8 @@ interface StoryProps extends Document{
   likes: string[]
   edited: false
   author: string
+  sharedAuthor: string
+  sharedDate?: string
   createdAt: string
   updatedAt: string
 }
@@ -82,6 +84,7 @@ interface CommentProps{
   updatedAt: string
 }
 
+type ConfirmationMethodType = 'LINK' | 'OTP'
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
@@ -95,7 +98,7 @@ interface SharedProps extends Document{
   sharerId: string,
   storyId: string,
   sharedLikes: string[],
-  author: string,
+  sharedAuthor: string,
   sharedStory: StoryProps,
   createdAt: string,
   updatedAt: string
@@ -120,7 +123,7 @@ interface UserProps extends Document{
   isAccountActivated: boolean,
   isAccountLocked: boolean,
   isResetPassword: boolean,
-  verificationToken: string,
+  verificationToken: { type: ConfirmationMethodType, token: string, createdAt: string },
   dateLocked: string,
   followers?: string[],
   followings?: string[],

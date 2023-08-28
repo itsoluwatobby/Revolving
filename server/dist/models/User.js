@@ -17,7 +17,11 @@ const USERSCHEMA = new Schema({
     isAccountLocked: { type: Boolean, default: false },
     dateLocked: { type: String, default: '' },
     isResetPassword: { type: Boolean, default: false },
-    verificationToken: { type: String, default: '' },
+    verificationToken: {
+        type: { type: String, default: 'LINK', enum: ['LINK', 'OTP'] },
+        token: { type: String, default: '' },
+        createdAt: { type: String, default: '' }
+    },
     followers: { type: Array, default: [] },
     followings: { type: Array, default: [] },
     lastSeen: { type: String, default: '' },

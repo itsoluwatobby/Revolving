@@ -3,6 +3,12 @@ import { useThemeContext } from "../hooks/useThemeContext"
 import { Link, useLocation } from "react-router-dom"
 import { reduceLength } from "../utils/navigator"
 
+/**
+ *  {
+        name: 'CV/Resume Builder',
+        link: `/resumeBuilder/${id}`
+      },
+ */
 type RouteProps = {
   name: string,
   link: string
@@ -26,10 +32,6 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
       {
         name: 'Expense Planner',
         link: `/expensePlanner/${id}`
-      },
-      {
-        name: 'CV/Resume Builder',
-        link: `/resumeBuilder/${id}`
       },
       {
         name: 'Admin Page',

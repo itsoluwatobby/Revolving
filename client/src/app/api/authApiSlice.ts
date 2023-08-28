@@ -1,11 +1,28 @@
-import { AuthType, UserProps } from "../../data";
+import { AuthType, ConfirmationMethodType, DataType, OptionType, UserDataType, UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
 
 type NewUser = {
   username: string,
   email: string,
   password: string,
-  resetPass?: string
+  resetPass?: string,
+  type: ConfirmationMethodType
+}
+
+type OTPConfirmType = {
+  meta: {
+    status: number,
+    message: string,
+  }
+  data?: UserDataType
+}
+
+type OTPResponseType = {
+  meta: {
+    status: number,
+    message: string,
+  }
+  data?: DataType
 }
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -57,7 +74,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: adminId
       }) as any
-    })
+    }),
+    confirmOTP: builder.mutation<OTPConfirmType, {email: string, otp: string, purpose?: 'ACCOUNT' | 'OTHERS'}>({
+      query: ({email, otp, purpose='ACCOUNT'}) => ({
+        url: `auth/otp_verification`,
+        method: 'POST',
+        body: {email, otp, purpose}
+      }) as any
+    }),
+    generateOTP: builder.mutation<OTPResponseType, {email: string, length?: number, option: OptionType}>({
+      query: ({email, length, option}) => ({
+        url: `auth/otp_generator`,
+        method: 'POST',
+        body: {email, length, option}
+      }) as any
+    }),
   })
 })
 
@@ -69,5 +100,7 @@ export const {
   useForgotPasswordMutation,
   useNewPasswordMutation,
   useNewAccessTokenMutation,
-  useToggleRoleByAdminMutation
+  useToggleRoleByAdminMutation,
+  useConfirmOTPMutation,
+  useGenerateOTPMutation,
 } = authApiSlice

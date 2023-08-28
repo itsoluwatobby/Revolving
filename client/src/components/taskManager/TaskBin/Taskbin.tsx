@@ -1,6 +1,6 @@
 import { useClearTaskBinMutation, useGetTaskBinQuery, usePermanentlyDeleteTasksMutation, useRestoreTasksMutation } from "../../../app/api/taskApiSlice"
 import { useState, useEffect, useCallback } from "react"
-import { Button, ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data"
+import { ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data"
 import { Theme, ThemeContextType } from "../../../posts"
 import { toast } from "react-hot-toast"
 import { useThemeContext } from "../../../hooks/useThemeContext"
@@ -15,19 +15,19 @@ type TaskBinProp = {
 
 export default function Taskbin({ userId }: TaskBinProp) {
   const {data, isLoading, isError: isErrorBin, error, refetch} = useGetTaskBinQuery(userId as string)
-  const[clearTaskBin, {isLoading: clearBinLoading, error: clearBinError, isError: isClearBinError}] = useClearTaskBinMutation()
-  const[restoreTask, {isLoading: restoreLoading, error: restoreError, isError: isRestoreError}] = useRestoreTasksMutation()
-  const[permanentlyDeleteTask, {isLoading: permanentlyDeleteLoading, error: permanentlyDeleteError, isError: isPermanentlyDeleteError}] = usePermanentlyDeleteTasksMutation();
+  const [clearTaskBin, {isLoading: clearBinLoading, error: clearBinError, isError: isClearBinError}] = useClearTaskBinMutation()
+  const [restoreTask, {isLoading: restoreLoading, error: restoreError, isError: isRestoreError}] = useRestoreTasksMutation()
+  const [permanentlyDeleteTask, {isLoading: permanentlyDeleteLoading, error: permanentlyDeleteError, isError: isPermanentlyDeleteError}] = usePermanentlyDeleteTasksMutation();
   const [taskIdsToDelete, setTaskIdsToDelete] = useState<string[]>([]);
   const [tasksInBin, setTasksInBin] = useState<TaskBin>()
   const {setLoginPrompt, theme } = useThemeContext() as ThemeContextType
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
-  const taskbinButtonClass = (theme:Theme, position:Position='NORM') => {
+  const taskbinButtonClass = useCallback((theme:Theme, position:Position='NORM') => {
     return (
       `cursor-pointer ${theme == 'light' ? 'hover:text-gray-500' : 'hover:text-gray-300'} text-base active:text-gray-100 transition-all ${(taskIdsToDelete.length && position == 'NORM') ? 'scale-0' : (!taskIdsToDelete.length && position == 'NAV') ? 'scale-0 hidden' : 'scale-100'} mobile:text-2xl`
     )
-  }
+  }, [taskIdsToDelete])
 
   const sortedTasks = tasksInBin?.taskBin?.slice().sort((a, b) => b?.createdAt.localeCompare(a?.createdAt))
 
@@ -171,7 +171,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
       
       {binContent}
 
-      <div className={`absolute ${clearBinLoading ? 'animate-pulse' : 'animate-none'} left-5 top-10 ${confirmDelete ? 'flex' : 'hidden'} rounded-md shadow-xl w-[80%] text-sm md:w-[35%] border bg-white h-14 items-center gap-2 justify-center z-30`}>
+      <div className={`absolute ${clearBinLoading ? 'animate-pulse' : 'animate-none'} left-5 top-10 ${confirmDelete ? 'flex' : 'hidden'} rounded-md shadow-xl text-sm w-fit px-1.5 border bg-white h-14 items-center gap-2 justify-center z-30`}>
         <button 
           onClick={clearTasks}
           className="p-0.5 text-white bg-red-500 rounded-md pl-2 pr-2 hover:bg-red-600 transition-all active:bg-red-500">Confirm</button>

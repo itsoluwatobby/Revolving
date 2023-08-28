@@ -22,7 +22,9 @@ type PostType = {
   edited: false,
   sharerId?: string,
   sharedId?: string,
+  sharedAuthor?: string,
   sharedLikes?: string[],
+  sharedDate?: string,
   createdAt: string,
   updatedAt: string
 }

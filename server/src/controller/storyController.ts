@@ -135,14 +135,14 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
     await getCachedResponse({key:`story:${category}`, cb: async() => {
       const categoryStory = await StoryModel.find({category: {$in: [category]}})
       const sharedCategoryStory = await getAllSharedByCategories(category as string)
-      const reMoulded = sharedCategoryStory.map(share => {
-        const object = {
+      const reMouldedSharedStory = sharedCategoryStory.map(share => {
+        const storyObject = {
           ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
-          sharerId: share?.sharerId, sharedDate: share?.createdAt
+          sharerId: share?.sharerId, sharedDate: share?.createdAt, sharedAuthor: share?.sharedAuthor
         }
-        return object
+        return storyObject
       })
-      const refactoredModel = [...categoryStory, ...reMoulded]
+      const refactoredModel = [...categoryStory, ...reMouldedSharedStory]
       return refactoredModel
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((storyCategory: StoryProps[] | string) => {

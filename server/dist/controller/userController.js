@@ -27,6 +27,8 @@ export const getUsers = (req, res) => {
 export const getUser = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId } = req.params;
+        if (!userId || userId == null)
+            return res.sendStatus(400);
         yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const current = yield getUserById(userId);
                 yield autoDeleteOnExpire(userId);

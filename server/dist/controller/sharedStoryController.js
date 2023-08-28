@@ -49,7 +49,6 @@ export const shareStory = (req, res) => {
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         yield autoDeleteOnExpire(userId);
-        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield createShareStory(user, storyId)
             .then((newShare) => responseType({ res, status: 201, count: 1, data: newShare }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
@@ -60,9 +59,7 @@ export const unShareUserStory = (req, res) => {
         const { userId, sharedId } = req.params;
         if (!userId || !sharedId)
             return res.sendStatus(400);
-        const user = yield getUserById(userId);
         yield autoDeleteOnExpire(userId);
-        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const result = yield unShareStory(userId, sharedId);
         redisClient.DEL(`sharedStory:${sharedId}`);
         return result == 'not found'
@@ -97,7 +94,6 @@ export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, v
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         yield likeAndUnlikeSharedStory(userId, sharedId)
             .then((result) => responseType({ res, status: 201, message: result }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));

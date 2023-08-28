@@ -16,6 +16,7 @@ import { FaRegImages } from 'react-icons/fa';
 import { nanoid } from '@reduxjs/toolkit';
 
 let uploadedImageIds = [] as string[]
+let imagesNames = [] as string[]
 export const NewStory = () => {
   const MAX_SIZE = 1_535_000 as const // 1.53mb 
   const { storyId } = useParams()
@@ -55,7 +56,7 @@ export const NewStory = () => {
   useEffect(() => {
     let isMounted = true
     const checkSizeAndUpload = () => {
-      files.slice(0, 3).map(async(file) => {
+      files.slice(0, 5).map(async(file) => {
         if(file.size > MAX_SIZE){
           setFiles([])
           return alert('MAX ALLOWED FILE SIZE IS 1.53MB')
@@ -63,9 +64,10 @@ export const NewStory = () => {
         else{
           const imageId = nanoid()
           const newImage = { imageId, image: file } as ImageType
+          if(imagesNames.includes(file?.name)) return
           if(imagesFiles.length < 5){
-            //  if(uploadedImageIds.includes(newImage.imageId)) return
             setImagesFiles(prev => ([...prev, newImage]))
+            imagesNames.push(file?.name)
             setFiles([])
           }
           else{
@@ -85,6 +87,7 @@ export const NewStory = () => {
   useEffect(() => {
     if(uploadedImageIds.length && !url.length){
       uploadedImageIds = []
+      imagesNames = []
     }
   }, [url])
 

@@ -5,18 +5,18 @@ import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
 
 export const Home = () => {
-  const { setRollout, theme } = useThemeContext() as ThemeContextType
+  const { setRollout } = useThemeContext() as ThemeContextType
  
   return (
     <main className="relative h-full w-full">
       <div className={`md:max-w-full flex`}>
         <div 
           onClick={() => setRollout(false)}
-          className="flex-grow flex flex-col h-fit gap-3 md:w-full min-w-[70%] mt-1.5">
+          className="flex-auto flex flex-col h-fit gap-3 md:w-full maxscreen:w-1/2 mt-1.5">
           <TopHome />
           <Posts />
         </div>
-        <aside className="mt-4 flex-grow hidden md:flex min-w-[45%] w-1/3 h-full border border-b-0 border-t-0 shadow-xl shadow-slate-200 border-l-slate-300 border-slate-600">
+        <aside className="flex-none w-[28%] min-w-[20rem] mt-4 hidden md:flex h-full border border-b-0 border-t-0 border-l-slate-300">
           <RightSection />
         </aside>
       </div>

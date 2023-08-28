@@ -37,7 +37,7 @@ export default function TaskManager() {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length || (isError && errorMsg?.status != 404)){
+    if(!data?.length && (isError && errorMsg?.status != 404)){
       timerId = setInterval(async() => {
         await refetch()
       }, REFRESH_RATE)
@@ -90,7 +90,7 @@ export default function TaskManager() {
         <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-[75%] ${toggleButton === 'LEFT' ? 'flex mobile:flex' : 'flex mobile:hidden'} flex-col maxscreen:items-center gap-3 h-[28rem] box-border`}>
 
           <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
-          <section className={`hidebars relative shadow-2xl shadow-slate-900 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400`}>
+          <section className={`hidebars relative shadow-lg shadow-slate-600 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400`}>
             <Form 
               currentUserId={userId as string}
             />

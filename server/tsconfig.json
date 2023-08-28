@@ -11,6 +11,6 @@
   "include": [
     "types.d.ts",
     "src/**/*"
-  ],
+, "dist/tests"  ],
   "exclude": ["node_modules"]
 }

@@ -49,7 +49,9 @@ export default function NewPassword() {
 
   const canSubmit = [password].every(Boolean)
   return (
-    <article className={`absolute md:w-1/4 w-1/2 border shadow-2xl ${theme == 'light' ? 'bg-gradient-to-r from-indigo-100 via-purple-200 to-pink-100 shadow-zinc-400' : 'dark:bg-gradient-to-r dark:from-slate-600 dark:via-slate-700 dark:to-slate-500 shadow-zinc-700'} md:m-auto translate-x-1/2 translate-y-12 z-30 rounded-md`}>
+    <section className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-100' : ''}`}>
+
+      <article className={`absolute md:w-1/4 w-1/2 mobile:w-3/4 border shadow-2xl text-white ${theme == 'light' ? 'bg-gradient-to-r  from-indigo-600 via-purple-900 to-pink-500 shadow-zinc-800' : 'dark:bg-gradient-to-r dark:from-slate-800 dark:via-slate-900 dark:to-slate-700 shadow-zinc-700'} translate-y-12 z-10 rounded-md`}>
         <form 
           onSubmit={handleSubmit}
           className={`flex flex-col p-2 w-full h-full gap-2 ${isLoading && 'bg-gray-400 animate-pulse'}`}
@@ -84,5 +86,6 @@ export default function NewPassword() {
           </div>
         </form>
       </article>
+    </section>
   )
 }

@@ -21,6 +21,7 @@ export const getUsers = (req: Request, res: Response) => {
 export const getUser = (req: Request, res: Response) => {
   asyncFunc(res, async() => { 
     const {userId} = req.params
+    if(!userId || userId == null) return res.sendStatus(400)
     await getCachedResponse({key: `user:${userId}`, cb: async() => {
       const current = await getUserById(userId)
       await autoDeleteOnExpire(userId)

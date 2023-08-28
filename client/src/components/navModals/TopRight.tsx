@@ -36,6 +36,7 @@ export default function TopRight() {
   const dispatch = useDispatch()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
+  const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
 
   const createNewStory = async() => {
     if(!storyData.userId) return setLoginPrompt('Open')
@@ -130,7 +131,7 @@ export default function TopRight() {
               onClick={() => changeTheme('dark')}
                 className={mode_class+'text-gray-700'} />
         }
-          {address.includes(pathname) ? 
+          {address?.includes(pathname) ? 
             (
               pathname == '/new_story' ? (
                 codeEditor ? (
@@ -162,12 +163,14 @@ export default function TopRight() {
               )
             )
           :
-            <Link to={'/new_story'} >
-              <div className='flex items-center cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
-                <FiEdit className='text-xl' />
-                <span className=''>Post</span>
-              </div>
-            </Link>
+            !exclude?.includes(pathname) ?
+              <Link to={'/new_story'} >
+                <div className='flex items-center cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
+                  <FiEdit className='text-xl' />
+                  <span className=''>Post</span>
+                </div>
+              </Link>
+            : null
           }
         {
           address.includes(pathname) && 
@@ -175,15 +178,19 @@ export default function TopRight() {
             onClick={() => setFontOption(prev => !prev)}
             className='relative cursor-pointer text-xl hover:text-gray-500 duration-200 ease-in' /> 
         }
-        <div className='w-12 p-1 flex'>
-          {image ?
-              <div className='cursor-pointer w-8 h-8 bg-slate-500 rounded-full border-2 border-slate-600'></div>
-              :
-            <figure className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
-              <img src={profileImage} alt="dp" className='object-cover h-full w-full rounded-full'/>
-            </figure>
-          }
-        </div>
+        {
+          !exclude?.includes(pathname) ?
+            <div className='w-12 p-1 flex'>
+              {image ?
+                  <div className='cursor-pointer w-8 h-8 bg-slate-500 rounded-full border-2 border-slate-600'></div>
+                  :
+                <figure className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
+                  <img src={profileImage} alt="dp" className='object-cover h-full w-full rounded-full'/>
+                </figure>
+              }
+            </div>
+          : null
+        }
         {!address.includes(pathname) ? 
                 <IoIosArrowDown 
                   onClick={() => setRollout(prev => !prev)}

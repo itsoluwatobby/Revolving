@@ -21,9 +21,9 @@ import PrompLogin from "./components/modals/PrompLogin";
 import TaskManager from "./pages/TaskManager";
 import ExpensePlanner from "./pages/ExpensePlanner";
 import AdminPage from "./pages/AdminPage";
-import ResumeBuilder from "./pages/ResumeBuilder";
 import { selectCurrentRoles } from "./features/auth/authSlice";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
+import { OTPEntry } from "./pages/OTPEntry";
 
  
 export const App = () => {
@@ -31,7 +31,7 @@ export const App = () => {
   const userRoles = useSelector(selectCurrentRoles)
 
   return (
-    <main className={`app relative ${theme == 'light' ? 'bg-slate-50' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
+    <main className={`app relative ${theme == 'light' ? 'bg-slate-100' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
         <Route path='/' element={<BlogLayout />}>
           
@@ -40,6 +40,7 @@ export const App = () => {
             <Route path="signIn" element={<LoginModal />} />
             <Route path="signUp" element={<RegisterModal />} />
             <Route path="new_password" element={<NewPassword />} />
+            <Route path="otp" element={<OTPEntry />} />
           
           </Route>
           
@@ -56,7 +57,6 @@ export const App = () => {
               <Route path="profile/:userId" element={<ProfilePage />} />
               <Route path="taskManager/:userId" element={<TaskManager />} />
               <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
-              <Route path="resumeBuilder/:userId" element={<ResumeBuilder />} />
               <Route path="adminPage/:userId" element={<AdminPage />} />
             
             </Route>

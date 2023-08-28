@@ -20,8 +20,9 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { storyId } = useParams()
   const { userId } = useParams()
 
-  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`]
-  const exclude = ['/signIn', '/signUp', 'new_password']
+  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`, '/signIn', '/signUp', '/new_password', '/otp']
+  const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
+
   return (
     <>
       <Link to='/'>
@@ -35,7 +36,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
           />
         </Link>
       {
-        (!address.includes(pathname) && !exclude.includes(pathname)) ?
+        !address.includes(pathname) ?
           <div 
             onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
             className={`flex gap-0.5 justify-around items-center rounded-md w-56 mobile:w-32 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-0`}>  

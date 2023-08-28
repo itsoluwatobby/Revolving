@@ -15,8 +15,6 @@ import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import { REFRESH_RATE } from '../../utils/navigator';
 
-
-
 export const Posts = () => {
   const getNavigation = useSelector(getTabCategory)
   const {data, isLoading, isError, error, refetch} = useGetStoriesByCategoryQuery(getNavigation)
@@ -35,7 +33,7 @@ export const Posts = () => {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length || (isError && errorMsg?.status != 404)){
+    if(!data?.length && (isError && errorMsg?.status != 404)){
       timerId = setInterval(async() => {
         await refetch()
       }, REFRESH_RATE)

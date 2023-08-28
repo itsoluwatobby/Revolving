@@ -14,7 +14,7 @@ export const getAllSharedByCategories = async(category: string) => await SharedS
 export const createShareStory = async(user: UserProps, storyId: string) => {
   const story = await getStoryById(storyId)
   const newSharedStory = new SharedStoryModel({
-    sharerId: user?._id, storyId: story?._id, sharedDate: dateTime, author: user?.username, sharedStory: {...story}
+    sharerId: user?._id, storyId: story?._id, sharedDate: dateTime, sharedAuthor: user?.username, sharedStory: {...story}
   })
   await newSharedStory.save();
   await story?.updateOne({$push: { isShared: { userId: user?._id, sharedId: newSharedStory?._id.toString() } }});
@@ -25,10 +25,10 @@ export const unShareStory = async(userId: string, sharedId: string) => {
   const sharedStory = await getSharedStoryById(sharedId)
   if(!sharedStory) return 'not found'
   const story = await getStoryById(sharedStory?.storyId)
-  const verifyUser = story?.isShared.map(targetShare => targetShare?.userId === userId && targetShare?.sharedId === sharedId).find(res => res = true)
+  const verifyUser = story?.isShared?.map(targetShare => targetShare?.userId?.toString() === userId && targetShare?.sharedId === sharedId).find(res => res = true)
   if(!verifyUser) return 'unauthorized'
   await sharedStory.deleteOne()
-  await story?.updateOne({ $pull: { isShared: { userId, sharedId } } });
+  await story?.updateOne({ $pull: { isShared: { sharedId } } });
 }
 
 export const likeAndUnlikeSharedStory = async(userId: string, sharedId: string): Promise<string> => {

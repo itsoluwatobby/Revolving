@@ -14,7 +14,7 @@ export const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () 
 export const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findById(id).exec(); });
 export const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ email }).exec(); });
 export const getUserByToken = (token) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ refreshToken: token }).exec(); });
-export const getUserByVerificationToken = (token) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ verificationToken: token }).exec(); });
+export const getUserByVerificationToken = (token) => __awaiter(void 0, void 0, void 0, function* () { return yield UserModel.findOne({ verificationToken: { token } }).exec(); });
 export const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const newUser = yield UserModel.create(user);
     yield TaskBinModel.create({
