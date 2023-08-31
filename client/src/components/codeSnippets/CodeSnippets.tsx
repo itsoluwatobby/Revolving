@@ -60,7 +60,7 @@ export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess
   }, [isPresent.present, setIsPresent, success.res, setSuccess])
   
   return (
-    <section className={`stackflow ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-900'} ${codeStore?.length >= 1 ? 'scale-100' : 'scale-0'} transition-all self-center ${codeEditor ? '' : 'mt-4'} max-w-[90%] w-fit p-1.5 h-48 shadow-md shadow-slate-500 rounded-md overflow-x-scroll flex items-center gap-2`}>
+    <section className={`stackflow ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-900'} ${(codeStore?.length >= 1 || imagesFiles.length >= 1) ? 'scale-100' : 'scale-0'} transition-all self-center ${codeEditor ? '' : 'mt-4'} max-w-[90%] w-fit p-1.5 h-48 shadow-md shadow-slate-500 rounded-md overflow-x-scroll flex items-center gap-2`}>
       {
         snippet !== 'Image' ? (
           sortedStoreCode?.map((code, index) => (

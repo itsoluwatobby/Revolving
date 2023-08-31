@@ -33,10 +33,10 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
         name: 'Expense Planner',
         link: `/expensePlanner/${id}`
       },
-      {
-        name: 'Admin Page',
-        link: `/adminPage/${id}`
-      },
+      // {
+      //   name: 'Admin Page',
+      //   link: `/adminPage/${id}`
+      // },
       {
         name: `About`,
         link: `/about`
@@ -73,14 +73,14 @@ export const LeftSection = () => {
             <Link to={conditionalRouting(values) ? '' : values.link}
               key={values.name}
               onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
-              className={`p-3 ${values.link == pathname ? 'bg-slate-600 shadow-slate-900 shadow-lg text-white' : ''} cursor-pointer hover:bg-slate-600 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
+              className={`p-3 ${values.link == pathname ? 'bg-slate-300 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-300 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
             >
               {values.name}
             </Link>
           ))
         }
       </div>
-      <div className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-600 w-full flex items-center gap-2 rounded-md`}>
+      <div className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full flex items-center gap-2 rounded-md`}>
         <figure className="rounded-full border shadow-2xl h-10 w-10">
           <img src="" alt="" />
         </figure>

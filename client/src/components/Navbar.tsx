@@ -60,19 +60,19 @@ export const Navbar = () => {
 
   return(
     <nav 
-      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} z-50 p-4 w-full h-16 flex items-center mobile:justify-between mobile:relative mobile:pr-1 minmobile:pr-0 minmobile:pl-2
+      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} z-50 p-4 w-full h-16 flex items-center justify-between mobile:justify-between mobile:relative mobile:pr-1 minmobile:pr-0 minmobile:pl-2
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />
 
       <MidModal 
         targetStory={targetStory as PostType}
-        theme={theme}
-        designatedPath={designatedPath}
-        pathname={pathname}
-        notintersecting={notintersecting}
+        theme={theme} designatedPath={designatedPath}
+        pathname={pathname} notintersecting={notintersecting}
       />
-
+      {/* {pathname === '/' ? <Drawdown rollout={rollout} /> : ''} */}
+      <Drawdown rollout={rollout} storyId={storyId as string} />
+      
       <div className={`relative mobile:flex-none flex items-center sm:gap-1 justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-36' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
         <TopRight />
       </div>
@@ -98,7 +98,7 @@ export const Navbar = () => {
             options={options}
         />  
       }
-      <Drawdown rollout={rollout} />
+      {/* <Drawdown rollout={rollout} /> */}
     </nav>
   )
 }
