@@ -3,6 +3,8 @@ import { Theme, ImageType, ImageUrlsType } from "../../posts"
 import { useDeleteImageMutation } from "../../app/api/storyApiSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { getUrl, resetUrl, setUrl } from "../../features/story/storySlice"
+import { toast } from "react-hot-toast"
+import { ErrorStyle } from "../../utils/navigator"
 
 type ImageCardProps = {
   image: ImageType,
@@ -30,6 +32,7 @@ export default function ImageCard({ image, theme, count, imagesFiles, setImagesF
     })
     .catch(() => {
       setImagesFiles([...imagesFiles])
+      toast.error('Error deleting images', ErrorStyle)
     })
   }
 

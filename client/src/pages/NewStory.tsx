@@ -56,7 +56,7 @@ export const NewStory = () => {
   useEffect(() => {
     let isMounted = true
     const checkSizeAndUpload = () => {
-      files.slice(0, 5).map(async(file) => {
+      files.slice(0, 2).map(file => {
         if(file.size > MAX_SIZE){
           setFiles([])
           return alert('MAX ALLOWED FILE SIZE IS 1.53MB')
@@ -65,10 +65,10 @@ export const NewStory = () => {
           const imageId = nanoid()
           const newImage = { imageId, image: file } as ImageType
           if(imagesNames.includes(file?.name)) return
-          if(imagesFiles.length < 5){
+          if(imagesFiles.length < 2){
             setImagesFiles(prev => ([...prev, newImage]))
             imagesNames.push(file?.name)
-            setFiles([])
+            //setFiles([])
           }
           else{
             setFiles([])
@@ -209,7 +209,7 @@ export const NewStory = () => {
                 placeholder='Title'
                 value={inputValue}
                 onChange={handleTitle}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
               />
               <textarea 
                 name="story" id=""
@@ -217,7 +217,7 @@ export const NewStory = () => {
                 value={textareaValue}
                 cols={30} rows={8}
                 onChange={handleBody}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
               />
             </>
           )
@@ -233,10 +233,10 @@ export const NewStory = () => {
         />
         <div>
           <button 
-            title={imagesFiles.length < 4 ? 'Add images' : 'MAX'}
+            title={imagesFiles.length < 2 ? 'Add images' : 'MAX'}
             role='Add images'
-            className={`absolute ${codeEditor ? 'scale-0' : 'scale-100'} right-4 bottom-[47.5%] ${theme === 'light' ? 'bg-opacity-50 hover:opacity-60' : 'hover:opacity-50'} transition-all active:opacity-30 ${imagesFiles.length < 4 ? 'bg-slate-400 bg-opacity-30' : 'bg-red-500'} grid place-content-center sm:right-[21%] mobile:bottom-[62%] midmobile:bottom-[52%] w-10 h-10 rounded-md xl:right-[20.8%] xl:bottom-[49%]`}>
-            <label htmlFor={imagesFiles.length < 4 ? 'image-upload' : ''} className='relative cursor-pointer h-full w-full' >
+            className={`absolute ${codeEditor ? 'scale-0' : 'scale-100'} right-3 md:right-20 top-4 ${theme === 'light' ? 'bg-opacity-50 hover:opacity-60' : 'hover:opacity-50'} transition-all active:opacity-30 ${imagesFiles.length < 2 ? 'bg-slate-400 bg-opacity-30' : 'bg-red-500'} grid place-content-center w-10 h-10`}>
+            <label htmlFor={imagesFiles.length < 2 ? 'image-upload' : ''} className='relative cursor-pointer h-full w-full' >
               <FaRegImages 
                 className={`text-2xl`}
               />
@@ -244,18 +244,18 @@ export const NewStory = () => {
             </label>
           </button>
         </div>
-      <div className='w-full flex items-center justify-between sm:w-[60%]'>
+      <div className='w-full flex items-center justify-between sm:w-[80%] md:w-3/4 lg:w-3/5'>
 
         <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] sm:w-1/2'} p-1.5 rounded-md gap-2 flex items-center`}>
           <BiCodeAlt 
             onClick={() => setCodeEditor(prev => !prev)}
-            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-70 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
-          <div title='Scroll left/right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
+            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-90 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
+          <div title='Scroll left | right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 py-1 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
             {
               Object.values(NAVIGATE).map(nav => (
                 <p
                   onClick={() => addCategory(nav)}
-                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-90 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-800' : ''}`}
+                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-800' : ''}`}
                   key={nav}>
                   {nav}
                 </p>
@@ -267,10 +267,10 @@ export const NewStory = () => {
         <div className={`${(codeStore.length >= 1 || imagesFiles.length >= 1) ? 'scale-100' : 'scale-0'} flex items-center transition-all ${theme == 'light' ? 'text-white bg-slate-300 ' : 'bg-slate-500'} w-fit gap-2 p-1 text-sm font-sans rounded-md shadow-lg`}>
           <p 
             onClick={() => activateSnippet('Snippet')}
-            className={`${codeStore.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Snippet' ? 'bg-slate-700' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Code snippets</p>
+            className={`${codeStore.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Snippet' ? 'bg-slate-700' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-95 transiton-all cursor-pointer`}>Code snippets</p>
           <p 
             onClick={() => activateSnippet('Image')}
-            className={`${imagesFiles.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Image' ? 'bg-slate-700' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-60 transiton-all cursor-pointer`}>Images</p>
+            className={`${imagesFiles.length >= 1 ? 'scale-100' : 'scale-0 hidden'} ${snippet == 'Image' ? 'bg-slate-700' : ''} rounded-md p-1.5 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} hover:opacity-95 transiton-all cursor-pointer`}>Images</p>
         </div>
 
       </div>

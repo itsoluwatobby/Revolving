@@ -13,6 +13,7 @@ type Props = {
 }
 
 export default function MidModal({ targetStory, theme, notintersecting, designatedPath, pathname }: Props) {
+ 
 
   return (
     <div className={`flex-auto grid transition-all place-content-center ${notintersecting === 'Open' ? 'scale-100' : 'scale-0'}`}>

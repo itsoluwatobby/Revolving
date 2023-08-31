@@ -194,7 +194,7 @@ export default function TopRight() {
         {!address.includes(pathname) ? 
                 <IoIosArrowDown 
                   onClick={() => setRollout(prev => !prev)}
-                  className={`sm:-ml-6 -ml-3 font-thin ${arrow_class}`} /> : null}
+                  className={`sm:hidden -ml-3 font-thin ${arrow_class}`} /> : null}
     </>
   )
 }
