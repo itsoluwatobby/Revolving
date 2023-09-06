@@ -18,6 +18,7 @@ export const Footer = ({ tasks, userId }: FooterProps) => {
   const {data: userData} = useGetUserByIdQuery(userId)
   const [userStories, setUserStories] = useState<PostType[]>([])
   const [user, setUser] = useState<UserProps>()
+  const [taskCount, setTaskCount] = useState<TaskProp[]>([])
   const countStyle = useCallback((theme: Theme, property:'MAIN'|'NUM'='MAIN') => {
     return (`text-white ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} ${property === 'MAIN' ? 'rounded-md bg-black tracking-wide mb-0.5 w-fit p-1 pt-0.5 pb-0.5' : 'font-bold mr-1'}
     `)
@@ -30,6 +31,14 @@ export const Footer = ({ tasks, userId }: FooterProps) => {
       isMounted = false
     }
   }, [data])
+  
+  useEffect(() => {
+    let isMounted = true
+    isMounted ? setTaskCount(tasks) : null
+    return () => {
+      isMounted = false
+    }
+  }, [tasks])
   
   useEffect(() => {
     let isMounted = true
@@ -47,7 +56,7 @@ export const Footer = ({ tasks, userId }: FooterProps) => {
           <span className={countStyle(theme, 'MAIN')}>Active Tasks:  &nbsp;<span className={`${countStyle(theme, 'NUM')} capitalize`}>{activeTasks?.toString()}</span></span>
           <p className='flex items-center gap-4'>
             <span className={countStyle(theme, 'MAIN')}>Tasks completed: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(completedTasks)}</span></span>
-            <span className={countStyle(theme, 'MAIN')}>Total Tasks: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(tasks)}</span></span>
+            <span className={countStyle(theme, 'MAIN')}>Total Tasks: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(taskCount)}</span></span>
           </p>
         </div>
         <p className='flex flex-col'>

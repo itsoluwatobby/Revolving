@@ -209,15 +209,16 @@ export const NewStory = () => {
                 placeholder='Title'
                 value={inputValue}
                 onChange={handleTitle}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 rounded-md text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-gray-200 shadow-2xl'}`}
               />
               <textarea 
                 name="story" id=""
+                key={currentUserId}
                 placeholder='Share your story...'
                 value={textareaValue}
                 cols={30} rows={8}
                 onChange={handleBody}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'shadow-2xl'}`}
+                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-slate-100 shadow-2xl'}`}
               />
             </>
           )
@@ -255,7 +256,7 @@ export const NewStory = () => {
               Object.values(NAVIGATE).map(nav => (
                 <p
                   onClick={() => addCategory(nav)}
-                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-800' : ''}`}
+                  className={`p-1 bg-slate-500 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-700' : ''}`}
                   key={nav}>
                   {nav}
                 </p>

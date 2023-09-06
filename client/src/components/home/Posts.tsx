@@ -86,7 +86,7 @@ export const Posts = () => {
           setLoginPrompt('Hide')
         }
       }
-      className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-2 pb-5`}>
+      className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-2 pb-5 px-3`}>
       {openComment?.option == 'Open' ? <Comments /> : content }
     </div>
   )

@@ -11,7 +11,7 @@ export default function Comments() {
   const comments = useSelector(getComments)
 
   return (
-    <section className={`comment_page text-sm absolute z-50 bg-opacity-90 w-full ${openComment?.option === 'Open' ? 'flex' : ''} flex-col p-3`}>
+    <section className={`comment_page text-sm absolute z-50 left-1 bg-opacity-90 w-full ${openComment?.option === 'Open' ? 'flex' : ''} flex-col p-3`}>
       <article className={`relative ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-700'} flex flex-col h-4/5 p-2 pt-1 md:w-4/5 shadow-lg rounded-lg`}>
         {!enlarge?.assert && (
           comments?.length ? (

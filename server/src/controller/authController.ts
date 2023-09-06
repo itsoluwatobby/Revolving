@@ -118,16 +118,16 @@ export const confirmOTPToken = (req: Request, res: Response) => {
     if(purpose === 'ACCOUNT'){
       if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
       const OTPMatch = user?.verificationToken?.token === otp
-      if(!OTPMatch) return responseType({res, status: 403, message: 'Bad credentials'})
+      if(!OTPMatch) return responseType({res, status: 403, message: 'Bad Token'})
       if(!checksExpiration(user?.verificationToken?.createdAt)){
         await user.updateOne({$set: { isAccountActivated: true, verificationToken: { type: 'OTP', token: '', createdAt: '' }}})
-        return responseType({res, status: 200, message: 'Welcome, account activation', data: { _id: user?._id, email: user?.email, roles: user?.roles }});
+        return responseType({res, status: 200, message: 'Welcome, account activated', data: { _id: user?._id, email: user?.email, roles: user?.roles }});
       }
       else return responseType({res, status: 403, message: 'OTP expired pls login to request for a new one'});
     }
     else{
       const OTPMatch = user?.verificationToken?.token === otp
-      if(!OTPMatch) return responseType({res, status: 403, message: 'Bad credentials'})
+      if(!OTPMatch) return responseType({res, status: 403, message: 'Bad Token'})
       if(!checksExpiration(user?.verificationToken?.createdAt)){
         await user.updateOne({$set: { verificationToken: { type: 'OTP', token: '', createdAt: '' }}})
         return responseType({res, status: 200, message: 'Token verified', data: { _id: user?._id, email: user?.email, roles: user?.roles }});
@@ -151,6 +151,7 @@ function OTPGenerator(res: Response, user: Document<unknown, {}, UserProps> & Us
 export function ExtraOTPGenerator(req: Request, res: Response){
   asyncFunc(res, async() => {
     const {email, length, option}: { email: string, length: number, option: 'EMAIL' | 'DIRECT' } = req.body
+    const dateTime = new Date().toString()
     const user = await getUserByEmail(email)
     if(option === 'EMAIL'){
       OTPGenerator(res, user, length)
@@ -158,6 +159,7 @@ export function ExtraOTPGenerator(req: Request, res: Response){
     }
     else{
       const OTPToken = generateOTP(length)
+      await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: dateTime } }});
       return responseType({res, status: 200, message: 'OTP generated', data: { otp: OTPToken, expiresIn: '30 minutes' }})
     }
   })

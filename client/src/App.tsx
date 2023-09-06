@@ -2,7 +2,7 @@ import { Home } from "./pages/Home"
 import { useThemeContext } from "./hooks/useThemeContext"
 import { ThemeContextType } from "./posts";
 import { Routes, Route } from 'react-router-dom';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { BlogLayout } from "./layouts/BlogLayout";
 import { NewStory } from "./pages/NewStory";
 import NotFound from "./pages/NotFound";
@@ -24,14 +24,30 @@ import AdminPage from "./pages/AdminPage";
 import { selectCurrentRoles } from "./features/auth/authSlice";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { OTPEntry } from "./pages/OTPEntry";
+import { useGetUserByIdQuery } from "./app/api/usersApiSlice"
+import { useEffect } from "react";
+import { setLoggedInUser } from "./features/auth/userSlice";
 
  
 export const App = () => {
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
+  const { data } = useGetUserByIdQuery(currentUserId)
+  const dispatch = useDispatch()
   const userRoles = useSelector(selectCurrentRoles)
 
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && data){
+      dispatch(setLoggedInUser(data))
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [data, dispatch])
+console.log(data)
   return (
-    <main className={`app relative ${theme == 'light' ? 'bg-slate-100' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
+    <main className={`app relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
         <Route path='/' element={<BlogLayout />}>
           

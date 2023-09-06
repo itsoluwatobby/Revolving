@@ -1,22 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
+import { UserProps } from '../../data'
 
-type PermissionType = 'ALLOWED' | 'FORBIDDEN'
+type PermissionType = 'ALLOWED' | 'FORBIDDEN' | 'AUTHENTICATING'
 interface Permission{
-  permission: PermissionType
+  permission: PermissionType,
+  user: Partial<UserProps>
 }
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: { permission: 'FORBIDDEN' } as Permission,
+  initialState: { permission: 'AUTHENTICATING', user: {} } as Permission,
   reducers: {
     setGrantedPermission: (state, action: PayloadAction<PermissionType>) => {
       state.permission = action?.payload
+    },
+    setLoggedInUser: (state, action: PayloadAction<Partial<UserProps>>) => {
+      state.user = action.payload
     }
   }
 })
 
-export const { setGrantedPermission } = userSlice.actions
+export const { setGrantedPermission, setLoggedInUser } = userSlice.actions
 export const grantedPermission = (state: RootState) => state.user.permission
+export const getLoggedInUser = (state: RootState) => state.user.user
 
 export default userSlice.reducer

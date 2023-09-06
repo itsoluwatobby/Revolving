@@ -16,9 +16,9 @@ export const Home = () => {
           <TopHome />
           <Posts />
         </div>
-        <aside className="flex-none w-[28%] min-w-[20rem] mt-4 hidden lg:flex h-full border border-b-0 border-t-0 border-l-slate-300">
+        {/* <aside className="flex-none mt-4 hidden lg:flex h-full border border-b-0 border-t-0 border-l-slate-300">
           <RightSection />
-        </aside>
+        </aside> */}
       </div>
     </main>
   )

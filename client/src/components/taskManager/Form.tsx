@@ -213,7 +213,7 @@ export default function Form({ currentUserId }: FormProps) {
           />
         </div>
         :
-        <form onSubmit={createNewTask} className={`flex-none transition-all ${taskRequest == 'Open' ? 'scale-100' : 'scale-0'} shadow-xl ${theme == 'light' ? 'shadow-slate-400 bg-slate-600' : 'shadow-slate-800 bg-slate-700'} w-full h-14 p-1 rounded-md flex items-center`}>
+        <form onSubmit={createNewTask} className={`flex-none transition-all ${taskRequest == 'Open' ? 'scale-100' : 'scale-0'} shadow-xl ${theme == 'light' ? 'shadow-slate-300 bg-slate-600' : 'shadow-slate-800 bg-slate-700'} w-full h-14 p-1 rounded-md flex items-center`}>
           <input
             ref={inputRef}
             type="text"

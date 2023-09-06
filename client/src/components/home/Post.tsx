@@ -2,7 +2,7 @@ import { MakeToButtom, PostType } from '../../posts'
 import { useWordCount } from '../../hooks/useWordCount'
 import { useState } from 'react';
 import { TextRules } from '../../fonts';
-import PostImage from './post/PostImages';
+import PostImage from '../PostImages';
 import PostTop from './post/PostTop';
 import PostBase from './post/PostBase';
 import { reduceLength } from '../../utils/navigator';
@@ -33,13 +33,13 @@ export const Post = ({ story }: Props) => {
  
   return (
     <article 
-      className={`${story?.fontFamily} flex flex-col gap-1 p-2 pl-3 text-xs sm:w-full min-w-[58%]`}>
+      className={`${story?.fontFamily} flex flex-col gap-1 text-xs sm:w-full min-w-[58%]`}>
       <PostTop 
         open={open} setOpen={setOpen} openText={openText}
         bodyContent={bodyContent} story={story}
       />
 
-      <PostImage story={story} />
+      <PostImage story={story} position='main' />
       
       <PostBase 
         story={story as MakeToButtom}
