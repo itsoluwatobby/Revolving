@@ -32,6 +32,7 @@ export default function useLogout() {
       option == 'use' ? navigate('/signIn', { state: pathname }) : null
     }catch(err){
       // const errors = error as ErrorResponse
+      dispatch(signUserOut())
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
           background: '#8FBC8F'

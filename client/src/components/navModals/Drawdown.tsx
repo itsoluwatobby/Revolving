@@ -30,17 +30,19 @@ export default function Drawdown({ rollout, storyId }: DrawdownProps) {
       onClick={() => setRollout(false)}
       className={`maxscreen:absolute maxscreen:rounded-md sm:gap-1 sm:flex-auto tracking-widest ${rollout ? '' : 'maxscreen:-translate-y-96 maxscreen:hidden'} maxscreen:right-0 maxscreen:w-full maxscreen:bg-opacity-90 maxscreen:flex maxscreen:flex-col maxscreen:items-center maxscreen:top-12 z-20 maxscreen:shadow-2xl text-sm maxscreen:border ${theme == 'light' ? 'maxscreen:bg-slate-100' : 'maxscreen:bg-slate-800'} transition-all last:border-0 p-2 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] sm:-translate-x-1 lg:-translate-x-24 lg:w-[13%] justify-between`}>
     {
-      !userRoles?.length && 
-        (pathname != '/signIn' &&
+      !userRoles?.length ?
+        (pathname != '/signIn' ?
           <Link to={`/signIn`}
             className={modalClass(theme)}
           >
               sign In
-          </Link>
+          </Link> 
+          : null
         )
+      : null
     }
     {
-      userRoles?.length && 
+      userRoles?.length ?
         (
           <Link to={`/profile/${userId}`}
              className={modalClass(theme)}
@@ -49,6 +51,7 @@ export default function Drawdown({ rollout, storyId }: DrawdownProps) {
             {/* <IoIosArrowDown /> */}
           </Link>
         )
+      : null
     }
     {/* {
       userId && 
@@ -61,15 +64,16 @@ export default function Drawdown({ rollout, storyId }: DrawdownProps) {
       )
     } */}
     {
-      userRoles?.length && 
+      userRoles?.length ? 
         <button 
           onClick={() => signOut('use')}
           className={modalClass(theme)}>
             sign Out
         </button>
+      : null
     }
     {
-      !userId && 
+      !userId ? 
         (pathname != '/signUp' &&
           <Link to={`/signUp`}
               className={modalClass(theme)}
@@ -77,6 +81,7 @@ export default function Drawdown({ rollout, storyId }: DrawdownProps) {
             sign Up
           </Link>
         )
+      : null
     }               
       <Link to={`/about`}
           className={modalClass(theme)}

@@ -144,10 +144,10 @@ export default function TopRight() {
                   </button>
                 ) : (
                   <button
-                    className={`text-[13px] rounded-md p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    className={`text-[13px] rounded-md p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'} ${isLoadingCreate ? 'cursor-not-allowed' : ''}`}
                     onClick={createNewStory}
                     disabled = {isCreateError ? isCreateError : isLoadingCreate ? isLoadingCreate : !canPost}
-                    >Publish
+                    >{isLoadingCreate ? 'Post...' : 'Publish'}
                   </button>
                 )
               )
@@ -155,17 +155,17 @@ export default function TopRight() {
               (
                 pathname != `/story/${storyId}` &&
                   <button
-                    className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingUpdate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'}`}
+                    className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingUpdate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'} ${isLoadingUpdate ? 'cursor-not-allowed' : ''}`}
                       onClick={updatedPost}
                       disabled = {isUpdateError ? isUpdateError : isLoadingUpdate ? isLoadingUpdate : !canPost}
-                    >Republish
+                    >{isLoadingUpdate ? 'Wait...' : 'Republish'}
                   </button>
               )
             )
           :
             !exclude?.includes(pathname) ?
               <Link to={'/new_story'} >
-                <div className='flex items-center cursor-pointer text-gray-400 hover:text-gray-500 duration-200 ease-linear font-normal ml-2'>
+                <div className='flex items-center cursor-pointer text-gray-400 hover:text-gray-600 transition-all ease-linear font-normal ml-2'>
                   <FiEdit className='text-xl' />
                   <span className=''>Post</span>
                 </div>

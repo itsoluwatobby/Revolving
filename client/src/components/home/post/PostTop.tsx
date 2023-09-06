@@ -93,14 +93,14 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
   return (
     <div 
       ref={observerRef as React.LegacyRef<HTMLDivElement>}
-      className={`${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
+      className={`maxmobile:text-base ${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
       <div 
         // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
         <p 
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
-          className='capitalize font-sans cursor-pointer hover:opacity-90 transition-all'>{
+          className='capitalize font-sans maxmobile:text-base cursor-pointer hover:opacity-90 transition-all'>{
           reduceLength(story?.sharedId ? (story?.sharedAuthor as string) :  story?.author, 10, 'letter') || 'anonymous'
           }
          

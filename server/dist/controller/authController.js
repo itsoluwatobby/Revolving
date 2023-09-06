@@ -118,10 +118,10 @@ export const confirmOTPToken = (req, res) => {
                 return responseType({ res, status: 200, message: 'Your account has already been activated' });
             const OTPMatch = ((_a = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _a === void 0 ? void 0 : _a.token) === otp;
             if (!OTPMatch)
-                return responseType({ res, status: 403, message: 'Bad credentials' });
+                return responseType({ res, status: 403, message: 'Bad Token' });
             if (!checksExpiration((_b = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _b === void 0 ? void 0 : _b.createdAt)) {
                 yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: { type: 'OTP', token: '', createdAt: '' } } });
-                return responseType({ res, status: 200, message: 'Welcome, account activation', data: { _id: user === null || user === void 0 ? void 0 : user._id, email: user === null || user === void 0 ? void 0 : user.email, roles: user === null || user === void 0 ? void 0 : user.roles } });
+                return responseType({ res, status: 200, message: 'Welcome, account activated', data: { _id: user === null || user === void 0 ? void 0 : user._id, email: user === null || user === void 0 ? void 0 : user.email, roles: user === null || user === void 0 ? void 0 : user.roles } });
             }
             else
                 return responseType({ res, status: 403, message: 'OTP expired pls login to request for a new one' });
@@ -129,7 +129,7 @@ export const confirmOTPToken = (req, res) => {
         else {
             const OTPMatch = ((_c = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _c === void 0 ? void 0 : _c.token) === otp;
             if (!OTPMatch)
-                return responseType({ res, status: 403, message: 'Bad credentials' });
+                return responseType({ res, status: 403, message: 'Bad Token' });
             if (!checksExpiration((_d = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _d === void 0 ? void 0 : _d.createdAt)) {
                 yield user.updateOne({ $set: { verificationToken: { type: 'OTP', token: '', createdAt: '' } } });
                 return responseType({ res, status: 200, message: 'Token verified', data: { _id: user === null || user === void 0 ? void 0 : user._id, email: user === null || user === void 0 ? void 0 : user.email, roles: user === null || user === void 0 ? void 0 : user.roles } });
@@ -154,6 +154,7 @@ function OTPGenerator(res, user, length = 6) {
 export function ExtraOTPGenerator(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { email, length, option } = req.body;
+        const dateTime = new Date().toString();
         const user = yield getUserByEmail(email);
         if (option === 'EMAIL') {
             OTPGenerator(res, user, length);
@@ -161,6 +162,7 @@ export function ExtraOTPGenerator(req, res) {
         }
         else {
             const OTPToken = generateOTP(length);
+            yield user.updateOne({ $set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: dateTime } } });
             return responseType({ res, status: 200, message: 'OTP generated', data: { otp: OTPToken, expiresIn: '30 minutes' } });
         }
     }));

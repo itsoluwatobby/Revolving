@@ -10,7 +10,7 @@ export default function PrompLogin() {
     <main 
       onClick={() => setLoginPrompt('Hide')}
       className="single_page fixed top-20 w-full z-50 bg-slate-500 bg-opacity-20 grid place-content-center">
-      <article className={`p-4 flex z-50 text-sm font-mono flex-col items-center gap-3.5 shadow-2xl capitalize shadow-gray-800 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-700'} rounded-md`}>
+      <article className={`p-4 flex z-50 text-sm text-white font-mono flex-col items-center gap-3.5 shadow-2xl capitalize shadow-gray-800 ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-700'} rounded-md`}>
         {pathname == '/new_story' ? 'Please copy entries as progess may be lost' : 'Please sigin to continue'}
         <Link to={'/signIn'} state={pathname}>
           <button 

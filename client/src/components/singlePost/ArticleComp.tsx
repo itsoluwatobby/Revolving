@@ -6,6 +6,7 @@ import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import LikeStory from './LikeStory';
 import FollowUnFollow from './FollowUnFollow';
+import PostImage from '../PostImages';
 
 type ArticleProps = {
   story: PostType,
@@ -61,6 +62,9 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
           className={`whitespace-pre-wrap font-sans tracking-wider text-justify`}>
             {bodyContent}
         </p>
+
+        <PostImage story={story} position='single' />
+
       <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 
         <div className={`flex flex-wrap items-center justify-between w-full text-gray-300 text-xs`}>
           <p>{averageReadingTime} read</p>
@@ -76,7 +80,7 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
 
   return (
     <article 
-      className={`app mt-2 flex-grow flex flex-col gap-3 overflow-y-scroll ${story?.fontFamily} p-2 pl-3 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
+      className={`app mt-2 flex-grow flex flex-col gap-3 overflow-y-scroll ${story?.fontFamily} p-2 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
         {content}
       </article>
   )

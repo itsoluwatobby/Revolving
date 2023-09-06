@@ -24,21 +24,22 @@ export const OTPEntry = () => {
   useEffect(() => {
     let isMounted = true
     const activateAccount = async() => {
+      if(isLoading) return
       try{
         const activationCode = [...Object.values(otp)].join('')
         const res = await confirmOTP({email, otp: activationCode, purpose: 'ACCOUNT'}).unwrap()
         toast.success(res?.meta?.message, SuccessStyle)
+        setOtp(initialState)
         setTimeout(() => {
-          setOtp(initialState)
           navigate('/signIn')
         }, 5000)
       }
       catch(err){
-        console.log(err)
         const errors = err as ErrorResponse
-        isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'Please Check Your Network' : errors?.data?.meta?.message}`, {
+        setOtp(initialState)
+        isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'SERVER BUSY' : errors?.data?.meta?.message}`, {
           duration: 10000, icon: '💀', style: {
-            background: errors?.status == 403 ? 'A6BCE2' : '#FF0000',
+            background: errors?.status == 403 ? '#FF6600' : '#FF0000',
             color: '#FFFFFF'
           }
         })
@@ -48,7 +49,7 @@ export const OTPEntry = () => {
     return () => {
       isMounted = false
     }
-  }, [canMakeRequest, otp, isError, navigate, confirmOTP, email])
+  }, [canMakeRequest, otp, isLoading, isError, navigate, confirmOTP, email])
 
   return (
     <section className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-200' : ''}`}>

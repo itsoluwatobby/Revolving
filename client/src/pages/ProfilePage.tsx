@@ -34,7 +34,7 @@ export default function ProfilePage() {
         <figure role="Cover photo" className="relative bg-slate-700 h-full rounded-md shadow-transparent shadow-2xl border-1">
           cover photo
         </figure>
-        <figure role="Display picture" className="rounded-full border-2 shadow-2xl shadow-slate-900 border-white  w-28 h-28 absolute translate-x-1/2 top-36 bg-slate-600 right-1/2 mobile:top-64">
+        <figure role="Display picture" className="rounded-full border-2 shadow-md shadow-slate-600 border-white w-28 h-28 absolute translate-x-1/2 top-36 bg-slate-600 right-1/2 mobile:top-64">
             dp
         </figure>
       </div>
@@ -84,7 +84,7 @@ export default function ProfilePage() {
           </p>
         </div>
         <p className="absolute uppercase right-14 text-gray-500 font-semibold font-mono">TECH Stack</p>
-        <div className="stackflow overflow-y-scroll absolute h-12 right-2 p-1 pt-1.5 pl-1.5 mt-5 w-fit overflow-x-scroll max-w-[120px] last:border-b-0  text-sm whitespace-nowrap font-serif font-light bg-slate-900 rounded-md">
+        <div className="stackflow overflow-y-scroll absolute h-12 right-2 p-1 pt-1.5 pl-1.5 mt-5 w-fit overflow-x-scroll max-w-[120px] last:border-b-0 text-sm text-white whitespace-nowrap font-serif font-light bg-slate-900 rounded-md">
           <p className="rounded-md hover:opacity-60 transition-all cursor-grab">Javascript</p>
           <p className="rounded-md hover:opacity-60 transition-all cursor-grab">Nodejs</p>
           <p className="rounded-md hover:opacity-60 transition-all cursor-grab">VueJs</p>

@@ -29,10 +29,10 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
         name: 'Task Manager',
         link: `/taskManager/${id}`
       },
-      {
-        name: 'Expense Planner',
-        link: `/expensePlanner/${id}`
-      },
+      // {
+      //   name: 'Expense Planner',
+      //   link: `/expensePlanner/${id}`
+      // },
       // {
       //   name: 'Admin Page',
       //   link: `/adminPage/${id}`
@@ -49,20 +49,24 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
 }
 
 export const LeftSection = () => {
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const storyId = location.pathname.split('/')[2]
+  const pathname = location.pathname
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, toggleLeft, setToggleLeft, setLoginPrompt  } = useThemeContext() as ThemeContextType
+
+  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
   const conditionalRouting = (value: {name: string}): boolean => {
     return (!currentUserId && (value.name == 'Profile Page' || value.name == 'Task Manager' || value.name == 'Expense Planner' || value.name == 'CV/Resume Builder' || value.name == 'Admin Page'))
   }
 
   return (
-    <section className={`left_container md:w-full top-20 mt-1 w-2/5 sm:w-full flex flex-col ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-700'} p-0.5 pb-2 rounded-md h-[90%] ${toggleLeft == 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'}  maxscreen:pb-4 transition-all`}>
+    <section className={`sidebars mt-6 ${address.includes(pathname) ? 'hidden' : 'md:block'} flex-none sm:w-1/4 w-4/12 transition-all overflow-y-scroll h-full ${toggleLeft === 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'} ${theme == 'light' ? 'bg-gray-50' : 'bg-slate-700'}  rounded-tr-lg z-50`}>
       <div className="relative w-full h-8 flex items-center">
         <button
           onClick={() => setToggleLeft('Hide')}
-          className={`absolute p-2 text-sm md:hidden pt-1 pb-1 text-center rounded-md right-0.5 ${theme == 'light' ? 'bg-slate-400' : 'bg-slate-600'}`}
+          className={`absolute p-2 text-sm md:hidden pt-1 pb-1 text-center rounded-md right-0.5 ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-500'}`}
         >
           close
         </button>
@@ -73,7 +77,7 @@ export const LeftSection = () => {
             <Link to={conditionalRouting(values) ? '' : values.link}
               key={values.name}
               onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
-              className={`p-3 ${values.link == pathname ? 'bg-slate-300 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-300 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1`}
+              className={`p-3 lg:py-4 ${values.link == pathname ? 'bg-slate-300 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-300 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-300 border-t-0 border-b-1`}
             >
               {values.name}
             </Link>
@@ -90,15 +94,3 @@ export const LeftSection = () => {
   )
 }
 
-/*
-  (!currentUserId && (values.name == 'Profile Page' || values.name == 'Task Manager' || values.name == 'Expense Planner' || values.name == 'CV/Resume Builder' || values.name == 'Admin Page')) ?
-    <button
-      onClick={() => setLoginPrompt('Open')}  
-    >
-      {values.name}
-    </button>
-    :
-    <Link to={`${values.link}`}>
-      {values.name}
-    </Link>
-*/
