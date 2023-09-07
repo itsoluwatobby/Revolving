@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
-import { useGetUserByIdQuery } from "../app/api/usersApiSlice"
+import { useGetCurrentUserMutation } from "../app/api/usersApiSlice"
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useDispatch } from 'react-redux';
 import { TypingEvent } from '../data';
@@ -20,22 +20,24 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
-  const { data } = useGetUserByIdQuery(currentUserId)
+  const [getLoggedInUser] = useGetCurrentUserMutation()
   const dispatch = useDispatch()
 
   useEffect(() => {
     let isMounted = true
-    if(!currentUserId) return
-    if(isMounted && data){
-      const { authentication, isAccountActivated, refreshToken, verificationToken, ...rest } = data
+    const getLoggedIn = async() => {
+      const res = await getLoggedInUser(currentUserId).unwrap()
+      const { authentication, isAccountActivated, refreshToken, verificationToken, ...rest } = res
       dispatch(setLoggedInUser(rest))
     }
+    if(isMounted && currentUserId) getLoggedIn()
+
     return () => {
       isMounted = false
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-console.log(data)
+
   useEffect(() => {
     let isMounted = true
     const getPostFeed = async() => {

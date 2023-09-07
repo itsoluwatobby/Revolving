@@ -5,6 +5,8 @@ import { UserProps } from '../../types.js';
 const USERSCHEMA: Schema = new Schema(
   {
     username: { type: String, required: [true, 'Username is required'], trim: true },
+    firstName: { type: String, default: '', trim: true },
+    lastName: { type: String, default: '', trim: true },
     email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
     description: { type: String, default: '', trim: true },
     authentication: {
@@ -16,7 +18,10 @@ const USERSCHEMA: Schema = new Schema(
       default: 1120
     },
     registrationDate: { type: String, default: '' },
-    displayPicture: { type: String, default: '' },
+    displayPicture: { 
+      coverPhoto: {type: String, default: '' },
+      photo: {type: String, default: '' },
+    },
     isAccountActivated: { type: Boolean, default: false },
     isAccountLocked: { type: Boolean, default: false },
     dateLocked: { type: String, default: '' },
@@ -34,11 +39,10 @@ const USERSCHEMA: Schema = new Schema(
     refreshToken: { type: String, default: '' },
     edited: { type: Boolean, default: false },
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
-    codeName: { type: String, default: '', trim: true },
     taskIds: { type: Array, default: [] },
     stack: { type: Array, default: [] },
     socialMediaAccounts: { type: Array, default: [] },
-    country: { type: Array, default: '' },
+    country: { type: String, default: '' },
   },
   { 
     minimize: false, 

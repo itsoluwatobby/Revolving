@@ -21,31 +21,15 @@ import PrompLogin from "./components/modals/PrompLogin";
 import TaskManager from "./pages/TaskManager";
 import ExpensePlanner from "./pages/ExpensePlanner";
 import AdminPage from "./pages/AdminPage";
-import { selectCurrentRoles } from "./features/auth/authSlice";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { OTPEntry } from "./pages/OTPEntry";
-import { useGetUserByIdQuery } from "./app/api/usersApiSlice"
-import { useEffect } from "react";
-import { setLoggedInUser } from "./features/auth/userSlice";
+import { getCurrentUser } from "./features/auth/userSlice";
 
  
 export const App = () => {
-  const currentUserId = localStorage.getItem('revolving_userId') as string
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
-  const { data } = useGetUserByIdQuery(currentUserId)
-  const dispatch = useDispatch()
-  const userRoles = useSelector(selectCurrentRoles)
+  const currentUser = useSelector(getCurrentUser)
 
-  useEffect(() => {
-    let isMounted = true
-    if(isMounted && data){
-      dispatch(setLoggedInUser(data))
-    }
-    return () => {
-      isMounted = false
-    }
-  }, [data, dispatch])
-console.log(data)
   return (
     <main className={`app relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
@@ -68,7 +52,7 @@ console.log(data)
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
 
-            <Route element={<ProtectedRoute roles={userRoles}/>}>
+            <Route element={<ProtectedRoute roles={currentUser?.roles as number[]}/>}>
 
               <Route path="profile/:userId" element={<ProfilePage />} />
               <Route path="taskManager/:userId" element={<TaskManager />} />

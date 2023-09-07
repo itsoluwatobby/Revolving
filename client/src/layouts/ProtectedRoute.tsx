@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { USERROLES } from "../data";
 import { useDispatch, useSelector } from "react-redux";
 import { setGrantedPermission, grantedPermission } from "../features/auth/userSlice";
-import { ThemeContextType } from "../posts";
-import { useThemeContext } from "../hooks/useThemeContext";
+// import { ThemeContextType } from "../posts";
+// import { useThemeContext } from "../hooks/useThemeContext";
 import { IsLayoutLoading } from "../components/IsLayoutLoading";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 
@@ -14,7 +14,7 @@ type AllowedRolesProp={
 
 export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
   const { pathname } = useLocation()
-  const { theme } = useThemeContext() as ThemeContextType
+  //const { theme } = useThemeContext() as ThemeContextType
   const getPermission = useSelector(grantedPermission)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -48,9 +48,6 @@ export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
       clearTimeout(timerId)
     }
   }, [getPermission, navigate, pathname])
-
-  console.log(getPermission)
-  console.log(roles)
 
   return(
     <>

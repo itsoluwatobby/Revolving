@@ -119,7 +119,10 @@ interface UserProps extends Document{
   },
   roles: USERROLES[],
   registrationDate: string,
-  displayPicture: string,
+  displayPicture: {
+    coverPhoto: string, 
+    photo: string
+  },
   isAccountActivated: boolean,
   isAccountLocked: boolean,
   isResetPassword: boolean,
@@ -132,7 +135,8 @@ interface UserProps extends Document{
   status: 'online' | 'offline',
   refreshToken: string,
   gender: 'Female' | 'Male' | 'Others',
-  codeName: string,
+  firstName: string,
+  lastName: string,
   stack: string[],
   country: string,
   taskIds: string[]

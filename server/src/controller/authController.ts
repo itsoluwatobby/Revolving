@@ -112,7 +112,7 @@ export const accountConfirmation = async(req: Request, res: Response) => {
 export const confirmOTPToken = (req: Request, res: Response) => {
   asyncFunc(res, async() => {
     const { email, otp, purpose='ACCOUNT' }: {email: string, otp: string, purpose?: 'ACCOUNT' | 'OTHERS'} = req.body
-    if(!email || !otp) return responseType({res, status: 400, message: 'OTP required'});
+    if(!email || !otp) return responseType({res, status: 400, message: 'OTP or Email required'});
     const user = await getUserByEmail(email)
     if(!user) return responseType({res, status: 404, message: 'You do not have an account'});
     if(purpose === 'ACCOUNT'){
@@ -151,6 +151,7 @@ function OTPGenerator(res: Response, user: Document<unknown, {}, UserProps> & Us
 export function ExtraOTPGenerator(req: Request, res: Response){
   asyncFunc(res, async() => {
     const {email, length, option}: { email: string, length: number, option: 'EMAIL' | 'DIRECT' } = req.body
+    if(!email) return responseType({res, status: 400, message: 'Email required'});
     const dateTime = new Date().toString()
     const user = await getUserByEmail(email)
     if(option === 'EMAIL'){
@@ -217,7 +218,7 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     await autoDeleteOnExpire(user?._id)
 
     const { _id } = user
-    await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false }})
+    await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false, verificationToken: { token: '' } }})
     //authentication: { sessionID: req?.sessionID },
     .then(() => {
       res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
@@ -240,7 +241,7 @@ export const logoutHandler = async(req: NewUserProp, res: Response) => {
       redisFunc()
       return res.sendStatus(204);
     }
-    user.updateOne({$set: {status: 'offline', authentication: { sessionID: '' }, refreshToken: '' }})
+    user.updateOne({$set: {status: 'offline', authentication: { sessionID: '' }, refreshToken: '', verificationToken: { token: '' } }})
     redisFunc()
     res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
     return res.sendStatus(204)

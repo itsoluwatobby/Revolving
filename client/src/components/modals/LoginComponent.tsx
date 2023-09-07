@@ -32,9 +32,8 @@ export default function LoginComponent({
                 id='email'
                 name="email"
                 placeholder='iamuser@mail.com'
-                autoComplete='off'
                 onChange={handleEmail}
-                className='w-full rounded-md p-2 focus:outline-none border-none text-black'
+                className='w-full rounded-sm p-2 focus:outline-none border-none text-black'
               />
             </div>
 
@@ -49,9 +48,9 @@ export default function LoginComponent({
                 name="password"
                 required
                 placeholder='*************'
-                autoComplete='false'
+                autoComplete='off'
                 onChange={handlePassword}
-                className='relative w-full rounded-md p-2 focus:outline-none border-none text-black'
+                className='relative w-full rounded-sm p-2 focus:outline-none border-none text-black'
               />
               {
                 revealPassword ? 
@@ -80,7 +79,7 @@ export default function LoginComponent({
             <button 
               type='submit'
               disabled={!canSubmit && !loading}
-              className={`w-[95%] self-center rounded-md p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
               {!loading ? 'Sign In' : 'Signing In...'}
             </button>

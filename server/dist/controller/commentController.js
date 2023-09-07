@@ -115,7 +115,7 @@ export const getComment = (req, res) => {
             .then((userComment) => {
             if (!userComment)
                 return responseType({ res, status: 404, message: 'comment not found' });
-            responseType({ res, status: 200, count: 1, data: userComment });
+            return responseType({ res, status: 200, count: 1, data: userComment });
         }).catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 };
@@ -140,7 +140,7 @@ export const userComments = (req, res) => {
             .then((userComments) => {
             if (!(userComments === null || userComments === void 0 ? void 0 : userComments.length))
                 return responseType({ res, status: 404, message: 'User have no comments' });
-            responseType({ res, status: 200, count: userComments === null || userComments === void 0 ? void 0 : userComments.length, data: userComments });
+            return responseType({ res, status: 200, count: userComments === null || userComments === void 0 ? void 0 : userComments.length, data: userComments });
         }).catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 };
@@ -157,7 +157,7 @@ export const getUserCommentStory = (req, res) => {
             .then((commentsInStories) => {
             if (!(commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length))
                 return responseType({ res, status: 404, message: 'No comments by you' });
-            responseType({ res, status: 200, count: commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length, data: commentsInStories });
+            return responseType({ res, status: 200, count: commentsInStories === null || commentsInStories === void 0 ? void 0 : commentsInStories.length, data: commentsInStories });
         }).catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 };
@@ -174,7 +174,7 @@ export const getStoryComments = (req, res) => {
             .then((storyComments) => {
             if (!(storyComments === null || storyComments === void 0 ? void 0 : storyComments.length))
                 return responseType({ res, status: 404, message: 'No comments' });
-            responseType({ res, status: 200, count: storyComments === null || storyComments === void 0 ? void 0 : storyComments.length, data: storyComments });
+            return responseType({ res, status: 200, count: storyComments === null || storyComments === void 0 ? void 0 : storyComments.length, data: storyComments });
         }).catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 };

@@ -52,7 +52,7 @@ export default function PasswordInput({
             placeholder='*************'
             autoComplete='off'
             onChange={handlePassword}
-            className='relative w-full rounded-md p-1.5 focus:outline-none border-none text-black'
+            className='relative w-full rounded-sm p-1.5 focus:outline-none border-none text-black'
           />
           {
             revealPassword ? 
@@ -81,7 +81,7 @@ export default function PasswordInput({
             placeholder='*************'
             autoComplete='off'
             onChange={handleConfirmPassword}
-            className='relative w-full rounded-md p-1.5 focus:outline-none border-none text-black'
+            className='relative w-full rounded-sm p-1.5 focus:outline-none border-none text-black'
           />
       </div>
     </>

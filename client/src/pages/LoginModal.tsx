@@ -55,6 +55,11 @@ export default function Login() {
           color: '#FFFFFF'
         }
       })
+      if(errors?.status == 404) {
+        setTimeout(() => {
+          navigate('/signUp')
+        }, 10000);
+      }
     }
   }
 

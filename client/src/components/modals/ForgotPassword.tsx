@@ -53,16 +53,16 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
             <input 
               type="email" value={email} required
               id='email' placeholder='iamuser@mail.com'
-              autoComplete='off' onChange={handleEmail}
-              className='w-full rounded-md p-2 focus:outline-none border-none text-black'
+              autoComplete='on' onChange={handleEmail}
+              className='w-full rounded-sm p-2 focus:outline-none border-none text-black'
             />
           </div>
           <button 
             type='submit'
-            disabled={!canSubmit}
-            className={`w-[95%] self-center rounded-md p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            disabled={!canSubmit && !isLoading}
+            className={`w-[95%] self-center ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}  rounded-sm p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
-            {isLoading ? 'requesting 🚀' : isSuccess ? 'Link sent to mail' : 'Request'}
+            {isLoading ? 'Requesting...' : isSuccess ? 'Link sent to mail' : 'Request'}
           </button>
           <div className='flex flex-col p-2 pt-0 pb-0 text-sm gap-2'>
             <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2 w-fit'

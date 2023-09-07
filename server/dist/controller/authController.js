@@ -109,7 +109,7 @@ export const confirmOTPToken = (req, res) => {
         var _a, _b, _c, _d;
         const { email, otp, purpose = 'ACCOUNT' } = req.body;
         if (!email || !otp)
-            return responseType({ res, status: 400, message: 'OTP required' });
+            return responseType({ res, status: 400, message: 'OTP or Email required' });
         const user = yield getUserByEmail(email);
         if (!user)
             return responseType({ res, status: 404, message: 'You do not have an account' });
@@ -154,6 +154,8 @@ function OTPGenerator(res, user, length = 6) {
 export function ExtraOTPGenerator(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { email, length, option } = req.body;
+        if (!email)
+            return responseType({ res, status: 400, message: 'Email required' });
         const dateTime = new Date().toString();
         const user = yield getUserByEmail(email);
         if (option === 'EMAIL') {
@@ -219,7 +221,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         }
         yield autoDeleteOnExpire(user === null || user === void 0 ? void 0 : user._id);
         const { _id } = user;
-        yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false } })
+        yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false, verificationToken: { token: '' } } })
             //authentication: { sessionID: req?.sessionID },
             .then(() => {
             res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
@@ -241,7 +243,7 @@ export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, fun
             redisFunc();
             return res.sendStatus(204);
         }
-        user.updateOne({ $set: { status: 'offline', authentication: { sessionID: '' }, refreshToken: '' } });
+        user.updateOne({ $set: { status: 'offline', authentication: { sessionID: '' }, refreshToken: '', verificationToken: { token: '' } } });
         redisFunc();
         res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true }); //secure: true
         return res.sendStatus(204);
