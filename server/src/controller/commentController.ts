@@ -107,7 +107,7 @@ export const getComment = (req: RequestProp, res: Response) => {
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((userComment: CommentProps) => {
       if(!userComment) return responseType({res, status: 404, message: 'comment not found'})
-      responseType({res, status: 200, count:1, data: userComment})
+      return responseType({res, status: 200, count:1, data: userComment})
     }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }
@@ -129,7 +129,7 @@ export const userComments = (req: Request, res: Response) => {
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((userComments: CommentProps[] | string) => {
       if(!userComments?.length) return responseType({res, status: 404, message: 'User have no comments'})
-      responseType({res, status: 200, count: userComments?.length, data: userComments})
+      return responseType({res, status: 200, count: userComments?.length, data: userComments})
     }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }
@@ -145,7 +145,7 @@ export const getUserCommentStory = (req: RequestProp, res: Response) => {
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((commentsInStories: CommentProps[] | string) => {
       if(!commentsInStories?.length) return responseType({res, status: 404, message: 'No comments by you'})
-      responseType({res, status: 200, count: commentsInStories?.length, data: commentsInStories})
+      return responseType({res, status: 200, count: commentsInStories?.length, data: commentsInStories})
     }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }
@@ -162,7 +162,7 @@ export const getStoryComments = (req: RequestProp, res: Response) => {
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((storyComments: CommentProps[] | string) => {
       if(!storyComments?.length) return responseType({res, status: 404, message: 'No comments'});
-      responseType({res, status: 200, count: storyComments?.length, data: storyComments})
+      return responseType({res, status: 200, count: storyComments?.length, data: storyComments})
     }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
 }

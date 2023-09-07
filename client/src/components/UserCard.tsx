@@ -54,7 +54,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         <div className="flex items-center justify-between w-full">
           <div className="flex-grow flex items-center gap-2">
             <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-10 h-10">
-              {user?.displayPicture ? <img src={user?.displayPicture} alt="" /> : null}
+              {user?.displayPicture?.photo ? <img src={user?.displayPicture?.photo} alt="" /> : null}
             </figure>
             <p className="capitalize font-bold flex flex-col">
               <Link to={`/profile/${user?._id}`}

@@ -29,8 +29,8 @@ export const OTPEntry = () => {
         const activationCode = [...Object.values(otp)].join('')
         const res = await confirmOTP({email, otp: activationCode, purpose: 'ACCOUNT'}).unwrap()
         toast.success(res?.meta?.message, SuccessStyle)
-        setOtp(initialState)
         setTimeout(() => {
+          setOtp(initialState)
           navigate('/signIn')
         }, 5000)
       }

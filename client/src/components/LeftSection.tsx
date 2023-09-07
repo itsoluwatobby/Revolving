@@ -14,7 +14,7 @@ type RouteProps = {
   link: string
 }
 
-const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteProps[] =>{ 
+const routeLinkNames = ({ userId }:{ userId?: string }): RouteProps[] =>{ 
   
   return ([
       {
@@ -23,19 +23,19 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
       },
       {
         name: 'Profile Page',
-        link: `/profile/${id}`
+        link: `/profile/${userId}`
       },
       {
         name: 'Task Manager',
-        link: `/taskManager/${id}`
+        link: `/taskManager/${userId}`
       },
       // {
       //   name: 'Expense Planner',
-      //   link: `/expensePlanner/${id}`
+      //   link: `/expensePlanner/${userId}`
       // },
       // {
       //   name: 'Admin Page',
-      //   link: `/adminPage/${id}`
+      //   link: `/adminPage/${userId}`
       // },
       {
         name: `About`,
@@ -43,7 +43,7 @@ const routeLinkNames = ({ params, id }:{ params?: string, id?: string }): RouteP
       },
       {
         name: 'Logout',
-        link: `/signout/${id}`
+        link: `/signout/${userId}`
       },
     ])
 }
@@ -62,7 +62,7 @@ export const LeftSection = () => {
   }
 
   return (
-    <section className={`sidebars mt-6 ${address.includes(pathname) ? 'hidden' : 'md:block'} flex-none sm:w-1/4 w-4/12 transition-all overflow-y-scroll h-full ${toggleLeft === 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'} ${theme == 'light' ? 'bg-gray-50' : 'bg-slate-700'}  rounded-tr-lg z-50`}>
+    <section className={`sidebars mt-6 ${address.includes(pathname) ? 'hidden' : 'md:block'} flex-none sm:w-[28%] lg:w-1/5 transition-all overflow-y-scroll h-full ${toggleLeft === 'Open' ? 'maxscreen:translate-x-0' : 'maxscreen:-translate-x-96 maxscreen:w-0'} ${theme == 'light' ? 'bg-gray-50' : 'bg-slate-700'}  rounded-tr-lg z-50`}>
       <div className="relative w-full h-8 flex items-center">
         <button
           onClick={() => setToggleLeft('Hide')}
@@ -73,11 +73,11 @@ export const LeftSection = () => {
       </div>
       <div className="h-full p-2 flex flex-col gap-1">
         {
-          routeLinkNames({params: 'Hello', id: currentUserId}).map(values => (
+          routeLinkNames({ userId: currentUserId }).map(values => (
             <Link to={conditionalRouting(values) ? '' : values.link}
               key={values.name}
               onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
-              className={`p-3 lg:py-4 ${values.link == pathname ? 'bg-slate-300 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-300 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-300 border-t-0 border-b-1`}
+              className={`p-3 lg:py-4 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-300 border-t-0 border-b-1`}
             >
               {values.name}
             </Link>

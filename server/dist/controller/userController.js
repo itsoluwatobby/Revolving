@@ -16,12 +16,14 @@ export const getUsers = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         yield getCachedResponse({ key: `allUsers`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const allUsers = yield getAllUsers();
-                if (!(allUsers === null || allUsers === void 0 ? void 0 : allUsers.length))
-                    return responseType({ res, status: 404, message: 'No users available' });
                 return allUsers;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
-            .then((users) => responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users }))
-            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+            .then((users) => {
+            if (!(users === null || users === void 0 ? void 0 : users.length))
+                return responseType({ res, status: 404, message: 'No users available' });
+            return responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users });
+        })
+            .catch((error) => responseType({ res, status: 403, message: `${error.message}` }));
     }));
 };
 export const getUser = (req, res) => {
@@ -32,12 +34,14 @@ export const getUser = (req, res) => {
         yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const current = yield getUserById(userId);
                 yield autoDeleteOnExpire(userId);
-                if (!current)
-                    return responseType({ res, status: 404, message: 'User not found' });
                 return current;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
-            .then((user) => responseType({ res, status: 200, count: 1, data: user }))
-            .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+            .then((user) => {
+            if (!user)
+                return responseType({ res, status: 404, message: 'User not found' });
+            return responseType({ res, status: 200, count: 1, data: user });
+        })
+            .catch((error) => responseType({ res, status: 403, message: `${error.message}` }));
     }));
 };
 export const followUnFollowUser = (req, res) => {

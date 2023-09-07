@@ -68,8 +68,8 @@ export default function NewPassword() {
 
           <button 
             type='submit'
-            disabled={!canSubmit && !match}
-            className={`w-full mt-2 rounded-md p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            disabled={!canSubmit && !match && !isLoading}
+            className={`w-[95%] mx-auto mt-2 rounded-sm ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
             {isSuccess ? 'Reset Successful' : 'Submit'}
           </button>

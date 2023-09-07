@@ -47,8 +47,12 @@ export const NewStory = () => {
   }
 
   useEffect(() => {
-    if (storyId) {
+    let isMounted = true
+    if (isMounted && storyId) {
       getStoryCond(storyId);
+    }
+    return () => {
+      isMounted = false
     }
   }, [storyId, getStoryCond])
 
@@ -85,13 +89,18 @@ export const NewStory = () => {
 
   // reset uploadedImageIds container
   useEffect(() => {
-    if(uploadedImageIds.length && !url.length){
+    let isMounted = true
+    if(isMounted && uploadedImageIds.length && !url.length){
       uploadedImageIds = []
       imagesNames = []
+    }
+    return () => {
+      isMounted = false
     }
   }, [url])
 
   useEffect(() => {
+    let isMounted = true
     const uploadImages = async() => {
       await Promise.all(imagesFiles.map(async(image) => {
         if(uploadedImageIds.includes(image.imageId)) return
@@ -110,7 +119,11 @@ export const NewStory = () => {
         //}
       }))
     }
-    imagesFiles.length >= 1 ? uploadImages() : null
+    (isMounted && imagesFiles.length >= 1) ? uploadImages() : null
+
+    return () => {
+      isMounted = false
+    }
   }, [imagesFiles, dispatch, setLoginPrompt, uploadToServer])
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
@@ -251,14 +264,14 @@ export const NewStory = () => {
           <BiCodeAlt 
             onClick={() => setCodeEditor(prev => !prev)}
             title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-90 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
-          <div title='Scroll left | right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 py-1 pl-2 pr-2 shadow-lg shadow-slate-600 ${theme == 'light' ? 'text-white' : ''}`}>
+          <div title='Scroll left | right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 py-1 pl-2 pr-2 shadow-inner shadow-slate-900 ${theme == 'light' ? 'text-white' : ''}`}>
             {
-              Object.values(NAVIGATE).map(nav => (
+              Object.values(NAVIGATE).map(category => (
                 <p
-                  onClick={() => addCategory(nav)}
-                  className={`p-1 bg-slate-500 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(nav) ? 'bg-slate-700' : ''}`}
-                  key={nav}>
-                  {nav}
+                  onClick={() => addCategory(category)}
+                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(category) ? 'bg-slate-700' : ''}`}
+                  key={category}>
+                  {category}
                 </p>
               ))
             }

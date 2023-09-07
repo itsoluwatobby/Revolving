@@ -32,9 +32,8 @@ export default function RegistrationForm({
                 name='name'
                 min={3}
                 placeholder='iamuser'
-                autoComplete='off'
                 onChange={handleUsername}
-                className='w-full rounded-md p-1.5 focus:outline-none border-none text-black'
+                className='w-full rounded-sm p-1.5 focus:outline-none border-none text-black'
               />
             </div>
             <div className='flex flex-col w-full p-2 pt-0 pb-0 gap-0.5'>
@@ -50,9 +49,8 @@ export default function RegistrationForm({
                 id='email'
                 min={3}
                 placeholder='iamuser@mail.com'
-                autoComplete='off'
                 onChange={handleEmail}
-                className='w-full rounded-md p-1.5 focus:outline-none border-none text-black'
+                className='w-full rounded-sm p-1.5 focus:outline-none border-none text-black'
               />
             </div>
             
@@ -70,25 +68,25 @@ export default function RegistrationForm({
                   type='button'
                   onClick={() => setConfirmationBy('LINK')}
                   title='default'
-                  className={`p-0.5 rounded-sm shadow-lg  ${confirmationBy === 'LINK' ? 'bg-green-600' : 'bg-slate-700'} px-2 hover:opacity-90 active:opacity-100`}
+                  className={`p-0.5 rounded-sm shadow-lg  ${confirmationBy === 'LINK' ? 'bg-green-500' : 'bg-slate-700'} px-2 hover:opacity-90 active:opacity-100`}
                 >Link</button>
                 <button
                   type='button'
                   onClick={() => setConfirmationBy('OTP')}
                   title='receive otp'
-                  className={`p-0.5 rounded-sm shadow-lg ${confirmationBy === 'OTP' ? 'bg-green-600' : 'bg-slate-700'} px-2 hover:opacity-90 active:opacity-100`}
+                  className={`p-0.5 rounded-sm shadow-lg ${confirmationBy === 'OTP' ? 'bg-green-500' : 'bg-slate-700'} px-2 hover:opacity-90 active:opacity-100`}
                 >OTP</button>
               </div>
             </div>
             <button 
               type='submit'
               disabled={!canSubmit && !loading && !match && !validEmail}
-              className={`w-[95%] self-center mt-2 rounded-md p-2 focus:outline-none border-none ${(canSubmit && !loading && validEmail && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center mt-2 rounded-sm ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && !loading && validEmail && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
               {!loading ? 'Sign Up' : 'Signing Up...'}
             </button>
             <div className='flex flex-col text-sm gap-2 p-2 pt-0 pb-0'>
-              <p className=''>Have an account?&nbsp;
+              <p className='p-1'>Have an account?&nbsp;
                 <Link to={'/signIn'}>
                   <span className='hover:underline hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70'>Sign In</span>
                 </Link>

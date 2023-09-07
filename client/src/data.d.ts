@@ -173,7 +173,10 @@ interface UserProps{
   },
   roles: USERROLES[],
   registrationDate: string,
-  displayPicture: string,
+  displayPicture: {
+    coverPhoto: string, 
+    photo: string
+  },
   isAccountActivated: boolean,
   isAccountLocked: boolean,
   isResetPassword: boolean,
@@ -187,7 +190,8 @@ interface UserProps{
   refreshToken: string,
   editDate: string,
   gender: 'Female' | 'Male' | 'Others',
-  codeName: string,
+  firstName: string,
+  lastName: string,
   stack: string[],
   country: string,
   socialMediaAccounts: SocialMediaAccoutProp[],

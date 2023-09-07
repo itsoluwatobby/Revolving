@@ -151,7 +151,7 @@ export default function Form({ currentUserId }: FormProps) {
       //dispatch(taskApiSlice.util.invalidateTags(['TASK']))
     }
     catch(err){
-      const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
+      const errors = (err as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
       err && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }

@@ -23,6 +23,6 @@ const userSlice = createSlice({
 
 export const { setGrantedPermission, setLoggedInUser } = userSlice.actions
 export const grantedPermission = (state: RootState) => state.user.permission
-export const getLoggedInUser = (state: RootState) => state.user.user
+export const getCurrentUser = (state: RootState) => state.user.user
 
 export default userSlice.reducer
