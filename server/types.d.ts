@@ -105,7 +105,7 @@ interface SharedProps extends Document{
 }
 
 type SocialMediaAccoutProp = {
-  media: string,
+  name: string,
   link: string
 }
 
