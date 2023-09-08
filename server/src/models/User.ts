@@ -1,6 +1,13 @@
 import { Schema, model} from 'mongoose';
 import { UserProps } from '../../types.js';
 
+const SocialMedia: Schema = new Schema(
+  {
+    name: { type: String, default: '' },
+    Link: { type: String, default: '' }
+  }
+) 
+
 
 const USERSCHEMA: Schema = new Schema(
   {
@@ -40,7 +47,7 @@ const USERSCHEMA: Schema = new Schema(
     edited: { type: Boolean, default: false },
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     taskIds: { type: Array, default: [] },
-    stack: { type: Array, default: [] },
+    stack: [SocialMedia],
     socialMediaAccounts: { type: Array, default: [] },
     country: { type: String, default: '' },
   },

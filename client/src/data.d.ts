@@ -47,6 +47,7 @@ type StoryProps = {
   edited: false
   author: string
   sharedAuthor: string
+  sharedLikes: string[]
   sharedDate: string
   createdAt: string,
   updatedAt: string
@@ -158,7 +159,7 @@ interface SharedProps{
 }
 
 type SocialMediaAccoutProp = {
-  media: string,
+  name: string,
   link: string
 }
 
