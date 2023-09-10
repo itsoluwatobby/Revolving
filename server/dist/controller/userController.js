@@ -13,8 +13,8 @@ import { getCachedResponse } from "../helpers/redis.js";
 import { ROLES } from "../config/allowedRoles.js";
 import bcrypt from 'bcrypt';
 export const getUsers = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        yield getCachedResponse({ key: `allUsers`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
+        getCachedResponse({ key: `allUsers`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const allUsers = yield getAllUsers();
                 return allUsers;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -24,14 +24,14 @@ export const getUsers = (req, res) => {
             return responseType({ res, status: 200, count: users === null || users === void 0 ? void 0 : users.length, data: users });
         })
             .catch((error) => responseType({ res, status: 403, message: `${error.message}` }));
-    }));
+    });
 };
 export const getUser = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
         const { userId } = req.params;
         if (!userId || userId == null)
             return res.sendStatus(400);
-        yield getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const current = yield getUserById(userId);
                 yield autoDeleteOnExpire(userId);
                 return current;
@@ -42,7 +42,7 @@ export const getUser = (req, res) => {
             return responseType({ res, status: 200, count: 1, data: user });
         })
             .catch((error) => responseType({ res, status: 403, message: `${error.message}` }));
-    }));
+    });
 };
 export const followUnFollowUser = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
@@ -62,7 +62,6 @@ export const followUnFollowUser = (req, res) => {
 };
 export const updateUserInfo = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b, _c;
         const { userId } = req.params;
         const userInfo = req.body;
         if (!userId)
@@ -72,18 +71,18 @@ export const updateUserInfo = (req, res) => {
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-        if ((_a = userInfo === null || userInfo === void 0 ? void 0 : userInfo.authentication) === null || _a === void 0 ? void 0 : _a.password) {
-            const newPassword = (_b = userInfo === null || userInfo === void 0 ? void 0 : userInfo.authentication) === null || _b === void 0 ? void 0 : _b.password;
-            const conflictingPassword = yield bcrypt.compare(newPassword, (_c = user === null || user === void 0 ? void 0 : user.authentication) === null || _c === void 0 ? void 0 : _c.password);
+        if (userInfo === null || userInfo === void 0 ? void 0 : userInfo.password) {
+            const newPassword = userInfo === null || userInfo === void 0 ? void 0 : userInfo.password;
+            const conflictingPassword = yield bcrypt.compare(newPassword, user === null || user === void 0 ? void 0 : user.password);
             if (conflictingPassword)
                 return responseType({ res, status: 409, message: 'same as old password' });
             const hashedPassword = yield bcrypt.hash(newPassword, 10);
-            yield user.updateOne({ $set: { authentication: { password: hashedPassword } } })
+            user.updateOne({ $set: { password: hashedPassword } })
                 .then(() => responseType({ res, status: 201, message: 'password reset successful' }))
                 .catch(() => res.sendStatus(500));
         }
         else {
-            yield updateUser(userId, userInfo)
+            updateUser(userId, userInfo)
                 .then(updatedInfo => responseType({ res, status: 201, message: 'success', data: updatedInfo }))
                 .catch(error => responseType({ res, status: 400, message: error.message }));
         }
@@ -100,7 +99,7 @@ export const deleteUserAccount = (req, res) => {
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (admin.roles.includes(ROLES.ADMIN)) {
-            yield deleteAccount(userId)
+            deleteAccount(userId)
                 .then(() => responseType({ res, status: 204 }))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
@@ -120,12 +119,12 @@ export const lockAndUnlockUserAccount = (req, res) => {
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (admin === null || admin === void 0 ? void 0 : admin.roles.includes(ROLES.ADMIN)) {
             if (!user.isAccountLocked) {
-                yield user.updateOne({ $set: { isAccountLocked: true } })
+                user.updateOne({ $set: { isAccountLocked: true } })
                     .then(() => responseType({ res, status: 201, message: 'user account LOCKED successfully' }))
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
             else {
-                yield user.updateOne({ $set: { isAccountLocked: false } })
+                user.updateOne({ $set: { isAccountLocked: false } })
                     .then(() => responseType({ res, status: 201, message: 'user account UNLOCKED successfully' }))
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }

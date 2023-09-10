@@ -40,7 +40,7 @@ interface StoryProps extends Document{
   body: string
   fontFamily: string
   category: Categories[]
-  commentIds?: ObjectId[]
+  commentIds?: string[]
   isShared?: SharedInfo[]
   likes: string[]
   edited: false
@@ -113,10 +113,8 @@ interface UserProps extends Document{
   username: string,
   email: string,
   description: string,
-  authentication: {
-    password: string,
-    sessionID: string
-  },
+  password: string,
+  userSession: string,
   roles: USERROLES[],
   registrationDate: string,
   displayPicture: {
@@ -141,6 +139,7 @@ interface UserProps extends Document{
   country: string,
   taskIds: string[]
   socialMediaAccounts: SocialMediaAccoutProp[],
+  notificationSubscribers: string[],
   createdAt: string,
   updatedAt: string
 }

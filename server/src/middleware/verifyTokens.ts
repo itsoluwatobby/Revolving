@@ -36,7 +36,7 @@ export const verifyAccessToken = async(req: TokenProp, res: Response, next: Next
   }
   else if(typeof verify == 'object'){
     // check if user account is activated
-    await activatedAccount(verify?.email)
+    activatedAccount(verify?.email)
     .then((user) => {
       if(!user.isAccountActivated) return responseType({res, status: 403, message: 'Account not activated'})
       if(user.isAccountLocked) return responseType({res, status: 403, message: 'Account Locked, Please contact support'})
@@ -59,13 +59,13 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
     if(verify == 'Bad Token') {
       // TODO: account hacked, send email to user
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
-      await user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
+      user.updateOne({$set: { refreshToken: '', userSession: '' }})
       .then(() => res.sendStatus(401))
       .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     }
     else if(verify == 'Expired Token') {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
-      await user.updateOne({$set: { refreshToken: '', authentication: { sessionID: '' } }})
+      user.updateOne({$set: { refreshToken: '', userSession: '' }})
       .then(() => responseType({res, status: 403, message: 'Expired Token'}))
       .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     }
@@ -74,12 +74,11 @@ export const getNewTokens = async(req: CookieProp, res: Response) => {
   const newAccessToken = await signToken({roles, email: user?.email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
   const newRefreshToken = await signToken({roles, email: user?.email}, '12h', process.env.REFRESHTOKEN_STORY_SECRET);
 
-  await user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
-    //authentication: { sessionID: req?.sessionID },
+  //userSession: sessionID: req?.sessionID,
+  user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
   .then(() => {
     res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
     return responseType({res, status: 200, data:{_id: user?._id, roles, accessToken: newAccessToken}})
   }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
 }
-
 // TODO: add secure option to cookies

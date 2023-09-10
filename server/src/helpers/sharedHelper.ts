@@ -43,5 +43,3 @@ export const likeAndUnlikeSharedStory = async(userId: string, sharedId: string):
   }
 }
 export type Like_Unlike_Shared = Awaited<ReturnType<typeof likeAndUnlikeSharedStory>>
-
-

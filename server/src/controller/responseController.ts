@@ -25,7 +25,7 @@ export const createNewResponse = (req: RequestProp, res: Response) => {
     const comment = await getCommentById(commentId)
     if(!comment) return responseType({res, status: 404, message: 'Comment not found'})
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await createResponse({...newResponse})
+    createResponse({...newResponse})
     .then((response) => responseType({res, status: 201, count:1, data: response}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -42,7 +42,7 @@ export const updateResponse = (req: RequestProp, res: Response) => {
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const responseExist = await getResponseById(responseId)
     if(!responseExist) return responseType({res, status: 404, message: 'Response not found'})
-    await editResponse(userId, responseId, editedResponse)
+    editResponse(userId, responseId, editedResponse)
     .then((response) => responseType({res, status: 201, count:1, data: response}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -58,12 +58,12 @@ export const deleteResponse = (req: RequestProp, res: Response) => {
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
     const response = await getResponseById(responseId) as CommentResponseProps
     if(user?.roles.includes(ROLES.ADMIN)) {
-      await deleteSingleResponse(responseId)
+      deleteSingleResponse(responseId)
       .then(() => res.sendStatus(204))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
     if(response?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
-    await deleteSingleResponse(responseId)
+    deleteSingleResponse(responseId)
     .then(() => res.sendStatus(204))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -83,12 +83,12 @@ export const deleteUserResponses = (req: RequestProp, res: Response) => {
 
     if(adminUser?.roles.includes(ROLES.ADMIN)) {
       if(option?.command == 'onlyInComment'){
-        await deleteAllUserResponseInComment(userId, option?.commentId)
+        deleteAllUserResponseInComment(userId, option?.commentId)
         .then(() => responseType({res, status: 201, message: 'All user responses in comment deleted'}))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
       else if(option?.command == 'allUserResponse'){
-        await deleteAllUserResponses(userId)
+        deleteAllUserResponses(userId)
         .then(() => responseType({res, status: 201, message: 'All user responses deleted'}))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
@@ -101,13 +101,13 @@ export const getResponse = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const {responseId} = req.params
     if(!responseId) return res.sendStatus(400);
-    await getCachedResponse({key:`singleResponse:${responseId}`, timeTaken: 1800, cb: async() => {
+    getCachedResponse({key:`singleResponse:${responseId}`, timeTaken: 1800, cb: async() => {
       const response = await getResponseById(responseId)
       return response;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((userResponse: CommentResponseProps) => {
       if(!userResponse) return responseType({res, status: 404, message: 'response not found'})
-      responseType({res, status: 200, count:1, data: userResponse})
+      return responseType({res, status: 200, count:1, data: userResponse})
     }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
@@ -123,7 +123,7 @@ export const userResponses = (req: Request, res: Response) => {
     // if(user?.isAccountLocked) return res.sendStatus(401)
     const admin = await getUserById(adminId)
     if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
-    await getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
+    getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
       const userResponse = await getUserResponses(userId, responseId) 
       return userResponse
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -138,7 +138,7 @@ export const getResponseByComment = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const { commentId } = req.params;
     if(!commentId) return res.sendStatus(400);
-    await getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
+    getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
       const responses = await getAllCommentsResponse(commentId);
       return responses
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -173,7 +173,7 @@ export const like_Unlike_Response = async(req: Request, res: Response) => {
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await likeAndUnlikeResponse(userId, responseId)
+    likeAndUnlikeResponse(userId, responseId)
     .then((result: Like_Unlike_Response) => responseType({res, status: 201, message: result}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })

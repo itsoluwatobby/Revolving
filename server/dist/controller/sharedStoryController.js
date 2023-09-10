@@ -14,8 +14,8 @@ import { getUserById } from "../helpers/userHelpers.js";
 ;
 // Only for admin page
 export const fetchSharedStories = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        yield getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
+        getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const sharedStories = yield getAllSharedStories();
                 return sharedStories;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -24,21 +24,21 @@ export const fetchSharedStories = (req, res) => {
                 return responseType({ res, status: 404, message: 'No shared stories available' });
             return responseType({ res, status: 200, count: allSharedStories === null || allSharedStories === void 0 ? void 0 : allSharedStories.length, data: allSharedStories });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
-    }));
+    });
 };
 export const getSingleShared = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { sharedId } = req.params;
         if (!sharedId)
             return res.sendStatus(400);
-        yield getCachedResponse({ key: `sharedStory:${sharedId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `sharedStory:${sharedId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const shared = yield getSharedStoryById(sharedId);
                 return shared;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
             .then((sharedStory) => {
             if (!sharedStory)
                 return responseType({ res, status: 404, message: 'story not found' });
-            responseType({ res, status: 200, count: 1, data: sharedStory });
+            return responseType({ res, status: 200, count: 1, data: sharedStory });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
@@ -49,7 +49,7 @@ export const shareStory = (req, res) => {
             return res.sendStatus(400);
         const user = yield getUserById(userId);
         yield autoDeleteOnExpire(userId);
-        yield createShareStory(user, storyId)
+        createShareStory(user, storyId)
             .then((newShare) => responseType({ res, status: 201, count: 1, data: newShare }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -74,7 +74,7 @@ export const getSharedStoriesByUser = (req, res) => {
         if (!userId)
             return res.sendStatus(400);
         yield autoDeleteOnExpire(userId);
-        yield getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `userSharedStories:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const sharedStory = yield getUserSharedStories(userId);
                 return sharedStory;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -94,7 +94,7 @@ export const like_Unlike_SharedStory = (req, res) => __awaiter(void 0, void 0, v
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        yield likeAndUnlikeSharedStory(userId, sharedId)
+        likeAndUnlikeSharedStory(userId, sharedId)
             .then((result) => responseType({ res, status: 201, message: result }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));

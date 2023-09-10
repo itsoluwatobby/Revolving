@@ -41,7 +41,7 @@ export default function TopRight() {
   const createNewStory = async() => {
     if(!storyData.userId) return setLoginPrompt('Open')
     if(storyData){
-      dispatch(setLoading(isLoadingCreate))
+      dispatch(setLoading(true))
       const urls = url.map(ur => ur.url)
       const userId = storyData.userId as string
       const story = {...storyData, picture: [...urls]} as PostType
@@ -49,11 +49,10 @@ export default function TopRight() {
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
           localStorage.removeItem(`newBody?id=${userId}`)
-          console.log('loading')
           toast.success('Success!! Post added', SuccessStyle)
           dispatch(resetUrl())
           setImagesFiles([])
-          dispatch(setLoading(isLoadingCreate))
+          dispatch(setLoading(false))
           navigate('/')
       }
       catch(err: unknown){

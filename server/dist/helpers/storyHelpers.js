@@ -22,9 +22,21 @@ import { StoryModel } from "../models/Story.js";
 import fsPromises from 'fs/promises';
 import { CommentModel } from "../models/CommentModel.js";
 import { deleteSingleComment } from "./commentHelper.js";
+import { getAllSharedStories } from "./sharedHelper.js";
 export const getAllStories = () => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.find().lean(); });
 export const getStoryById = (id) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.findById(id).exec(); });
 export const getUserStories = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield StoryModel.find({ userId }).lean(); });
+export const getStoriesWithUserIdInIt = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const allStories = yield getAllStories();
+    const allSharedStories = yield getAllSharedStories();
+    const allUserStoryWithId = allStories.filter(story => { var _a, _b; return (story === null || story === void 0 ? void 0 : story.userId.toString()) === userId || ((_a = story === null || story === void 0 ? void 0 : story.likes) === null || _a === void 0 ? void 0 : _a.includes(userId)) || ((_b = story === null || story === void 0 ? void 0 : story.commentIds) === null || _b === void 0 ? void 0 : _b.includes(userId)); });
+    const allUserSharedStoryWithId = allSharedStories.filter(story => { var _a; return (story === null || story === void 0 ? void 0 : story.sharerId) === userId || ((_a = story === null || story === void 0 ? void 0 : story.sharedLikes) === null || _a === void 0 ? void 0 : _a.includes(userId)); });
+    const reMoulded = allUserSharedStoryWithId.map(share => {
+        const object = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.createdAt });
+        return object;
+    });
+    return [...allUserStoryWithId, ...reMoulded];
+});
 export const createUserStory = (story) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { category } = story, rest = __rest(story, ["category"]);
@@ -77,8 +89,8 @@ export const deleteUserStory = (storyId) => __awaiter(void 0, void 0, void 0, fu
         yield Promise.all(picturesArray.map((pictureLink) => __awaiter(void 0, void 0, void 0, function* () {
             const imageName = pictureLink.substring(pictureLink.indexOf('4000/') + 5);
             const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
-            yield fsPromises.unlink(pathname)
-                .then(() => console.log('DELETED'))
+            fsPromises.unlink(pathname)
+                .then(() => 'success')
                 .catch(error => console.log(error.message));
         })));
     }

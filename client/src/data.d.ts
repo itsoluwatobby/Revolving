@@ -168,10 +168,8 @@ interface UserProps{
   username: string,
   email: string,
   description: string,
-  authentication: {
-    password: string,
-    sessionID: string
-  },
+  password: string,
+  userSession: string,
   roles: USERROLES[],
   registrationDate: string,
   displayPicture: {
@@ -196,6 +194,7 @@ interface UserProps{
   stack: string[],
   country: string,
   socialMediaAccounts: SocialMediaAccoutProp[],
+  notificationSubscribers: string[],
   createdAt: string,
   updatedAt: string
 }
@@ -211,9 +210,10 @@ type ChatProps = {
   updatedAt?: string
 }
 
+type ConfirmationMethodType = 'LINK' | 'OTP'
+type PageType = 'PROFILE' | 'OTHERS'
 type DeleteCommentByAdmin = 'onlyInStory' | 'allUserComment'
 type DeleteResponseByAdmin = 'onlyInComment' | 'allUserResponse'
-type ConfirmationMethodType = 'LINK' | 'OTP'
 type DataType = { otp: string, expiresIn: string }
 type UserDataType = { _id: string, email: string, roles: USERROLES[] }
 

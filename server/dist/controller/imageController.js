@@ -18,10 +18,10 @@ export const uploadImages = (req, res) => __awaiter(void 0, void 0, void 0, func
         const fileext = filename.substring(filename.lastIndexOf('.'));
         const newName = `${uniqueId}${fileext}`;
         const newPath = `fileUpload/${newName}`;
-        yield fsPromises.rename(uploadedFile.path, newPath)
+        fsPromises.rename(uploadedFile.path, newPath)
             .then(() => {
             const imageUrl = `${process.env.IMAGELINK}/${newName}`;
-            responseType({ res, status: 201, message: 'image uploaded', count: 1, data: { url: imageUrl } });
+            return responseType({ res, status: 201, message: 'image uploaded', count: 1, data: { url: imageUrl } });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 });
@@ -38,7 +38,7 @@ export const deleteImage = (req, res) => {
         const name = req.url;
         const imageName = name.substring(1);
         const pathname = process.cwd() + `\\fileUpload\\${imageName}`;
-        yield fsPromises.unlink(pathname)
+        fsPromises.unlink(pathname)
             .then(() => responseType({ res, status: 204, message: 'image deleted' }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));

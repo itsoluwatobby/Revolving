@@ -13,8 +13,8 @@ interface RequestProp extends Request{
 
 // Only for admin page
 export const fetchSharedStories = (req: Request, res: Response) => {
-  asyncFunc(res, async() => {
-    await getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
+  asyncFunc(res, () => {
+    getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
       const sharedStories = await getAllSharedStories();
       return sharedStories
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -29,13 +29,13 @@ export const getSingleShared = (req: RequestProp, res: Response) => {
   asyncFunc(res, async() => {
     const {sharedId} = req.params
     if(!sharedId) return res.sendStatus(400);
-    await getCachedResponse({key:`sharedStory:${sharedId}`, cb: async() => {
+    getCachedResponse({key:`sharedStory:${sharedId}`, cb: async() => {
       const shared = await getSharedStoryById(sharedId) as SharedProps
       return shared
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((sharedStory: SharedProps) => {
       if(!sharedStory) return responseType({res, status: 404, message: 'story not found'})
-      responseType({res, status: 200, count:1, data: sharedStory})
+      return responseType({res, status: 200, count:1, data: sharedStory})
     }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
@@ -46,7 +46,7 @@ export const shareStory = (req: RequestProp, res: Response) => {
     if (!userId || !storyId) return res.sendStatus(400);
     const user = await getUserById(userId)
     await autoDeleteOnExpire(userId)
-    await createShareStory(user, storyId)
+    createShareStory(user, storyId)
     .then((newShare) => responseType({res, status: 201, count:1, data: newShare}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -71,7 +71,7 @@ export const getSharedStoriesByUser = (req: RequestProp, res: Response) => {
     const {userId} = req.params
     if (!userId) return res.sendStatus(400);
     await autoDeleteOnExpire(userId)
-    await getCachedResponse({key:`userSharedStories:${userId}`, timeTaken: 1800, cb: async() => {
+    getCachedResponse({key:`userSharedStories:${userId}`, timeTaken: 1800, cb: async() => {
       const sharedStory = await getUserSharedStories(userId) as SharedProps[]
       return sharedStory;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
@@ -89,7 +89,7 @@ export const like_Unlike_SharedStory = async(req: Request, res: Response) => {
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    await likeAndUnlikeSharedStory(userId, sharedId)
+    likeAndUnlikeSharedStory(userId, sharedId)
     .then((result: Like_Unlike_Shared) => responseType({res, status: 201, message: result}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })

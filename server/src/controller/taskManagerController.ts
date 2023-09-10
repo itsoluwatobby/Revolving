@@ -16,7 +16,7 @@ export const createTask = (req: Request, res: Response) => {
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})
-    await createNewTask(userId, task)
+    createNewTask(userId, task)
     .then((newTask) => responseType({res, count: 1, data: newTask}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -31,7 +31,7 @@ export const updateTasks = (req: Request, res: Response) => {
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 401, message: 'unauthorized'})
     if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})
-    await updateTask(task)
+    updateTask(task)
     .then((updatedTask) => responseType({res, status: 201, count: 1, data: updatedTask}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -47,7 +47,7 @@ export const deleteUserTask = (req: Request, res: Response) => {
     const task = await getTaskById(taskId);
     if(!task) return responseType({res, status: 404, message: 'task not found'})
     if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})
-    await deleteTask(userId, taskId)
+    deleteTask(userId, taskId)
     .then(() => responseType({res, status: 204, message: 'task deleted'}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -61,7 +61,7 @@ export const emptyBin = (req: Request, res: Response) => {
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     const task = await getTaskInBin(userId);
     if(!task) return responseType({res, status: 404, message: 'bin not found'})
-    await emptyTaskBin(userId)
+    emptyTaskBin(userId)
     .then(() => responseType({res, status: 201, message: 'task bin emptied'}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -74,7 +74,7 @@ export const getUserTask = (req: Request, res: Response) => {
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    await getCachedResponse({key:`tasks:${userId}`, timeTaken: 1800, cb: async() => {
+    getCachedResponse({key:`tasks:${userId}`, timeTaken: 1800, cb: async() => {
       const tasks = await getUserTasks(userId)
       return tasks;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -86,10 +86,10 @@ export const getUserTask = (req: Request, res: Response) => {
 }
 
 export const getTask = (req: Request, res: Response) => {
-  asyncFunc(res, async() => {
+  asyncFunc(res, () => {
     const { taskId } = req.params
     if(!taskId) return responseType({res, status: 400, message: 'taskId required'})
-    await getCachedResponse({key:`singleTask:${taskId}`, timeTaken: 1800, cb: async() => {
+    getCachedResponse({key:`singleTask:${taskId}`, timeTaken: 1800, cb: async() => {
       const task = await getTaskById(taskId)
       return task;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -101,10 +101,10 @@ export const getTask = (req: Request, res: Response) => {
 }
 
 export const getTasksInBin = (req: Request, res: Response) => {
-  asyncFunc(res, async() => {
+  asyncFunc(res, () => {
     const { userId } = req.params
     if(!userId) return responseType({res, status: 400, message: 'userId required'})
-    await getCachedResponse({key:`taskInBin:${userId}`, timeTaken: 1800, cb: async() => {
+    getCachedResponse({key:`taskInBin:${userId}`, timeTaken: 1800, cb: async() => {
       const task = await getTaskInBin(userId)
       return task;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -124,7 +124,7 @@ export const restoreTasks = (req: Request, res: Response) => {
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    await restoreTaskFromBin(taskIds, userId)
+    restoreTaskFromBin(taskIds, userId)
     .then(() => responseType({res, status: 201, message: 'Tasks restored'}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -138,7 +138,7 @@ export const deletePermanently = (req: Request, res: Response) => {
     const user = await getUserById(userId);
     await autoDeleteOnExpire(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-    await deletePermanentlyFromBin(taskIds, userId)
+    deletePermanentlyFromBin(taskIds, userId)
     .then(() => responseType({res, status: 204, message: 'Tasks deleted permanently'}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })

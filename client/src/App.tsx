@@ -23,12 +23,13 @@ import ExpensePlanner from "./pages/ExpensePlanner";
 import AdminPage from "./pages/AdminPage";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { OTPEntry } from "./pages/OTPEntry";
-import { getCurrentUser } from "./features/auth/userSlice";
+import { selectCurrentRoles } from "./features/auth/authSlice";
+import { USERROLES } from "./data";
 
  
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
-  const currentUser = useSelector(getCurrentUser)
+  const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
 
   return (
     <main className={`app relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
@@ -52,7 +53,7 @@ export const App = () => {
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
 
-            <Route element={<ProtectedRoute roles={currentUser?.roles as number[]}/>}>
+            <Route element={<ProtectedRoute roles={user_roles}/>}>
 
               <Route path="profile/:userId" element={<ProfilePage />} />
               <Route path="taskManager/:userId" element={<TaskManager />} />

@@ -45,10 +45,10 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
         }
       }
     }})
-    const duplicateEmail = await UserModel.findOne({email}).select('+authentication.password').exec();
+    const duplicateEmail = await UserModel.findOne({email}).select('+password').exec();
     if(duplicateEmail) {
       if (duplicateEmail?.isAccountActivated) {
-        const matchingPassword = await brcypt.compare(password, duplicateEmail?.authentication?.password);
+        const matchingPassword = await brcypt.compare(password, duplicateEmail?.password);
         if (!matchingPassword) return responseType({res, status: 409, message: 'Email taken'})
         
           return duplicateEmail?.isAccountLocked 
@@ -61,7 +61,7 @@ export const registerUser = async(req: NewUserProp, res: Response) => {
     const dateTime = new Date().toString()
     const user = {
       username, email,
-      authentication:{ password: hashedPassword }, 
+      password: hashedPassword, 
       registrationDate: dateTime
     } as Partial<UserProps>
     const newUser = await createUser({...user})
@@ -171,10 +171,10 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     const {email, password} = req.body
     if (!email || !password) return res.sendStatus(400);
 
-    const user = await UserModel.findOne({email}).select('+authentication.password').exec();
+    const user = await UserModel.findOne({email}).select('+password').exec();
     if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
 
-    const matchingPassword = await brcypt.compare(password, user?.authentication?.password);
+    const matchingPassword = await brcypt.compare(password, user?.password);
     if (!matchingPassword) return responseType({res, status: 401, message: 'Bad credentials'})
     
     if (user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
@@ -218,8 +218,8 @@ export const loginHandler = async(req: NewUserProp, res: Response) => {
     await autoDeleteOnExpire(user?._id)
 
     const { _id } = user
-    await user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false, verificationToken: { token: '' } }})
-    //authentication: { sessionID: req?.sessionID },
+    user.updateOne({$set: { status: 'online', refreshToken, isResetPassword: false, verificationToken: { token: '' } }})
+    //userSession: req?.sessionID,
     .then(() => {
       res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
       return responseType({res, status: 200, count:1, data:{_id, roles, accessToken}})
@@ -241,7 +241,7 @@ export const logoutHandler = async(req: NewUserProp, res: Response) => {
       redisFunc()
       return res.sendStatus(204);
     }
-    user.updateOne({$set: {status: 'offline', authentication: { sessionID: '' }, refreshToken: '', verificationToken: { token: '' } }})
+    user.updateOne({$set: {status: 'offline', userSession: '', refreshToken: '', verificationToken: { token: '' } }})
     redisFunc()
     res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
     return res.sendStatus(204)
@@ -268,7 +268,7 @@ export const forgetPassword = async(req: Request, res: Response) => {
     transporter.sendMail(options, (err) => {
       if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
     })
-    await user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: dateTime } }})
+    user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: dateTime } }})
     .then(() => responseType({res, status:201, message:'Please check your email'}))
     .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
@@ -286,7 +286,7 @@ export const passwordResetRedirectLink = async(req: QueryProps, res: Response) =
     if (!verify?.email) return res.sendStatus(400)
     if (verify?.email != user?.email) return res.sendStatus(400)
 
-    await user.updateOne({$set: { verificationToken: { type: 'LINK', token: '', createdAt: '' } }})
+    user.updateOne({$set: { verificationToken: { type: 'LINK', token: '', createdAt: '' } }})
     .then(() => res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`))
     .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
   })
@@ -296,15 +296,15 @@ export const passwordReset = async(req: EmailProps, res: Response) => {
   asyncFunc(res, async () => {
     const {resetPass, email} = req.body
     if(!email || !resetPass) return res.sendStatus(400)
-    const user = await UserModel.findOne({email}).select('+authentication.password').exec();
+    const user = await UserModel.findOne({email}).select('+password').exec();
     if(!user) return responseType({res, status: 401, message:'Bad credentials'})
     
     if(user.isResetPassword){
-      const conflictingPassword = await brcypt.compare(resetPass, user?.authentication?.password);
+      const conflictingPassword = await brcypt.compare(resetPass, user?.password);
       if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
       
       const hashedPassword = await brcypt.hash(resetPass, 10);
-      await user.updateOne({$set: { authentication: { password: hashedPassword }, isResetPassword: false}})
+      user.updateOne({$set: { password: hashedPassword, isResetPassword: false }})
         .then(() => responseType({res, status:201, message:'password reset successful, please login'}))
         .catch(() => res.sendStatus(500));
     }
@@ -323,14 +323,14 @@ export const toggleAdminRole = (req: Request, res: Response) => {
       if(!user?.roles.includes(ROLES.ADMIN)) {
         user.roles = [...user.roles, ROLES.ADMIN]
         await user.save()
-        await getUserById(userId)
+        getUserById(userId)
         .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role assigned', data: userAd}))
         .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }
       else{
         user.roles = [ROLES.USER]
         await user.save()
-         await getUserById(userId)
+        getUserById(userId)
         .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role removed', data: userAd}))
         .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }

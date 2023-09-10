@@ -24,6 +24,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   });
   
   const [isPresent, setIsPresent] = useState<ConflictType>({codeId: '', present: false});
+  const [openEditPage, setOpenEditPage] = useState<ChatOption>('Hide');
 
   const [editing, setEditing] = useState<EditingProp>({editing: false, codeId: ''});
   const [notintersecting, setNotIntersecting] = useState<ChatOption>('Open')
@@ -37,7 +38,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenComment,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
+    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenComment,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
   }
   return (
     <ThemeContext.Provider value={ values }>

@@ -31,7 +31,7 @@ export const verifyAccessToken = (req, res, next) => __awaiter(void 0, void 0, v
     }
     else if (typeof verify == 'object') {
         // check if user account is activated
-        yield activatedAccount(verify === null || verify === void 0 ? void 0 : verify.email)
+        activatedAccount(verify === null || verify === void 0 ? void 0 : verify.email)
             .then((user) => {
             if (!user.isAccountActivated)
                 return responseType({ res, status: 403, message: 'Account not activated' });
@@ -56,13 +56,13 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (verify == 'Bad Token') {
             // TODO: account hacked, send email to user
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); // secure: true
-            yield user.updateOne({ $set: { refreshToken: '', authentication: { sessionID: '' } } })
+            user.updateOne({ $set: { refreshToken: '', userSession: '' } })
                 .then(() => res.sendStatus(401))
                 .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
         }
         else if (verify == 'Expired Token') {
             res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true }); // secure: true
-            yield user.updateOne({ $set: { refreshToken: '', authentication: { sessionID: '' } } })
+            user.updateOne({ $set: { refreshToken: '', userSession: '' } })
                 .then(() => responseType({ res, status: 403, message: 'Expired Token' }))
                 .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
         }
@@ -70,8 +70,8 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
     const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
     const newAccessToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
     const newRefreshToken = yield signToken({ roles, email: user === null || user === void 0 ? void 0 : user.email }, '12h', process.env.REFRESHTOKEN_STORY_SECRET);
-    yield user.updateOne({ $set: { status: 'online', refreshToken: newRefreshToken } })
-        //authentication: { sessionID: req?.sessionID },
+    //userSession: sessionID: req?.sessionID,
+    user.updateOne({ $set: { status: 'online', refreshToken: newRefreshToken } })
         .then(() => {
         res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
         return responseType({ res, status: 200, data: { _id: user === null || user === void 0 ? void 0 : user._id, roles, accessToken: newAccessToken } });

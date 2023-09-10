@@ -19,7 +19,7 @@ export const updateTask = async(task: TaskProp) => await TaskManagerModel.findBy
 
 export const deleteTask = async(userId: string, taskId: string) => {
   const task = await getTaskById(taskId)
-  await UserModel.findByIdAndUpdate({_id: userId}, {$pull: {taskIds: taskId}}).exec()
+  UserModel.findByIdAndUpdate({_id: userId}, {$pull: {taskIds: taskId}}).exec()
   .then(async() => {
     await TaskBinModel.findOneAndUpdate({userId}, {$push: {taskBin: task}})
     await TaskManagerModel.findByIdAndDelete(taskId)
@@ -27,7 +27,7 @@ export const deleteTask = async(userId: string, taskId: string) => {
 }
 
 export const emptyTaskBin = async(userId: string) => {
-  await TaskBinModel.findOneAndUpdate({userId}, {$set: { taskBin: [] }})
+  TaskBinModel.findOneAndUpdate({userId}, {$set: { taskBin: [] }})
   .then(async() => {
     await UserModel.findByIdAndUpdate({_id: userId}, {$set: { taskIds: [] }})
   })
@@ -44,10 +44,10 @@ export const restoreTaskFromBin = async(taskIds: string[], userId: string) => {
   }))
   // save the modified taskbin without the restored tasks
   const otherTasks = await Promise.all(taskBin.taskBin.filter((task: TaskProp) => !taskIds.includes(task?._id.toString())));
-  await taskBin.updateOne({$set: {taskBin: []}})
+  taskBin.updateOne({$set: {taskBin: []}})
   .then(async() => {
     await Promise.all(otherTasks.map(async(task) => {
-      await taskBin.updateOne({$push: {taskBin: task}})
+      taskBin.updateOne({$push: {taskBin: task}})
       .then(async() => {
         await UserModel.findByIdAndUpdate({_id: userId}, {$pull: {taskIds: task?._id.toString()}})
       })
@@ -59,7 +59,7 @@ export const deletePermanentlyFromBin = async(taskIds: string[], userId: string)
   const taskBin = await TaskBinModel.findOne({userId}).exec()
   // save the modified taskbin without the restored tasks
   const otherTasks = await Promise.all(taskBin.taskBin.filter((task: TaskProp) => !taskIds.includes(task?._id.toString())));
-  await taskBin.updateOne({$set: {taskBin: []}})
+  taskBin.updateOne({$set: {taskBin: []}})
   .then(async() => {
     await Promise.all(otherTasks.map(async(task) => {
       await taskBin.updateOne({$push: {taskBin: task}})

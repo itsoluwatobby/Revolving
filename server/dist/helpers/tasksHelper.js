@@ -21,14 +21,14 @@ export const createNewTask = (userId, task) => __awaiter(void 0, void 0, void 0,
 export const updateTask = (task) => __awaiter(void 0, void 0, void 0, function* () { return yield TaskManagerModel.findByIdAndUpdate({ _id: task === null || task === void 0 ? void 0 : task._id }, Object.assign(Object.assign({}, task), { edited: true })); });
 export const deleteTask = (userId, taskId) => __awaiter(void 0, void 0, void 0, function* () {
     const task = yield getTaskById(taskId);
-    yield UserModel.findByIdAndUpdate({ _id: userId }, { $pull: { taskIds: taskId } }).exec()
+    UserModel.findByIdAndUpdate({ _id: userId }, { $pull: { taskIds: taskId } }).exec()
         .then(() => __awaiter(void 0, void 0, void 0, function* () {
         yield TaskBinModel.findOneAndUpdate({ userId }, { $push: { taskBin: task } });
         yield TaskManagerModel.findByIdAndDelete(taskId);
     }));
 });
 export const emptyTaskBin = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield TaskBinModel.findOneAndUpdate({ userId }, { $set: { taskBin: [] } })
+    TaskBinModel.findOneAndUpdate({ userId }, { $set: { taskBin: [] } })
         .then(() => __awaiter(void 0, void 0, void 0, function* () {
         yield UserModel.findByIdAndUpdate({ _id: userId }, { $set: { taskIds: [] } });
     }));
@@ -44,10 +44,10 @@ export const restoreTaskFromBin = (taskIds, userId) => __awaiter(void 0, void 0,
     })));
     // save the modified taskbin without the restored tasks
     const otherTasks = yield Promise.all(taskBin.taskBin.filter((task) => !taskIds.includes(task === null || task === void 0 ? void 0 : task._id.toString())));
-    yield taskBin.updateOne({ $set: { taskBin: [] } })
+    taskBin.updateOne({ $set: { taskBin: [] } })
         .then(() => __awaiter(void 0, void 0, void 0, function* () {
         yield Promise.all(otherTasks.map((task) => __awaiter(void 0, void 0, void 0, function* () {
-            yield taskBin.updateOne({ $push: { taskBin: task } })
+            taskBin.updateOne({ $push: { taskBin: task } })
                 .then(() => __awaiter(void 0, void 0, void 0, function* () {
                 yield UserModel.findByIdAndUpdate({ _id: userId }, { $pull: { taskIds: task === null || task === void 0 ? void 0 : task._id.toString() } });
             }));
@@ -58,7 +58,7 @@ export const deletePermanentlyFromBin = (taskIds, userId) => __awaiter(void 0, v
     const taskBin = yield TaskBinModel.findOne({ userId }).exec();
     // save the modified taskbin without the restored tasks
     const otherTasks = yield Promise.all(taskBin.taskBin.filter((task) => !taskIds.includes(task === null || task === void 0 ? void 0 : task._id.toString())));
-    yield taskBin.updateOne({ $set: { taskBin: [] } })
+    taskBin.updateOne({ $set: { taskBin: [] } })
         .then(() => __awaiter(void 0, void 0, void 0, function* () {
         yield Promise.all(otherTasks.map((task) => __awaiter(void 0, void 0, void 0, function* () {
             yield taskBin.updateOne({ $push: { taskBin: task } });

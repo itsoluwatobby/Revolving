@@ -28,7 +28,7 @@ export const createNewResponse = (req, res) => {
         if (!comment)
             return responseType({ res, status: 404, message: 'Comment not found' });
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-        yield createResponse(Object.assign({}, newResponse))
+        createResponse(Object.assign({}, newResponse))
             .then((response) => responseType({ res, status: 201, count: 1, data: response }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -47,7 +47,7 @@ export const updateResponse = (req, res) => {
         const responseExist = yield getResponseById(responseId);
         if (!responseExist)
             return responseType({ res, status: 404, message: 'Response not found' });
-        yield editResponse(userId, responseId, editedResponse)
+        editResponse(userId, responseId, editedResponse)
             .then((response) => responseType({ res, status: 201, count: 1, data: response }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -64,13 +64,13 @@ export const deleteResponse = (req, res) => {
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
         const response = yield getResponseById(responseId);
         if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
-            yield deleteSingleResponse(responseId)
+            deleteSingleResponse(responseId)
                 .then(() => res.sendStatus(204))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
         if ((response === null || response === void 0 ? void 0 : response.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
             return res.sendStatus(401);
-        yield deleteSingleResponse(responseId)
+        deleteSingleResponse(responseId)
             .then(() => res.sendStatus(204))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -91,12 +91,12 @@ export const deleteUserResponses = (req, res) => {
             return responseType({ res, status: 423, message: 'Account locked' });
         if (adminUser === null || adminUser === void 0 ? void 0 : adminUser.roles.includes(ROLES.ADMIN)) {
             if ((option === null || option === void 0 ? void 0 : option.command) == 'onlyInComment') {
-                yield deleteAllUserResponseInComment(userId, option === null || option === void 0 ? void 0 : option.commentId)
+                deleteAllUserResponseInComment(userId, option === null || option === void 0 ? void 0 : option.commentId)
                     .then(() => responseType({ res, status: 201, message: 'All user responses in comment deleted' }))
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
             else if ((option === null || option === void 0 ? void 0 : option.command) == 'allUserResponse') {
-                yield deleteAllUserResponses(userId)
+                deleteAllUserResponses(userId)
                     .then(() => responseType({ res, status: 201, message: 'All user responses deleted' }))
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
@@ -110,14 +110,14 @@ export const getResponse = (req, res) => {
         const { responseId } = req.params;
         if (!responseId)
             return res.sendStatus(400);
-        yield getCachedResponse({ key: `singleResponse:${responseId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `singleResponse:${responseId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield getResponseById(responseId);
                 return response;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
             .then((userResponse) => {
             if (!userResponse)
                 return responseType({ res, status: 404, message: 'response not found' });
-            responseType({ res, status: 200, count: 1, data: userResponse });
+            return responseType({ res, status: 200, count: 1, data: userResponse });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
@@ -135,7 +135,7 @@ export const userResponses = (req, res) => {
         const admin = yield getUserById(adminId);
         if (!admin.roles.includes(ROLES.ADMIN))
             return res.sendStatus(401);
-        yield getCachedResponse({ key: `userResponses:${userId}/${responseId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `userResponses:${userId}/${responseId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const userResponse = yield getUserResponses(userId, responseId);
                 return userResponse;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -151,7 +151,7 @@ export const getResponseByComment = (req, res) => {
         const { commentId } = req.params;
         if (!commentId)
             return res.sendStatus(400);
-        yield getCachedResponse({ key: `responseInComment:${commentId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `responseInComment:${commentId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const responses = yield getAllCommentsResponse(commentId);
                 return responses;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -185,7 +185,7 @@ export const like_Unlike_Response = (req, res) => __awaiter(void 0, void 0, void
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-        yield likeAndUnlikeResponse(userId, responseId)
+        likeAndUnlikeResponse(userId, responseId)
             .then((result) => responseType({ res, status: 201, message: result }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));

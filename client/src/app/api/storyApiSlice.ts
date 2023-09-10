@@ -32,6 +32,28 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    personalImageupload: builder.mutation<ImageRes, FormData>({
+      query: (imageData) => ({
+        url: `images/dp_upload`,
+        method: 'POST',
+        body: imageData
+      }) as any,
+      transformResponse: (baseQueryReturnValue: {data: ImageRes}) => {
+        return baseQueryReturnValue?.data
+      },
+    }),
+    
+    coverImageupload: builder.mutation<ImageRes, FormData>({
+      query: (imageData) => ({
+        url: `images/cover_upload`,
+        method: 'POST',
+        body: imageData
+      }) as any,
+      transformResponse: (baseQueryReturnValue: {data: ImageRes}) => {
+        return baseQueryReturnValue?.data
+      },
+    }),
+
     deleteImage: builder.mutation<ImageRes, string>({
       query: (imageName) => ({
         url: `images/${imageName}`,
@@ -108,21 +130,33 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
     }),
+    
+    getStoriesWithUserId: builder.query<PostType[], string>({
+      query: (userId) => `story/user/storyWithUserId/${userId}`,
+      transformResponse: (baseQueryReturnValue: ResponseType) => {
+        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
+        return response
+      }, 
+      providesTags:(result) => providesTag(result as PostType[], 'STORY')
+    }),
   })
 })
 
 export const {
-  useCreateStoryMutation,
-  useUpdateStoryMutation,
-  useLikeAndUnlikeStoryMutation,
-  useDeleteStoryMutation,
-  useGetStoriesByCategoryQuery,
-  useGetStoriesQuery,
   useGetStoryQuery,
-  useGetUserStoriesQuery,
-  useGetStoryCondMutation,
+  useGetStoriesQuery,
   useUploadImageMutation,
   useDeleteImageMutation,
+  useGetUserStoriesQuery,
+  useDeleteStoryMutation,
+  useCreateStoryMutation,
+  useUpdateStoryMutation,
+  useGetStoryCondMutation,
+  useLikeAndUnlikeStoryMutation,
+  usePersonalImageuploadMutation,
+  useCoverImageuploadMutation,
+  useGetStoriesByCategoryQuery,
+  useGetStoriesWithUserIdQuery,
 } = storyApiSlice
 
 // //returns query result object 

@@ -136,7 +136,7 @@ export default function OTPComp({ subject, otp, setOtp, accountAuthenticationPag
           <button 
             title={mailMode === 'EMAIL' ? 'Send to Email' : 'Insert Automatically'}
             onClick={() => setMailMode(prev => prev === 'EMAIL' ? prev = 'DIRECT' : prev = 'EMAIL')}
-            className={`focus:outline-none border-none shadow-lg rounded-full h-full ${mailMode === 'EMAIL' ? 'bg-slate-200' : 'bg-slate-300'} w-1/2 hover:opacity-90 transitiion-all`} 
+            className={`focus:outline-none border-none shadow-lg rounded-full h-full ${mailMode === 'EMAIL' ? 'bg-slate-200' : 'bg-green-500'} w-1/2 hover:opacity-90 transitiion-all`} 
           />
         </div>
         <button 

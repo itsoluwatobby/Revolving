@@ -45,11 +45,11 @@ export const OTPEntry = () => {
         })
       }
     }
-    (isMounted && canMakeRequest) ? activateAccount() : null
+    (isMounted && canMakeRequest && !isSuccess) ? activateAccount() : null
     return () => {
       isMounted = false
     }
-  }, [canMakeRequest, otp, isLoading, isError, navigate, confirmOTP, email])
+  }, [canMakeRequest, otp, isLoading, isError, isSuccess, navigate, confirmOTP, email])
 
   return (
     <section className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-200' : ''}`}>
