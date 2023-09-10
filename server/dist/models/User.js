@@ -1,14 +1,16 @@
 import { Schema, model } from 'mongoose';
+const SocialMedia = new Schema({
+    name: { type: String, default: '' },
+    Link: { type: String, default: '' }
+});
 const USERSCHEMA = new Schema({
     username: { type: String, required: [true, 'Username is required'], trim: true },
+    password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
+    userSession: { type: String, default: '' },
     firstName: { type: String, default: '', trim: true },
     lastName: { type: String, default: '', trim: true },
     email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
     description: { type: String, default: '', trim: true },
-    authentication: {
-        password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
-        sessionID: { type: String, default: '' }
-    },
     roles: {
         type: Array,
         default: 1120
@@ -36,7 +38,8 @@ const USERSCHEMA = new Schema({
     edited: { type: Boolean, default: false },
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     taskIds: { type: Array, default: [] },
-    stack: { type: Array, default: [] },
+    notificationSubscribers: { type: Array, default: [] },
+    stack: [SocialMedia],
     socialMediaAccounts: { type: Array, default: [] },
     country: { type: String, default: '' },
 }, {

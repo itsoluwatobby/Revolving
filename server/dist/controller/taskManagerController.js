@@ -23,7 +23,7 @@ export const createTask = (req, res) => {
             return responseType({ res, status: 403, message: 'You do not have an account' });
         if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
             return responseType({ res, status: 403, message: 'Not you resource' });
-        yield createNewTask(userId, task)
+        createNewTask(userId, task)
             .then((newTask) => responseType({ res, count: 1, data: newTask }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -40,7 +40,7 @@ export const updateTasks = (req, res) => {
             return responseType({ res, status: 401, message: 'unauthorized' });
         if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
             return responseType({ res, status: 403, message: 'Not you resource' });
-        yield updateTask(task)
+        updateTask(task)
             .then((updatedTask) => responseType({ res, status: 201, count: 1, data: updatedTask }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -59,7 +59,7 @@ export const deleteUserTask = (req, res) => {
             return responseType({ res, status: 404, message: 'task not found' });
         if (userId !== (task === null || task === void 0 ? void 0 : task.userId.toString()))
             return responseType({ res, status: 403, message: 'Not you resource' });
-        yield deleteTask(userId, taskId)
+        deleteTask(userId, taskId)
             .then(() => responseType({ res, status: 204, message: 'task deleted' }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -75,7 +75,7 @@ export const emptyBin = (req, res) => {
         const task = yield getTaskInBin(userId);
         if (!task)
             return responseType({ res, status: 404, message: 'bin not found' });
-        yield emptyTaskBin(userId)
+        emptyTaskBin(userId)
             .then(() => responseType({ res, status: 201, message: 'task bin emptied' }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -89,7 +89,7 @@ export const getUserTask = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        yield getCachedResponse({ key: `tasks:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `tasks:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const tasks = yield getUserTasks(userId);
                 return tasks;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -101,11 +101,11 @@ export const getUserTask = (req, res) => {
     }));
 };
 export const getTask = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
         const { taskId } = req.params;
         if (!taskId)
             return responseType({ res, status: 400, message: 'taskId required' });
-        yield getCachedResponse({ key: `singleTask:${taskId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `singleTask:${taskId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const task = yield getTaskById(taskId);
                 return task;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -114,14 +114,14 @@ export const getTask = (req, res) => {
                 return responseType({ res, status: 404, message: 'task not found' });
             return responseType({ res, count: 1, data: userTask });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
-    }));
+    });
 };
 export const getTasksInBin = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
         const { userId } = req.params;
         if (!userId)
             return responseType({ res, status: 400, message: 'userId required' });
-        yield getCachedResponse({ key: `taskInBin:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `taskInBin:${userId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const task = yield getTaskInBin(userId);
                 return task;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -132,7 +132,7 @@ export const getTasksInBin = (req, res) => {
             const binLength = (_b = (_a = userTask[0]) === null || _a === void 0 ? void 0 : _a.taskBin) === null || _b === void 0 ? void 0 : _b.length;
             return responseType({ res, count: binLength, data: userTask });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
-    }));
+    });
 };
 export const restoreTasks = (req, res) => {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
@@ -144,7 +144,7 @@ export const restoreTasks = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        yield restoreTaskFromBin(taskIds, userId)
+        restoreTaskFromBin(taskIds, userId)
             .then(() => responseType({ res, status: 201, message: 'Tasks restored' }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -159,7 +159,7 @@ export const deletePermanently = (req, res) => {
         yield autoDeleteOnExpire(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
-        yield deletePermanentlyFromBin(taskIds, userId)
+        deletePermanentlyFromBin(taskIds, userId)
             .then(() => responseType({ res, status: 204, message: 'Tasks deleted permanently' }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));

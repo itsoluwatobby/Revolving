@@ -60,27 +60,33 @@ type TypingEvent = 'typing' | 'notTyping'
 
 type PostContextType = {
   search: string,
-  filteredStories: PostType[],
-  typingEvent: TypingEvent,
   canPost: boolean,
   navPosts: PostType[],
-  inputValue: CodeStoreType,
   imagesFiles: ImageType[]
+  typingEvent: TypingEvent,
+  inputValue: CodeStoreType,
   codeStore: CodeStoreType[],
+  filteredStories: PostType[],
+  setSearch: React.Dispatch<React.SetStateAction<string>>,
+  setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
+  setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>,
+  setTypingEvent: React.Dispatch<React.SetStateAction<TypingEvent>>,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>,
-  setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
-  setSearch: React.Dispatch<React.SetStateAction<string>>,
-  setTypingEvent: React.Dispatch<React.SetStateAction<TypingEvent>>
-  setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>
 }
 
 type PromptLiterals = 'Show' | 'Discard' | 'Retain' | 'Dommant'
 
 type Theme = 'light' | 'dark';
-type FontStyle = string | 'font_style';
 type ChatOption = 'Hide' | 'Open';
+type FontStyle = string | 'font_style';
+type ImageTypeProp = 'DP' | 'COVER' | 'NIL'
+type NameType = 'photo' | 'coverPhoto' | null
+type TargetImageType = {
+  name: NameType, 
+  data: File | null
+}
 
 type CommentOptionProp = { 
   option: ChatOption, 
@@ -111,33 +117,35 @@ type UpdateSuccess={
 
 type ThemeContextType = {
   theme: Theme,
-  fontFamily: FontStyle,
-  fontOption: boolean,
-  rollout: boolean,
-  success: UpdateSuccess,
-  codeEditor: boolean,
-  isPresent: ConflictType,
-  openComment: CommentOptionProp,
   parseId: string,
+  rollout: boolean,
+  fontOption: boolean,
+  codeEditor: boolean,
   editing: EditingProp,
-  enlarge: EnlargeCompo,
   openChat: ChatOption,
+  enlarge: EnlargeCompo,
+  fontFamily: FontStyle,
   toggleLeft: ChatOption,
-  notintersecting: ChatOption, 
+  success: UpdateSuccess,
+  isPresent: ConflictType,
   loginPrompt: ChatOption,
+  openEditPage: ChatOption,
+  notintersecting: ChatOption, 
+  openComment: CommentOptionProp,
   changeTheme: (mode: string) => void,
-  setOpenChat: React.Dispatch<React.SetStateAction<ChatOption>>,
-  setToggleLeft: React.Dispatch<React.SetStateAction<ChatOption>>,
-  setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
-  setEnlarge: React.Dispatch<React.SetStateAction<EnlargeCompo>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
+  setRollout: React.Dispatch<React.SetStateAction<boolean>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
+  setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
+  setCodeEditor: React.Dispatch<React.SetStateAction<boolean>>,
+  setEditing: React.Dispatch<React.SetStateAction<EditingProp>>,
+  setOpenChat: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setEnlarge: React.Dispatch<React.SetStateAction<EnlargeCompo>>,
+  setToggleLeft: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setSuccess: React.Dispatch<React.SetStateAction<UpdateSuccess>>,
+  setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
+  setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
   setNotIntersecting: React.Dispatch<React.SetStateAction<ChatOption>>
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
-  setFontOption: React.Dispatch<React.SetStateAction<boolean>>,
-  setRollout: React.Dispatch<React.SetStateAction<boolean>>,
-  setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
-  setCodeEditor: React.Dispatch<React.SetStateAction<boolean>>,
-  setSuccess: React.Dispatch<React.SetStateAction<UpdateSuccess>>,
-  setEditing: React.Dispatch<React.SetStateAction<EditingProp>>
 }

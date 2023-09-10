@@ -6,16 +6,17 @@ import { Link } from "react-router-dom"
 import { AiOutlineRetweet } from "react-icons/ai"
 import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast";
-import { ErrorResponse } from "../../../data"
+import { ErrorResponse, PageType } from "../../../data"
 import { ErrorStyle, SuccessStyle, checkCount } from "../../../utils/navigator"
 import { useLikeAndUnlikeSharedStoryMutation, useShareStoryMutation } from "../../../app/api/sharedStorySlice"
 
 type PostButtomProps = {
   story: MakeToButtom,
   averageReadingTime: string,
+  page?: PageType
 }
 
-export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
+export default function PostBase({ story, averageReadingTime, page }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme,  setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, isError: isLikeError, isUninitialized }] = useLikeAndUnlikeStoryMutation()
@@ -64,7 +65,7 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
               :
               <BsHandThumbsUp 
                 title='like' 
-                className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
+                className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes?.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
           }
             <span className={`font-mono text-base ${theme == 'dark' ? 'text-white' : 'text-black'}`}>
               {story?.sharedId ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}

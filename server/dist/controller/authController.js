@@ -18,7 +18,6 @@ const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
 export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
         const { username, email, password, type } = req.body;
         if (!username || !email || !password)
             return res.sendStatus(400);
@@ -36,10 +35,10 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
                         }
                     }
                 } });
-        const duplicateEmail = yield UserModel.findOne({ email }).select('+authentication.password').exec();
+        const duplicateEmail = yield UserModel.findOne({ email }).select('+password').exec();
         if (duplicateEmail) {
             if (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountActivated) {
-                const matchingPassword = yield brcypt.compare(password, (_a = duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.authentication) === null || _a === void 0 ? void 0 : _a.password);
+                const matchingPassword = yield brcypt.compare(password, duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.password);
                 if (!matchingPassword)
                     return responseType({ res, status: 409, message: 'Email taken' });
                 return (duplicateEmail === null || duplicateEmail === void 0 ? void 0 : duplicateEmail.isAccountLocked)
@@ -53,7 +52,7 @@ export const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         const dateTime = new Date().toString();
         const user = {
             username, email,
-            authentication: { password: hashedPassword },
+            password: hashedPassword,
             registrationDate: dateTime
         };
         const newUser = yield createUser(Object.assign({}, user));
@@ -171,21 +170,21 @@ export function ExtraOTPGenerator(req, res) {
 }
 export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        var _b, _c, _d, _e;
+        var _a, _b, _c;
         const { email, password } = req.body;
         if (!email || !password)
             return res.sendStatus(400);
-        const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
+        const user = yield UserModel.findOne({ email }).select('+password').exec();
         if (!user)
             return responseType({ res, status: 404, message: 'You do not have an account' });
-        const matchingPassword = yield brcypt.compare(password, (_b = user === null || user === void 0 ? void 0 : user.authentication) === null || _b === void 0 ? void 0 : _b.password);
+        const matchingPassword = yield brcypt.compare(password, user === null || user === void 0 ? void 0 : user.password);
         if (!matchingPassword)
             return responseType({ res, status: 401, message: 'Bad credentials' });
         if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
             return responseType({ res, status: 423, message: 'Account locked' });
         if (!(user === null || user === void 0 ? void 0 : user.isAccountActivated)) {
-            if (((_c = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _c === void 0 ? void 0 : _c.type) === 'LINK') {
-                const verify = yield verifyToken((_d = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _d === void 0 ? void 0 : _d.token, process.env.ACCOUNT_VERIFICATION_SECRET);
+            if (((_a = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _a === void 0 ? void 0 : _a.type) === 'LINK') {
+                const verify = yield verifyToken((_b = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _b === void 0 ? void 0 : _b.token, process.env.ACCOUNT_VERIFICATION_SECRET);
                 console.log(verify);
                 if (!(verify === null || verify === void 0 ? void 0 : verify.email)) {
                     const dateTime = new Date().toString();
@@ -203,7 +202,7 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
                     return responseType({ res, status: 406, message: 'Please check your email to activate your account' });
             }
             else {
-                if (checksExpiration((_e = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _e === void 0 ? void 0 : _e.createdAt)) {
+                if (checksExpiration((_c = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _c === void 0 ? void 0 : _c.createdAt)) {
                     OTPGenerator(res, user);
                     return responseType({ res, status: 201, message: 'Please check your email, OTP sent' });
                 }
@@ -221,8 +220,8 @@ export const loginHandler = (req, res) => __awaiter(void 0, void 0, void 0, func
         }
         yield autoDeleteOnExpire(user === null || user === void 0 ? void 0 : user._id);
         const { _id } = user;
-        yield user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false, verificationToken: { token: '' } } })
-            //authentication: { sessionID: req?.sessionID },
+        user.updateOne({ $set: { status: 'online', refreshToken, isResetPassword: false, verificationToken: { token: '' } } })
+            //userSession: req?.sessionID,
             .then(() => {
             res.cookie('revolving', refreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 }); //secure: true
             return responseType({ res, status: 200, count: 1, data: { _id, roles, accessToken } });
@@ -243,7 +242,7 @@ export const logoutHandler = (req, res) => __awaiter(void 0, void 0, void 0, fun
             redisFunc();
             return res.sendStatus(204);
         }
-        user.updateOne({ $set: { status: 'offline', authentication: { sessionID: '' }, refreshToken: '', verificationToken: { token: '' } } });
+        user.updateOne({ $set: { status: 'offline', userSession: '', refreshToken: '', verificationToken: { token: '' } } });
         redisFunc();
         res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true }); //secure: true
         return res.sendStatus(204);
@@ -272,7 +271,7 @@ export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, fu
             if (err)
                 return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
         });
-        yield user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: dateTime } } })
+        user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: dateTime } } })
             .then(() => responseType({ res, status: 201, message: 'Please check your email' }))
             .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
@@ -292,26 +291,25 @@ export const passwordResetRedirectLink = (req, res) => __awaiter(void 0, void 0,
             return res.sendStatus(400);
         if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
             return res.sendStatus(400);
-        yield user.updateOne({ $set: { verificationToken: { type: 'LINK', token: '', createdAt: '' } } })
+        user.updateOne({ $set: { verificationToken: { type: 'LINK', token: '', createdAt: '' } } })
             .then(() => res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`))
             .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 });
 export const passwordReset = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        var _f;
         const { resetPass, email } = req.body;
         if (!email || !resetPass)
             return res.sendStatus(400);
-        const user = yield UserModel.findOne({ email }).select('+authentication.password').exec();
+        const user = yield UserModel.findOne({ email }).select('+password').exec();
         if (!user)
             return responseType({ res, status: 401, message: 'Bad credentials' });
         if (user.isResetPassword) {
-            const conflictingPassword = yield brcypt.compare(resetPass, (_f = user === null || user === void 0 ? void 0 : user.authentication) === null || _f === void 0 ? void 0 : _f.password);
+            const conflictingPassword = yield brcypt.compare(resetPass, user === null || user === void 0 ? void 0 : user.password);
             if (conflictingPassword)
                 return responseType({ res, status: 409, message: 'same as old password' });
             const hashedPassword = yield brcypt.hash(resetPass, 10);
-            yield user.updateOne({ $set: { authentication: { password: hashedPassword }, isResetPassword: false } })
+            user.updateOne({ $set: { password: hashedPassword, isResetPassword: false } })
                 .then(() => responseType({ res, status: 201, message: 'password reset successful, please login' }))
                 .catch(() => res.sendStatus(500));
         }
@@ -332,14 +330,14 @@ export const toggleAdminRole = (req, res) => {
             if (!(user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN))) {
                 user.roles = [...user.roles, ROLES.ADMIN];
                 yield user.save();
-                yield getUserById(userId)
+                getUserById(userId)
                     .then((userAd) => responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: userAd }))
                     .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
             }
             else {
                 user.roles = [ROLES.USER];
                 yield user.save();
-                yield getUserById(userId)
+                getUserById(userId)
                     .then((userAd) => responseType({ res, status: 201, count: 1, message: 'admin role removed', data: userAd }))
                     .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
             }

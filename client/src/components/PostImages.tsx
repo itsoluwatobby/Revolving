@@ -1,18 +1,20 @@
+import { PageType } from "../data"
 import { PostType } from "../posts"
 
 type ImageProp={
   story: PostType
   position: 'main' | 'single' | 'mini'
+  page?: PageType
 }
 //h-52
-export default function PostImage({ story, position }: ImageProp) {
+export default function PostImage({ story, position, page }: ImageProp) {
   const picturesLength = story?.picture?.length
 
   return (
     <>
       {
         story?.picture?.length ?  (
-          <div className={`flex items-center ${position === 'single' ? 'px-4 h-72' : 'h-64'} maxmobile:flex-col gap-1 w-full`}>
+          <div className={`flex items-center ${page === 'PROFILE' ? 'h-36 flex-row' : ''} ${position === 'single' ? 'px-4 h-72' : 'h-64'} ${page === 'PROFILE' ? '' : 'maxmobile:flex-col'} gap-1 w-full`}>
             {
               story?.picture?.map(pic => (
                 <figure 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getUserById } from "../helpers/userHelpers.js";
-import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
+import { Like_Unlike, createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoriesWithUserIdInIt, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
@@ -24,7 +24,7 @@ export const createNewStory = (req: RequestProp, res: Response) => {
     newStory = {...newStory, userId, author: user?.username} as StoryProps
     if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await createUserStory({...newStory})
+    createUserStory({...newStory})
     .then((story) => responseType({res, status: 201, count:1, data: story}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -39,7 +39,7 @@ export const updateStory = (req: RequestProp, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await updateUserStory(storyId, editedStory)
+    updateUserStory(storyId, editedStory)
     .then((updatedStory) => {
       if(!updatedStory) return responseType({res, status: 404, message: 'Story not found'})
       return responseType({res, status: 201, count:1, data: updatedStory})
@@ -60,12 +60,12 @@ export const deleteStory = (req: RequestProp, res: Response) => {
     if(!story) return responseType({res, status: 404, message: 'story not found'})
 
     if(user?.roles.includes(ROLES.ADMIN)) {
-      await deleteUserStory(storyId)
+      deleteUserStory(storyId)
       .then(() => res.sendStatus(204))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
     else if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
-    await deleteUserStory(storyId)
+    deleteUserStory(storyId)
     .then(() => res.sendStatus(204))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
@@ -85,7 +85,7 @@ export const deleteStoryByAdmin = (req: RequestProp, res: Response) => {
     if(!story.length) return responseType({res, status: 404, message: 'user does not have a story'})
 
     if(user?.roles.includes(ROLES.ADMIN)) {
-      await deleteAllUserStories(userId)
+      deleteAllUserStories(userId)
       .then(() => responseType({res, status: 201, message: 'All user stories deleted'}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     } 
@@ -97,13 +97,13 @@ export const getStory = (req: RequestProp, res: Response) => {
   asyncFunc(res, async () => {
     const {storyId} = req.params
     if(!storyId) return res.sendStatus(400);
-    await getCachedResponse({key:`singleStory:${storyId}`, timeTaken: 1800, cb: async() => {
+    getCachedResponse({key:`singleStory:${storyId}`, timeTaken: 1800, cb: async() => {
       const story = await getStoryById(storyId)
       return story;
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
     .then((userStory: StoryProps) => {
       if(!userStory) return responseType({res, status: 404, message: 'story not found'})
-      responseType({res, status: 200, count:1, data: userStory})
+      return responseType({res, status: 200, count:1, data: userStory})
     }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })
 }
@@ -117,7 +117,7 @@ export const getUserStory = (req: Request, res: Response) => {
     const user = await getUserById(userId)
     if(!user) return res.sendStatus(404)
     // if(user?.isAccountLocked) return res.sendStatus(401)
-    await getCachedResponse({key: `userStory:${userId}`, cb: async() => {
+    getCachedResponse({key: `userStory:${userId}`, cb: async() => {
       const userStory = await getUserStories(userId) 
       return userStory
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -129,10 +129,10 @@ export const getUserStory = (req: Request, res: Response) => {
 }
 
 export const getStoryByCategory = (req: RequestProp, res: Response) => {
-  asyncFunc(res, async() => {
+  asyncFunc(res, () => {
     const {category} = req.query
     if(!category) return res.sendStatus(400);
-    await getCachedResponse({key:`story:${category}`, cb: async() => {
+    getCachedResponse({key:`story:${category}`, cb: async() => {
       const categoryStory = await StoryModel.find({category: {$in: [category]}})
       const sharedCategoryStory = await getAllSharedByCategories(category as string)
       const reMouldedSharedStory = sharedCategoryStory.map(share => {
@@ -153,8 +153,8 @@ export const getStoryByCategory = (req: RequestProp, res: Response) => {
 }
 
 export const getStories = (req: Request, res: Response) => {
-  asyncFunc(res, async () => {
-    await getCachedResponse({key:'allStories', cb: async() => {
+  asyncFunc(res, () => {
+    getCachedResponse({key:'allStories', cb: async() => {
       const stories = await getAllStories();
       const sharedStories = await getAllSharedStories();
       const reMoulded = sharedStories.map(share => {
@@ -175,15 +175,30 @@ export const getStories = (req: Request, res: Response) => {
   })
 }
 
+export const getStoriesWithUserId = (req: Request, res: Response) => {
+  asyncFunc(res, () => {
+    const {userId} = req.params
+    if (!userId) return res.sendStatus(400);
+    getCachedResponse({key:`allStoriesWithUserId:${userId}`, cb: async() => {
+      const stories = await getStoriesWithUserIdInIt(userId);
+      return stories
+    }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+    .then((allStoriesWithUserId: StoryProps[] | string) => {
+      if(!allStoriesWithUserId?.length) return responseType({res, status: 404, message: 'No stories available'})
+      return responseType({res, status: 200, count: allStoriesWithUserId?.length, data: allStoriesWithUserId})
+    }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+  })
+}
+
 export const like_Unlike_Story = async(req: Request, res: Response) => {
   asyncFunc(res, async () => {
     const {userId, storyId} = req.params
-    await autoDeleteOnExpire(userId)
     if (!userId || !storyId) return res.sendStatus(400);
+    await autoDeleteOnExpire(userId)
     const user = await getUserById(userId);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-    await likeAndUnlikeStory(userId, storyId)
+    likeAndUnlikeStory(userId, storyId)
     .then((result: Like_Unlike) => responseType({res, status: 201, message: result}))
     .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   })

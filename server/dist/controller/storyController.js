@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getUserById } from "../helpers/userHelpers.js";
-import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
+import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoriesWithUserIdInIt, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../helpers/storyHelpers.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { StoryModel } from "../models/Story.js";
@@ -27,7 +27,7 @@ export const createNewStory = (req, res) => {
         if (!user)
             return responseType({ res, status: 401, message: 'You do not have an account' });
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-        yield createUserStory(Object.assign({}, newStory))
+        createUserStory(Object.assign({}, newStory))
             .then((story) => responseType({ res, status: 201, count: 1, data: story }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -43,7 +43,7 @@ export const updateStory = (req, res) => {
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-        yield updateUserStory(storyId, editedStory)
+        updateUserStory(storyId, editedStory)
             .then((updatedStory) => {
             if (!updatedStory)
                 return responseType({ res, status: 404, message: 'Story not found' });
@@ -65,13 +65,13 @@ export const deleteStory = (req, res) => {
         if (!story)
             return responseType({ res, status: 404, message: 'story not found' });
         if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
-            yield deleteUserStory(storyId)
+            deleteUserStory(storyId)
                 .then(() => res.sendStatus(204))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
         else if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
             return res.sendStatus(401);
-        yield deleteUserStory(storyId)
+        deleteUserStory(storyId)
             .then(() => res.sendStatus(204))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
@@ -91,7 +91,7 @@ export const deleteStoryByAdmin = (req, res) => {
         if (!story.length)
             return responseType({ res, status: 404, message: 'user does not have a story' });
         if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
-            yield deleteAllUserStories(userId)
+            deleteAllUserStories(userId)
                 .then(() => responseType({ res, status: 201, message: 'All user stories deleted' }))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
@@ -103,14 +103,14 @@ export const getStory = (req, res) => {
         const { storyId } = req.params;
         if (!storyId)
             return res.sendStatus(400);
-        yield getCachedResponse({ key: `singleStory:${storyId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `singleStory:${storyId}`, timeTaken: 1800, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const story = yield getStoryById(storyId);
                 return story;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
             .then((userStory) => {
             if (!userStory)
                 return responseType({ res, status: 404, message: 'story not found' });
-            responseType({ res, status: 200, count: 1, data: userStory });
+            return responseType({ res, status: 200, count: 1, data: userStory });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 };
@@ -125,7 +125,7 @@ export const getUserStory = (req, res) => {
         if (!user)
             return res.sendStatus(404);
         // if(user?.isAccountLocked) return res.sendStatus(401)
-        yield getCachedResponse({ key: `userStory:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `userStory:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const userStory = yield getUserStories(userId);
                 return userStory;
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -137,11 +137,11 @@ export const getUserStory = (req, res) => {
     }));
 };
 export const getStoryByCategory = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
         const { category } = req.query;
         if (!category)
             return res.sendStatus(400);
-        yield getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+        getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
                 const sharedCategoryStory = yield getAllSharedByCategories(category);
                 const reMouldedSharedStory = sharedCategoryStory.map(share => {
@@ -156,11 +156,11 @@ export const getStoryByCategory = (req, res) => {
                 return responseType({ res, status: 404, message: 'You have no stories' });
             return responseType({ res, status: 200, count: storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length, data: storyCategory });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
-    }));
+    });
 };
 export const getStories = (req, res) => {
-    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
-        yield getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
+    asyncFunc(res, () => {
+        getCachedResponse({ key: 'allStories', cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 const stories = yield getAllStories();
                 const sharedStories = yield getAllSharedStories();
                 const reMoulded = sharedStories.map(share => {
@@ -175,19 +175,35 @@ export const getStories = (req, res) => {
                 return responseType({ res, status: 404, message: 'No stories available' });
             return responseType({ res, status: 200, count: allStories === null || allStories === void 0 ? void 0 : allStories.length, data: allStories });
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
-    }));
+    });
+};
+export const getStoriesWithUserId = (req, res) => {
+    asyncFunc(res, () => {
+        const { userId } = req.params;
+        if (!userId)
+            return res.sendStatus(400);
+        getCachedResponse({ key: `allStoriesWithUserId:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                const stories = yield getStoriesWithUserIdInIt(userId);
+                return stories;
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((allStoriesWithUserId) => {
+            if (!(allStoriesWithUserId === null || allStoriesWithUserId === void 0 ? void 0 : allStoriesWithUserId.length))
+                return responseType({ res, status: 404, message: 'No stories available' });
+            return responseType({ res, status: 200, count: allStoriesWithUserId === null || allStoriesWithUserId === void 0 ? void 0 : allStoriesWithUserId.length, data: allStoriesWithUserId });
+        }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+    });
 };
 export const like_Unlike_Story = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
-        yield autoDeleteOnExpire(userId);
         if (!userId || !storyId)
             return res.sendStatus(400);
+        yield autoDeleteOnExpire(userId);
         const user = yield getUserById(userId);
         if (!user)
             return responseType({ res, status: 403, message: 'You do not have an account' });
         // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-        yield likeAndUnlikeStory(userId, storyId)
+        likeAndUnlikeStory(userId, storyId)
             .then((result) => responseType({ res, status: 201, message: result }))
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));

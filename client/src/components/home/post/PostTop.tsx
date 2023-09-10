@@ -1,5 +1,5 @@
 import { format } from "timeago.js"
-import { ErrorResponse } from "../../../data"
+import { ErrorResponse, PageType } from "../../../data"
 import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator"
 import { FiMoreVertical } from "react-icons/fi"
 import { Link } from "react-router-dom"
@@ -18,11 +18,12 @@ type PostTopProps = {
   story: PostType,
   bodyContent: JSX.Element[] | "No content",
   open: boolean,
+  page?: PageType,
   openText: () => void,
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function PostTop({ story, bodyContent, openText, open, setOpen }: PostTopProps) {
+export default function PostTop({ story, bodyContent, page, openText, open, setOpen }: PostTopProps) {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const [revealCard, setRevealCard] = useState<ChatOption>('Hide')
@@ -37,6 +38,7 @@ export default function PostTop({ story, bodyContent, openText, open, setOpen }:
     return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
   }, [])
   const observerRef = useRef<HTMLDivElement>(null)
+
   // const headingRef = useCallback((node: HTMLDivElement) => {
   //   if(observerRef.current) observerRef.current.disconnect()
   //   observerRef.current = new IntersectionObserver(entries => {

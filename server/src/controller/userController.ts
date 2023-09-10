@@ -7,8 +7,8 @@ import { ROLES } from "../config/allowedRoles.js";
 import bcrypt from 'bcrypt'
 
 export const getUsers = (req: Request, res: Response) => {
-  asyncFunc(res, async() => { 
-    await getCachedResponse({key:`allUsers`, cb: async() => {
+  asyncFunc(res, () => { 
+    getCachedResponse({key:`allUsers`, cb: async() => {
       const allUsers = await getAllUsers()
       return allUsers
     }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
@@ -21,10 +21,10 @@ export const getUsers = (req: Request, res: Response) => {
 }
 
 export const getUser = (req: Request, res: Response) => {
-  asyncFunc(res, async() => { 
+  asyncFunc(res, () => { 
     const {userId} = req.params
     if(!userId || userId == null) return res.sendStatus(400)
-    await getCachedResponse({key: `user:${userId}`, cb: async() => {
+    getCachedResponse({key: `user:${userId}`, cb: async() => {
       const current = await getUserById(userId)
       await autoDeleteOnExpire(userId)
       return current;
@@ -62,18 +62,18 @@ export const updateUserInfo = (req: Request, res: Response) => {
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
-    if(userInfo?.authentication?.password){
-      const newPassword = userInfo?.authentication?.password
-      const conflictingPassword = await bcrypt.compare(newPassword, user?.authentication?.password);
+    if(userInfo?.password){
+      const newPassword = userInfo?.password
+      const conflictingPassword = await bcrypt.compare(newPassword, user?.password);
       if(conflictingPassword) return responseType({res, status:409, message:'same as old password'})
       
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await user.updateOne({$set: { authentication: { password: hashedPassword }}})
+      user.updateOne({$set: { password: hashedPassword }})
         .then(() => responseType({res, status:201, message:'password reset successful'}))
         .catch(() => res.sendStatus(500));
     }
     else{
-      await updateUser(userId, userInfo)
+      updateUser(userId, userInfo)
       .then(updatedInfo => responseType({res, status: 201, message: 'success', data: updatedInfo}))
       .catch(error => responseType({res, status: 400, message: error.message}))
     }    
@@ -89,7 +89,7 @@ export const deleteUserAccount = (req: Request, res: Response) => {
     const admin = await getUserById(adminId as string);
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(admin.roles.includes(ROLES.ADMIN)){
-      await deleteAccount(userId)
+      deleteAccount(userId)
       .then(() => responseType({res, status: 204}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     }
@@ -107,12 +107,12 @@ export const lockAndUnlockUserAccount = (req: Request, res: Response) => {
     if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
     if(admin?.roles.includes(ROLES.ADMIN)){
       if(!user.isAccountLocked){
-        await user.updateOne({$set: { isAccountLocked: true }})
+        user.updateOne({$set: { isAccountLocked: true }})
         .then(() => responseType({res, status: 201, message: 'user account LOCKED successfully'}))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
       else {
-        await user.updateOne({$set: { isAccountLocked: false }})
+        user.updateOne({$set: { isAccountLocked: false }})
         .then(() => responseType({res, status: 201, message: 'user account UNLOCKED successfully'}))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }

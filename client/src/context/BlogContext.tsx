@@ -16,9 +16,10 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [imagesFiles, setImagesFiles] = useState<ImageType[]>([]);
   const [canPost, setCanPost] = useState<boolean>(false);
   const [navPosts, setNavPosts] = useState<PostType[]>([])
-  
-  const currentUserId = localStorage.getItem('revolving_userId') as string
+
+  const userId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
+
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
   const [getLoggedInUser] = useGetCurrentUserMutation()
   const dispatch = useDispatch()
@@ -26,17 +27,16 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   useEffect(() => {
     let isMounted = true
     const getLoggedIn = async() => {
-      const res = await getLoggedInUser(currentUserId).unwrap()
-      const { authentication, isAccountActivated, refreshToken, verificationToken, ...rest } = res
+      const res = await getLoggedInUser(userId).unwrap()
+      const { isAccountActivated, refreshToken, verificationToken, ...rest } = res
       dispatch(setLoggedInUser(rest))
     }
-    if(isMounted && currentUserId) getLoggedIn()
+    if(isMounted && userId) getLoggedIn()
 
     return () => {
       isMounted = false
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [userId, dispatch, getLoggedInUser])
 
   useEffect(() => {
     let isMounted = true

@@ -1,19 +1,19 @@
-import { useLocation, useParams } from 'react-router-dom';
-import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
-import { usePostContext } from '../hooks/usePostContext';
-import { useThemeContext } from '../hooks/useThemeContext';
-import { ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
-import { useState, useEffect, ChangeEvent, useRef } from 'react';
-import { BiCodeAlt } from 'react-icons/bi'
-import { Components, NAVIGATE } from '../utils/navigator';
-import { Categories, ErrorResponse, OpenSnippet } from '../data';
-import CodeBlock from '../codeEditor/CodeEditor';
-import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
-import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
-import { FaRegImages } from 'react-icons/fa';
 import { nanoid } from '@reduxjs/toolkit';
+import { BiCodeAlt } from 'react-icons/bi';
+import { FaRegImages } from 'react-icons/fa';
+import CodeBlock from '../codeEditor/CodeEditor';
+import { useDispatch, useSelector } from 'react-redux';
+import { usePostContext } from '../hooks/usePostContext';
+import { useLocation, useParams } from 'react-router-dom';
+import { Components, NAVIGATE } from '../utils/navigator';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { Categories, ErrorResponse, OpenSnippet } from '../data';
+import { useState, useEffect, ChangeEvent, useRef } from 'react';
+import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
+import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
+import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
+import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
+import { ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
 
 let uploadedImageIds = [] as string[]
 let imagesNames = [] as string[]
@@ -211,7 +211,7 @@ export const NewStory = () => {
   }
   
   return (
-    <section className={`relative ${loading ? 'animate-pulse bg-opacity-20' : ''} ${fontFamily} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2`}>
+    <section className={`relative ${fontFamily} ${loading ? 'cursor-none' : ''} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2 ${theme == 'light' ? 'bg-gray-100' : ''}`}>
       {
         codeEditor ? <CodeBlock /> 
         : (
@@ -222,7 +222,7 @@ export const NewStory = () => {
                 placeholder='Title'
                 value={inputValue}
                 onChange={handleTitle}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 rounded-md text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-gray-200 shadow-2xl'}`}
+                className={`${(isLoading || loading) ? 'animate-pulse cursor-none' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 rounded-md text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-gray-200 shadow-2xl'}`}
               />
               <textarea 
                 name="story" id=""
@@ -231,7 +231,7 @@ export const NewStory = () => {
                 value={textareaValue}
                 cols={30} rows={8}
                 onChange={handleBody}
-                className={`${isLoading ? 'animate-pulse' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-slate-100 shadow-2xl'}`}
+                className={`${(isLoading || loading) ? 'animate-pulse cursor-none' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-slate-100 shadow-2xl'}`}
               />
             </>
           )
@@ -263,13 +263,13 @@ export const NewStory = () => {
         <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] sm:w-1/2'} p-1.5 rounded-md gap-2 flex items-center`}>
           <BiCodeAlt 
             onClick={() => setCodeEditor(prev => !prev)}
-            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-90 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-300 bg-gray-500'}`} />
+            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-90 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-200 bg-gray-600'}`} />
           <div title='Scroll left | right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 py-1 pl-2 pr-2 shadow-inner shadow-slate-900 ${theme == 'light' ? 'text-white' : ''}`}>
             {
               Object.values(NAVIGATE).map(category => (
                 <p
                   onClick={() => addCategory(category)}
-                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(category) ? 'bg-slate-700' : ''}`}
+                  className={`p-1 bg-slate-600 rounded-md cursor-pointer hover:opacity-95 whitespace-nowrap transition-all ${postCategory.includes(category) ? 'bg-slate-800' : ''}`}
                   key={category}>
                   {category}
                 </p>

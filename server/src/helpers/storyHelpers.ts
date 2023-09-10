@@ -3,12 +3,29 @@ import { StoryModel } from "../models/Story.js";
 import fsPromises from 'fs/promises'
 import { CommentModel } from "../models/CommentModel.js";
 import { deleteSingleComment } from "./commentHelper.js";
+import { getAllSharedStories } from "./sharedHelper.js";
 
 export const getAllStories = async() => await StoryModel.find().lean();
 
 export const getStoryById = async(id: string) => await StoryModel.findById(id).exec();
 
 export const getUserStories = async(userId: string) => await StoryModel.find({ userId }).lean()
+
+export const getStoriesWithUserIdInIt = async(userId: string) => {
+  const allStories = await getAllStories()
+  const allSharedStories = await getAllSharedStories()
+  const allUserStoryWithId = allStories.filter(story => story?.userId.toString() === userId || story?.likes?.includes(userId) || story?.commentIds?.includes(userId))
+  const allUserSharedStoryWithId = allSharedStories.filter(story => story?.sharerId === userId || story?.sharedLikes?.includes(userId))
+  const reMoulded = allUserSharedStoryWithId.map(share => {
+    const object = {
+      ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
+      sharerId: share?.sharerId,
+      sharedDate: share?.createdAt 
+    }
+    return object
+  })
+  return [...allUserStoryWithId, ...reMoulded]
+}
 
 export const createUserStory = async(story: StoryProps) => {
   try{
@@ -66,8 +83,8 @@ export const deleteUserStory = async(storyId: string) =>{
     await Promise.all(picturesArray.map(async(pictureLink) => {
       const imageName = pictureLink.substring(pictureLink.indexOf('4000/') + 5)
       const pathname = process.cwd()+`\\fileUpload\\${imageName}`
-      await fsPromises.unlink(pathname)
-      .then(() => console.log('DELETED'))
+      fsPromises.unlink(pathname)
+      .then(() => 'success')
       .catch(error => console.log(error.message))
     }))
   }

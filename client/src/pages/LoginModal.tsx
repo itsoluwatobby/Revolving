@@ -4,13 +4,14 @@ import LoginComponent from '../components/modals/LoginComponent'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { ThemeContextType } from '../posts';
+import { PostContextType, ThemeContextType } from '../posts';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../features/auth/authSlice';
 import { persistLogin } from '../features/auth/authSlice';
 import { useSignInMutation } from '../app/api/authApiSlice';
 import { ErrorResponse } from '../data';
 import { SuccessStyle } from '../utils/navigator';
+import { usePostContext } from '../hooks/usePostContext';
 
 export default function Login() {
   const dispatch = useDispatch()
