@@ -130,8 +130,9 @@ type ThemeContextType = {
   isPresent: ConflictType,
   loginPrompt: ChatOption,
   openEditPage: ChatOption,
-  notintersecting: ChatOption, 
+  notintersecting: ChatOption,
   openComment: CommentOptionProp,
+  revealEditModal: ImageTypeProp, 
   changeTheme: (mode: string) => void,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>,
@@ -148,4 +149,5 @@ type ThemeContextType = {
   setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
   setNotIntersecting: React.Dispatch<React.SetStateAction<ChatOption>>
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
+  setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
 }

@@ -25,15 +25,17 @@ import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { OTPEntry } from "./pages/OTPEntry";
 import { selectCurrentRoles } from "./features/auth/authSlice";
 import { USERROLES } from "./data";
+import Comments from "./components/comments/Comments";
 
  
 export const App = () => {
-  const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
+  const {theme, openComment, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
 
   return (
     <main className={`app relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
+
         <Route path='/' element={<BlogLayout />}>
           
           <Route path="/" element={<Welcome />}>
@@ -71,7 +73,9 @@ export const App = () => {
         <Route path="*" element={<NotFound />} />
       
       </Routes>
+
       <Toaster />
+      
       {openChat === 'Open' ?
         <ChatModal />
         :  
@@ -82,6 +86,7 @@ export const App = () => {
         />
       }
       {loginPrompt == 'Open' ? <PrompLogin /> : null}
+      {/* {openComment?.option == 'Open' ? <Comments /> : null } */}
     </main>
   )
 }

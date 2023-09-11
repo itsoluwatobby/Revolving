@@ -108,7 +108,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
          
         </p>
         <span>.</span>
-        <p className="font-sans flex items-center gap-2">
+        <p className="font-sans flex items-center gap-2 text-sm">
           {story?.sharedId ? format(story?.sharedDate as string) : format(story?.createdAt)}
           {story?.sharedId ? <Link to={`/story/${story?._id}`} title="link to story" className="text-gray-400 cursor-pointer">shared</Link> : null}
         </p>
@@ -168,7 +168,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
 
           <span>.</span>
 
-          <p className="font-sans flex items-center gap-2">{format(story?.createdAt)}</p>
+          <p className="font-sans flex items-center text-sm gap-2">{format(story?.createdAt)}</p>
         
           {!story?.sharedAuthor ?
             <UserCard 

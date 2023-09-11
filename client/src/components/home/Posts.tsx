@@ -87,7 +87,8 @@ export const Posts = () => {
         }
       }
       className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-2 pb-5 px-3`}>
-      {openComment?.option == 'Open' ? <Comments /> : content }
+        {content}
+      {/* {openComment?.option == 'Open' ? <Comments /> : content } */}
     </div>
   )
 }

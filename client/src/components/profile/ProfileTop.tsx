@@ -1,71 +1,74 @@
 import { FaTimes } from 'react-icons/fa'
 import { BsCameraFill } from 'react-icons/bs'
-import { ChatOption, ImageTypeProp, TargetImageType, Theme } from '../../posts'
+import { ImageTypeProp, TargetImageType, ThemeContextType } from '../../posts'
 import { UserProps } from '../../data'
 import { MdNotificationsActive } from 'react-icons/md'
 import { ChangeEvent, useState } from 'react'
 import { reduceLength } from '../../utils/navigator'
-import DPComponent from './DPComponent'
+import DPComponent from './DPComponent';
+import DefaultCover from '../../assets/revolving/default_cover.webp'
+import EditModal from './EditModal'
+import { useThemeContext } from '../../hooks/useThemeContext'
+import { IsLoadingSpinner } from '../IsLoadingSpinner'
 
 type Props = {
-  theme: Theme,
-  isLoadingDp: boolean,
+  isLoading: boolean,
   userProfile: UserProps,
   image: TargetImageType,
-  isLoadingCover: boolean,
   imageType: ImageTypeProp,
   isLoadingDelete: boolean,
   isLoadingUpdate: boolean,
   clearPhoto: (type: ImageTypeProp) => Promise<void>,
-  handleImage: (event: ChangeEvent<HTMLInputElement>) => void,
-  setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>
+  handleImage: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
-export default function ProfileTop({ userProfile, image, handleImage, clearPhoto, theme, imageType, isLoadingDp, isLoadingCover, isLoadingDelete, isLoadingUpdate, setOpenEditPage }: Props) {
+export default function ProfileTop({ userProfile, image, handleImage, clearPhoto, imageType, isLoading, isLoadingDelete, isLoadingUpdate }: Props) {
   const [hoverDp, setHoverDp] = useState<ImageTypeProp>('NIL')
+  const { theme, revealEditModal, setOpenEditPage, setRevealEditModal } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
 
   return (
     <>
-      <div className="md:flex-none md:mt-2 min-h-[7.5rem] shadow-inner shadow-slate-800 rounded-md border md:h-2/3 md:w-1/2 md:sticky md:top-0">
-        <input 
-          type="file" name="coverPhoto" hidden id={`cover_photo:${userProfile?._id}`} 
-          accept='image/*.{png,jpeg,jpg}' onChange={handleImage} 
-        />
+      <input 
+        type="file" name="coverPhoto" hidden id={`cover_photo:${userProfile?._id}`} 
+        accept='image/*.{png,jpeg,jpg}' onChange={handleImage} 
+      />
+      <div className="md:flex-none md:mt-2 h-[7.5rem] shadow-inner shadow-slate-800 rounded-md border md:h-64 md:w-1/2 md:sticky md:top-0">
         <figure 
           role="Cover photo" 
           onMouseEnter={() => setHoverDp('COVER')}
           onMouseLeave={() => setHoverDp('NIL')}
-          className={`relative ${(imageType === 'COVER' && (isLoadingDelete || isLoadingUpdate || isLoadingCover)) ? 'animate-pulse' : ''} ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-600'} h-full w-full rounded-md shadow-transparent shadow-2xl border-1`}>
+          className={`relative ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-600'} h-full w-full rounded-md shadow-transparent shadow-2xl border-1 box-border`}>
           
           {
             userProfile?.displayPicture?.coverPhoto ?
               <img 
                 src={userProfile?.displayPicture?.coverPhoto}
                 alt={`${userProfile?.firstName}:CoverPhoto`}
-                className={`w-full h-full object-cover ${(imageType === 'COVER' && (isLoadingDelete || isLoadingUpdate || isLoadingCover)) ? 'animate-pulse' : ''}`}
+                className={`w-full h-full object-cover rounded-md`}
               /> 
-              : null
+              : 
+              <img src={DefaultCover} alt="" 
+                className='w-full h-full object-cover rounded-md'
+              />
           }
 
             <DPComponent 
-              imageType={imageType} isLoadingDp={isLoadingDp} image={image}
+              imageType={imageType} isLoading={isLoading} image={image}
               isLoadingDelete={isLoadingDelete} userProfile={userProfile}
-              isLoadingUpdate={isLoadingUpdate} theme={theme} hoverDp={hoverDp}
+              isLoadingUpdate={isLoadingUpdate} hoverDp={hoverDp}
               setHoverDp={setHoverDp} handleImage={handleImage} clearPhoto={clearPhoto}
             />
           
-            <label htmlFor={`cover_photo:${userProfile?._id}`}>
-              <BsCameraFill 
-                title={userProfile?.displayPicture?.photo ? 'Change cover photo' : 'Add cover photo'}
-                className={`text-6xl m-auto ${theme === 'light' ? 'text-gray-800 opacity-20' : 'text-gray-950'} cursor-pointer ${hoverDp === 'COVER' ? 'scale-[1.02]' : 'scale-0'} hover:text-gray-800 active:text-gray-950 transition-all`} 
+             <EditModal cover='COVER'
+                theme={theme} clearPhoto={clearPhoto} revealEditModal={revealEditModal} 
+                hoverDp={hoverDp} userProfile={userProfile} setRevealEditModal={setRevealEditModal}
               />
-            </label>
-            <FaTimes 
-              title='Remove photo' 
-              onClick={() => clearPhoto('COVER')}
-              className={`absolute text-xl top-0.5 right-0.5 z-10 cursor-pointer ${image?.data ? 'hover:scale-[1.02] active:scale-1' : 'hidden'} transition-all`} 
-            />
+             
+              {(imageType === 'COVER' && (isLoadingDelete || isLoadingUpdate || isLoading)) ?
+                <IsLoadingSpinner page='PROFILE' customSize='LARGE' /> : null
+              }
+
         </figure>
 
       </div>

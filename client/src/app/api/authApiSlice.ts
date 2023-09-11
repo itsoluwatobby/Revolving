@@ -1,4 +1,4 @@
-import { AuthType, ConfirmationMethodType, DataType, OptionType, UserDataType, UserProps } from "../../data";
+import { AuthType, ConfirmationMethodType, DataType, OptionType, RefreshType, UserDataType, UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
 
 type NewUser = {
@@ -65,7 +65,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: userId
       }) as any
     }),
-    newAccessToken: builder.mutation<AuthType, void>({
+    newAccessToken: builder.mutation<RefreshType, void>({
       query: () => '/auth/new_access_token',
     }),
     toggleRoleByAdmin: builder.mutation<UserProps, {adminId: string, userId: string}>({

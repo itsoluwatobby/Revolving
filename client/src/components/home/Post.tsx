@@ -7,6 +7,7 @@ import PostTop from './post/PostTop';
 import PostBase from './post/PostBase';
 import { reduceLength } from '../../utils/navigator';
 import { PageType } from '../../data';
+import Comments from '../comments/Comments';
 
 type Props = {
   story: PostType
@@ -31,7 +32,7 @@ export const Post = ({ story, page }: Props) => {
   const openText = () => {
     setOpen(false)
   }
- 
+  
   return (
     <article 
       className={`${story?.fontFamily} ${page === 'PROFILE' ? '' : ''} flex flex-col gap-1 text-xs sm:w-full min-w-[58%]`}>
@@ -46,6 +47,7 @@ export const Post = ({ story, page }: Props) => {
         story={story as MakeToButtom} page={page}
         averageReadingTime={averageReadingTime}
       />
+      <Comments />
     </article>
   )
 }

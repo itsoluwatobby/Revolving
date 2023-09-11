@@ -61,7 +61,7 @@ export const LeftSection = () => {
   return (
     <section className={`sidebars h-full mt-6 ${address.includes(pathname) ? 'hidden' : 'md:block'} flex-none sm:w-[28%] lg:w-1/5 transition-all overflow-y-scroll ${toggleLeft === 'Open' ? 'maxscreen:fixed maxscreen:mt-20 maxscreen:w-full' : 'hidden maxscreen:w-0'} ${theme == 'light' ? 'bg-gray-50  maxscreen:bg-opacity-20' : 'bg-slate-700 maxscreen:bg-opacity-20'}  rounded-tr-lg z-50`}>
 
-      <div className={`sidebars h-[95%] pb-10 overflow-y-scroll flex flex-col rounded-tr-md gap-1 maxscreen:w-[45%] maxmobile:w-1/2 ${theme == 'light' ? 'maxscreen:bg-gray-50' : 'maxscreen:bg-slate-700'}`}>
+      <div className={`sidebars h-[96%] overflow-y-scroll flex flex-col rounded-tr-md gap-1 maxscreen:w-[45%] maxmobile:w-1/2 ${theme == 'light' ? 'maxscreen:bg-gray-50' : 'maxscreen:bg-slate-700'}`}>
 
         <div className={`relative w-full h-8 flex items-center`}>
           <button
@@ -85,10 +85,10 @@ export const LeftSection = () => {
           }
         </div>
         <Link to={`/profile/${currentUser?._id}`} className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full flex items-center gap-2 rounded-md`}>
-          <figure className="rounded-full border shadow-2xl h-10 w-10">
+          <figure className="rounded-full border-2 shadow-2xl h-10 w-10">
             {
               currentUser?.displayPicture?.photo ?
-              <img src={currentUser?.displayPicture?.photo} alt="" className="w-full h-full object-cover" /> : null
+              <img src={currentUser?.displayPicture?.photo} alt="" className="w-full h-full object-cover rounded-full" /> : null
             }
           </figure>
           <p className="text-white hover:underline">{reduceLength(currentUser?.email as string, 13, 'letter')}</p>

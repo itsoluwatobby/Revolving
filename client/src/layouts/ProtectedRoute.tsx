@@ -1,23 +1,20 @@
-import { Outlet, Navigate, useLocation, useNavigate } from "react-router-dom"
 import { useEffect } from 'react';
 import { USERROLES } from "../data";
 import { useDispatch, useSelector } from "react-redux";
-import { setGrantedPermission, grantedPermission } from "../features/auth/userSlice";
-// import { ThemeContextType } from "../posts";
-// import { useThemeContext } from "../hooks/useThemeContext";
 import { IsLayoutLoading } from "../components/IsLayoutLoading";
+import { Outlet, Navigate, useLocation, useNavigate } from "react-router-dom"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { setGrantedPermission, grantedPermission } from "../features/auth/userSlice";
 
 type AllowedRolesProp={
   roles: USERROLES[]
 }
 
 export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
-  const { pathname } = useLocation()
-  //const { theme } = useThemeContext() as ThemeContextType
-  const getPermission = useSelector(grantedPermission)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const getPermission = useSelector(grantedPermission)
 
   useEffect(() => {
     let isMounted = true
@@ -31,7 +28,6 @@ export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
       dispatch(setGrantedPermission(grantPermission ? 'ALLOWED' : 'FORBIDDEN'))
     }
     isMounted ? permitted() : null
-
     return () => {
       isMounted = false
     }

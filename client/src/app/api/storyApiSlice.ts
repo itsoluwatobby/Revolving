@@ -32,28 +32,6 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
-    personalImageupload: builder.mutation<ImageRes, FormData>({
-      query: (imageData) => ({
-        url: `images/dp_upload`,
-        method: 'POST',
-        body: imageData
-      }) as any,
-      transformResponse: (baseQueryReturnValue: {data: ImageRes}) => {
-        return baseQueryReturnValue?.data
-      },
-    }),
-    
-    coverImageupload: builder.mutation<ImageRes, FormData>({
-      query: (imageData) => ({
-        url: `images/cover_upload`,
-        method: 'POST',
-        body: imageData
-      }) as any,
-      transformResponse: (baseQueryReturnValue: {data: ImageRes}) => {
-        return baseQueryReturnValue?.data
-      },
-    }),
-
     deleteImage: builder.mutation<ImageRes, string>({
       query: (imageName) => ({
         url: `images/${imageName}`,
@@ -152,11 +130,9 @@ export const {
   useCreateStoryMutation,
   useUpdateStoryMutation,
   useGetStoryCondMutation,
-  useLikeAndUnlikeStoryMutation,
-  usePersonalImageuploadMutation,
-  useCoverImageuploadMutation,
   useGetStoriesByCategoryQuery,
   useGetStoriesWithUserIdQuery,
+  useLikeAndUnlikeStoryMutation,
 } = storyApiSlice
 
 // //returns query result object 
