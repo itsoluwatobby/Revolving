@@ -9,7 +9,7 @@ import profileImage from "../../images/bg_image3.jpg"
 import { usePostContext } from "../../hooks/usePostContext"
 import { useState } from "react"
 import { toast } from "react-hot-toast";
-import { ErrorResponse } from "../../data"
+import { ErrorResponse, UserProps } from "../../data"
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice"
@@ -21,14 +21,16 @@ const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale
 
 const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
-export default function TopRight() {
+type TopRightProps = {
+  currentUser: UserProps
+}
+export default function TopRight({ currentUser }: TopRightProps) {
   const [updateStory, {isLoading: isLoadingUpdate, error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
   const { canPost, inputValue, setCodeStore, setImagesFiles } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData)
-  const [image, setImage] = useState<boolean>(false);
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const url = useSelector(getUrl)
@@ -179,21 +181,26 @@ export default function TopRight() {
         }
         {
           !exclude?.includes(pathname) ?
-            <div className='w-12 p-1 flex'>
-              {image ?
-                  <div className='cursor-pointer w-8 h-8 bg-slate-500 rounded-full border-2 border-slate-600'></div>
+            <div className='w-10 h-10 rounded-full p-1 flex'>
+              {!currentUser?.displayPicture?.photo ?
+                  <div className='cursor-pointer w-10 h-10 bg-slate-500 rounded-full border-2 border-slate-600'></div>
                   :
-                <figure className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
-                  <img src={profileImage} alt="dp" className='object-cover h-full w-full rounded-full'/>
-                </figure>
+                // <Link to={`/profile/${currentUser?._id}`}>
+                  <figure 
+                     onClick={() => setRollout(true)}
+                    className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
+                    <img src={currentUser?.displayPicture?.photo} alt="dp" className='object-cover h-full w-full rounded-full'/>
+                  </figure>
+                // </Link>
               }
             </div>
           : null
         }
-        {!address.includes(pathname) ? 
+        {/* {!address.includes(pathname) ? 
                 <IoIosArrowDown 
                   onClick={() => setRollout(prev => !prev)}
-                  className={`sm:hidden -ml-3 font-thin ${arrow_class}`} /> : null}
+                  className={`sm:hidden -ml-3 font-thin ${arrow_class}`} /> : null
+        } */}
     </>
   )
 }

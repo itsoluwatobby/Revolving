@@ -22,7 +22,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: {...user}
       }) as any,
-      invalidatesTags: [{ type:  'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type:  'USERS', id: 'LIST' }],
     }),
 
     followUnfollowUser: builder.mutation<string, {followerId: string, followedId: string}>({
@@ -48,7 +48,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       transformResponse: (baseQueryReturnValue: {data: UserProps}) => {
           return baseQueryReturnValue?.data
         },
-      providesTags: [{ type: 'USERS' }]
+      providesTags: ['USERS']
     }),
 
     getCurrentUser: builder.mutation<UserProps, string>({

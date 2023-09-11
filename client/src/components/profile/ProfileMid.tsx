@@ -1,22 +1,26 @@
 import { useState } from 'react'
-import { Theme } from '../../posts'
+import { ImageTypeProp, Theme } from '../../posts'
 import { UserProps } from '../../data'
 import { MdAttachEmail } from 'react-icons/md'
 import { reduceLength } from '../../utils/navigator'
 import { FaGithub, FaTwitterSquare } from 'react-icons/fa'
 
 type Props = {
+  theme: Theme,
   userProfile: UserProps,
-  theme: Theme
+  setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>
 }
 
-export default function ProfileMid({ userProfile, theme }: Props) {
+export default function ProfileMid({ userProfile, setRevealEditModal, theme }: Props) {
   const [showAll, setShowAll] = useState<boolean>(false)
 
   const about = 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusamus animi sequi quis aut deserunt recusandae! Molestias assumenda incidunt vel amet magnam repudiandae atque dignissimos, ipsam mollitia quidem sint. Delectus, hic? Quibusdam velit facere odit quidem praesentium quo, quis laboriosam quod numquam tenetur quaerat, sapiente sit. Iste architecto voluptatem minima natus eaque libero recusandae aliquam, inventore, molestias explicabo consequuntur atque delectus!'
 
   return (
-    <div role="user information" className="relative flex py-2 pt-3 md:mt-0 mt-16 flex-col w-full">
+    <div 
+      role="user information" 
+      onClick={() => setRevealEditModal('NIL')}
+      className="relative flex py-2 pt-3 md:mt-0 mt-16 flex-col w-full">
       {
         <>
           <article className="flex items-center justify-between w-full md:flex-wrap lg:flex-nowrap">
@@ -33,21 +37,21 @@ export default function ProfileMid({ userProfile, theme }: Props) {
               
               <a 
                 href="mailto:email" target='_blank'
-                className={`flex items-center gap-1.5 text-blue-600 hover:underline`}
+                className={`flex items-center gap-1.5 text-blue-600 hover:underline w-fit`}
               >
                 <MdAttachEmail className={`${theme === 'light' ? 'text-gray-800' : 'text-gray-400'} text-lg`} />
                 itsoluwatobby@gmail.com
               </a>
               <a 
                 href="https://github.com/itsoluwatobby" target='_blank'
-                className={`absolute flex items-center gap-1.5 right-1 md:left-0 lg:right-1 top-24 text-blue-600 hover:underline`}
+                className={`absolute flex items-center gap-1.5 right-1 md:left-0 lg:right-1 top-24 text-blue-600 hover:underline w-fit`}
               >
                 <FaGithub className={`${theme === 'light' ? 'text-gray-800' : 'text-gray-400'} text-lg`} />
                 github.com/itsoluwatobby
               </a>
               <a 
                 href="https://twitter.com/itsoluwatobby" target='_blank'
-                className={`flex items-center gap-1.5 text-blue-500 hover:underline`}
+                className={`flex items-center gap-1.5 text-blue-500 hover:underline w-fit`}
               >
                 <FaTwitterSquare className={`${theme === 'light' ? 'text-gray-800' : 'text-gray-400'} text-lg`} />
                 twitter.com/itsoluwatobby
@@ -57,7 +61,7 @@ export default function ProfileMid({ userProfile, theme }: Props) {
 
             <div className={`flex-none w-[20%] md:translate-x-5 lg:translate-x-0 md:mt-8 lg:mt-0 ${userProfile?.stack?.length ? 'flex' : 'flex'}  items-center flex-col h-20`}>
               <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
-              <div className={`stackflow overflow-y-scroll h-12 p-1 pt-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light bg-slate-900 rounded-md`}>
+              <div className={`stackflow overflow-y-scroll h-12 p-1 pt-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
                 {
                   // userStories?.skills?.map(skill => {
                   [...Array(8).keys()]?.map(i => (

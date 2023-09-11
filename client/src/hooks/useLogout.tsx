@@ -29,7 +29,7 @@ export default function useLogout() {
       })
       setRollout(false)
       clearStorage(currentUserId as string, languages)
-      option == 'use' ? navigate('/signIn', { state: pathname }) : null
+      option == 'use' ? navigate('/signIn', { state: pathname }) : navigate('/signIn')
     }catch(err){
       // const errors = error as ErrorResponse
       dispatch(signUserOut())
@@ -39,7 +39,7 @@ export default function useLogout() {
         }
       })
       clearStorage(currentUserId as string, languages)
-      option == 'use' ? navigate('/signIn', { state: pathname }) : null
+      option == 'use' ? navigate('/signIn', { state: pathname }) : navigate('/signIn')
     }
   }
 

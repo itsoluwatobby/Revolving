@@ -7,12 +7,10 @@ export const uploadImages = async(req: Request, res: Response) => {
   asyncFunc(res, async() => {
     const uploadedFile = req.file;
     const uniqueId = uuidV4()
-  
     const filename = uploadedFile.originalname
     const fileext = filename.substring(filename.lastIndexOf('.'))
     const newName = `${uniqueId}${fileext}`
     const newPath = `fileUpload/${newName}`
-    
     fsPromises.rename(uploadedFile.path, newPath)
     .then(() => {
       const imageUrl = `${process.env.IMAGELINK}/${newName}`

@@ -253,6 +253,13 @@ type RefreshTokenType = {
   originalStatus?: number
 }
 
+type RefreshType = {
+  data: AuthType, 
+  status: number | 'FETCH_ERROR' | 'PARSING_ERROR' | 'TIMEOUT_ERROR' | 'CUSTOM_ERROR', 
+  error?: string,
+  originalStatus?: number
+}
+
 type AuthenticationContextType={
   auth: AuthType,
   userSession?: boolean,

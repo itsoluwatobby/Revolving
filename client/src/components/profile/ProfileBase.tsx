@@ -2,7 +2,7 @@ import { Post } from '../home/Post';
 import { ErrorResponse, UserProps } from '../../data';
 import { BiErrorAlt } from 'react-icons/bi'
 import { useState, useEffect } from 'react';
-import { PostType, Theme } from '../../posts';
+import { ImageTypeProp, PostType, Theme } from '../../posts';
 import { SerializedError } from '@reduxjs/toolkit';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { SkeletonBlog } from '../skeletons/SkeletonBlog';
@@ -15,9 +15,10 @@ type Props = {
   userStories: PostType[],
   isStoryLoading: boolean,
   storyError: FetchBaseQueryError | SerializedError | undefined,
+  setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>
 }
 
-export default function ProfileBase({ userProfile, userStories, theme, isStoryError, storyError, isStoryLoading }: Props) {
+export default function ProfileBase({ userProfile, setRevealEditModal, userStories, theme, isStoryError, storyError, isStoryLoading }: Props) {
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
  
   useEffect(() => {
@@ -63,7 +64,9 @@ export default function ProfileBase({ userProfile, userStories, theme, isStoryEr
     )
 
   return (
-    <section className={`flex-none pb-4 flex flex-col w-full gap-2.5`}>
+    <section 
+      onClick={() => setRevealEditModal('NIL')}
+      className={`flex-none pb-4 flex flex-col w-full gap-2.5`}>
       <hr className={`w-full border ${theme == 'light' ? 'border-gray-200' : 'border-gray-600'}`}/> 
       <p className={`italic ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} capitalize tracking-wide`}>Your stories and stories you engaged in</p>
   

@@ -1,24 +1,26 @@
-import { ChangeEvent } from 'react'
 import { UserProps } from '../../data'
-import { ImageTypeProp, TargetImageType, Theme } from '../../posts'
-import { BsCameraFill } from 'react-icons/bs'
-import { FaTimes } from 'react-icons/fa'
+import { ChangeEvent } from 'react'
+import { ImageTypeProp, TargetImageType, ThemeContextType } from '../../posts'
+import { useThemeContext } from '../../hooks/useThemeContext'
+import { BsFillPersonFill } from 'react-icons/bs'
+import EditModal from './EditModal'
+import { IsLoadingSpinner } from '../IsLoadingSpinner'
 
 type Props = {
-  theme: Theme
-  isLoadingDp: boolean,
+  isLoading: boolean,
   userProfile: UserProps,
   hoverDp: ImageTypeProp,
   image: TargetImageType,
-  imageType: ImageTypeProp,
   isLoadingDelete: boolean,
   isLoadingUpdate: boolean,
+  imageType: ImageTypeProp,
   clearPhoto: (type: ImageTypeProp) => Promise<void>,
   handleImage: (event: ChangeEvent<HTMLInputElement>) => void,
-  setHoverDp: React.Dispatch<React.SetStateAction<ImageTypeProp>> 
+  setHoverDp: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
 }
 
-export default function DPComponent({ userProfile, hoverDp, isLoadingDp, image, isLoadingUpdate, isLoadingDelete, imageType, theme, setHoverDp, handleImage, clearPhoto }: Props) {
+export default function DPComponent({ userProfile, hoverDp, isLoading, image, isLoadingUpdate, isLoadingDelete, imageType, setHoverDp, handleImage, clearPhoto }: Props) {
+  const { theme, revealEditModal, setRevealEditModal } = useThemeContext() as ThemeContextType
 
   return (
     <>
@@ -28,35 +30,29 @@ export default function DPComponent({ userProfile, hoverDp, isLoadingDp, image, 
       />
 
       <figure 
-            role="Display picture" 
-            onMouseEnter={() => setHoverDp('DP')}
-            onMouseLeave={() => setHoverDp('NIL')}
-            className={`absolute rounded-full z-30 ${(imageType === 'DP' && (isLoadingDelete || isLoadingUpdate || isLoadingDp)) ? 'animate-pulse' : ''} border-2 shadow-inner shadow-slate-600 border-gray-300 w-28 lg:w-36 lg:h-36 h-28 translate-x-1/2 top-[70px] ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'} right-1/2`}>
-            
-            {
-              userProfile?.displayPicture?.photo ?
-                <img 
-                  src={userProfile?.displayPicture?.photo}
-                  alt={`${userProfile?.firstName}:DP`}
-                  className={`w-full h-full ${(imageType === 'DP' && (isLoadingDelete || isLoadingUpdate || isLoadingDp)) ? 'animate-pulse' : ''} object-cover`}
-                /> 
-                : null
-            }
-          
-            <label htmlFor={`profile_pic:${userProfile?._id}`}>
-              <BsCameraFill
-                title={userProfile?.displayPicture?.photo ? 'Change photo' : 'Add photo'}
-                className={`absolute text-2xl ${theme === 'light' ? '' : 'text-gray-950'} bottom-3 right-0 cursor-pointer ${hoverDp === 'DP' ? 'scale-[1.02]' : 'scale-0'} hover:text-gray-800 active:text-gray-950 transition-all`} 
-              />
-            </label>
-            <FaTimes
-              title='Remove photo' 
-              onClick={() => clearPhoto('DP')}
-              className={`absolute top-3 right-6 text-lg z-10 cursor-pointer ${image?.data ? 'hover:scale-[1.02] active:scale-1' : 'hidden'} transition-all`} 
-            />
+        role="Display picture" 
+        onMouseEnter={() => setHoverDp('DP')}
+        onMouseLeave={() => setHoverDp('NIL')}
+        className={`absolute rounded-full z-20 border-2 shadow-inner shadow-slate-600 border-gray-300 w-28 lg:w-36 lg:h-36 h-28 translate-x-1/2 top-[70px] ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'} right-1/2`}>
+        
+        {
+          userProfile?.displayPicture?.photo ?
+            <img 
+              src={userProfile?.displayPicture?.photo}
+              alt={`${userProfile?.firstName}:DP`}
+              className={`w-full h-full rounded-full border-2 border-gray-500 object-cover`}
+            /> 
+            : <BsFillPersonFill className='absolute right-6 top-4 text-6xl text-gray-600' />
+        }
 
-          </figure>
-
+        <EditModal cover='DP'
+          theme={theme} clearPhoto={clearPhoto} revealEditModal={revealEditModal} 
+          hoverDp={hoverDp} userProfile={userProfile} setRevealEditModal={setRevealEditModal}
+        />
+        <div className={`absolute right-12 top-10 ${(imageType === 'DP' && (isLoadingDelete || isLoadingUpdate || isLoading)) ? 'block' : 'hidden'}`}>
+          <IsLoadingSpinner />
+        </div>
+      </figure>
     </>
   )
 }

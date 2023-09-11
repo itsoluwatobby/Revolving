@@ -11,7 +11,8 @@ import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
 import { useSelector } from 'react-redux';
 import { getTabCategory } from '../features/story/navigationSlice.js';
 import MidModal from './navModals/MidModal.js';
-import { TypingEvent } from '../data.js';
+import { TypingEvent, UserProps } from '../data.js';
+import { getCurrentUser } from '../features/auth/userSlice.js';
 
 const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
@@ -21,6 +22,7 @@ const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase te
 
 export const Navbar = () => {
   const { pathname } = useLocation();
+  const currentUser = useSelector(getCurrentUser)
   const getNavigation = useSelector(getTabCategory)
   const { typingEvent } = usePostContext() as PostContextType
   const {theme, rollout, notintersecting, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
@@ -60,7 +62,7 @@ export const Navbar = () => {
 
   return(
     <nav 
-      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} z-50 p-4 w-full h-16 flex items-center justify-between mobile:justify-between mobile:relative mobile:pr-1 minmobile:pr-0 minmobile:pl-2
+      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} z-30 p-4 w-full h-16 flex items-center justify-between mobile:justify-between minmobile:pr-0 minmobile:pl-2
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />
@@ -71,10 +73,13 @@ export const Navbar = () => {
         pathname={pathname} notintersecting={notintersecting}
       />
       {/* {pathname === '/' ? <Drawdown rollout={rollout} /> : ''} */}
-      <Drawdown rollout={rollout} storyId={storyId as string} />
+      <Drawdown 
+        rollout={rollout} storyId={storyId as string} 
+        currentUser={currentUser as UserProps}
+      />
       
-      <div className={`relative mobile:flex-none flex items-center sm:gap-1 justify-between p-1 z-50 ${pathname != `/story/${storyId}` ? 'w-44 mobile:w-36' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
-        <TopRight />
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-30 ${pathname != `/story/${storyId}` ? 'w-40 mobile:w-36' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
+        <TopRight currentUser={currentUser as UserProps} />
       </div>
      { 
       address.slice(0, 2).includes(pathname) ? (
