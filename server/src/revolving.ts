@@ -1,48 +1,24 @@
-import express, { Request, Response } from 'express'
 import http from 'http';
 import cors from 'cors';
+import express from 'express'
 
-import cookieParser from 'cookie-parser';
-import process from 'process';
-import dotenv from 'dotenv';
 dotenv.config()
+import dotenv from 'dotenv';
+import process from 'process';
+import cookieParser from 'cookie-parser';
 
-import mongoose from 'mongoose';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import mongoose from 'mongoose';
 
-import { corsOptions } from './config/corsOption.js';
 import { cpus } from 'os';
 import cluster from 'cluster';
+import { corsOptions } from './config/corsOption.js';
 
+import SlowDown from 'express-slow-down';
 import { dbConfig } from './config/mongoConfig.js';
 import { rateLimit, RateLimitRequestHandler } from 'express-rate-limit';
-import SlowDown from 'express-slow-down';
-
-import authRouter from './routes/authRoutes.js';
-import { verifyAccessToken } from './middleware/verifyTokens.js';
-import storyRouter from './routes/storyRoutes.js';
-
-import { getStories, getStory, getStoryByCategory } from './controller/storyController.js';
-import { getUser, getUsers } from './controller/userController.js';
-import userRouter from './routes/usersRoutes.js';
-
-import passwordResetRouter from './routes/resetPassword.js';
-import { logoutHandler } from './controller/authController.js';
-import { logURLAndMethods } from './middleware/urlLogger.js';
-
-import { fetchSharedStories, getSingleShared } from './controller/sharedStoryController.js';
-import { getComment, getStoryComments } from './controller/commentController.js';
-import commentRouter from './routes/commentRoutes.js';
-
-import { getResponse, getResponseByComment } from './controller/responseController.js';
-import responseRouter from './routes/responseRoutes.js';
-import taskManagerRouter from './routes/taskManagerRoutes.js';
-
-import { eventLogger } from './middleware/logger.js';
-import { getTask, getTasksInBin, getUserTask } from './controller/taskManagerController.js';
-import imageRouter from './routes/imageRoute.js';
-import { getImage } from './controller/imageController.js';
+import { RevolvingApplication } from './config/RevolvingApplication.js';
 
 // import { errorLog, logEvents } from './middleware/logger.js';
 
@@ -91,73 +67,8 @@ if (cluster.isPrimary){
   })
 }
 else{
-  app.get('/', (req: Request, res: Response) => {
-    res.status(200).json({ status: true, message: 'server up and running' });
-  })
-
-  // CACHING URLS
-  app.use(logURLAndMethods)
-
-  // ROUTES
-  app.use('/revolving/auth', authRouter);
-  app.post('/revolving/auth/logout/:userId', logoutHandler);
-
-  // USERS
-  app.get('/revolving/users', getUsers);
-  app.get('/revolving/users/single/:userId', getUser);
-
-  //password reset
-  app.use('/revolving/auth', passwordResetRouter);
-  
-  app.get('/revolving/story/share_getAll', fetchSharedStories)
-
-  //public routes
-  app.get('/revolving/story', getStories);
-  
-  // comments
-  app.get('/revolving/comment_in_story/:storyId', getStoryComments);
-  app.get('/revolving/comment/:commentId', getComment);
-  
-  app.get('/revolving/response_in_comment/:commentId', getResponseByComment);
-  app.get('/revolving/response/:responseId', getResponse);
-
-  app.get('/revolving/story/category', getStoryByCategory);
-  app.get('/revolving/story/:storyId', getStory);
-  app.get('/revolving/story/share/:sharedId', getSingleShared)
-
-  // Task manager
-  app.get('/revolving/task/user/:userId', getUserTask)
-  app.get('/revolving/task/:taskId', getTask)
-  app.get('/revolving/task/bin/:userId', getTasksInBin)
-
-  // get image
-  //app.get('/revolving/images/:imageName', getImage)
-  
-  // checks for accesstoken
-  app.use(verifyAccessToken);
-  
-  // story router
-  app.use('/revolving/story', storyRouter);
-  
-  // user router
-  app.use('/revolving/users', userRouter);
-  
-  // comment router
-  app.use('/revolving/comments', commentRouter);
-  
-  // image upload
-  app.use('/revolving/images', imageRouter)
-  
-  // response router
-  app.use('/revolving/responses', responseRouter);
-
-  // task manager router
-  app.use('/revolving/task', taskManagerRouter);
-
-  //app.use(errorLog);
-  app.all('*', (req: Request, res: Response) => {
-    res.status(404).json({status: false, message: 'NOT FOUND'})
-  })
+  // app.use router initialization
+  new RevolvingApplication(app).initiate()
   
   mongoose.connection.once('open', () => {
     console.log('Revolving DB connected')

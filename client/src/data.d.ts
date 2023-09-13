@@ -195,6 +195,7 @@ interface UserProps{
   country: string,
   socialMediaAccounts: SocialMediaAccoutProp[],
   notificationSubscribers: string[],
+  subscribed: string[],
   createdAt: string,
   updatedAt: string
 }
@@ -228,10 +229,12 @@ interface ErrorResponse{
   originalStatus?: number
 }
 //  FetchBaseQueryError | SerializedError
+
 type AuthType={
   _id: string,
   accessToken: string,
-  roles: USERROLES[]
+  roles: USERROLES[],
+  updatedAt: string
 }
 
 type ApiSliceType = {

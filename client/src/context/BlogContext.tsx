@@ -30,6 +30,9 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
       const res = await getLoggedInUser(userId).unwrap()
       const { isAccountActivated, refreshToken, verificationToken, ...rest } = res
       dispatch(setLoggedInUser(rest))
+      if(!localStorage.getItem('revolving_login_time')){
+        localStorage.setItem('revolving_login_time', rest?.updatedAt)
+      }
     }
     if(isMounted && userId) getLoggedIn()
 

@@ -1,20 +1,18 @@
-import { FaTimes } from 'react-icons/fa'
-import { BsCameraFill } from 'react-icons/bs'
-import { ImageTypeProp, TargetImageType, ThemeContextType } from '../../posts'
-import { UserProps } from '../../data'
-import { MdNotificationsActive } from 'react-icons/md'
-import { ChangeEvent, useState } from 'react'
-import { reduceLength } from '../../utils/navigator'
+import EditModal from './EditModal';
+import { UserProps } from '../../data';
+import { Link } from 'react-router-dom';
 import DPComponent from './DPComponent';
-import DefaultCover from '../../assets/revolving/default_cover.webp'
-import EditModal from './EditModal'
-import { useThemeContext } from '../../hooks/useThemeContext'
-import { IsLoadingSpinner } from '../IsLoadingSpinner'
+import { ChangeEvent, useState } from 'react';
+import { reduceLength } from '../../utils/navigator';
+import { IsLoadingSpinner } from '../IsLoadingSpinner';
+import { MdNotificationsActive } from 'react-icons/md';
+import { ImageTypeProp, ThemeContextType } from '../../posts';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import DefaultCover from '../../assets/revolving/default_cover.webp';
 
 type Props = {
   isLoading: boolean,
   userProfile: UserProps,
-  image: TargetImageType,
   imageType: ImageTypeProp,
   isLoadingDelete: boolean,
   isLoadingUpdate: boolean,
@@ -22,9 +20,9 @@ type Props = {
   handleImage: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
-export default function ProfileTop({ userProfile, image, handleImage, clearPhoto, imageType, isLoading, isLoadingDelete, isLoadingUpdate }: Props) {
+export default function ProfileTop({ userProfile, imageType, handleImage, clearPhoto, isLoadingDelete, isLoading, isLoadingUpdate }: Props) {
   const [hoverDp, setHoverDp] = useState<ImageTypeProp>('NIL')
-  const { theme, revealEditModal, setOpenEditPage, setRevealEditModal } = useThemeContext() as ThemeContextType
+  const { theme, revealEditModal, setRevealEditModal } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
 
   return (
@@ -54,15 +52,18 @@ export default function ProfileTop({ userProfile, image, handleImage, clearPhoto
           }
 
             <DPComponent 
-              imageType={imageType} isLoading={isLoading} image={image}
-              isLoadingDelete={isLoadingDelete} userProfile={userProfile}
-              isLoadingUpdate={isLoadingUpdate} hoverDp={hoverDp}
-              setHoverDp={setHoverDp} handleImage={handleImage} clearPhoto={clearPhoto}
+              handleImage={handleImage}
+              clearPhoto={clearPhoto}
+              isLoadingUpdate={isLoadingUpdate} setHoverDp={setHoverDp} 
+              isLoadingDelete={isLoadingDelete} 
+              userProfile={userProfile}
+              imageType={imageType} isLoading={isLoading} hoverDp={hoverDp}
             />
           
              <EditModal cover='COVER'
+                setRevealEditModal={setRevealEditModal}
+                hoverDp={hoverDp} userProfile={userProfile} 
                 theme={theme} clearPhoto={clearPhoto} revealEditModal={revealEditModal} 
-                hoverDp={hoverDp} userProfile={userProfile} setRevealEditModal={setRevealEditModal}
               />
              
               {(imageType === 'COVER' && (isLoadingDelete || isLoadingUpdate || isLoading)) ?
@@ -76,12 +77,13 @@ export default function ProfileTop({ userProfile, image, handleImage, clearPhoto
       <div className={`absolute right-2 top-32 lg:top-28 flex flex-row-reverse gap-8`}>
         {
           userProfile?._id === currentUserId ?
-            <button 
-              onClick={() => setOpenEditPage('Open')}
-              className={`p-1 px-3 rounded-sm shadow-md hover:opacity-95 active:opacity-100 focus:outline-none border-none ${theme === 'light' ? 'bg-slate-500 text-white' : 'bg-slate-600'} z-20 transition-all`}
-            >
-              Edit profile
-            </button>
+            <Link to={`/edit_profile/${userProfile?._id}`} >
+              <button 
+                className={`p-1 px-3 rounded-sm shadow-md hover:opacity-95 active:opacity-100 focus:outline-none border-none ${theme === 'light' ? 'bg-slate-500 text-white' : 'bg-slate-600'} transition-all`}
+              >
+                Edit profile
+              </button>
+            </Link>
           :
             <MdNotificationsActive
               title='Notification'

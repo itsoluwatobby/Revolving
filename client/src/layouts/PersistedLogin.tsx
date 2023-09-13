@@ -5,11 +5,13 @@ import { LeftSection } from '../components/LeftSection';
 import { IsLayoutLoading } from '../components/IsLayoutLoading';
 import { useNewAccessTokenMutation } from '../app/api/authApiSlice';
 import { persisted, selectCurrentToken, setCredentials } from '../features/auth/authSlice';
+import useNotPersistedLogin from '../hooks/useNotPersistedLogin';
 
 export const PersistedLogin = () => {
+  const dispatch = useDispatch()
   const token = useSelector(selectCurrentToken)
   const persistLogin = useSelector(persisted)
-  const dispatch = useDispatch()
+  const notPersistedLogin = useNotPersistedLogin()
   const [getNewAccessToken, { isLoading, isError }] = useNewAccessTokenMutation()
 
   useEffect(() => {
@@ -23,11 +25,14 @@ export const PersistedLogin = () => {
         console.log(err)
       }
     }
-    (isMounted && !token && persistLogin) ? getNewToken() : null
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if(persistLogin)
+     (isMounted && !token && persistLogin) ? getNewToken() : null
+    else (isMounted && !token && notPersistedLogin === 'VALID') ? getNewToken() : null
+
     return () => {
       isMounted = false
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

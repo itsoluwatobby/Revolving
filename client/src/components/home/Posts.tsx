@@ -1,25 +1,24 @@
-import { PostContextType, PostType, ThemeContextType } from '../../posts'
-import { SkeletonBlog } from '../skeletons/SkeletonBlog';
 import { Post } from './Post';
-import { RiSignalWifiErrorLine } from 'react-icons/ri'
-import { BiErrorAlt } from 'react-icons/bi'
-import { usePostContext } from '../../hooks/usePostContext';
-import { useState, useEffect } from 'react';
-import { ErrorResponse } from '../../data';
-import Comments from '../comments/Comments';
-import { useThemeContext } from '../../hooks/useThemeContext';
-import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
 import { useSelector } from 'react-redux';
-import { getTabCategory } from '../../features/story/navigationSlice';
-import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
-import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import { BiErrorAlt } from 'react-icons/bi'
+import { ErrorResponse } from '../../data';
+import { useState, useEffect } from 'react';
 import { REFRESH_RATE } from '../../utils/navigator';
+import { RiSignalWifiErrorLine } from 'react-icons/ri';
+import { SkeletonBlog } from '../skeletons/SkeletonBlog';
+import { usePostContext } from '../../hooks/usePostContext';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { getTabCategory } from '../../features/story/navigationSlice';
+import { PostContextType, PostType, ThemeContextType } from '../../posts'
+import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 
 export const Posts = () => {
   const getNavigation = useSelector(getTabCategory)
   const {data, isLoading, isError, error, refetch} = useGetStoriesByCategoryQuery(getNavigation)
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
-  const { openComment, setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
+  const { setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
   //const filteredFeeds = useRevolvingPostFeed(filteredStories, filteredStories) as PostType[]
 
@@ -88,7 +87,6 @@ export const Posts = () => {
       }
       className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-2 pb-5 px-3`}>
         {content}
-      {/* {openComment?.option == 'Open' ? <Comments /> : content } */}
     </div>
   )
 }

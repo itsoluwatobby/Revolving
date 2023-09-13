@@ -1,14 +1,14 @@
 
 type PasswordCheckerProps = {
-  password: string
+  password: string,
 }
 
 export default function PasswordChecker({
-  password
+  password,
 }: PasswordCheckerProps) {
   
   return (
-    <ul className={`flex items-center justify-evenly bg-slate-900 rounded-md text-xs w-[95%] self-center -mt-0.5 overflow-x-auto`}>
+    <ul className={`flex items-center justify-evenly bg-slate-900 rounded-md text-xs w-[95%] self-center mt-1 overflow-x-auto`}>
       <li className='flex flex-col'>
         <span className={`before:content-['*'] flex items-center gap-1 ${!password ? 'text-white' : /[a-z]/.test(password) ? 'text-green-500' : 'text-red-500'}`}>lowercase</span>
         <span className={`before:content-['*'] flex items-center gap-1 ${!password ? 'text-white' : /[A-Z]/.test(password) ? 'text-green-500' : 'text-red-500'}`}>uppercase</span>

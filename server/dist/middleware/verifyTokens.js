@@ -7,12 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getUserByEmail, getUserByToken } from "../helpers/userHelpers.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 import { getCachedResponse } from "../helpers/redis.js";
+import userServiceInstance from "../services/userService.js";
 const activatedAccount = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield getCachedResponse({ key: `user:${email}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
-            const user = yield getUserByEmail(email);
+            const user = yield userServiceInstance.getUserByEmail(email);
             return user;
         }), reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] });
     return userData;
@@ -48,7 +48,7 @@ export const getNewTokens = (req, res) => __awaiter(void 0, void 0, void 0, func
     if (!(cookie === null || cookie === void 0 ? void 0 : cookie.revolving))
         return responseType({ res, status: 401, message: 'Bad Credentials' });
     const token = cookie === null || cookie === void 0 ? void 0 : cookie.revolving;
-    const user = yield getUserByToken(token);
+    const user = yield userServiceInstance.getUserByToken(token);
     if (!user)
         return res.sendStatus(404);
     const verify = yield verifyToken(user === null || user === void 0 ? void 0 : user.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET);

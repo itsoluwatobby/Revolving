@@ -118,7 +118,6 @@ export default function TopRight({ currentUser }: TopRightProps) {
     }
     else {
       setIsPresent({codeId: isPresent?.codeId as string, present: true})
-      console.log('present')
     }
   }
 
@@ -166,7 +165,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
           :
             !exclude?.includes(pathname) ?
               <Link to={'/new_story'} >
-                <div className='flex items-center cursor-pointer text-gray-400 hover:text-gray-600 transition-all ease-linear font-normal ml-2'>
+                <div className={`flex items-center cursor-pointer ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} hover:text-gray-600 transition-all ease-linear font-normal ml-2`}>
                   <FiEdit className='text-xl' />
                   <span className=''>Post</span>
                 </div>

@@ -38,6 +38,7 @@ export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
     if(getPermission === 'AUTHENTICATING'){
       timerId = setTimeout(() => {
         navigate('/signIn', { state: { pathname } })
+        localStorage.removeItem('revolving_login_time')
       }, 15000);
     }
     return () => {
