@@ -38,6 +38,9 @@ export default function Login() {
       const userAuth = await signIn({ email, password }).unwrap();
       localStorage.setItem('revolving_userId', userAuth?.data?._id)
       dispatch(setCredentials({...userAuth?.data}))
+      if(!localStorage.getItem('revolving_login_time')){
+        localStorage.setItem('revolving_login_time', userAuth?.data?.updatedAt)
+      }
       setEmail('')
       setPassword('')
       isLoading && toast.loading('signing you in', {
@@ -45,7 +48,7 @@ export default function Login() {
             style: { background: '#3CB341' }
         }
       )
-        !isLoading && toast.success('welcome', SuccessStyle)
+      !isLoading && toast.success('welcome', SuccessStyle)
       navigate(pathname, { replace: true })
     }
     catch(err: unknown){

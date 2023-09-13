@@ -1,19 +1,17 @@
 import { toast } from "react-hot-toast"
-import { useLocation, useNavigate } from "react-router-dom"
-import { useThemeContext } from "./useThemeContext"
 import { ThemeContextType } from "../posts"
-import { useSignOutMutation } from "../app/api/authApiSlice"
-import { useDispatch, useSelector } from "react-redux"
+import { useThemeContext } from "./useThemeContext"
+import { useDispatch } from "react-redux"
 import { signUserOut } from "../features/auth/authSlice"
-import { getLanguages } from "../features/story/codeSlice"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useSignOutMutation } from "../app/api/authApiSlice"
 
 type SignOutType = 'dont' | 'use'
 
 export default function useLogout() {
   const { setRollout } = useThemeContext() as ThemeContextType
-  const currentUserId = localStorage.getItem('revolving_userId')
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   const [signedOut] = useSignOutMutation()
-  const languages = useSelector(getLanguages)
   const { pathname } = useLocation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -28,34 +26,40 @@ export default function useLogout() {
         }
       })
       setRollout(false)
-      clearStorage(currentUserId as string, languages)
-      option == 'use' ? navigate('/signIn', { state: pathname }) : navigate('/signIn')
+      if(option === 'use') navigate('/signIn', { state: pathname })
+      else if(option === 'dont'){
+        localStorage.clear()
+        navigate('/signIn')
+      }
     }catch(err){
-      // const errors = error as ErrorResponse
       dispatch(signUserOut())
+      setRollout(false)
+      if(option === 'use') navigate('/signIn', { state: pathname })
+      else if(option === 'dont'){
+        localStorage.clear()
+        navigate('/signIn')
+      }
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
           background: '#8FBC8F'
         }
       })
-      clearStorage(currentUserId as string, languages)
-      option == 'use' ? navigate('/signIn', { state: pathname }) : navigate('/signIn')
     }
   }
-
   return signOut
 }
 
-function clearStorage(userId: string, languages: string[]){
-  localStorage.removeItem(`newTitle?id=${userId}`)
-  localStorage.removeItem(`newBody?id=${userId}`)
-  languages.map(language => {
-    localStorage.removeItem(`revolving-${language}`)
-  })
-  // localStorage.removeItem('revolving-codeStore')
+// function clearStorage(userId: string, languages: string[]){
+//   localStorage.removeItem(`newTitle?id=${userId}`)
+//   localStorage.removeItem(`newBody?id=${userId}`)
+//   languages.map(language => {
+//     localStorage.removeItem(`revolving-${language}`)
+//   })
+//   // localStorage.removeItem('revolving-codeStore')
 
-  localStorage.removeItem(`editTitle?id=${userId}`)
-  localStorage.removeItem(`editBody?id=${userId}`)
-  localStorage.removeItem('revolving_userId')
-  localStorage.removeItem('revolving-languageName')
-}
+//   localStorage.removeItem(`editTitle?id=${userId}`)
+//   localStorage.removeItem(`editBody?id=${userId}`)
+//   localStorage.removeItem('revolving_login_time')
+//   localStorage.removeItem('revolving_userId')
+//   localStorage.removeItem('revolving-languageName')
+// }

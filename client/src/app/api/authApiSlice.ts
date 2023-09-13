@@ -41,14 +41,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: credentials
       }) as any
     }),
-    forgotPassword: builder.mutation<AuthType, string>({
+    forgotPassword: builder.mutation<Omit<AuthType, 'updatedAt'>, string>({
       query: email => ({
         url: `auth/forgot_password?email=${email}`,
         method: 'POST',
         body: JSON.stringify({email})
       }) as any
     }),
-    newPassword: builder.mutation<AuthType, Pick<NewUser, 'email' | 'resetPass'>>({
+    newPassword: builder.mutation<Omit<AuthType, 'updatedAt'>, Pick<NewUser, 'email' | 'resetPass'>>({
       query: credentials => ({
         url: 'auth/new_password',
         method: 'POST',
@@ -89,18 +89,29 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: {email, length, option}
       }) as any
     }),
+
+    confirmPassword: builder.query<UserProps, {password: string, email: string}>({
+      query: ({email, password}) => ({
+        url: `auth/confirm_password`,
+        method: 'POST',
+        body: {email, password}
+      }) as any,
+      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+    }),
+
   })
 })
 
 export const {
+  useToggleRoleByAdminMutation,
+  useVerify_accountMutation, // not in use on client side
+  useForgotPasswordMutation,
+  useNewAccessTokenMutation,
+  useConfirmPasswordQuery,
+  useGenerateOTPMutation,
+  useNewPasswordMutation,
+  useConfirmOTPMutation,
   useSignUpMutation,
   useSignInMutation,
-  useVerify_accountMutation, // not in use on client side
   useSignOutMutation,
-  useForgotPasswordMutation,
-  useNewPasswordMutation,
-  useNewAccessTokenMutation,
-  useToggleRoleByAdminMutation,
-  useConfirmOTPMutation,
-  useGenerateOTPMutation,
 } = authApiSlice

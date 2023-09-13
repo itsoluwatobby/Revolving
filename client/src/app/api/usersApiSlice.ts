@@ -2,17 +2,6 @@ import { UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
 
-// interface TransformResponseType extends EntityState<UserProps>{
-//   baseQueryReturnValue?: UserProps[],
-//   meta?: FetchBaseQueryMeta,
-//   args?: void
-// }
-
-// type ReturnsThis = UserProps[] | Promise<UserProps[]>
-
-// const usersAdapter = createEntityAdapter<UserProps>({})
-
-// const initialState: EntityState<UserProps> = usersAdapter.getInitialState({})
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -66,7 +55,17 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         return baseQueryReturnValue?.data
       },
       providesTags: (result) => providesTag(result as UserProps[], 'USERS')
-    })
+    }),
+
+    subscribe: builder.mutation<UserProps, {subscriberId: string, subscribeeId: string}>({
+      query: ({subscriberId, subscribeeId}) => ({
+        url: `users/subscribe/${subscriberId}/${subscribeeId}`,
+        method: 'PUT',
+        body: subscriberId
+      }) as any,
+      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+    }),
+
   })
 })
 
@@ -75,6 +74,7 @@ export const {
   useGetCurrentUserMutation,
   useUpdateInfoMutation,
   useDeleteUserMutation,
+  useSubscribeMutation,
   useGetUserByIdQuery,
   useGetUsersQuery
 } = usersApiSlice

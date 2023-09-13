@@ -1,13 +1,14 @@
 import { Router } from "express";
-import { deleteUserAccount, followUnFollowUser, lockAndUnlockUserAccount, updateUserInfo } from "../controller/userController.js";
-import { verifyRoles } from "../middleware/verifyRoles.js";
 import { ROLES } from "../config/allowedRoles.js";
+import { verifyRoles } from "../middleware/verifyRoles.js";
+import UserControllerInstance from "../controller/userController.js";
 
 const userRouter: Router = Router()
 
-userRouter.put('/updateInfo/:userId', verifyRoles([ROLES.USER]), updateUserInfo);
-userRouter.put('/follow_unfollow/:followerId/:followingId', verifyRoles([ROLES.USER]), followUnFollowUser);
-userRouter.delete('/delete/:userId', verifyRoles([ROLES.USER, ROLES.ADMIN]), deleteUserAccount);
-userRouter.patch('/islocked/:userId', verifyRoles([ROLES.ADMIN]), lockAndUnlockUserAccount);
+userRouter.put('/updateInfo/:userId', verifyRoles([ROLES.USER]), UserControllerInstance.updateUserInfo);
+userRouter.patch('/islocked/:userId', verifyRoles([ROLES.ADMIN]), UserControllerInstance.lockAndUnlockUserAccount);
+userRouter.delete('/delete/:userId', verifyRoles([ROLES.USER, ROLES.ADMIN]), UserControllerInstance.deleteUserAccount);
+userRouter.put('/follow_unfollow/:followerId/:followingId', verifyRoles([ROLES.USER]), UserControllerInstance.followUnFollowUser);
+userRouter.put('/subscribe/:subscriberId/:subscribeeId', verifyRoles([ROLES.USER]), UserControllerInstance.subscribeToNotification);
 
 export default userRouter;

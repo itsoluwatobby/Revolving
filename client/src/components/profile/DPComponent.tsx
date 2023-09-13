@@ -1,16 +1,16 @@
-import { UserProps } from '../../data'
-import { ChangeEvent } from 'react'
-import { ImageTypeProp, TargetImageType, ThemeContextType } from '../../posts'
-import { useThemeContext } from '../../hooks/useThemeContext'
-import { BsFillPersonFill } from 'react-icons/bs'
 import EditModal from './EditModal'
+import { ChangeEvent } from 'react'
+import { UserProps } from '../../data'
+import { BsFillPersonFill } from 'react-icons/bs'
 import { IsLoadingSpinner } from '../IsLoadingSpinner'
+import { ImageTypeProp, ThemeContextType } from '../../posts'
+import { useThemeContext } from '../../hooks/useThemeContext'
 
 type Props = {
+  page?: 'EDIT',
   isLoading: boolean,
   userProfile: UserProps,
   hoverDp: ImageTypeProp,
-  image: TargetImageType,
   isLoadingDelete: boolean,
   isLoadingUpdate: boolean,
   imageType: ImageTypeProp,
@@ -19,7 +19,7 @@ type Props = {
   setHoverDp: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
 }
 
-export default function DPComponent({ userProfile, hoverDp, isLoading, image, isLoadingUpdate, isLoadingDelete, imageType, setHoverDp, handleImage, clearPhoto }: Props) {
+export default function DPComponent({ userProfile, hoverDp, page, isLoading, clearPhoto, isLoadingDelete, isLoadingUpdate, imageType, setHoverDp, handleImage }: Props) {
   const { theme, revealEditModal, setRevealEditModal } = useThemeContext() as ThemeContextType
 
   return (
@@ -33,7 +33,7 @@ export default function DPComponent({ userProfile, hoverDp, isLoading, image, is
         role="Display picture" 
         onMouseEnter={() => setHoverDp('DP')}
         onMouseLeave={() => setHoverDp('NIL')}
-        className={`absolute rounded-full z-20 border-2 shadow-inner shadow-slate-600 border-gray-300 w-28 lg:w-36 lg:h-36 h-28 translate-x-1/2 top-[70px] ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'} right-1/2`}>
+        className={`${page === 'EDIT' ? 'w-36 h-36' : 'absolute '} rounded-full z-20 border-2 shadow-inner shadow-slate-600 border-gray-300 w-28 lg:w-36 lg:h-36 h-28 translate-x-1/2 top-[70px] ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'} right-1/2`}>
         
         {
           userProfile?.displayPicture?.photo ?
@@ -46,8 +46,9 @@ export default function DPComponent({ userProfile, hoverDp, isLoading, image, is
         }
 
         <EditModal cover='DP'
+          setRevealEditModal={setRevealEditModal}
+          hoverDp={hoverDp} userProfile={userProfile} 
           theme={theme} clearPhoto={clearPhoto} revealEditModal={revealEditModal} 
-          hoverDp={hoverDp} userProfile={userProfile} setRevealEditModal={setRevealEditModal}
         />
         <div className={`absolute right-12 top-10 ${(imageType === 'DP' && (isLoadingDelete || isLoadingUpdate || isLoading)) ? 'block' : 'hidden'}`}>
           <IsLoadingSpinner />

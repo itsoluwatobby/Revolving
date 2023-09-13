@@ -1,35 +1,34 @@
-import { Home } from "./pages/Home"
-import { useThemeContext } from "./hooks/useThemeContext"
-import { ThemeContextType } from "./posts";
-import { Routes, Route } from 'react-router-dom';
-import { useDispatch, useSelector } from "react-redux";
-import { BlogLayout } from "./layouts/BlogLayout";
-import { NewStory } from "./pages/NewStory";
-import NotFound from "./pages/NotFound";
-import SingleStoryPage from "./pages/SingleStoryPage";
-import Welcome from "./layouts/Welcome";
-import LoginModal from "./pages/LoginModal";
-import RegisterModal from "./pages/RegisterModel";
-import NewPassword from "./pages/NewPassword";
-import { Toaster } from "react-hot-toast";
-import { PersistedLogin } from "./layouts/PersistedLogin";
-import ProfilePage from "./pages/ProfilePage";
 import About from "./pages/About";
-import { BsChatTextFill } from 'react-icons/bs'
-import ChatModal from "./pages/chatAdmin/ChatModal";
-import PrompLogin from "./components/modals/PrompLogin";
-import TaskManager from "./pages/TaskManager";
-import ExpensePlanner from "./pages/ExpensePlanner";
-import AdminPage from "./pages/AdminPage";
-import { ProtectedRoute } from "./layouts/ProtectedRoute";
-import { OTPEntry } from "./pages/OTPEntry";
-import { selectCurrentRoles } from "./features/auth/authSlice";
 import { USERROLES } from "./data";
-import Comments from "./components/comments/Comments";
-
+import { Home } from "./pages/Home";
+import Welcome from "./layouts/Welcome";
+import NotFound from "./pages/NotFound";
+import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import AdminPage from "./pages/AdminPage";
+import { ThemeContextType } from "./posts";
+import { OTPEntry } from "./pages/OTPEntry";
+import { NewStory } from "./pages/NewStory";
+import LoginModal from "./pages/LoginModal";
+import ProfilePage from "./pages/ProfilePage";
+import NewPassword from "./pages/NewPassword";
+import TaskManager from "./pages/TaskManager";
+import { BsChatTextFill } from 'react-icons/bs';
+import { Routes, Route } from 'react-router-dom';
+import RegisterModal from "./pages/RegisterModel";
+import { BlogLayout } from "./layouts/BlogLayout";
+import ExpensePlanner from "./pages/ExpensePlanner";
+import ChatModal from "./pages/chatAdmin/ChatModal";
+import SingleStoryPage from "./pages/SingleStoryPage";
+import PrompLogin from "./components/modals/PrompLogin";
+import { useThemeContext } from "./hooks/useThemeContext";
+import { PersistedLogin } from "./layouts/PersistedLogin";
+import { ProtectedRoute } from "./layouts/ProtectedRoute";
+import { selectCurrentRoles } from "./features/auth/authSlice";
+import EditProfilePage from "./pages/EditProfilePage";
  
 export const App = () => {
-  const {theme, openComment, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
+  const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
 
   return (
@@ -58,6 +57,7 @@ export const App = () => {
             <Route element={<ProtectedRoute roles={user_roles}/>}>
 
               <Route path="profile/:userId" element={<ProfilePage />} />
+              <Route path="edit_profile/:userId" element={<EditProfilePage />} />
               <Route path="taskManager/:userId" element={<TaskManager />} />
               <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
               <Route path="adminPage/:userId" element={<AdminPage />} />
@@ -86,7 +86,6 @@ export const App = () => {
         />
       }
       {loginPrompt == 'Open' ? <PrompLogin /> : null}
-      {/* {openComment?.option == 'Open' ? <Comments /> : null } */}
     </main>
   )
 }

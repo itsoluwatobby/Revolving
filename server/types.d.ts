@@ -140,6 +140,7 @@ interface UserProps extends Document{
   taskIds: string[]
   socialMediaAccounts: SocialMediaAccoutProp[],
   notificationSubscribers: string[],
+  subscribed: string[],
   createdAt: string,
   updatedAt: string
 }

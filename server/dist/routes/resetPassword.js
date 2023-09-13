@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { forgetPassword, passwordReset, passwordResetRedirectLink } from "../controller/authController.js";
+import AuthenticationInstance from "../controller/authController.js";
 const passwordResetRouter = Router();
 // RESET PASSWORD
-passwordResetRouter.post('/forgot_password', forgetPassword);
-passwordResetRouter.get('/password_reset', passwordResetRedirectLink);
-passwordResetRouter.post('/new_password', passwordReset);
+passwordResetRouter.post('/forgot_password', AuthenticationInstance.forgetPassword);
+passwordResetRouter.get('/password_reset', AuthenticationInstance.passwordResetRedirectLink);
+passwordResetRouter.post('/new_password', AuthenticationInstance.passwordReset);
 export default passwordResetRouter;
 //# sourceMappingURL=resetPassword.js.map

@@ -8,17 +8,19 @@ interface UserAuthType extends AuthType{
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState:{_id: '', accessToken: '', roles: [], persistedLogin: (JSON.parse(localStorage.getItem('persist-login') as string) as boolean) || false} as UserAuthType,
+  initialState:{_id: '', accessToken: '', roles: [], updatedAt: '', persistedLogin: (JSON.parse(localStorage.getItem('persist-login') as string) as boolean) || false} as UserAuthType,
   reducers: {
     setCredentials: (state, action: PayloadAction<AuthType>) => {
-      const { _id, accessToken, roles } = action.payload
+      const { _id, accessToken, roles, updatedAt } = action.payload
       state._id = _id
       state.accessToken = accessToken
+      state.updatedAt = updatedAt
       state.roles = roles
     },
     signUserOut: (state) => {
       state._id = ''
       state.accessToken = ''
+      state.updatedAt = ''
       state.roles = []
     },
     persistLogin: (state, action) => {

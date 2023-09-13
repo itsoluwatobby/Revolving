@@ -1,22 +1,21 @@
 import { toast } from "react-hot-toast";
-import { ChangeEvent, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ErrorStyle } from "../utils/navigator";
 import { ErrorResponse, UserProps } from "../data";
-import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../posts";
+import { ChangeEvent, useEffect, useState } from 'react';
 import ProfileMid from "../components/profile/ProfileMid";
 import ProfileTop from "../components/profile/ProfileTop";
 import { useThemeContext } from "../hooks/useThemeContext";
 import ProfileBase from "../components/profile/ProfileBase";
 import { useGetUserByIdQuery, useUpdateInfoMutation } from "../app/api/usersApiSlice";
+import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../posts";
 import { useDeleteImageMutation, useGetStoriesWithUserIdQuery, useUploadImageMutation } from "../app/api/storyApiSlice";
 
 const initialState = {name: null, data: null}
 
 export default function ProfilePage() {
   const { userId } = useParams()
-  const MAX_SIZE = 1_530_000 as const // 1.53mb
-  // const [getCurrentUser] = useGetCurrentUserMutation()
+  const MAX_SIZE = 1_000_000 as const // 1mb
   const { data: userData } = useGetUserByIdQuery(userId as string)
   const [userProfile, setUserProfile] = useState<UserProps>()
   const [imageType, setImageType] = useState<ImageTypeProp>('NIL')
@@ -76,7 +75,7 @@ export default function ProfilePage() {
       if(!image?.data) return
       if(image?.data?.size > MAX_SIZE){
         setImage(initialState)
-        return alert('MAX ALLOWED FILE SIZE IS 1.53MB')
+        return alert('MAX ALLOWED FILE SIZE IS 1MB')
       }
       else{
         if(!userProfile) return
@@ -163,29 +162,30 @@ export default function ProfilePage() {
     setOpenChat('Hide')
     setLoginPrompt('Hide')
   }
+  console.log(userProfile)
 
   return (
     <main
       role="User profile"
       onClick={closeSetups}
-      className={`hidebars single_page md:pt-8 text-sm p-2 flex flex-col gap-2 w-full overflow-y-scroll`}>
+      className={`hidebars single_page md:pt-8 text-sm p-2 flex-col gap-2 w-full overflow-y-scroll`}>
 
       <section className={`relative flex-auto text-sm flex md:flex-row flex-col gap-2 w-full`}>
         <ProfileTop 
           userProfile={userProfile as UserProps} 
-          isLoadingUpdate={isLoadingUpdate} clearPhoto={clearPhoto}
-          isLoadingDelete={isLoadingDelete} handleImage={handleImage}
-          isLoading={isLoading} image={image} imageType={imageType}
+          handleImage={handleImage} imageType={imageType}
+          isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
+          clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
         />
         <ProfileMid 
-          userProfile={userProfile as UserProps} theme={theme} 
           setRevealEditModal={setRevealEditModal} 
+          userProfile={userProfile as UserProps} theme={theme} 
         />
       </section>
 
       <ProfileBase 
-        userProfile={userProfile as UserProps} theme={theme} 
         userStories={userStories as PostType[]} 
+        userProfile={userProfile as UserProps} theme={theme} 
         isStoryLoading={isStoryLoading} isStoryError={isStoryError} 
         storyError={storyError} setRevealEditModal={setRevealEditModal}
       />

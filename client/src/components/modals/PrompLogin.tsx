@@ -1,10 +1,17 @@
+import useLogout from "../../hooks/useLogout"
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { ThemeContextType } from "../../posts"
 import { Link, useLocation } from "react-router-dom"
 
 export default function PrompLogin() {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
+  const signout = useLogout()
   const { pathname } = useLocation()
+
+  const signUserOut = () => {
+    signout('use')
+    setLoginPrompt('Hide')
+  }
 
   return (
     <main 
@@ -14,7 +21,7 @@ export default function PrompLogin() {
         {pathname == '/new_story' ? 'Please copy entries as progess may be lost' : 'Please sigin to continue'}
         <Link to={'/signIn'} state={pathname}>
           <button 
-            onClick={() => setLoginPrompt('Hide')}
+            onClick={signUserOut}
             className="border rounded-md p-2 bg-slate-400 shadow-lg hover:bg-slate-500 transition-all active:scale-[1.03] uppercase font-medium text-gray-900">
             Sign in
           </button>

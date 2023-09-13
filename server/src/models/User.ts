@@ -46,6 +46,7 @@ const USERSCHEMA: Schema = new Schema(
     gender: { type: String, enum: ['Female', 'Male', 'Others'] },
     taskIds: { type: Array, default: [] },
     notificationSubscribers: { type: Array, default: [] },
+    subscribed: { type: Array, default: [] },
     stack: [SocialMedia],
     socialMediaAccounts: { type: Array, default: [] },
     country: { type: String, default: '' },
