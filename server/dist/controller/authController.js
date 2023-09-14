@@ -246,7 +246,7 @@ class AuthenticationController extends UserService {
                     yield redisFunc();
                     return res.sendStatus(204);
                 }
-                user.updateOne({ $set: { status: 'offline', userSession: '', refreshToken: '', verificationToken: { token: '' } } });
+                yield user.updateOne({ $set: { status: 'offline', userSession: '', lastSeen: this.dateTime, refreshToken: '', verificationToken: { token: '' } } });
                 yield redisFunc();
                 res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true }); //secure: true
                 return res.sendStatus(204);
@@ -328,10 +328,10 @@ class AuthenticationController extends UserService {
                 return res.sendStatus(400);
             const user = yield UserModel.findOne({ email }).select('+password').exec();
             if (!user)
-                return responseType({ res, status: 401, message: 'Bad credentials' });
+                return responseType({ res, status: 403, message: 'Bad credentials' });
             const isUserValid = yield brcypt.compare(password, user === null || user === void 0 ? void 0 : user.password);
             if (!isUserValid)
-                return responseType({ res, status: 401, message: 'Bad credentials' });
+                return responseType({ res, status: 403, message: 'Bad credentials' });
             return responseType({ res, status: 200, message: 'authentication successful' });
         }));
     }

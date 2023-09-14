@@ -26,7 +26,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         url: `responses/${userId}/${commentId}`,
         method: 'POST',
         body: {...response}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'RESPONSE', id: 'LIST' }, { type: 'COMMENT', id: 'LIST' }],
     }),
 
@@ -35,7 +35,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         url: `responses/${userId}/${responseId}`,
         method: 'PUT',
         body: {...response}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}],
     }),
     
@@ -44,7 +44,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         url: `responses/${userId}/${responseId}`,
         method: 'PATCH',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}],
     }),
     
@@ -54,7 +54,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         url: `responses/${userId}/${responseId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}, { type: 'COMMENT', id: 'LIST' }],
     }),
 
@@ -63,7 +63,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         url: `responses/admin/${adminId}/${userId}/${responseId}?command=${command}&commentId=${commentId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'RESPONSE', id: 'LIST' }, { type: 'COMMENT', id: 'LIST'}],
     }),
 

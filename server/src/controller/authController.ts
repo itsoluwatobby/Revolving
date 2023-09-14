@@ -247,7 +247,7 @@ class AuthenticationController extends UserService{
         await redisFunc()
         return res.sendStatus(204);
       }
-      user.updateOne({$set: {status: 'offline', userSession: '', refreshToken: '', verificationToken: { token: '' } }})
+      await user.updateOne({$set: {status: 'offline', userSession: '', lastSeen: this.dateTime, refreshToken: '', verificationToken: { token: '' } }})
       await redisFunc()
       res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
       return res.sendStatus(204)
@@ -321,9 +321,9 @@ class AuthenticationController extends UserService{
       const {password, email} = req.body
       if(!email || !password) return res.sendStatus(400)
       const user = await UserModel.findOne({email}).select('+password').exec();
-      if(!user) return responseType({res, status: 401, message:'Bad credentials'})
+      if(!user) return responseType({res, status: 403, message:'Bad credentials'})
       const isUserValid = await brcypt.compare(password, user?.password);
-      if(!isUserValid) return responseType({res, status: 401, message:'Bad credentials'})
+      if(!isUserValid) return responseType({res, status: 403, message:'Bad credentials'})
       return responseType({res, status:200, message:'authentication successful'})
     })
   }

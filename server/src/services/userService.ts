@@ -2,6 +2,7 @@ import { UserProps } from "../../types.js";
 import { UserModel } from "../models/User.js";
 import StoryServiceInstance from "./StoryService.js";
 import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
+import { userInfo } from "os";
 
 export class UserService{
 
@@ -32,7 +33,7 @@ export class UserService{
   }
 
   async updateUser(userId: string, updatedUser: UserProps){
-    return await UserModel.findByIdAndUpdate({ _id: userId }, {...updatedUser})
+    return await UserModel.findByIdAndUpdate({ _id: userId }, updatedUser, {new: true})
   }
 
   async followOrUnFollow(followerId: string, followingId: string): Promise<string>{

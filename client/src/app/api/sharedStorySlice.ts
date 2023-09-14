@@ -17,7 +17,7 @@ export const sharedStoryApiSlice = apiSlice.injectEndpoints({
         url: `story/share/${userId}/${storyId}`,
         method: 'POST',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY' }, { type: 'STORY', id: 'LIST' }, { type: 'SHAREDSTORY' }],
     }),
 
@@ -26,7 +26,7 @@ export const sharedStoryApiSlice = apiSlice.injectEndpoints({
         url: `story/unshare/${userId}/${sharedId}`,
         method: 'PUT',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}, { type: 'SHAREDSTORY', id: 'LIST' }],
     }),
     
@@ -35,7 +35,7 @@ export const sharedStoryApiSlice = apiSlice.injectEndpoints({
         url: `story/share/${userId}/${sharedId}`,
         method: 'PATCH',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST' }, { type: 'SHAREDSTORY', id: 'LIST' }],
     }),
 

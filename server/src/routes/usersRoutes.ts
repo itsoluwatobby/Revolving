@@ -9,6 +9,6 @@ userRouter.put('/updateInfo/:userId', verifyRoles([ROLES.USER]), UserControllerI
 userRouter.patch('/islocked/:userId', verifyRoles([ROLES.ADMIN]), UserControllerInstance.lockAndUnlockUserAccount);
 userRouter.delete('/delete/:userId', verifyRoles([ROLES.USER, ROLES.ADMIN]), UserControllerInstance.deleteUserAccount);
 userRouter.put('/follow_unfollow/:followerId/:followingId', verifyRoles([ROLES.USER]), UserControllerInstance.followUnFollowUser);
-userRouter.put('/subscribe/:subscriberId/:subscribeeId', verifyRoles([ROLES.USER]), UserControllerInstance.subscribeToNotification);
+userRouter.put('/subscribe/:subscribeId/:subscriberId', verifyRoles([ROLES.USER]), UserControllerInstance.subscribeToNotification);
 
 export default userRouter;

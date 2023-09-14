@@ -17,7 +17,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `story/${userId}`,
         method: 'POST',
         body: {...story}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY' }],
     }),
     
@@ -26,7 +26,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `images/upload`,
         method: 'POST',
         body: imageData
-      }) as any,
+      }),
       transformResponse: (baseQueryReturnValue: {data: ImageRes}) => {
         return baseQueryReturnValue?.data
       },
@@ -37,7 +37,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `images/${imageName}`,
         method: 'DELETE',
         body: imageName
-      }) as any,
+      }),
     }),
 
     updateStory: builder.mutation<PostType, StoryArgs>({
@@ -45,7 +45,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `story/${userId}/${storyId}`,
         method: 'PUT',
         body: {...story}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
     
@@ -54,7 +54,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `story/${userId}/${storyId}`,
         method: 'PATCH',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST' }],
     }),
     
@@ -63,7 +63,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         url: `story/${userId}/${storyId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'STORY', id: 'LIST'}],
     }),
 

@@ -8,7 +8,6 @@ import { useSignUpMutation } from '../app/api/authApiSlice';
 import { ErrorStyle, SuccessStyle } from '../utils/navigator';
 import { useNavigate } from 'react-router-dom';
 
-
 export default function RegisterModal() {
   const [username, setUsername] = useState<string>('')
   const [email, setEmail] = useState<string>('')
@@ -20,7 +19,7 @@ export default function RegisterModal() {
   const [validEmail, setValidEmail] = useState<boolean>(false);
   const [match, setMatch] = useState<boolean>(false);
   const { theme, setRollout } = useThemeContext() as ThemeContextType;
-  const [signUp, { isLoading, isError, error, isSuccess }] = useSignUpMutation()
+  const [signUp, { isLoading, isError, error }] = useSignUpMutation()
   const navigate = useNavigate()
 
   const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/

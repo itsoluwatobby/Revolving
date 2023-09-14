@@ -85,6 +85,7 @@ interface CommentProps{
 }
 
 type ConfirmationMethodType = 'LINK' | 'OTP'
+type Gender = "Female" | "Male" | "Others" | "Undecided"
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
@@ -109,38 +110,44 @@ type SocialMediaAccoutProp = {
   link: string
 }
 
+type VerificationTokenType = { 
+  token: string, 
+  createdAt: string,
+  type: ConfirmationMethodType, 
+}
+
 interface UserProps extends Document{
-  username: string,
   email: string,
-  description: string,
+  gender: Gender,
+  country: string,
+  stack: string[],
+  lastName: string,
   password: string,
-  userSession: string,
+  username: string,
+  lastSeen: string,
+  taskIds: string[],
+  hobbies: string[],
+  firstName: string,
   roles: USERROLES[],
-  registrationDate: string,
+  dateLocked: string,
+  description: string,
+  userSession: string,
+  refreshToken: string,
+  subscribed: string[],
+  followers?: string[],
+  followings?: string[],
   displayPicture: {
     coverPhoto: string, 
     photo: string
   },
-  isAccountActivated: boolean,
+  registrationDate: string,
   isAccountLocked: boolean,
   isResetPassword: boolean,
-  verificationToken: { type: ConfirmationMethodType, token: string, createdAt: string },
-  dateLocked: string,
-  followers?: string[],
-  followings?: string[],
-  lastSeen: string,
-  hobbies: string[],
+  isAccountActivated: boolean,
   status: 'online' | 'offline',
-  refreshToken: string,
-  gender: 'Female' | 'Male' | 'Others',
-  firstName: string,
-  lastName: string,
-  stack: string[],
-  country: string,
-  taskIds: string[]
-  socialMediaAccounts: SocialMediaAccoutProp[],
   notificationSubscribers: string[],
-  subscribed: string[],
+  verificationToken: VerificationTokenType,
+  socialMediaAccounts: SocialMediaAccoutProp[],
   createdAt: string,
   updatedAt: string
 }

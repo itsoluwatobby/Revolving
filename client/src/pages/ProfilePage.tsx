@@ -87,6 +87,10 @@ export default function ProfilePage() {
           // throw new Error("Testing Ongoing")
           if(image?.name === 'photo'){
             setImageType('DP')
+            if(userProfile?.displayPicture?.photo){
+              const imageName = userProfile?.displayPicture?.photo.substring(userProfile?.displayPicture?.photo?.lastIndexOf('/')+1)
+              await deleteImage(imageName)
+            }
             const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: res?.url } }
             await upDateUserInfo(user)
             .then(() => {
@@ -102,6 +106,10 @@ export default function ProfilePage() {
           }
           else if(image?.name === 'coverPhoto'){
             setImageType('COVER')
+            if(userProfile?.displayPicture?.coverPhoto){
+              const imageName = userProfile?.displayPicture?.coverPhoto.substring(userProfile?.displayPicture?.coverPhoto?.lastIndexOf('/')+1)
+              await deleteImage(imageName)
+            }
             const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, coverPhoto: res?.url } }
             await upDateUserInfo(user)
             .then(() => {
@@ -127,7 +135,7 @@ export default function ProfilePage() {
     return () => {
       isMounted = false
     }
-  }, [image?.data, image?.name, setLoginPrompt, setRevealEditModal, uploadToServer, upDateUserInfo, userProfile])
+  }, [image?.data, image?.name, setLoginPrompt, deleteImage, setRevealEditModal, uploadToServer, upDateUserInfo, userProfile])
 
   const clearPhoto = async(type: ImageTypeProp) => {
     if(!userProfile) return

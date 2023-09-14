@@ -21,6 +21,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { userId } = useParams()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`, '/signIn', '/signUp', '/new_password', '/otp']
+  const searchBar = ['/', `/story/${storyId}`, `/taskManager/${userId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
 
   return (
@@ -36,7 +37,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
           />
         </Link>
       {
-        !address.includes(pathname) ?
+        searchBar.includes(pathname) ?
           <div 
             onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
             className={`flex gap-0.5 justify-around items-center rounded-md md:w-60 sm:w-48 mobile:w-32 h-full ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-0`}>  

@@ -136,25 +136,26 @@ class UserController {
     subscribeToNotification(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const { subscriberId, subscribeeId } = req.params;
-            if (!subscriberId || !subscribeeId)
+            const { subscribeId, subscriberId } = req.params;
+            if (!subscribeId || !subscriberId)
                 return res.sendStatus(400);
-            const subscribee = yield userServiceInstance.getUserById(subscribeeId);
-            const subscriber = yield userServiceInstance.getUserById(subscriberId);
-            if (!subscriber)
+            // subscribeId - recipient, subscriberId - subscriber
+            const subscribee = yield userServiceInstance.getUserById(subscriberId);
+            const subscribe = yield userServiceInstance.getUserById(subscribeId);
+            if (!subscribe)
                 return responseType({ res, status: 404, message: 'User not found' });
-            if ((_a = subscriber === null || subscriber === void 0 ? void 0 : subscriber.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.includes(subscribeeId)) {
-                subscriber.updateOne({ $pull: { notificationSubscribers: { subscribeeId } } })
+            if ((_a = subscribe === null || subscribe === void 0 ? void 0 : subscribe.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.includes(subscriberId)) {
+                subscribe.updateOne({ $pull: { notificationSubscribers: { subscriberId } } })
                     .then(() => __awaiter(this, void 0, void 0, function* () {
-                    yield subscribee.updateOne({ $pull: { subscribed: { subscriberId } } });
-                    return responseType({ res, status: 201, message: 'You unsubscrbed' });
+                    yield subscribee.updateOne({ $pull: { subscribed: { subscribeId } } });
+                    return responseType({ res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL' });
                 })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
             }
             else {
-                subscriber.updateOne({ $push: { notificationSubscribers: { subscribeeId } } })
+                subscribe.updateOne({ $push: { notificationSubscribers: { subscriberId } } })
                     .then(() => __awaiter(this, void 0, void 0, function* () {
-                    yield subscribee.updateOne({ $push: { subscribed: { subscriberId } } });
-                    return responseType({ res, status: 201, message: 'You subscrbed' });
+                    yield subscribee.updateOne({ $push: { subscribed: { subscribeId } } });
+                    return responseType({ res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED' });
                 })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
             }
         }));

@@ -30,7 +30,7 @@ export default function ProfileMid({ userProfile, setRevealEditModal, theme }: P
               <div className={`${userProfile?.firstName ? 'flex' : 'flex'} items-center gap-1.5 mb-2`}>
                 <p className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'}`}>Name:</p>
                 <p className="font-medium capitalize cursor-pointer whitespace-pre-wrap tracking-wide">
-                  {reduceLength(userProfile?.firstName as string, 20, 'letter')}
+                  {reduceLength(userProfile?.firstName as string, 20, 'letter')}&nbsp;
                   {reduceLength(userProfile?.lastName as string, 20, 'letter')}
                 </p>
               </div>
@@ -63,12 +63,12 @@ export default function ProfileMid({ userProfile, setRevealEditModal, theme }: P
               <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
               <div className={`stackflow overflow-y-scroll h-12 p-1 pt-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
                 {
-                  // userStories?.skills?.map(skill => {
-                  [...Array(8).keys()]?.map(i => (
+                  // userStories?.stack?.map(skill => {
+                    userProfile?.stack?.map(skill => (
                     <p 
-                      key={i}
+                      key={skill}
                       className="rounded-md hover:opacity-80 tracking-wide capitalize transition-all cursor-grab">
-                        Javascript
+                        {skill}
                     </p>
                   ))
                 }
@@ -84,7 +84,7 @@ export default function ProfileMid({ userProfile, setRevealEditModal, theme }: P
             <p 
               onDoubleClick={() => setShowAll(prev => !prev)}
               className="text-justify cursor-pointer w-full whitespace-pre-wrap tracking-wide first-letter:text-lg transition-all">
-              {showAll ? about : reduceLength(about, 50, 'word')}
+              {showAll ? userProfile?.description : reduceLength(userProfile?.description, 50, 'word')}
             </p>
           </div>
       {/* 

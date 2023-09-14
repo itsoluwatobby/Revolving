@@ -59,7 +59,7 @@ class UserController{
     asyncFunc(res, async () => {
       const {userId} = req.params
       const userInfo: UserProps = req.body
-      if (!userId) return res.sendStatus(400);
+      if(!userId) return res.sendStatus(400);
       const user = await userServiceInstance.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
@@ -125,24 +125,25 @@ class UserController{
 
   subscribeToNotification(req: Request, res: Response){
     asyncFunc(res, async() => {
-      const {subscriberId, subscribeeId} = req.params
-      if(!subscriberId || !subscribeeId) return res.sendStatus(400)
-      const subscribee = await userServiceInstance.getUserById(subscribeeId);
-      const subscriber = await userServiceInstance.getUserById(subscriberId);
-      if(!subscriber) return responseType({res, status: 404, message: 'User not found'})
+      const {subscribeId, subscriberId} = req.params
+      if(!subscribeId || !subscriberId) return res.sendStatus(400)
+      // subscribeId - recipient, subscriberId - subscriber
+      const subscribee = await userServiceInstance.getUserById(subscriberId);
+      const subscribe = await userServiceInstance.getUserById(subscribeId);
+      if(!subscribe) return responseType({res, status: 404, message: 'User not found'})
 
-      if(subscriber?.notificationSubscribers?.includes(subscribeeId)){
-        subscriber.updateOne({$pull: {notificationSubscribers: { subscribeeId }}})
+      if(subscribe?.notificationSubscribers?.includes(subscriberId)){
+        subscribe.updateOne({$pull: {notificationSubscribers: { subscriberId }}})
         .then(async() => {
-          await subscribee.updateOne({$pull: { subscribed: { subscriberId } }})
-          return responseType({res, status: 201, message: 'You unsubscrbed'})
+          await subscribee.updateOne({$pull: { subscribed: { subscribeId } }})
+          return responseType({res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL'})
         }).catch(() => responseType({res, status: 400, message: 'unable to subscribe'}))
       }
       else{
-        subscriber.updateOne({$push: {notificationSubscribers: { subscribeeId }}})
+        subscribe.updateOne({$push: {notificationSubscribers: { subscriberId }}})
         .then(async() => {
-          await subscribee.updateOne({$push: { subscribed: { subscriberId } }})
-          return responseType({res, status: 201, message: 'You subscrbed'})
+          await subscribee.updateOne({$push: { subscribed: { subscribeId } }})
+          return responseType({res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED'})
         }).catch(() => responseType({res, status: 400, message: 'unable to subscribe'}))
       }
     })
