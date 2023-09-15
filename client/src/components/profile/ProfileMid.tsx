@@ -98,7 +98,7 @@ export default function ProfileMid({ userProfile, setRevealEditModal, theme }: P
             </div>
           </div>
 
-          <div className="flex flex-col mt-1 lg:mt-2 w-full">
+          <div className={`${userProfile?.description ? 'flex' : 'hidden'} flex-col mt-1 lg:mt-2 md:mt-1 w-full`}>
             <p className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'} underline underline-offset-2`}>
               About: 
             </p>

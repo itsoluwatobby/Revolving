@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { PostType, ThemeContextType } from "../../posts";
-import { useThemeContext } from "../../hooks/useThemeContext";
-import { useEffect, useState } from "react";
 import { reduceLength } from "../../utils/navigator";
+import { PostType, ThemeContextType } from "../../posts";
+import useRecentStories from "../../hooks/useRecentStories";
+import { useThemeContext } from "../../hooks/useThemeContext";
 
 type AsideProps = {
   sidebar: boolean,
@@ -13,19 +14,7 @@ type AsideProps = {
 
 export default function Aside({ stories, setSidebar, sidebar, setIsBarOpen }: AsideProps) {
   const { theme } = useThemeContext() as ThemeContextType
-  const [recentStories, setRecentStories] = useState<PostType[]>([])
-
-  useEffect(() => {
-    let isMounted = true
-    if(isMounted){
-      setRecentStories(
-        stories?.filter(story => +new Date(story.createdAt).getDay() < 3)
-      )
-    }
-    return () => {
-      isMounted = false
-    }
-  }, [stories])
+  const recentStories = useRecentStories(stories)
 
   useEffect(() => {
     let isMounted = true
@@ -58,7 +47,7 @@ export default function Aside({ stories, setSidebar, sidebar, setIsBarOpen }: As
                 >
                   <Link to={`/story/${story?._id}`}>
                     <p className="text-center font-serif uppercase font-medium underline underline-offset-4">{reduceLength(story?.title, 3, 'word')}</p>
-                    <p className="cursor-pointer whitespace-pre-wrap text-justify">{reduceLength(story?.body, 23, 'word')}</p>
+                    <p className="cursor-pointer whitespace-pre-wrap break-all">{reduceLength(story?.body, 180, 'letter')}</p>
                   </Link>
                 </li>
               ))

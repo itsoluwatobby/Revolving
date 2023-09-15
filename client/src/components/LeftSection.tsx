@@ -61,29 +61,34 @@ export const LeftSection = () => {
   return (
     <section className={`sidebars h-full mt-6 ${address.includes(pathname) ? 'hidden' : 'md:block'} flex-none sm:w-[28%] lg:w-1/5 transition-all overflow-y-scroll ${toggleLeft === 'Open' ? 'maxscreen:fixed maxscreen:mt-20 maxscreen:w-full' : 'hidden maxscreen:w-0'} ${theme == 'light' ? 'bg-gray-50  maxscreen:bg-opacity-20' : 'bg-slate-700 maxscreen:bg-opacity-20'}  rounded-tr-lg z-50`}>
 
-      <div className={`sidebars h-[89%] overflow-y-scroll flex flex-col rounded-tr-md gap-1 maxscreen:w-[45%] maxmobile:w-1/2 ${theme == 'light' ? 'maxscreen:bg-gray-50' : 'maxscreen:bg-slate-700'}`}>
-
-        <div className={`relative w-full h-8 flex items-center`}>
-          <button
-            onClick={() => setToggleLeft('Hide')}
-            className={`absolute p-2 text-sm sm:hidden pt-1 pb-1 text-center rounded-md right-0.5 ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-500'}`}
-          >
-            close
-          </button>
+      <div className={`sidebars h-[89%] sm:h-[97%]  overflow-y-scroll flex flex-col rounded-tr-md justify-between maxscreen:w-[45%] maxmobile:w-1/2 ${theme == 'light' ? 'maxscreen:bg-gray-50' : 'maxscreen:bg-slate-700'}`}>
+        
+        <div className='flex flex-col w-full gap-1'>
+          
+          <div className={`relative w-full h-8 flex items-center`}>
+            <button
+              onClick={() => setToggleLeft('Hide')}
+              className={`absolute p-2 text-sm sm:hidden pt-1 pb-1 text-center rounded-md right-0.5 ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-500'}`}
+            >
+              close
+            </button>
+          </div>
+          <div className={`h-full p-2 flex flex-col gap-1`}>
+            {
+              routeLinkNames({ userId: currentUserId }).map(values => (
+                <Link to={conditionalRouting(values) ? '' : values.link}
+                  key={values.name}
+                  onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
+                  className={`p-3 lg:py-4 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-300 border-t-0 border-b-1`}
+                >
+                  {values.name}
+                </Link>
+              ))
+            }
+          </div>
+        
         </div>
-        <div className={`h-full p-2 flex flex-col gap-1`}>
-          {
-            routeLinkNames({ userId: currentUserId }).map(values => (
-              <Link to={conditionalRouting(values) ? '' : values.link}
-                key={values.name}
-                onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
-                className={`p-3 lg:py-4 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-300 border-t-0 border-b-1`}
-              >
-                {values.name}
-              </Link>
-            ))
-          }
-        </div>
+        
         <Link to={`/profile/${currentUser?._id}`} className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full flex items-center gap-2 rounded-md`}>
           <figure className="rounded-full border-2 shadow-2xl h-10 w-10">
             {

@@ -20,7 +20,7 @@ export const Post = ({ story, page }: Props) => {
   const end = averageReadingTime.split(' ')[1]
 
   averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end
-  const adjustedStory = page === 'OTHERS' ? reduceLength(story?.body, 120, 'word') : reduceLength(story?.body, 45, 'word')
+  const adjustedStory = page === 'OTHERS' ? reduceLength(story?.body, 120, 'word') : reduceLength(story?.body, 150, 'word')
 
   const watchWords = TextRules.keywords as string[]
   const bodyContent = story && story?.body ? adjustedStory.split(' ').map((word, index) => {

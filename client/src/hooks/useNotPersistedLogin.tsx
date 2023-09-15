@@ -1,7 +1,6 @@
 /**
 * @description checks if user login time is valid in order to 
 * get a new accessToken in cases of a refresh
-* @param loginTime: string, User login date
 * @returns VALID onsuccess else INVALID onerror
 */
 

@@ -321,14 +321,14 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
         </div>
         
         <ArrayComponent 
-          addToArray={addToArray} inputRef={inputRef1} maxLetter={15} max={5}
+          addToArray={addToArray} inputRef={inputRef1} maxLetter={20} max={5}
           theme={theme} handleChange={handleChange} hobbies={hobbies as string[]}
           name='hobbiesEntry' placeholder='Hobbies' value={hobbiesEntry as string}
           removeFromArray={removeFromArray} scrollRef={scrollRef1 as React.LegacyRef<HTMLParagraphElement>}
         />
         
         <ArrayComponent 
-          addToArray={addToArray} inputRef={inputRef2} maxLetter={15} 
+          addToArray={addToArray} inputRef={inputRef2} maxLetter={20} 
           theme={theme} handleChange={handleChange} hobbies={stack as string[]}
           name='stackEntry' placeholder='Skills' value={stackEntry as string} max={10}
           removeFromArray={removeFromArray} scrollRef={scrollRef2 as React.LegacyRef<HTMLParagraphElement>}

@@ -25,6 +25,7 @@ export const InputField = ({ title, refVal, name, maxLetter, value, theme, handl
           maxLength={maxLetter}
           value={value} placeholder={placeholder} 
           onChange={handleChange}
+          autoComplete="off"
           className={`w-full px-2 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-100'} text-black py-1 h-full border-none focus:outline-none placeholder:text-gray-600 rounded-sm`}
         />
       </div>
