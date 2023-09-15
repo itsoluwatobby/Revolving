@@ -3,6 +3,7 @@ import PasswordChecker from './PasswordChecker'
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { BsCheck } from 'react-icons/bs';
 import { FaTimes } from 'react-icons/fa';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 type PasswordCompoProps = {
   page?: 'EDIT',
@@ -22,7 +23,7 @@ export default function PasswordInput({
   const [correct, setCorrect] = useState(true);
 
   useEffect(() => {
-    let timerId: any = '';
+    let timerId: TimeoutId;
     if(passwordRegex.test(password)){
       timerId = setTimeout(() => {
         setCorrect(false)
@@ -42,7 +43,7 @@ export default function PasswordInput({
 
         <div className={`relative flex flex-col w-full ${page === 'EDIT' ? '' : 'p-2'} pt-0 pb-0 gap-0.5`}>
           <label htmlFor='password' className='flex items-center gap-2 font-medium text-sm'>
-            Password
+            {page === 'EDIT' ? 'New password' : 'Password'}
             {password && (passwordRegex.test(password) ? <BsCheck className='text-green-600 text-2xl'/> : <FaTimes className='ml-1 text-red-500' />)}
           </label>
             <input 
@@ -83,7 +84,7 @@ export default function PasswordInput({
             type={revealPassword ? "text" : "password"} 
             value={confirmPassword}
             id='confirm-pwd'
-            name='confirm password'
+            name='confirmPassword'
             required
             placeholder='*************'
             autoComplete='off'

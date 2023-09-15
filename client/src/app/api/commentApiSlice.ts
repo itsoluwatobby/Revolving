@@ -26,7 +26,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         url: `comments/${userId}/${storyId}`,
         method: 'POST',
         body: {...comment}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'COMMENT' }, { type: 'STORY', id: 'LIST' }],
     }),
 
@@ -35,7 +35,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         url: `comments/${userId}/${commentId}`,
         method: 'PUT',
         body: {...comment}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
     }),
     
@@ -44,7 +44,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         url: `comments/${userId}/${commentId}`,
         method: 'PATCH',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
     }),
     
@@ -54,7 +54,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         url: `comments/${userId}/${commentId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }],
     }),
 
@@ -63,7 +63,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         url: `comments/admin/${adminId}/${userId}/${commentId}?command=${command}&storyId=${storyId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }],
     }),
 

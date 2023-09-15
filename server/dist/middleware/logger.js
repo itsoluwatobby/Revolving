@@ -7,13 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-export const eventLogger = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    next();
-    const date = new Intl.DateTimeFormat('en-US', {
-        dateStyle: 'full'
-    }).format(new Date());
-    const errStats = (res === null || res === void 0 ? void 0 : res.statusCode) >= 400 ? `${res.statusMessage}` : '';
-    const logMessage = `-${req.hostname}::${req.httpVersion} - [${date}] "${req.method} ${req.baseUrl}${req.url}" ${res.statusCode + ' ' + req.headers.origin} ${errStats}`;
-    console.info(logMessage);
-});
+export function eventLogger(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        next();
+        const date = new Intl.DateTimeFormat('en-US', {
+            dateStyle: 'full'
+        }).format(new Date());
+        const errStats = (res === null || res === void 0 ? void 0 : res.statusCode) >= 400 ? `${res.statusMessage}` : '';
+        const logMessage = `-${req.hostname}::${req.httpVersion} - [${date}] "${req.method} ${req.baseUrl}${req.url}" ${res.statusCode + ' ' + req.headers.origin} ${errStats}`;
+        console.info(logMessage);
+    });
+}
 //# sourceMappingURL=logger.js.map

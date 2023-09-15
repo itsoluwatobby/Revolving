@@ -3,9 +3,8 @@ import fsPromises from 'fs/promises';
 import { Request, Response } from "express";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 
-class ImageController{
 
-  uploadImages(req: Request, res: Response){
+  export function uploadImages(req: Request, res: Response){
     asyncFunc(res, async() => {
       const uploadedFile = req.file;
       const uniqueId = uuidV4()
@@ -22,7 +21,7 @@ class ImageController{
   }
 
   // Using express-static middleware to serve my images
-  getImage(req: Request, res: Response){
+  export function getImage(req: Request, res: Response){
     asyncFunc(res, async() => {
       const {imageName} = req.params
       const pathname = process.cwd()+`\\fileUpload\\${imageName}`
@@ -30,7 +29,7 @@ class ImageController{
     })
   }
 
-  deleteImage(req: Request, res: Response){
+  export function deleteImage(req: Request, res: Response){
     asyncFunc(res, async() => {
       const name = req.url
       const imageName = name.substring(1)
@@ -40,6 +39,3 @@ class ImageController{
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
-}
-
-export default new ImageController()

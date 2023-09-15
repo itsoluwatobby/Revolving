@@ -4,7 +4,7 @@ import { UserProps } from '../../types.js';
 const SocialMedia: Schema = new Schema(
   {
     name: { type: String, default: '' },
-    Link: { type: String, default: '' }
+    link: { type: String, default: '' }
   }
 ) 
 
@@ -13,10 +13,10 @@ const USERSCHEMA: Schema = new Schema(
   {
     username: { type: String, required: [true, 'Username is required'], trim: true },
     password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
+    email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
     userSession: { type: String, default: '' },
     firstName: { type: String, default: '', trim: true },
     lastName: { type: String, default: '', trim: true },
-    email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
     description: { type: String, default: '', trim: true },
     roles: { 
       type: Array, 
@@ -43,12 +43,12 @@ const USERSCHEMA: Schema = new Schema(
     status: { type: String, default: 'offline', enum: ['online', 'offline'] },
     refreshToken: { type: String, default: '' },
     edited: { type: Boolean, default: false },
-    gender: { type: String, enum: ['Female', 'Male', 'Others'] },
+    gender: { type: String, enum: ['Female', 'Male', 'Others', 'Undecided'] },
     taskIds: { type: Array, default: [] },
     notificationSubscribers: { type: Array, default: [] },
     subscribed: { type: Array, default: [] },
-    stack: [SocialMedia],
-    socialMediaAccounts: { type: Array, default: [] },
+    stack: { type: Array, default: [] },
+    socialMediaAccounts: [SocialMedia],
     country: { type: String, default: '' },
   },
   { 

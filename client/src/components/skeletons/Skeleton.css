@@ -18,6 +18,10 @@
   width: 100%;
 }
 
+.skeleton.width-75{
+  width: 75%;
+}
+
 .skeleton.width-50{
   width: 50%;
 }
@@ -29,6 +33,12 @@
 .skeleton.profile-circle{
   width: 45px;
   height: 45px;
+  border-radius: 50%;
+}
+
+.skeleton.profile-dp{
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
 }
 

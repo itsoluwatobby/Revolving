@@ -2,6 +2,11 @@ import { UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
 
+type SubscribeType = {
+  meta: {
+    status: number, nessage: string
+  }
+}
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -10,7 +15,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `users/updateInfo/${user?._id}`,
         method: 'PUT',
         body: {...user}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'USERS' }, { type:  'USERS', id: 'LIST' }],
     }),
 
@@ -19,8 +24,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `users/follow_unfollow/${followerId}/${followedId}`,
         method: 'PUT',
         body: followerId
-      }) as any,
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      }),
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
     }),
     
     deleteUser: builder.mutation<void, string>({
@@ -28,8 +33,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `users/delete/${userId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      }),
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
     }),
 
     getUserById: builder.query<UserProps, string>({
@@ -57,13 +62,13 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       providesTags: (result) => providesTag(result as UserProps[], 'USERS')
     }),
 
-    subscribe: builder.mutation<UserProps, {subscriberId: string, subscribeeId: string}>({
-      query: ({subscriberId, subscribeeId}) => ({
-        url: `users/subscribe/${subscriberId}/${subscribeeId}`,
+    subscribe: builder.mutation<SubscribeType, {subscribeId: string, subscriberId: string}>({
+      query: ({subscribeId, subscriberId}) => ({
+        url: `users/subscribe/${subscribeId}/${subscriberId}`,
         method: 'PUT',
         body: subscriberId
-      }) as any,
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      }),
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
     }),
 
   })

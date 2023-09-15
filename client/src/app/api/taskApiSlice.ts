@@ -20,7 +20,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         url: `task/${userId}/tasks`,
         method: 'POST',
         body: {...task}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'TASK' }],
     }),
 
@@ -29,7 +29,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         url: `task/${userId}/tasks/update`,
         method: 'PUT',
         body: {...task}
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'TASK', id: 'LIST'}],
     }),
     
@@ -38,7 +38,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         url: `task/${userId}/tasks/${taskId}`,
         method: 'DELETE',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'TASK', id: 'LIST'}, { type: 'TASKBIN' }]
     }),
 
@@ -72,7 +72,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         url: `task/${userId}/bin`,
         method: 'PUT',
         body: userId
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'TASKBIN'}],
     }),
     
@@ -82,7 +82,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         url: `/task/${userId}/bin/restore`,
         method: 'POST',
         body: taskIds
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'TASKBIN'}, { type: 'TASK' }]
     }),
     
@@ -92,7 +92,7 @@ export const taskApiSlice = apiSlice.injectEndpoints({
         url: `/task/${userId}/bin/permanent`,
         method: 'DELETE',
         body: taskIds
-      }) as any,
+      }),
       invalidatesTags: [{ type: 'TASKBIN'}]
     }),
 

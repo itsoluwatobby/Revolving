@@ -50,11 +50,17 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
     </>
   ) : content = (
     <>
-      <div className="flex flex-col gap-0.5 text-sm">
+      <div className="flex flex-col gap-0.5 text-sm bg-inherit">
         <div className="flex items-center justify-between w-full">
           <div className="flex-grow flex items-center gap-2">
             <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-10 h-10">
-              {user?.displayPicture?.photo ? <img src={user?.displayPicture?.photo} alt="" /> : null}
+              {
+                user?.displayPicture?.photo ? 
+                <img src={user?.displayPicture?.photo} alt="" 
+                  className="w-full h-full rounded-full object-cover"
+                /> 
+                : null
+              }
             </figure>
             <p className="capitalize font-bold flex flex-col">
               <Link to={`/profile/${user?._id}`}
@@ -62,7 +68,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
               >
                 {user?.username}
               </Link>
-              <span className="text-xs text-gray-950 font-normal">{reduceLength(user?.description as string, 32,)}</span>
+              <span className="text-xs font-normal">{reduceLength(user?.description as string, 28, 'letter')}</span>
             </p>
           </div>
           <FollowUnFollow position="others" userId={user?._id as string} />
@@ -94,7 +100,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         setOnCard(false)
         setRevealCard('Hide')
       }}
-      className={`absolute ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2 z-10 top-5 max-h-40 shadow-2xl md:w-1/3 w-1/2 ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
+      className={`absolute bg-slate-100 ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2 z-10 top-5 max-h-40 shadow-2xl md:w-1/3 w-1/2 ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
       {content}
     </article>
   )

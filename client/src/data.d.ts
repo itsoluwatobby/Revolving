@@ -82,11 +82,15 @@ type InputTaskProp = {
   isTyping?: TypingEvent
 }
 
-type OpenSnippet = 'Snippet' | 'Image' | 'Nil'
-type CreatePrompt = 'Hide' | 'Open' | 'Idle' | 'Nil'
-type TypingEvent = 'typing' | 'notTyping'
 type ButtonType = 'EDIT' | 'DELETE'
+type TypingEvent = 'typing' | 'notTyping'
+
 type EditTaskOption = 'EDIT' | 'VIEW' | 'NIL'
+type OpenSnippet = 'Snippet' | 'Image' | 'Nil'
+
+type CreatePrompt = 'Hide' | 'Open' | 'Idle' | 'Nil'
+type Gender = "Female" | "Male" | "Others" | "Undecided"
+
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
@@ -188,7 +192,7 @@ interface UserProps{
   status: 'online' | 'offline',
   refreshToken: string,
   editDate: string,
-  gender: 'Female' | 'Male' | 'Others',
+  gender: Gender,
   firstName: string,
   lastName: string,
   stack: string[],
@@ -229,6 +233,12 @@ interface ErrorResponse{
   originalStatus?: number
 }
 //  FetchBaseQueryError | SerializedError
+
+type ConfirmType = {
+  meta: {
+    status: number, nessage: string
+  }
+}
 
 type AuthType={
   _id: string,

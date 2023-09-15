@@ -1,6 +1,5 @@
 import { createClient } from 'redis';
 import { objInstance } from './helper.js';
-import { CommentResponseModel } from '../models/CommentResponse.js';
 
 type Methods = 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -12,8 +11,8 @@ type RedisOptionProps<T>={
 }
 export const redisClient = createClient();
 
-export const getCachedResponse = async<T>({key, timeTaken=7200, cb, reqMtd=[]}): Promise<T> => {
-  redisClient.on('error', err => console.error('Redis client error: ', err.logMessage))
+export async function getCachedResponse<T>({key, timeTaken=7200, cb, reqMtd=[]}): Promise<T> {
+  redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage))
   if(!redisClient.isOpen) await redisClient.connect();
   try{
     if(objInstance.isPresent(reqMtd)){
@@ -48,7 +47,7 @@ export const getCachedValueResponse = async<T>({key, timeTaken=3600, cb}): Promi
   }
 }
 
-export const timeConverterInMillis = () => {
+export function timeConverterInMillis() {
   const minute = 60 * 1000
   const hour = minute * 60
   const day = hour * 24

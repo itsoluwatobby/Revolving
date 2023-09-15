@@ -19,7 +19,7 @@ export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
  * @param secret token secret
  * @returns 
  */
-export const signToken = async(claim: ClaimProps, expires: string, secret: string) => {
+export async function signToken(claim: ClaimProps, expires: string, secret: string) {
     const token = jwt.sign(
       {
         "userInfo": {
@@ -38,7 +38,7 @@ export const signToken = async(claim: ClaimProps, expires: string, secret: strin
  * @param secret 
  * @returns 
  */
-export const verifyToken = async(token: string, secret: string): Promise<string | ClaimProps> => {
+export async function verifyToken(token: string, secret: string): Promise<string | ClaimProps> {
   let response: string | ClaimProps;  
   jwt.verify(
       token,
@@ -125,7 +125,7 @@ export const asyncFunc = (res: Response, callback: () => void) => {
   }
 }
 
-export const pagination = async<T>({startIndex=1, endIndex=1, page=1, limit=1, cb}) => {
+export async function pagination({startIndex=1, endIndex=1, page=1, limit=1, cb}) {
 
   const pages = {} as PagesType;
   try{
@@ -163,7 +163,7 @@ export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
  * @param userId 
  * @returns null
  */
-export const autoDeleteOnExpire = async(userId: string)=>{
+export async function autoDeleteOnExpire(userId: string) {
   const {day} = timeConverterInMillis()
   const expireAfterThirtyDays = day * 30
   const currentTime = new Date()
@@ -203,7 +203,7 @@ export function checksExpiration(createdTime:string): boolean {
   return elaspedTime > EXPIRES_IN_30_MINUTES ? true : false
 }
 
-export const mongooseError = <T>(cb: () => T | T[]): T | T[] => {
+export function mongooseError<T>(cb: () => T | T[]): T | T[] {
   try{
     const data = cb() as T | T[]
     return data

@@ -1,4 +1,4 @@
-export const verifyRoles = (roles) => {
+export function verifyRoles(roles) {
     return (req, res, next) => {
         if (!roles.length)
             return res.sendStatus(403);
@@ -8,5 +8,5 @@ export const verifyRoles = (roles) => {
             return res.sendStatus(403);
         next();
     };
-};
+}
 //# sourceMappingURL=verifyRoles.js.map

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { Categories, SharedProps } from "../../types.js";
-import userServiceInstance from "../services/userService.js";
+import { getUserById } from "../services/userService.js";
 import { getCachedResponse, redisClient } from "../helpers/redis.js";
-import SharedStoryServiceInstance from "../services/SharedStoryService.js";
+import { createShareStory, getAllSharedStories, getSharedStoryById, getUserSharedStories, likeAndUnlikeSharedStory, unShareStory } from "../services/SharedStoryService.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 
 interface RequestProp extends Request{
@@ -11,13 +11,12 @@ interface RequestProp extends Request{
   category: Categories
 };
 
-class SharedStoryController{
 
   // Only for admin page
-  fetchSharedStories(req: Request, res: Response){
+  export function fetchSharedStories(req: Request, res: Response){
     asyncFunc(res, () => {
       getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
-        const sharedStories = await SharedStoryServiceInstance.getAllSharedStories();
+        const sharedStories = await getAllSharedStories();
         return sharedStories
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((allSharedStories: SharedProps[] | string) => {
@@ -27,12 +26,12 @@ class SharedStoryController{
     })
   }
 
-  getSingleShared(req: RequestProp, res: Response){
+  export function getSingleShared(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const {sharedId} = req.params
       if(!sharedId) return res.sendStatus(400);
       getCachedResponse({key:`sharedStory:${sharedId}`, cb: async() => {
-        const shared = await SharedStoryServiceInstance.getSharedStoryById(sharedId) as SharedProps
+        const shared = await getSharedStoryById(sharedId) as SharedProps
         return shared
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((sharedStory: SharedProps) => {
@@ -42,24 +41,24 @@ class SharedStoryController{
     })
   }
 
-  shareStory(req: RequestProp, res: Response){
+  export function shareStory(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const { userId, storyId } = req.params
       if (!userId || !storyId) return res.sendStatus(400);
-      const user = await userServiceInstance.getUserById(userId)
+      const user = await getUserById(userId)
       await autoDeleteOnExpire(userId)
-      SharedStoryServiceInstance.createShareStory(user, storyId)
+      createShareStory(user, storyId)
       .then((newShare) => responseType({res, status: 201, count:1, data: newShare}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  unShareUserStory(req: RequestProp, res: Response){
+  export function unShareUserStory(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const { userId, sharedId } = req.params
       if (!userId || !sharedId) return res.sendStatus(400);
       await autoDeleteOnExpire(userId)
-      const result = await SharedStoryServiceInstance.unShareStory(userId, sharedId)
+      const result = await unShareStory(userId, sharedId)
       redisClient.DEL(`sharedStory:${sharedId}`)
       return result == 'not found' 
           ? responseType({res, status: 404, count:0, message: result }) : result == 'unauthorized' 
@@ -68,13 +67,13 @@ class SharedStoryController{
     })
   }
 
-  getSharedStoriesByUser(req: RequestProp, res: Response){
+  export function getSharedStoriesByUser(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const {userId} = req.params
       if (!userId) return res.sendStatus(400);
       await autoDeleteOnExpire(userId)
       getCachedResponse({key:`userSharedStories:${userId}`, timeTaken: 1800, cb: async() => {
-        const sharedStory = await SharedStoryServiceInstance.getUserSharedStories(userId) as SharedProps[]
+        const sharedStory = await getUserSharedStories(userId) as SharedProps[]
         return sharedStory;
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
       .then((sharedStories: SharedProps[] | string) => {
@@ -84,18 +83,15 @@ class SharedStoryController{
     })
   }
 
-  like_Unlike_SharedStory(req: Request, res: Response){
+  export function like_Unlike_SharedStory(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId, sharedId} = req.params
       if (!userId || !sharedId) return res.sendStatus(400);
-      const user = await userServiceInstance.getUserById(userId);
+      const user = await getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-      SharedStoryServiceInstance.likeAndUnlikeSharedStory(userId, sharedId)
-      .then((result: Awaited<ReturnType<typeof SharedStoryServiceInstance.likeAndUnlikeSharedStory>>) => responseType({res, status: 201, message: result}))
+      likeAndUnlikeSharedStory(userId, sharedId)
+      .then((result: Awaited<ReturnType<typeof likeAndUnlikeSharedStory>>) => responseType({res, status: 201, message: result}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
-}
-
-export default new SharedStoryController()

@@ -9,7 +9,7 @@ import { nanoid } from '@reduxjs/toolkit';
 
 type ChatBaseProp={
   theme: Theme
-  input: string
+  input: string,
   setInput: React.Dispatch<React.SetStateAction<string>>
 }
 
@@ -55,7 +55,7 @@ export default function ChatBase({ theme, input, setInput }: ChatBaseProp) {
           onClick={handleChat}
           className="flex-none w-12 hover:bg-opacity-40 hover:opacity-50 h-10 grid place-content-center transition-all rounded-tr-md rounded-br-md">
           <BsSend
-            className={`text-lg text-center hover:scale-[1.08] active:scale-[1]`}
+            className={`text-lg text-white text-center hover:scale-[1.08] active:scale-[1]`}
           />
         </button>
       </div>

@@ -1,11 +1,11 @@
+import { format } from 'timeago.js';
+import { ChatProps } from '../../data'
 import { useSelector } from 'react-redux'
 import { Theme, ThemeContextType } from '../../posts'
-import { useState, useEffect } from 'react'
-import { getChatMessages } from '../../features/chat/chatSlice'
-import { ChatProps } from '../../data'
+import { useState, useEffect, useCallback } from 'react'
+import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg'
 import { useThemeContext } from '../../hooks/useThemeContext'
-import { format } from 'timeago.js';
-
+import { getChatMessages } from '../../features/chat/chatSlice'
 
 const DELAY = 250 as const
 
@@ -14,6 +14,9 @@ export default function ChatBody() {
   const {theme, openChat} = useThemeContext() as ThemeContextType;
   const [customMessage, setCustomMessage] = useState<ChatProps>()
   const getChats = useSelector(getChatMessages)
+  const scrollIntoCurrent = useCallback((node: HTMLElement) => {
+    node ? node?.scrollIntoView({ behavior: "smooth" }) : null
+  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -38,8 +41,8 @@ export default function ChatBody() {
     let isMounted = true
     let customIndex = 0
     if(getChats.length == 3) {customIndex+=2}
-    if(openChat == 'Open'){
-      isMounted && setCustomMessage(getChats[customIndex] as ChatProps)
+    if(isMounted && openChat == 'Open'){
+      setCustomMessage(getChats[customIndex] as ChatProps)
       setTypedInput('')
     }
     else{
@@ -49,25 +52,25 @@ export default function ChatBody() {
       isMounted = false
     }
   }, [openChat, getChats])
+  console.log(2)
 
   const chatContent = (
     getChats?.length && getChats.map(chat => (
       <article 
         key={chat._id}
+        ref={scrollIntoCurrent}
         className={`flex ${chat.adminId ? 'self-start' : 'self-end flex-row-reverse'} text-white items-center shadow-slate-800 text-xs bg-slate-500 rounded-md rounded-br-none gap-2 p-1 shadow-md w-5/6`}>
-        <figure className={`flex-none rounded-full border border-white bg-slate-800 w-8 h-8 shadow-lg`}>
-
+        <figure className={`flex-none rounded-full border border-white bg-slate-700 w-8 h-8 shadow-lg`}>
+          <img 
+            src={WedgeLoad} 
+            alt='Logo' 
+            className='h-full w-full object-cover rounded-full mr-2'
+          />
         </figure>
         <p className='flex-auto flex flex-col text-justify tracking-tight whitespace-pre-wrap'>
-          {chat.adminId ? 
-            <span className={`w-full whitespace-pre-wrap text-justify`}>
-              {typedInput}
-            </span>
-            :
             <span className={`w-full`}>
               {chat.message}
             </span>
-          }
           <span className={`w-full text-right text-xs`} >
             {format(chat.dateTime as string)}
           </span>

@@ -18,7 +18,7 @@ import { ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType }
 let uploadedImageIds = [] as string[]
 let imagesNames = [] as string[]
 export const NewStory = () => {
-  const MAX_SIZE = 1_535_000 as const // 1.53mb 
+  const MAX_SIZE = 800_000 as const // 800kb 
   const { storyId } = useParams()
   const loading = useSelector(getLoading)
   const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore } = usePostContext() as PostContextType;
@@ -63,7 +63,7 @@ export const NewStory = () => {
       files.slice(0, 2).map(file => {
         if(file.size > MAX_SIZE){
           setFiles([])
-          return alert('MAX ALLOWED FILE SIZE IS 1.53MB')
+          return alert('MAX ALLOWED FILE SIZE IS 800kb')
         }
         else{
           const imageId = nanoid()

@@ -28,7 +28,7 @@ export default function MidModal({ targetStory, theme, notintersecting, designat
         </div>
         <div className='flex items-center gap-4'>
           <h1 
-            className='whitespace-pre-wrap font-bold uppercase mobile:line-clamp-1'>{reduceLength(targetStory?.title, 5, 'word')}
+            className='whitespace-pre-wrap font-bold uppercase mobile:line-clamp-1'>{reduceLength(targetStory?.title, 20, 'letter')}
           </h1>
           <LikeStory story={targetStory} position='navbar' />
         </div>
