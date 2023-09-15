@@ -10,26 +10,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { createClient } from 'redis';
 import { objInstance } from './helper.js';
 export const redisClient = createClient();
-export const getCachedResponse = ({ key, timeTaken = 7200, cb, reqMtd = [] }) => __awaiter(void 0, void 0, void 0, function* () {
-    redisClient.on('error', err => console.error('Redis client error: ', err.logMessage));
-    if (!redisClient.isOpen)
-        yield redisClient.connect();
-    try {
-        if (objInstance.isPresent(reqMtd)) {
-            redisClient.flushAll();
-            objInstance.pullIt(reqMtd);
+export function getCachedResponse({ key, timeTaken = 7200, cb, reqMtd = [] }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage));
+        if (!redisClient.isOpen)
+            yield redisClient.connect();
+        try {
+            if (objInstance.isPresent(reqMtd)) {
+                redisClient.flushAll();
+                objInstance.pullIt(reqMtd);
+            }
+            const data = yield redisClient.get(key);
+            if (data)
+                return JSON.parse(data);
+            const freshData = yield cb();
+            redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
+            return freshData;
         }
-        const data = yield redisClient.get(key);
-        if (data)
-            return JSON.parse(data);
-        const freshData = yield cb();
-        redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
-        return freshData;
-    }
-    catch (error) {
-        console.error(error === null || error === void 0 ? void 0 : error.message);
-    }
-});
+        catch (error) {
+            console.error(error === null || error === void 0 ? void 0 : error.message);
+        }
+    });
+}
 export const getCachedValueResponse = ({ key, timeTaken = 3600, cb }) => __awaiter(void 0, void 0, void 0, function* () {
     redisClient.on('error', err => console.error('Redis client error: ', err));
     if (!redisClient.isOpen)
@@ -46,10 +48,10 @@ export const getCachedValueResponse = ({ key, timeTaken = 3600, cb }) => __await
         console.error(error === null || error === void 0 ? void 0 : error.message);
     }
 });
-export const timeConverterInMillis = () => {
+export function timeConverterInMillis() {
     const minute = 60 * 1000;
     const hour = minute * 60;
     const day = hour * 24;
     return { minute, hour, day };
-};
+}
 //# sourceMappingURL=redis.js.map

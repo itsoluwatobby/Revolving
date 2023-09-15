@@ -181,20 +181,22 @@ export default function TopRight({ currentUser }: TopRightProps) {
         {
           !exclude?.includes(pathname) ?
             <div className='w-10 h-10 rounded-full p-1 flex'>
-              {!currentUser?.displayPicture?.photo ?
-                  <div className='cursor-pointer w-10 h-10 bg-slate-500 rounded-full border-2 border-slate-600'></div>
-                  :
-                // <Link to={`/profile/${currentUser?._id}`}>
+                 
                   <figure 
                      onClick={() => setRollout(true)}
                     className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
-                    <img src={currentUser?.displayPicture?.photo} alt="dp" className='object-cover h-full w-full rounded-full'/>
+                    {
+                      currentUser?.displayPicture?.photo ?
+                        <img src={currentUser?.displayPicture?.photo} alt="dp" 
+                          className='object-cover h-full w-full rounded-full' 
+                        />
+                      : null
+                    }
                   </figure>
-                // </Link>
-              }
             </div>
           : null
         }
+    
         {/* {!address.includes(pathname) ? 
                 <IoIosArrowDown 
                   onClick={() => setRollout(prev => !prev)}

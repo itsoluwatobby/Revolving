@@ -19,37 +19,41 @@ export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
  * @param secret token secret
  * @returns
  */
-export const signToken = (claim, expires, secret) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = jwt.sign({
-        "userInfo": {
-            roles: claim === null || claim === void 0 ? void 0 : claim.roles, email: claim === null || claim === void 0 ? void 0 : claim.email
-        }
-    }, secret, { expiresIn: expires });
-    return token;
-});
+export function signToken(claim, expires, secret) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const token = jwt.sign({
+            "userInfo": {
+                roles: claim === null || claim === void 0 ? void 0 : claim.roles, email: claim === null || claim === void 0 ? void 0 : claim.email
+            }
+        }, secret, { expiresIn: expires });
+        return token;
+    });
+}
 /**
  * @description function to verify jwt tokens
  * @param token
  * @param secret
  * @returns
  */
-export const verifyToken = (token, secret) => __awaiter(void 0, void 0, void 0, function* () {
-    let response;
-    jwt.verify(token, secret, (err, decoded) => {
-        var _a, _b;
-        if ((err === null || err === void 0 ? void 0 : err.name) == 'TokenExpiredError')
-            response = 'Expired Token';
-        else if ((err === null || err === void 0 ? void 0 : err.name) == 'JsonWebTokenError')
-            response = 'Bad Token';
-        else {
-            response = {
-                roles: (_a = decoded === null || decoded === void 0 ? void 0 : decoded.userInfo) === null || _a === void 0 ? void 0 : _a.roles,
-                email: (_b = decoded === null || decoded === void 0 ? void 0 : decoded.userInfo) === null || _b === void 0 ? void 0 : _b.email
-            };
-        }
+export function verifyToken(token, secret) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let response;
+        jwt.verify(token, secret, (err, decoded) => {
+            var _a, _b;
+            if ((err === null || err === void 0 ? void 0 : err.name) == 'TokenExpiredError')
+                response = 'Expired Token';
+            else if ((err === null || err === void 0 ? void 0 : err.name) == 'JsonWebTokenError')
+                response = 'Bad Token';
+            else {
+                response = {
+                    roles: (_a = decoded === null || decoded === void 0 ? void 0 : decoded.userInfo) === null || _a === void 0 ? void 0 : _a.roles,
+                    email: (_b = decoded === null || decoded === void 0 ? void 0 : decoded.userInfo) === null || _b === void 0 ? void 0 : _b.email
+                };
+            }
+        });
+        return response;
     });
-    return response;
-});
+}
 /**
  * @description general response body
  * @param param0
@@ -108,56 +112,60 @@ export const asyncFunc = (res, callback) => {
         res.sendStatus(500);
     }
 };
-export const pagination = ({ startIndex = 1, endIndex = 1, page = 1, limit = 1, cb }) => __awaiter(void 0, void 0, void 0, function* () {
-    const pages = {};
-    try {
-        const parsedObject = yield cb();
-        if (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length) {
-            if (endIndex < (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length)) {
-                pages.next = {
-                    page: +page + 1,
-                    limit: +limit
-                };
-            }
-            if (startIndex > 0) {
-                pages.previous = {
-                    page: +page - 1,
-                    limit: +limit
-                };
+export function pagination({ startIndex = 1, endIndex = 1, page = 1, limit = 1, cb }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pages = {};
+        try {
+            const parsedObject = yield cb();
+            if (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length) {
+                if (endIndex < (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length)) {
+                    pages.next = {
+                        page: +page + 1,
+                        limit: +limit
+                    };
+                }
+                if (startIndex > 0) {
+                    pages.previous = {
+                        page: +page - 1,
+                        limit: +limit
+                    };
+                }
+                const result = parsedObject;
+                return { pages, result };
             }
             const result = parsedObject;
-            return { pages, result };
+            return result;
         }
-        const result = parsedObject;
-        return result;
-    }
-    catch (error) {
-        console.log(error);
-    }
-});
+        catch (error) {
+            console.log(error);
+        }
+    });
+}
 /**
  * @description function to autodelete a taskbin when expired
  * @param userId
  * @returns null
  */
-export const autoDeleteOnExpire = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const { day } = timeConverterInMillis();
-    const expireAfterThirtyDays = day * 30;
-    const currentTime = new Date();
-    if (!userId)
-        return;
-    else {
-        const task = yield TaskBinModel.findOne({ userId });
-        if (!(task === null || task === void 0 ? void 0 : task.updatedAt))
+export function autoDeleteOnExpire(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { day } = timeConverterInMillis();
+        const expireAfterThirtyDays = day * 30;
+        const currentTime = new Date();
+        if (!userId)
             return;
-        const elaspedTime = +currentTime - +(task === null || task === void 0 ? void 0 : task.updatedAt);
-        if (elaspedTime > expireAfterThirtyDays) {
-            yield TaskBinModel.findOneAndUpdate({ userId }, { $set: { taskBin: [] } });
+        else {
+            const task = yield TaskBinModel.findOne({ userId });
+            if (!(task === null || task === void 0 ? void 0 : task.updatedAt))
+                return;
+            const elaspedTime = +currentTime - +(task === null || task === void 0 ? void 0 : task.updatedAt);
+            if (elaspedTime > expireAfterThirtyDays) {
+                yield TaskBinModel.findOneAndUpdate({ userId }, { $set: { taskBin: [] } });
+                return;
+            }
             return;
         }
-        return;
-    }
-});
+    });
+}
 /**
  * @description function to generate otp
  * @param MAXLENGTH size of otp
@@ -180,7 +188,7 @@ export function checksExpiration(createdTime) {
     const elaspedTime = +presentTime - +createdTime;
     return elaspedTime > EXPIRES_IN_30_MINUTES ? true : false;
 }
-export const mongooseError = (cb) => {
+export function mongooseError(cb) {
     try {
         const data = cb();
         return data;
@@ -188,5 +196,5 @@ export const mongooseError = (cb) => {
     catch (error) {
         console.log('An error occurred');
     }
-};
+}
 //# sourceMappingURL=helper.js.map

@@ -74,7 +74,7 @@ export default function ProfileTop({ userProfile, imageType, handleImage, clearP
 
       </div>
 
-      <div className={`absolute right-2 top-32 lg:top-28 flex flex-row-reverse gap-8`}>
+      <div className={`absolute right-2 top-32 md:top-40 lg:top-28 flex flex-row-reverse gap-8 md:z-10`}>
         {
           userProfile?._id === currentUserId ?
             <Link to={`/edit_profile/${userProfile?._id}`} >
@@ -96,7 +96,7 @@ export default function ProfileTop({ userProfile, imageType, handleImage, clearP
         <span className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'}`}>Username:</span>
         <span className="font-medium cursor-pointer">{reduceLength(userProfile?.username as string, 15, 'letter')}</span>  
       </p>
-      <p role="Country" className={`absolute right-0 md:-top-[1.5rem] top-44 ${userProfile?.country ? 'flex' : 'flex'} items-center gap-2`}>
+      <p role="Country" className={`absolute right-0 md:-top-[1.5rem] top-44 ${userProfile?.country ? 'flex' : 'hidden'} items-center gap-2`}>
         <span className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'}`}>Country:</span>
         <span className="font-medium capitalize cursor-pointer">{userProfile?.country || 'NA'}</span>  
       </p>

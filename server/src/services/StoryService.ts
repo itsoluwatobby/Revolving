@@ -2,27 +2,25 @@ import fsPromises from 'fs/promises';
 import { StoryProps } from "../../types.js";
 import { StoryModel } from "../models/Story.js";
 import { CommentModel } from "../models/CommentModel.js";
-import commentServiceInstance from "../services/commentService.js";
-import sharedStoryServiceInstance from "./SharedStoryService.js";
-
-class StoryService{
+import { getAllSharedStories } from './SharedStoryService.js';
+import { deleteSingleComment } from './commentService.js';
 
 
-  async getAllStories(){
+  export async function getAllStories(){
     return await StoryModel.find().lean();
   }
 
-  async getStoryById(id: string){
+  export async function getStoryById(id: string){
     return await StoryModel.findById(id).exec();
   }
 
-  async getUserStories(userId: string){
+  export async function getUserStories(userId: string){
     return await StoryModel.find({ userId }).lean()
   }
 
-  async getStoriesWithUserIdInIt(userId: string){
-    const allStories = await this.getAllStories()
-    const allSharedStories = await sharedStoryServiceInstance.getAllSharedStories()
+  export async function getStoriesWithUserIdInIt(userId: string){
+    const allStories = await getAllStories()
+    const allSharedStories = await getAllSharedStories()
     const allUserStoryWithId = allStories.filter(story => story?.userId.toString() === userId || story?.likes?.includes(userId) || story?.commentIds?.includes(userId))
     const allUserSharedStoryWithId = allSharedStories.filter(story => story?.sharerId === userId || story?.sharedLikes?.includes(userId))
     const reMoulded = allUserSharedStoryWithId.map(share => {
@@ -36,7 +34,7 @@ class StoryService{
     return [...allUserStoryWithId, ...reMoulded]
   }
 
-  async createUserStory(story: StoryProps){
+  export async function createUserStory(story: StoryProps){
     try{
       const {category, ...rest} = story;
       const newStory = new StoryModel({ ...rest })
@@ -52,7 +50,7 @@ class StoryService{
     }
   }
 
-  async updateUserStory(storyId: string, updateStory: StoryProps){
+  export async function updateUserStory(storyId: string, updateStory: StoryProps){
     try{
       const res = await StoryModel.findByIdAndUpdate({ _id: storyId }, {...updateStory, edited: true})
       return res
@@ -62,7 +60,7 @@ class StoryService{
     }
   }
 
-  async likeAndUnlikeStory(userId: string, storyId: string): Promise<string>{
+  export async function likeAndUnlikeStory(userId: string, storyId: string): Promise<string>{
     try{
       const story = await StoryModel.findById(storyId).exec();
       if(!story?.likes?.includes(userId)) {
@@ -79,13 +77,13 @@ class StoryService{
     }
   }
 
-  async deleteUserStory(storyId: string){
-    const story = await this.getStoryById(storyId)
+  export async function deleteUserStory(storyId: string){
+    const story = await getStoryById(storyId)
     try{
       await StoryModel.findByIdAndDelete({ _id: storyId })
       const commentInStory = await CommentModel.find({ storyId }).lean()
       await Promise.all(commentInStory.map(comment => {
-        commentServiceInstance.deleteSingleComment(comment._id, false)
+        deleteSingleComment(comment._id, false)
       }))
       const picturesArray = story.picture
       await Promise.all(picturesArray.map(async(pictureLink) => {
@@ -101,13 +99,13 @@ class StoryService{
     }
   }
 
-  async deleteAllUserStories(userId: string){
-    const stories = await this.getUserStories(userId)
+  export async function deleteAllUserStories(userId: string){
+    const stories = await getUserStories(userId)
     try{
       await StoryModel.deleteMany({ userId })
       const userComments = await CommentModel.find({ userId }).lean()
       await Promise.all(userComments.map(comment => {
-        commentServiceInstance.deleteSingleComment(comment._id, false)
+        deleteSingleComment(comment._id, false)
       }))
       await Promise.all(stories.map(async(story) => {
         const picturesArray = story.picture
@@ -122,6 +120,3 @@ class StoryService{
       console.log(error.messages)
     }
   }
-}
-
-export default new StoryService()

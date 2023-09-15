@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-export const eventLogger = async(req: Request, res: Response, next: NextFunction) => {
+export async function eventLogger(req: Request, res: Response, next: NextFunction) {
   next()
   const date = new Intl.DateTimeFormat('en-US', {
     dateStyle: 'full'

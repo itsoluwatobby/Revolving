@@ -68,6 +68,7 @@ export default function EditProfilePage() {
           const errors = error as ErrorResponse
           setImageType('NIL')
           errors?.originalStatus == 401 && setLoginPrompt('Open')
+          toast.error(errors?.message as string, ErrorStyle)
         })
       }
     }

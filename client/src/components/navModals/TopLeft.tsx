@@ -21,7 +21,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { userId } = useParams()
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`, '/signIn', '/signUp', '/new_password', '/otp']
-  const searchBar = ['/', `/story/${storyId}`, `/taskManager/${userId}`]
+  const searchBar = ['/', `/taskManager/${userId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
 
   return (

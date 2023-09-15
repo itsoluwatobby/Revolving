@@ -7,6 +7,7 @@ import ProfileMid from "../components/profile/ProfileMid";
 import ProfileTop from "../components/profile/ProfileTop";
 import { useThemeContext } from "../hooks/useThemeContext";
 import ProfileBase from "../components/profile/ProfileBase";
+import SkeletonProfile from "../components/skeletons/SkeletonProfile";
 import { useGetUserByIdQuery, useUpdateInfoMutation } from "../app/api/usersApiSlice";
 import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../posts";
 import { useDeleteImageMutation, useGetStoriesWithUserIdQuery, useUploadImageMutation } from "../app/api/storyApiSlice";
@@ -16,15 +17,15 @@ const initialState = {name: null, data: null}
 export default function ProfilePage() {
   const { userId } = useParams()
   const MAX_SIZE = 1_000_000 as const // 1mb
-  const { data: userData } = useGetUserByIdQuery(userId as string)
   const [userProfile, setUserProfile] = useState<UserProps>()
   const [imageType, setImageType] = useState<ImageTypeProp>('NIL')
+  const [uploadToServer, { isLoading }] = useUploadImageMutation()
   const [image, setImage] = useState<TargetImageType>(initialState)
   const [userStories, setUserStories] = useState<Partial<PostType[]>>()
-  const [uploadToServer, { isLoading }] = useUploadImageMutation()
   const [deleteImage, { isLoading: isLoadingDelete }] = useDeleteImageMutation()
   const [upDateUserInfo, { isLoading: isLoadingUpdate }] = useUpdateInfoMutation()
   const { theme, setOpenChat, setLoginPrompt, setRevealEditModal } = useThemeContext() as ThemeContextType
+  const { data: userData, isLoading: isLoadingUserInfo, isError: isErrorUserInfo } = useGetUserByIdQuery(userId as string)
   const { data, isLoading: isStoryLoading, isError: isStoryError, error: storyError } =  useGetStoriesWithUserIdQuery(userId as string)
 
   const handleImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -54,21 +55,6 @@ export default function ProfilePage() {
     }
   },  [data])
 
-  // const truncate = about.length > 250 ? about.substring(0, 250)+'...' : about
-
-  // useEffect(() => {
-  //   const userLink = async() => {
-  //     const info = await axios.get('https://twitter.com/itsoluwatobby',
-  //       {
-  //         headers: { 'Content-Type': 'application/json'}
-  //       }
-  //     )
-  //     console.log(info.data)
-  //   }
-  //   userLink()
-
-  // }, [])
-
   useEffect(() => {
     let isMounted = true
     const checkSizeAndUpload = async() => {
@@ -84,7 +70,6 @@ export default function ProfilePage() {
         await uploadToServer(imageData).unwrap()
         .then(async(data) => {
           const res = data as unknown as { url: string }
-          // throw new Error("Testing Ongoing")
           if(image?.name === 'photo'){
             setImageType('DP')
             if(userProfile?.displayPicture?.photo){
@@ -127,6 +112,7 @@ export default function ProfilePage() {
           const errors = error as ErrorResponse
           setImageType('NIL')
           errors?.originalStatus == 401 && setLoginPrompt('Open')
+          toast.error(errors?.message as string, ErrorStyle)
         })
       }
     }
@@ -170,7 +156,6 @@ export default function ProfilePage() {
     setOpenChat('Hide')
     setLoginPrompt('Hide')
   }
-  console.log(userProfile)
 
   return (
     <main
@@ -179,16 +164,23 @@ export default function ProfilePage() {
       className={`hidebars single_page md:pt-8 text-sm p-2 flex-col gap-2 w-full overflow-y-scroll`}>
 
       <section className={`relative flex-auto text-sm flex md:flex-row flex-col gap-2 w-full`}>
-        <ProfileTop 
-          userProfile={userProfile as UserProps} 
-          handleImage={handleImage} imageType={imageType}
-          isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
-          clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
-        />
-        <ProfileMid 
-          setRevealEditModal={setRevealEditModal} 
-          userProfile={userProfile as UserProps} theme={theme} 
-        />
+        {
+          isLoadingUserInfo ?
+            <SkeletonProfile theme={theme} page="EDIT" />
+          :
+          <>
+            <ProfileTop 
+              userProfile={userProfile as UserProps} 
+              handleImage={handleImage} imageType={imageType}
+              isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
+              clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
+            />
+            <ProfileMid 
+              setRevealEditModal={setRevealEditModal} 
+              userProfile={userProfile as UserProps} theme={theme} 
+            />
+          </>
+        }
       </section>
 
       <ProfileBase 

@@ -12,7 +12,7 @@ type OptionsType = 'account' | 'password'
  * @param  type (LINK | OTP)
  * @returns 
  */
-export const mailOptions = (receiver: string, username: string, verificationLink: string, option: OptionsType = 'account', type: ConfirmationMethodType='LINK') => {
+export function mailOptions(receiver: string, username: string, verificationLink: string, option: OptionsType = 'account', type: ConfirmationMethodType='LINK') {
   const messageHeader = `${type == 'OTP' ? 'Action Required: One Time Activation Code' : `Tap the Link below To ${option == 'account' ?  'Activate Your Account' : 'Reset Your Password'}`}`
   const year = new Date().getFullYear()
   return {

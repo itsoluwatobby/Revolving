@@ -9,13 +9,13 @@ import passwordResetRouter from '../routes/resetPassword.js';
 import { logURLAndMethods } from '../middleware/urlLogger.js';
 import taskManagerRouter from '../routes/taskManagerRoutes.js';
 import { verifyAccessToken } from '../middleware/verifyTokens.js';
-import AuthenticationInstance from '../controller/authController.js';
-import UserControllerInstance from '../controller/userController.js';
-import StoryControllerInstance from '../controller/storyController.js';
-import CommentControllerInstance from '../controller/commentController.js';
-import ResponseControllerInstance from '../controller/responseController.js';
-import TaskManagerControllerInstance from '../controller/taskManagerController.js';
-import SharedStoryControllerInstance from '../controller/sharedStoryController.js';
+import { logoutHandler } from '../controller/authController.js';
+import { getUser, getUsers } from '../controller/userController.js';
+import { getComment, getStoryComments } from '../controller/commentController.js';
+import { getResponse, getResponseByComment } from '../controller/responseController.js';
+import { getStories, getStory, getStoryByCategory } from '../controller/storyController.js';
+import { getTask, getTasksInBin, getUserTask } from '../controller/taskManagerController.js';
+import { fetchSharedStories, getSingleShared } from '../controller/sharedStoryController.js';
 
 export class RevolvingApplication{
 
@@ -36,35 +36,35 @@ export class RevolvingApplication{
 
   // ROUTES
     this.app.use('/revolving/auth', authRouter);
-    this.app.post('/revolving/auth/logout/:userId', AuthenticationInstance.logoutHandler);
+    this.app.post('/revolving/auth/logout/:userId', logoutHandler);
 
   // USERS
-    this.app.get('/revolving/users', UserControllerInstance.getUsers);
-    this.app.get('/revolving/users/single/:userId', UserControllerInstance.getUser);
+    this.app.get('/revolving/users', getUsers);
+    this.app.get('/revolving/users/single/:userId', getUser);
 
   //password reset
     this.app.use('/revolving/auth', passwordResetRouter);
   
-    this.app.get('/revolving/story/share_getAll', SharedStoryControllerInstance.fetchSharedStories)
+    this.app.get('/revolving/story/share_getAll', fetchSharedStories)
 
   //public routes
-    this.app.get('/revolving/story', StoryControllerInstance.getStories);
+    this.app.get('/revolving/story', getStories);
   
   // comments
-    this.app.get('/revolving/comment_in_story/:storyId', CommentControllerInstance.getStoryComments);
-    this.app.get('/revolving/comment/:commentId', CommentControllerInstance.getComment);
+    this.app.get('/revolving/comment_in_story/:storyId', getStoryComments);
+    this.app.get('/revolving/comment/:commentId', getComment);
   
-    this.app.get('/revolving/response_in_comment/:commentId', ResponseControllerInstance.getResponseByComment);
-    this.app.get('/revolving/response/:responseId', ResponseControllerInstance.getResponse);
+    this.app.get('/revolving/response_in_comment/:commentId', getResponseByComment);
+    this.app.get('/revolving/response/:responseId', getResponse);
 
-    this.app.get('/revolving/story/category', StoryControllerInstance.getStoryByCategory);
-    this.app.get('/revolving/story/:storyId', StoryControllerInstance.getStory);
-    this.app.get('/revolving/story/share/:sharedId', SharedStoryControllerInstance.getSingleShared)
+    this.app.get('/revolving/story/category', getStoryByCategory);
+    this.app.get('/revolving/story/:storyId', getStory);
+    this.app.get('/revolving/story/share/:sharedId', getSingleShared)
 
   // Task manager
-    this.app.get('/revolving/task/user/:userId', TaskManagerControllerInstance.getUserTask)
-    this.app.get('/revolving/task/:taskId', TaskManagerControllerInstance.getTask)
-    this.app.get('/revolving/task/bin/:userId', TaskManagerControllerInstance.getTasksInBin)
+    this.app.get('/revolving/task/user/:userId', getUserTask)
+    this.app.get('/revolving/task/:taskId', getTask)
+    this.app.get('/revolving/task/bin/:userId', getTasksInBin)
 
   // get image
   //  this.app.get('/revolving/images/:imageName', getImage)
@@ -96,5 +96,4 @@ export class RevolvingApplication{
       res.status(404).json({status: false, message: 'NOT FOUND'})
     })
   }
-
 }

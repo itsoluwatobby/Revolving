@@ -17,6 +17,7 @@ export default function SingleStoryPage() {
   const { data: target, isLoading, isError } = useGetStoryQuery(storyId);
   const { data, isLoading: loading } = useGetStoriesQuery()
   const [stories, setStories] = useState<PostType[]>([])
+  const [isBarOpen, setIsBarOpen] = useState<boolean>(false)
   const [targetStory, setTargetStory] = useState<PostType>();
 
   let averageReadingTime = useWordCount(targetStory?.body as string)
@@ -51,12 +52,14 @@ export default function SingleStoryPage() {
     <WindowScroll>
       <main className={`single_page h-full ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl`}>
         <div className="flex h-full">
-          {Array.isArray(stories) && stories.length 
-            && <Aside 
-            stories={stories as PostType[]} 
-            sidebar={sidebar} 
-            setSidebar={setSidebar} 
-          />}
+          {(Array.isArray(stories) && stories.length)
+            ? <Aside 
+                setSidebar={setSidebar} 
+                stories={stories as PostType[]} 
+                sidebar={sidebar} setIsBarOpen={setIsBarOpen}
+              /> 
+              : null
+          }
           <ArticleComp 
             story={targetStory as PostType} 
             bodyContent={bodyContent as JSX.Element[]}
@@ -67,8 +70,9 @@ export default function SingleStoryPage() {
           />
         </div>
         <BsArrowBarRight 
+          title='Recent stories'
           onClick={() => setSidebar(true)}
-          className={`fixed md:hidden left-0 top-[40%] opacity-30 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:opacity-80 p-1 text-[30px]`} />
+          className={`${isBarOpen ? '' : 'hidden'} fixed md:hidden left-0 top-[40%] opacity-30 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:opacity-80 p-1 text-[30px]`} />
       </main>
     </WindowScroll>
   )

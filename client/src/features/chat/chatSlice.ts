@@ -1,28 +1,28 @@
 import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
-import { ChatProps } from "../../data";
+import { ChatProps, UserProps } from "../../data";
 import { RootState } from "../../app/store";
 // import { sub } from "date-fns";
 
 //const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 
 export const defaultMessages = [
-  {
-    adminId: '1234',
-    message: "Welcome USER, how may i help you?",
-    image: '',
-    _id: nanoid(5)
-  },
-  {
-    adminId: '1234',
-    message: "I will get back to you soon, with whatever your request is. Please be patient?",
-    image: '',
-    _id: nanoid(5)
-  }
-] as ChatProps[]
-
+      {
+        adminId: '1234',
+        message: 'Welcome Guest, how may i help you?',
+        image: '',
+        _id: nanoid(5)
+      },
+      {
+        adminId: '1234',
+        message: "I will get back to you soon, with whatever your request is. Please be patient?",
+        image: '',
+        _id: nanoid(5)
+      }
+    ] as ChatProps[]
+  
 const initialState = {
+  chat: {} as ChatProps,
   chats: [defaultMessages[0]] as ChatProps[],
-  chat: {} as ChatProps
 }
 
 const chatSlice = createSlice({

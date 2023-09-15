@@ -1,30 +1,27 @@
 import { UserProps } from "../../types.js";
 import { UserModel } from "../models/User.js";
-import StoryServiceInstance from "./StoryService.js";
 import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
-import { userInfo } from "os";
+import { deleteAllUserStories } from "./StoryService.js";
 
-export class UserService{
 
-  constructor(){}
-  async getAllUsers(){
+  export async function getAllUsers(){
     return await UserModel.find().lean();
   }
 
-  async getUserById(id: string){
+  export async function getUserById(id: string){
     return await UserModel.findById(id).exec();
   }
-  async getUserByEmail(email: string){
+  export async function getUserByEmail(email: string){
     return await UserModel.findOne({email}).exec();
   }
-  async getUserByToken(token: string){
+  export async function getUserByToken(token: string){
     return await UserModel.findOne({refreshToken: token}).exec();
   }
-  async getUserByVerificationToken(token: string){
+  export async function getUserByVerificationToken(token: string){
     return await UserModel.findOne({ verificationToken: { token } }).exec();
   }
 
-  async createUser(user: Partial<UserProps>){
+  export async function createUser(user: Partial<UserProps>){
     const newUser = await UserModel.create(user)
     await TaskBinModel.create({
       userId: newUser?._id, taskBin: []
@@ -32,11 +29,11 @@ export class UserService{
     return newUser 
   }
 
-  async updateUser(userId: string, updatedUser: UserProps){
+  export async function updateUser(userId: string, updatedUser: UserProps){
     return await UserModel.findByIdAndUpdate({ _id: userId }, updatedUser, {new: true})
   }
 
-  async followOrUnFollow(followerId: string, followingId: string): Promise<string>{
+  export async function followOrUnFollow(followerId: string, followingId: string): Promise<string>{
     const user = await UserModel.findById(followerId).exec();
     const following = await UserModel.findById(followingId).exec();
     if(user?._id.toString() == followingId) return 'duplicate'
@@ -52,11 +49,8 @@ export class UserService{
     }
   }
 
-  async deleteAccount(userId: string): Promise<void>{
+  export async function deleteAccount(userId: string): Promise<void>{
     await UserModel.findByIdAndDelete({ _id: userId })
-    await StoryServiceInstance.deleteAllUserStories(userId)
+    await deleteAllUserStories(userId)
     await TaskManagerModel.deleteOne({userId})
   }
-}
-
-export default new UserService()

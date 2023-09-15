@@ -25,7 +25,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: followerId
       }),
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
     }),
     
     deleteUser: builder.mutation<void, string>({
@@ -34,7 +34,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }),
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
     }),
 
     getUserById: builder.query<UserProps, string>({
@@ -68,7 +68,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: subscriberId
       }),
-      invalidatesTags: [{ type: 'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
     }),
 
   })

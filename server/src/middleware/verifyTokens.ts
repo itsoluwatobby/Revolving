@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 import { ClaimProps, USERROLES, UserProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import userServiceInstance, { UserService } from "../services/userService.js";
+import { getUserByEmail, getUserByToken } from "../services/userService.js";
 
 interface TokenProp extends Request{
   email: string,
@@ -15,15 +15,15 @@ interface CookieProp extends Request{
   }
 }
 
-const activatedAccount = async(email: string): Promise<UserProps> => {
-  const userData = await getCachedResponse({key: `user:${email}`, cb: async() => {
-    const user = await userServiceInstance.getUserByEmail(email)
+async function activatedAccount(email: string): Promise<UserProps> {
+  const userData = await getCachedResponse({key: `user:${email}`, cb: async () => {
+    const user = await getUserByEmail(email)
     return user
   }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE']}) as UserProps
   return userData
 }
 
-export const verifyAccessToken = async(req: TokenProp, res: Response, next: NextFunction) => {
+export async function verifyAccessToken(req: TokenProp, res: Response, next: NextFunction) {
   const auth = req.headers['authorization']
   if(!auth || !auth.startsWith('Bearer ')) return res.sendStatus(401)
   const token = auth?.split(' ')[1]
@@ -46,11 +46,11 @@ export const verifyAccessToken = async(req: TokenProp, res: Response, next: Next
   }
 }
 
-export const getNewTokens = async(req: CookieProp, res: Response) => {
+export async function getNewTokens(req: CookieProp, res: Response) {  
   const cookie = req.cookies;
   if(!cookie?.revolving) return responseType({res, status: 401, message: 'Bad Credentials'})
   const token = cookie?.revolving;
-  const user = await userServiceInstance.getUserByToken(token)
+  const user = await getUserByToken(token)
   if(!user) return res.sendStatus(404)
 
   const verify = await verifyToken(user?.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET) as ClaimProps | string

@@ -10,7 +10,7 @@ import { IsLoadingSpinner } from '../IsLoadingSpinner';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import { useUpdateInfoMutation } from '../../app/api/usersApiSlice';
 import { ArrayComponent } from './ArrayComponent';
-import { SuccessStyle } from '../../utils/navigator';
+import { ErrorStyle, SuccessStyle } from '../../utils/navigator';
 
 type UserInputsProps = {
   theme: Theme,
@@ -40,8 +40,8 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
   const [userDetails, setUserDetails] = useState<Partial<UserProps>>(initUserState)
   const [inputRef1, inputRef2] = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
   const [passwordConfig, setPasswordConfig] = useState<typeof initPasswordConfig>(initPasswordConfig)
-  const [upDateUserInfo, { isLoading: isLoadingUserInfo, isError: isErrorUserInfo }] = useUpdateInfoMutation()
-  const [confirmCurrentPassword, { isLoading: isLoadingConfirmation, isError, isSuccess }] = useConfirmPasswordMutation()
+  const [upDateUserInfo, { isLoading: isLoadingUserInfo, isError: isErrorUserInfo, error }] = useUpdateInfoMutation()
+  const [confirmCurrentPassword, { isLoading: isLoadingConfirmation, isError, isSuccess, isUninitialized }] = useConfirmPasswordMutation()
   const scrollRef1 = useCallback((node: Element) => {
     node ? node?.scrollIntoView({ behavior: 'smooth'}) : null
   }, [])
@@ -154,20 +154,16 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     }
     catch(error){
       const errors = error as ErrorResponse;
-      console.log(errors);
       (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
       setErrorMsg(errors?.data?.meta?.message)
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 10000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
   const updateInfo = async() => {
     try{
-      await upDateUserInfo(userDetails as UserProps).unwrap()
+      if(password) await upDateUserInfo({...userDetails, password} as UserProps).unwrap()
+      else await upDateUserInfo(userDetails as UserProps).unwrap()
       toast.success('Successfully updated', SuccessStyle)
       setPasswordConfig(initPasswordConfig)
       setChecked(false)
@@ -175,11 +171,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     catch(error){
       const errors = error as ErrorResponse;
       (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
-      isErrorUserInfo && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
-        duration: 10000, icon: '💀', style: {
-          background: '#FF0000'
-        }
-      })
+      isErrorUserInfo && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
 
@@ -275,7 +267,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
 
           <div 
             onKeyUpCapture={event => event.key === 'Enter' ? getConfirmation() : null}
-            className={`relative ${(checked && !isSuccess) ? 'flex scale-1' : 'scale-0 hidden'} transition-all flex items-center gap-1`}>
+            className={`relative ${(checked && !isSuccess) ? 'flex scale-1' : 'scale-0 hidden'} transition-all flex items-center gap-0.5`}>
             <InputField title='Current password'
               name='oldPassword' placeholder='current password' 
               value={currentPassword || ''} handleChange={handleCurrent}
@@ -291,7 +283,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
             <span 
               onClick={() => setReveal(prev => prev === 'Hide' ? prev = 'Open' : 'Hide')}
               className='absolute top-9 right-16 text-black font-medium underline cursor-pointer hover:opacity-90 transition-all active:opacity-100 text-xs z-20'>{reveal === 'Hide' ? 'show' : 'Hide'}</span>
-            <p className={`absolute ${(errorMsg  || isSuccess) ? 'scale-1' : 'scale-0 hidden'} transition-all -bottom-6 text-xs font-medium w-[81%] rounded-sm capitalize ${isSuccess ? 'text-green-500 bg-gray-100' : 'text-red-500 bg-gray-300'} py-0.5 p-1 text-center`}>{isSuccess ? 'Successfully Verified' : errorMsg}</p>
+            <p className={`absolute ${(errorMsg  || isSuccess) ? 'scale-1' : 'scale-0 hidden'} transition-all bottom-[-22px] text-xs font-medium w-[81%] rounded-sm capitalize ${isSuccess ? 'text-green-500 bg-gray-100' : 'text-red-500 bg-gray-300'} py-0.5 p-1 text-center`}>{isSuccess ? 'Successfully Verified' : errorMsg}</p>
           </div>
 
           <div className={`${(isSuccess && checked) ? 'flex scale-1' : 'scale-0 hidden'} transition-all flex-col md:flex-row w-full gap-y-2 gap-x-2`}>
@@ -307,14 +299,14 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
               disabled={!validPassword && !match}
               className={`w-fit self-start text-sm ${isLoadingUserInfo ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-1 py-2 font-medium focus:outline-none transition-all border-none ${(validPassword && match && !isLoadingUserInfo) ? 'bg-green-600 hover:bg-green-500' : 'bg-gray-400'}`}
             >
-              {!isLoadingUserInfo ? 'Change password' : 'In progress...'}
+              {!isLoadingUserInfo ? 'Update' : 'In progress...'}
             </button>
 
           </div>
 
         </div>
 
-        <div className='flex flex-col mobile:w-full w-7/12 md:w-4/6 p-2 gap-y-2'> 
+        <div className='flex flex-col mobile:w-full w-7/12 md:w-4/6 p-2 gap-y-2 mt-1'> 
           <h3 className='text-base font-medium capitalize'>Social medial links</h3>
           <div className='flex flex-col md:flex-row gap-y-2 gap-x-2'> 
             <InputField title='Name'
