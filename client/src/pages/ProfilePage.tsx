@@ -161,7 +161,7 @@ export default function ProfilePage() {
     <main
       role="User profile"
       onClick={closeSetups}
-      className={`hidebars single_page md:pt-8 text-sm p-2 flex-col gap-2 w-full overflow-y-scroll`}>
+      className={`hidebars single_page md:pt-8 text-sm p-2 pt-0 flex-col gap-2 w-full overflow-y-scroll`}>
 
       <section className={`relative flex-auto text-sm flex md:flex-row flex-col gap-2 w-full`}>
         {

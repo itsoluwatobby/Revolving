@@ -10,11 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { StoryModel } from "../models/Story.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoriesWithUserIdInIt, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../services/StoryService.js";
-import { getAllSharedByCategories, getAllSharedStories } from "../services/SharedStoryService.js";
-import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { getUserById } from "../services/userService.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
+import { getAllSharedByCategories, getAllSharedStories } from "../services/SharedStoryService.js";
+import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoriesWithUserIdInIt, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../services/StoryService.js";
 ;
+/**
+* @description creates a new user story
+* @param req - userid
+*/
 export function createNewStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
@@ -31,6 +35,10 @@ export function createNewStory(req, res) {
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+* @description updates user story
+* @param req - userid and storyId
+*/
 export function updateStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
@@ -49,6 +57,10 @@ export function updateStory(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+ * @description deletes story by user
+ * @param req - userid
+*/
 export function deleteStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
@@ -74,6 +86,10 @@ export function deleteStory(req, res) {
     }));
 }
 // Delete user story by admin
+/**
+ * @description deletes a story by admin user
+ * @param req - adminId, userId, storyId
+*/
 export function deleteStoryByAdmin(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { adminId, userId, storyId } = req.params;
@@ -94,6 +110,10 @@ export function deleteStoryByAdmin(req, res) {
         return responseType({ res, status: 401, message: 'unauthorized' });
     }));
 }
+/**
+* @description fetches a single story
+* @param req - storyid
+*/
 export function getStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { storyId } = req.params;
@@ -111,6 +131,10 @@ export function getStory(req, res) {
     }));
 }
 // HANDLE GETTING A USER STORIES
+/**
+* @description fetches all user stories
+* @param req - userid
+*/
 export function getUserStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
@@ -132,6 +156,10 @@ export function getUserStory(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+* @description fetches all stories by category
+* @param req - category
+*/
 export function getStoryByCategory(req, res) {
     asyncFunc(res, () => {
         const { category } = req.query;
@@ -154,6 +182,9 @@ export function getStoryByCategory(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     });
 }
+/**
+* @description fetches all stories
+*/
 export function getStories(req, res) {
     asyncFunc(res, () => {
         getCachedResponse({ key: 'allStories', cb: () => __awaiter(this, void 0, void 0, function* () {
@@ -173,6 +204,10 @@ export function getStories(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     });
 }
+/**
+ * @description fetches all stories with userid in it
+ * @param req - userid
+*/
 export function getStoriesWithUserId(req, res) {
     asyncFunc(res, () => {
         const { userId } = req.params;
@@ -189,6 +224,10 @@ export function getStoriesWithUserId(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     });
 }
+/**
+ * @description likes or unlikes a story
+ * @param req - story id and userId
+*/
 export function like_Unlike_Story(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
@@ -203,4 +242,32 @@ export function like_Unlike_Story(req, res) {
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+ * @description fetches users that likes a story
+ * @param req - story id
+*/
+export const getStoryLikes = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { storyId } = req.params;
+        if (!storyId)
+            return res.sendStatus(400);
+        const story = yield getStoryById(storyId);
+        if (!story)
+            return responseType({ res, status: 404, message: 'You do not have an account' });
+        yield autoDeleteOnExpire(storyId);
+        getCachedResponse({ key: `usersStoryLikes:${storyId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                var _a;
+                const users = yield Promise.all((_a = story === null || story === void 0 ? void 0 : story.likes) === null || _a === void 0 ? void 0 : _a.map((id) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
+                    return { _id, email, firstName, lastName, followers, followings };
+                })));
+                return users;
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((allUsers) => {
+            if (!(allUsers === null || allUsers === void 0 ? void 0 : allUsers.length))
+                return responseType({ res, status: 404, message: 'You have no likes' });
+            return responseType({ res, status: 200, message: 'success', count: allUsers === null || allUsers === void 0 ? void 0 : allUsers.length, data: allUsers });
+        }).catch((error) => responseType({ res, status: 400, message: error === null || error === void 0 ? void 0 : error.message }));
+    }));
+};
 //# sourceMappingURL=storyController.js.map

@@ -93,14 +93,7 @@ export default function ProfileTop({ userId, userProfile, imageType, handleImage
 
       </div>
 
-      <div className={`absolute right-2 top-32 md:top-40 lg:top-28 flex flex-row gap-8 md:z-10`}>
-        <Link to={`/subscriptions/${userProfile?._id}`} className={`${userId === currentUserId ? 'block' : 'hidden'}`}>
-          <button 
-            className={`p-1 px-1.5 mobile:line-clamp-6 rounded-sm shadow-md hover:opacity-95 active:opacity-100 focus:outline-none border-none ${theme === 'light' ? 'bg-slate-500 text-white' : 'bg-slate-600'} transition-all`}
-          >
-            view subcriptions
-          </button>
-        </Link>
+      <div className={`absolute right-2 top-32 md:top-40 lg:right-0 lg:top-36 flex flex-row gap-8 md:z-10`}>
         {
           userId === currentUserId ?
             <Link to={`/edit_profile/${userProfile?._id}`} >

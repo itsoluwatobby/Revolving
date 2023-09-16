@@ -181,3 +181,13 @@ type ObjectUnknown<K>={
   createdAt: string,
   likes: string[]
 }
+
+type GetFollowsType = {
+  follows: Partial<UserProps[]>,
+  followers: Partial<UserProps[]>
+}
+ 
+type GetSubscriptionType = {
+  subscriptions: Partial<UserProps[]>,
+  subscribed: Partial<UserProps[]>
+}

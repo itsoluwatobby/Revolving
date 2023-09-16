@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { UserProps } from "../../types.js";
+import { GetFollowsType, GetSubscriptionType, UserProps } from "../../types.js";
 import { Request, Response } from "express";
 import { ROLES } from "../config/allowedRoles.js";
 import { getCachedResponse } from "../helpers/redis.js";
@@ -189,15 +189,19 @@ import { UserModel } from '../models/User.js';
       if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
       await autoDeleteOnExpire(userId)
       getCachedResponse({key: `userSubscriptions:${userId}`, cb: async() => {
-        const allSubscriptions = await Promise.all(user?.notificationSubscribers?.map(async(id) => {
+        const subscriptions = await Promise.all(user?.notificationSubscribers?.map(async(id) => {
           const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
           return { _id, email, firstName, lastName, followers, followings }
         })) as Partial<UserProps[]>
-        return allSubscriptions
+        const subscribed = await Promise.all(user?.subscribed?.map(async(id) => {
+          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
+          return { _id, email, firstName, lastName, followers, followings }
+        })) as Partial<UserProps[]>
+        return { subscriptions, subscribed }
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
-      .then((allSubscriptions: Partial<UserProps[]>) => {
-        if(!allSubscriptions?.length) return responseType({res, status: 404, message: 'You have no subscriptions'})
-        return responseType({res, status: 200, message: 'success', count: allSubscriptions?.length, data: allSubscriptions})
+      .then((allSubscriptions: GetSubscriptionType) => {
+        if(!allSubscriptions?.subscriptions?.length && !allSubscriptions?.subscribed?.length) return responseType({res, status: 404, message: 'You have no subscriptions'})
+        return responseType({res, status: 200, message: 'success', data: allSubscriptions})
       }).catch((error) => responseType({res, status: 400, message: error?.message}))
     })
   }
@@ -224,8 +228,8 @@ import { UserModel } from '../models/User.js';
         })) as Partial<UserProps[]>
         return { followings, followers }
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
-      .then((allFollows: {follows: Partial<UserProps[]>, followers: Partial<UserProps[]>}) => {
-        if(!allFollows) return responseType({res, status: 404, message: 'You have no follows or followings'})
+      .then((allFollows: GetFollowsType) => {
+        if(!allFollows?.followers?.length && !allFollows?.follows?.length) return responseType({res, status: 404, message: 'You have no follows or followings'})
         return responseType({res, status: 200, message: 'success', data: allFollows})
       }).catch((error) => responseType({res, status: 400, message: error?.message}))
     })

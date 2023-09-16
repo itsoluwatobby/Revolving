@@ -66,11 +66,15 @@ export default function ProfileBase({ userProfile, setRevealEditModal, userStori
   return (
     <section 
       onClick={() => setRevealEditModal('NIL')}
-      className={`flex-none pb-4 flex flex-col w-full gap-2.5`}>
+      className={`flex-none pb-4 flex flex-col w-full`}>
       <hr className={`w-full border ${theme == 'light' ? 'border-gray-200' : 'border-gray-600'}`}/> 
-      <p className={`italic ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} capitalize tracking-wide`}>Your stories and stories you engaged in</p>
+      <div className={`sticky top-0 md:-top-8 z-30 py-2 px-1 italic ${theme === 'light' ? 'text-gray-600 bg-white' : 'text-gray-400 bg-slate-800'} capitalize tracking-wide w-full`}>Your stories and stories you engaged in</div>
   
-      {userContent}
+      <div className='flex flex-col gap-3'>
+      
+        {userContent}
+
+      </div>
   
     </section>
   )

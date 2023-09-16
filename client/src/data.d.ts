@@ -247,6 +247,16 @@ type AuthType={
   updatedAt: string
 }
 
+type GetFollowsType = {
+  follows: Partial<UserProps[]>,
+  followers: Partial<UserProps[]>
+}
+
+type GetSubscriptionType = {
+  subscriptions: Partial<UserProps[]>,
+  subscribed: Partial<UserProps[]>
+}
+
 type ApiSliceType = {
   error?: {
     originalStatus?: number, 

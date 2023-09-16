@@ -19,6 +19,10 @@ import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } f
 const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
 const dateTime = new Date().toString();
+/**
+ * @description signs up a new user
+ * @param body - username, email, password, type= 'LINK' | 'OTP'
+*/
 export function registerUser(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { username, email, password, type } = req.body;
@@ -75,6 +79,10 @@ export function registerUser(req, res) {
         }
     }));
 }
+/**
+ * @description account confirmation by link
+ * @param query - token
+*/
 export function accountConfirmation(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.query;
@@ -104,6 +112,10 @@ export function accountConfirmation(req, res) {
         }
     }));
 }
+/**
+* @descriptionconfirms OTP sent by user
+* @body body - email, otp, purpose='ACCOUNT' | 'OTHERS
+*/
 export function confirmOTPToken(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d;
@@ -139,6 +151,10 @@ export function confirmOTPToken(req, res) {
         }
     }));
 }
+/**
+* @description generates OTP and sends it to user email
+* @param req - response object, user, length(default - 6)
+*/
 export function OTPGenerator(res, user, length = 6) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const OTPToken = generateOTP(length);
@@ -152,6 +168,10 @@ export function OTPGenerator(res, user, length = 6) {
         });
     }));
 }
+/**
+ * @description generates a new OTP
+ * @param req - email, length(optional), option='EMAIL
+*/
 export function ExtraOTPGenerator(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { email, length, option } = req.body;
@@ -168,6 +188,10 @@ export function ExtraOTPGenerator(req, res) {
         }
     }));
 }
+/**
+ * @description signs in in a user
+ * @param req - email and password
+*/
 export function loginHandler(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c;
@@ -226,6 +250,10 @@ export function loginHandler(req, res) {
         }).catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 }
+/**
+* @description logs out a user
+* @param req - userId
+*/
 export function logoutHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -253,6 +281,10 @@ export function logoutHandler(req, res) {
         }
     });
 }
+/**
+* @description receives a request to reset user password
+* @param query - email
+*/
 export function forgetPassword(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { email } = req.query;
@@ -275,6 +307,10 @@ export function forgetPassword(req, res) {
             .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 }
+/**
+ * @description confirms password request and sends back a password_reset link
+ * @param query - token
+*/
 export function passwordResetRedirectLink(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.query;
@@ -295,6 +331,10 @@ export function passwordResetRedirectLink(req, res) {
             .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
     }));
 }
+/**
+* @description resets user password
+* @param boby - email, resetPass
+*/
 export function passwordReset(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { resetPass, email } = req.body;
@@ -316,6 +356,10 @@ export function passwordReset(req, res) {
             return responseType({ res, status: 401, message: 'unauthorised' });
     }));
 }
+/**
+ * @description confirms user password
+ * @param req - email, password
+*/
 export function confirmUserByPassword(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { password, email } = req.body;
@@ -330,6 +374,10 @@ export function confirmUserByPassword(req, res) {
         return responseType({ res, status: 200, message: 'authentication successful' });
     }));
 }
+/**
+ * @description toggles assigning admin role by admin
+ * @param req - adminId and userId
+*/
 export function toggleAdminRole(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { adminId, userId } = req.params;
@@ -359,6 +407,9 @@ export function toggleAdminRole(req, res) {
             return responseType({ res, status: 401, message: 'unauthorised' });
     }));
 }
+/**
+ * @description disconnects redis connection
+*/
 function redisFunc() {
     return __awaiter(this, void 0, void 0, function* () {
         objInstance.reset();

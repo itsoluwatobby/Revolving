@@ -1,4 +1,4 @@
-import { Categories } from "../../data";
+import { Categories, UserProps } from "../../data";
 import { ImageRes, PostType } from "../../posts";
 import { providesTag } from "../../utils/helperFunc";
 import { apiSlice } from "./apiSlice";
@@ -116,6 +116,14 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         return response
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')
+    }),
+    
+    getUsersThatLikedStory: builder.query<Partial<UserProps[]>, string>({
+      query: (userId) => `story/user/likesUsersInStory/${userId}`,
+      transformResponse: (baseQueryReturnValue: {data: UserProps[]}) => {
+        return baseQueryReturnValue.data
+      }, 
+      providesTags:(result) => providesTag(result as UserProps[], 'USERS')
     }),
   })
 })

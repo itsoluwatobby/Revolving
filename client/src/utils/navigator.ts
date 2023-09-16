@@ -25,10 +25,12 @@ export const ErrorStyle = {
 }
 
 export const SuccessStyle = {
-  duration: 2000, 
+  duration: 4000, 
   icon: '🔥', 
   style: { 
-    background: '#3CB371' 
+    background: '#3CB371',
+    color: '#FFFFFF',
+    fontSize: '12px'
   }
 }
 

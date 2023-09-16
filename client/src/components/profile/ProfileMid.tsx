@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { ImageTypeProp, Theme } from '../../posts'
-import { UserProps } from '../../data'
-import { MdAttachEmail } from 'react-icons/md'
-import { checkCount, reduceLength } from '../../utils/navigator'
-import { FaGithub, FaTwitterSquare } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { useState } from 'react';
+import { UserProps } from '../../data';
+import { Link } from 'react-router-dom';
+import { MdAttachEmail } from 'react-icons/md';
+import { ImageTypeProp, Theme } from '../../posts';
+import { FaGithub, FaTwitterSquare } from 'react-icons/fa';
+import { checkCount, reduceLength } from '../../utils/navigator';
 
 type Props = {
   theme: Theme,
@@ -15,6 +15,7 @@ type Props = {
 
 export default function ProfileMid({ userId, userProfile, setRevealEditModal, theme }: Props) {
   const [showAll, setShowAll] = useState<boolean>(false)
+  const currentUserId = localStorage.getItem('revolving_userId') as string
 
   return (
     <div 
@@ -57,7 +58,7 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
               </a>
               <a 
                 href="https://github.com/itsoluwatobby" target='_blank'
-                className={`absolute flex items-center gap-1.5 right-1 md:left-0 md:top-[7.5rem] lg:right-1 top-24 text-blue-600 hover:underline w-fit`}
+                className={`flex items-center gap-1.5 text-blue-600 hover:underline w-fit`}
               >
                 <FaGithub className={`${theme === 'light' ? 'text-gray-800' : 'text-gray-400'} text-lg`} />
                 github.com/itsoluwatobby
@@ -72,26 +73,39 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
 
             </div>
 
-            <div className={`flex-none w-[20%] md:translate-x-7 lg:translate-x-0 md:mt-8 lg:mt-0 ${userProfile?.stack?.length ? 'flex' : 'hidden'}  items-center flex-col h-20`}>
-              <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
-              <div className={`stackflow overflow-y-scroll h-12 p-1 pt-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
-                {
-                  userProfile?.stack?.map(skill => (
-                    <p 
-                      key={skill}
-                      className="rounded-md hover:opacity-80 tracking-wide capitalize transition-all cursor-default">
-                        {skill}
-                    </p>
-                  ))
-                }
+            <div className={`flex-none w-[20%] md:translate-x-7 lg:translate-x-0 md:mt-6 lg:mt-0 ${userProfile?.stack?.length ? 'flex' : 'hidden'} items-center flex-col gap-3 mobile:-translate-x-5`}>
+
+              <Link to={`/subscriptions/${userProfile?._id}`} 
+                className={`${userId === currentUserId ? 'block' : 'hidden'}`}>
+                <button 
+                  className={`p-1 px-1.5 mobile:line-clamp-6 rounded-sm shadow-md border-none hover:opacity-95 active:opacity-100 focus:outline-none ${theme === 'light' ? 'bg-slate-500 text-white' : 'bg-slate-600'} transition-all`}
+                >
+                  subcriptions
+                </button>
+              </Link>
+
+              <div className='flex flex-col gap-2 md:pl-2'>
+                <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
+                <div className={`stackflow overflow-y-scroll h-12 p-1 py-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
+                  {
+                    userProfile?.stack?.map(skill => (
+                      <p 
+                        key={skill}
+                        className="rounded-md hover:opacity-80 tracking-wide capitalize transition-all cursor-default">
+                          {skill}
+                      </p>
+                    ))
+                  }
+                </div>
               </div>
+
             </div>
 
           </article>
 
           <div className={`${userProfile?.hobbies?.length ? 'flex' : 'hidden'} py-2 lg:mt-6 flex-col`}>
             <p>Hobbies:</p>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-2 flex-wrap'>
               {
                 userProfile?.hobbies?.map(hobby => (
                   <p 
