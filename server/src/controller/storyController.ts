@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { StoryModel } from "../models/Story.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { Categories, StoryProps } from "../../types.js";
 import { getCachedResponse } from "../helpers/redis.js";
-import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoriesWithUserIdInIt, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../services/StoryService.js";
-import { getAllSharedByCategories, getAllSharedStories } from "../services/SharedStoryService.js";
-import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { getUserById } from "../services/userService.js";
+import { Categories, StoryProps, UserProps } from "../../types.js";
+import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
+import { getAllSharedByCategories, getAllSharedStories } from "../services/SharedStoryService.js";
+import { createUserStory, deleteAllUserStories, deleteUserStory, getAllStories, getStoriesWithUserIdInIt, getStoryById, getUserStories, likeAndUnlikeStory, updateUserStory } from "../services/StoryService.js";
 
 interface RequestProp extends Request{
   userId: string,
@@ -15,6 +15,10 @@ interface RequestProp extends Request{
 };
 
 
+   /**
+   * @description creates a new user story
+   * @param req - userid 
+  */
   export function createNewStory(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { userId } = req.params
@@ -30,6 +34,10 @@ interface RequestProp extends Request{
     })
   }
 
+   /**
+   * @description updates user story
+   * @param req - userid and storyId
+  */
   export function updateStory(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { userId, storyId } = req.params;
@@ -46,6 +54,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description deletes story by user
+   * @param req - userid 
+  */
   export function deleteStory(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { userId, storyId } = req.params;
@@ -70,6 +82,10 @@ interface RequestProp extends Request{
   }
 
   // Delete user story by admin
+  /**
+   * @description deletes a story by admin user
+   * @param req - adminId, userId, storyId 
+  */
   export function deleteStoryByAdmin(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { adminId, userId, storyId } = req.params;
@@ -90,6 +106,10 @@ interface RequestProp extends Request{
     })
   }
 
+   /**
+   * @description fetches a single story
+   * @param req - storyid 
+   */
   export function getStory(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const {storyId} = req.params
@@ -106,6 +126,10 @@ interface RequestProp extends Request{
   }
 
   // HANDLE GETTING A USER STORIES
+   /**
+   * @description fetches all user stories
+   * @param req - userid 
+  */
   export function getUserStory(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId} = req.params
@@ -125,6 +149,10 @@ interface RequestProp extends Request{
     })
   }
 
+   /**
+   * @description fetches all stories by category
+   * @param req - category 
+  */
   export function getStoryByCategory(req: RequestProp, res: Response){
     asyncFunc(res, () => {
       const {category} = req.query
@@ -149,6 +177,9 @@ interface RequestProp extends Request{
     })
   }
 
+   /**
+   * @description fetches all stories
+   */
   export function getStories(req: Request, res: Response){
     asyncFunc(res, () => {
       getCachedResponse({key:'allStories', cb: async() => {
@@ -172,6 +203,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description fetches all stories with userid in it
+   * @param req - userid 
+  */
   export function getStoriesWithUserId(req: Request, res: Response){
     asyncFunc(res, () => {
       const {userId} = req.params
@@ -187,6 +222,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description likes or unlikes a story
+   * @param req - story id and userId
+  */
   export function like_Unlike_Story(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId, storyId} = req.params
@@ -197,5 +236,30 @@ interface RequestProp extends Request{
       likeAndUnlikeStory(userId, storyId)
       .then((result: Awaited<ReturnType<typeof likeAndUnlikeStory>>) => responseType({res, status: 201, message: result}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+    })
+  }
+
+  /**
+   * @description fetches users that likes a story
+   * @param req - story id 
+  */
+  export const getStoryLikes = (req: Request, res: Response) => {
+    asyncFunc(res, async() => {
+      const {storyId} = req.params
+      if(!storyId) return res.sendStatus(400)
+      const story = await getStoryById(storyId);
+      if(!story) return responseType({res, status: 404, message: 'You do not have an account'})
+      await autoDeleteOnExpire(storyId)
+      getCachedResponse({key: `usersStoryLikes:${storyId}`, cb: async() => {
+        const users = await Promise.all(story?.likes?.map(async(id) => {
+          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
+          return { _id, email, firstName, lastName, followers, followings }
+        })) as Partial<UserProps[]>
+        return users
+      }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
+      .then((allUsers: Partial<UserProps[]>) => {
+        if(!allUsers?.length) return responseType({res, status: 404, message: 'You have no likes'})
+        return responseType({res, status: 200, message: 'success', count: allUsers?.length, data: allUsers})
+      }).catch((error) => responseType({res, status: 400, message: error?.message}))
     })
   }

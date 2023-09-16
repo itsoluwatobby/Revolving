@@ -1,29 +1,48 @@
 import EditModal from './EditModal';
-import { UserProps } from '../../data';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import DPComponent from './DPComponent';
 import { ChangeEvent, useState } from 'react';
-import { reduceLength } from '../../utils/navigator';
+import { ErrorResponse, UserProps } from '../../data';
 import { IsLoadingSpinner } from '../IsLoadingSpinner';
 import { MdNotificationsActive } from 'react-icons/md';
-import { ImageTypeProp, ThemeContextType } from '../../posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import { useSubscribeMutation } from '../../app/api/usersApiSlice';
 import DefaultCover from '../../assets/revolving/default_cover.webp';
+import { ChatOption, ImageTypeProp, ThemeContextType } from '../../posts';
+import { ErrorStyle, SuccessStyle, reduceLength } from '../../utils/navigator';
 
 type Props = {
+  userId: string,
   isLoading: boolean,
   userProfile: UserProps,
   imageType: ImageTypeProp,
   isLoadingDelete: boolean,
   isLoadingUpdate: boolean,
   clearPhoto: (type: ImageTypeProp) => Promise<void>,
-  handleImage: (event: ChangeEvent<HTMLInputElement>) => void
+  handleImage: (event: ChangeEvent<HTMLInputElement>) => void,
+  setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export default function ProfileTop({ userProfile, imageType, handleImage, clearPhoto, isLoadingDelete, isLoading, isLoadingUpdate }: Props) {
+export default function ProfileTop({ userId, userProfile, imageType, handleImage, clearPhoto, isLoadingDelete, isLoading, isLoadingUpdate, setLoginPrompt }: Props) {
   const [hoverDp, setHoverDp] = useState<ImageTypeProp>('NIL')
-  const { theme, revealEditModal, setRevealEditModal } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
+  const [subscribe, { isLoading: isLoadingSubscribe }] = useSubscribeMutation()
+  const { theme, revealEditModal, setRevealEditModal } = useThemeContext() as ThemeContextType
+
+  console.log(userProfile)
+  const subscribeToNotification = async() => {
+    if(isLoadingSubscribe) return
+    try{
+      const res = await subscribe({subscribeId: userId as string, subscriberId: currentUserId}).unwrap()
+      toast.success(res?.meta?.message, SuccessStyle)
+    }
+    catch(error){
+      const errors = error as ErrorResponse
+      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      toast.error(errors?.message as string, ErrorStyle)
+    }
+  }
 
   return (
     <>
@@ -74,9 +93,16 @@ export default function ProfileTop({ userProfile, imageType, handleImage, clearP
 
       </div>
 
-      <div className={`absolute right-2 top-32 md:top-40 lg:top-28 flex flex-row-reverse gap-8 md:z-10`}>
+      <div className={`absolute right-2 top-32 md:top-40 lg:top-28 flex flex-row gap-8 md:z-10`}>
+        <Link to={`/subscriptions/${userProfile?._id}`} className={`${userId === currentUserId ? 'block' : 'hidden'}`}>
+          <button 
+            className={`p-1 px-1.5 mobile:line-clamp-6 rounded-sm shadow-md hover:opacity-95 active:opacity-100 focus:outline-none border-none ${theme === 'light' ? 'bg-slate-500 text-white' : 'bg-slate-600'} transition-all`}
+          >
+            view subcriptions
+          </button>
+        </Link>
         {
-          userProfile?._id === currentUserId ?
+          userId === currentUserId ?
             <Link to={`/edit_profile/${userProfile?._id}`} >
               <button 
                 className={`p-1 px-3 rounded-sm shadow-md hover:opacity-95 active:opacity-100 focus:outline-none border-none ${theme === 'light' ? 'bg-slate-500 text-white' : 'bg-slate-600'} transition-all`}
@@ -87,7 +113,8 @@ export default function ProfileTop({ userProfile, imageType, handleImage, clearP
           :
             <MdNotificationsActive
               title='Notification'
-              className={`text-2xl {'animate-bounce'} cursor-pointer ${!userProfile?.notificationSubscribers?.includes(userProfile?._id) ? 'text-green-700' : 'text-gray-500'} hover:scale-[1.02] active:scale-[1] transition-all`}
+              onClick={subscribeToNotification}
+              className={`text-2xl ${userProfile ? 'block' : 'hidden'} z-10 ${isLoadingSubscribe ? 'animate-bounce' : 'animate-none'} cursor-pointer ${userProfile?.notificationSubscribers?.includes(currentUserId) ? 'text-green-500' : 'text-gray-400'} hover:scale-[1.02] active:scale-[1] transition-all`}
             />
         }
       </div>

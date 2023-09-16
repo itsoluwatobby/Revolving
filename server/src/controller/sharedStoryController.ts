@@ -11,8 +11,10 @@ interface RequestProp extends Request{
   category: Categories
 };
 
-
   // Only for admin page
+  /**
+   * @description fetches all shared stories
+  */
   export function fetchSharedStories(req: Request, res: Response){
     asyncFunc(res, () => {
       getCachedResponse({key:'allSharedStoriesCache', cb: async() => {
@@ -26,6 +28,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description fetches a single shared story
+   * @param req - shared story id 
+  */
   export function getSingleShared(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const {sharedId} = req.params
@@ -41,6 +47,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description shares a story
+   * @param req - userId and story id
+  */
   export function shareStory(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const { userId, storyId } = req.params
@@ -53,6 +63,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description unshares a story
+   * @param req - userId and shared story id
+  */
   export function unShareUserStory(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const { userId, sharedId } = req.params
@@ -67,6 +81,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description fetches shared stories user
+   * @param req - userId 
+  */
   export function getSharedStoriesByUser(req: RequestProp, res: Response){
     asyncFunc(res, async() => {
       const {userId} = req.params
@@ -83,6 +101,10 @@ interface RequestProp extends Request{
     })
   }
 
+  /**
+   * @description likes a shared story
+   * @param req - userId and shared story id 
+  */
   export function like_Unlike_SharedStory(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId, sharedId} = req.params

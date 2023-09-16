@@ -4,14 +4,16 @@ import { UserProps } from '../../data'
 import { MdAttachEmail } from 'react-icons/md'
 import { checkCount, reduceLength } from '../../utils/navigator'
 import { FaGithub, FaTwitterSquare } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 
 type Props = {
   theme: Theme,
+  userId: string,
   userProfile: UserProps,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>
 }
 
-export default function ProfileMid({ userProfile, setRevealEditModal, theme }: Props) {
+export default function ProfileMid({ userId, userProfile, setRevealEditModal, theme }: Props) {
   const [showAll, setShowAll] = useState<boolean>(false)
 
   return (
@@ -36,8 +38,12 @@ export default function ProfileMid({ userProfile, setRevealEditModal, theme }: P
                 </div>
 
                 <div className='flex items-center gap-5 capitalize'>
-                  <p className='opacity-90'>followers: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followers as string[])}</span></p>
-                  <p className='opacity-90'>followings: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followings as string[])}</span></p>
+                  <Link to={`/follows/${userId}`}>
+                    <p className='opacity-90 hover:underline underline-offset-2'>followers: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followers as string[])}</span></p>
+                  </Link>
+                  <Link to={`/follows/${userId}`}>
+                    <p className='opacity-90 hover:underline underline-offset-2'>followings: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followings as string[])}</span></p>
+                  </Link>
                 </div>
 
               </div>

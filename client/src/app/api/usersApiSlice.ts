@@ -4,7 +4,7 @@ import { providesTag } from "../../utils/helperFunc";
 
 type SubscribeType = {
   meta: {
-    status: number, nessage: string
+    status: number, message: string
   }
 }
 
@@ -16,7 +16,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: {...user}
       }),
-      invalidatesTags: [{ type: 'USERS' }, { type:  'USERS', id: 'LIST' }],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST' }],
     }),
 
     followUnfollowUser: builder.mutation<string, {followerId: string, followedId: string}>({
@@ -56,7 +56,6 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     getUsers: builder.query<UserProps[], void>({
       query: () => `users`,
       transformResponse: (baseQueryReturnValue: {data: UserProps[]}) => {
-      //   usersAdapter.setAll(initialState, baseQueryReturnValue)
         return baseQueryReturnValue?.data
       },
       providesTags: (result) => providesTag(result as UserProps[], 'USERS')
@@ -68,7 +67,15 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: subscriberId
       }),
-      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'USERS', id: 'LIST' }],
+    }),
+
+    getSubscriptions: builder.query<UserProps[], string>({
+      query: (userId) => `users/user_subscriptions/${userId}`,
+      transformResponse: (baseQueryReturnValue: {data: UserProps[]}) => {
+          return baseQueryReturnValue?.data
+        },
+      providesTags: (result) => providesTag(result as UserProps[], 'USERS'),
     }),
 
   })
@@ -77,6 +84,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 export const {
   useFollowUnfollowUserMutation,
   useGetCurrentUserMutation,
+  useGetSubscriptionsQuery,
   useUpdateInfoMutation,
   useDeleteUserMutation,
   useSubscribeMutation,

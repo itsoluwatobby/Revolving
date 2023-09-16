@@ -7,6 +7,7 @@ import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import LikeStory from './LikeStory';
 import FollowUnFollow from './FollowUnFollow';
 import PostImage from '../PostImages';
+import { Link } from 'react-router-dom';
 
 type ArticleProps = {
   story: PostType,
@@ -47,7 +48,9 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
   : content = (
     <>
       <div className='relative flex items-center gap-3'>
-        <p className='capitalize'>{story?.author || 'anonymous'}</p>
+        <Link to={`/profile/${story?.userId}`}>
+          <p className='capitalize hover:underline underline-offset-1'>{story?.author || 'anonymous'}</p>
+        </Link>
         <span>.</span>
         <p>{format(story?.createdAt, 'en-US')}</p>
 
@@ -56,7 +59,7 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
       </div>
         <h1 
           ref={headingRef as React.LegacyRef<HTMLHeadingElement>}
-          className='whitespace-pre-wrap font-bold text-3xl uppercase'>{story?.title}
+          className='whitespace-pre-wrap font-bold text-3xl uppercase text-justify break-all'>{story?.title}
         </h1>
         <p 
           className={`whitespace-pre-wrap font-sans tracking-wider text-justify`}>

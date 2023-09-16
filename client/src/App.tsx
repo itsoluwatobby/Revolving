@@ -26,6 +26,8 @@ import { PersistedLogin } from "./layouts/PersistedLogin";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { selectCurrentRoles } from "./features/auth/authSlice";
 import EditProfilePage from "./pages/EditProfilePage";
+import Followers from "./pages/Followers";
+import Subscriptions from "./pages/Subscriptions";
  
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
@@ -53,14 +55,16 @@ export const App = () => {
             <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="new_story" element={<NewStory />} />
             <Route path="edit_story/:storyId" element={<NewStory />} />
+            <Route path="profile/:userId" element={<ProfilePage />} />
+            <Route path="follows/:userId" element={<Followers />} />
 
             <Route element={<ProtectedRoute roles={user_roles}/>}>
 
-              <Route path="profile/:userId" element={<ProfilePage />} />
-              <Route path="edit_profile/:userId" element={<EditProfilePage />} />
-              <Route path="taskManager/:userId" element={<TaskManager />} />
-              <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
               <Route path="adminPage/:userId" element={<AdminPage />} />
+              <Route path="subscriptions/:userId" element={<Subscriptions />} />
+              <Route path="taskManager/:userId" element={<TaskManager />} />
+              <Route path="edit_profile/:userId" element={<EditProfilePage />} />
+              <Route path="expensePlanner/:userId" element={<ExpensePlanner />} />
             
             </Route>
             

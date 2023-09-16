@@ -30,6 +30,10 @@ interface EmailProps extends Request{
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
   const dateTime = new Date().toString()
 
+  /**
+   * @description signs up a new user
+   * @param body - username, email, password, type= 'LINK' | 'OTP'
+  */
   export function registerUser(req: NewUserProp, res: Response){
     asyncFunc(res, async () => {
       const {username, email, password, type}: Omit<NewUserProp, 'userId'> = req.body
@@ -84,6 +88,10 @@ interface EmailProps extends Request{
     })
   }
 
+  /**
+   * @description account confirmation by link
+   * @param query - token
+  */
   export function accountConfirmation(req: Request, res: Response){
     asyncFunc(res, async () => {
       const { token } = req.query
@@ -108,6 +116,10 @@ interface EmailProps extends Request{
     })
   }
 
+   /**
+   * @descriptionconfirms OTP sent by user
+   * @body body - email, otp, purpose='ACCOUNT' | 'OTHERS
+  */
   export function confirmOTPToken(req: Request, res: Response){
     asyncFunc(res, async () => {
       const { email, otp, purpose='ACCOUNT' }: {email: string, otp: string, purpose?: 'ACCOUNT' | 'OTHERS'} = req.body
@@ -136,6 +148,10 @@ interface EmailProps extends Request{
     })
   }
 
+   /**
+   * @description generates OTP and sends it to user email
+   * @param req - response object, user, length(default - 6)
+  */
   export function OTPGenerator(res: Response, user: Document<unknown, {}, UserProps> & UserProps & {_id: Types.ObjectId;}, length=6){
     asyncFunc(res, async () => {
       const OTPToken = generateOTP(length)
@@ -147,7 +163,11 @@ interface EmailProps extends Request{
       })
     })
   }
-  
+
+  /**
+   * @description generates a new OTP
+   * @param req - email, length(optional), option='EMAIL
+  */  
   export function ExtraOTPGenerator(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {email, length, option}: { email: string, length: number, option: 'EMAIL' | 'DIRECT' } = req.body
@@ -164,6 +184,10 @@ interface EmailProps extends Request{
     })
   }
 
+  /**
+   * @description signs in in a user
+   * @param req - email and password
+  */
   export function loginHandler(req: NewUserProp, res: Response){
     asyncFunc(res, async () => {
       const {email, password} = req.body
@@ -224,6 +248,10 @@ interface EmailProps extends Request{
     })
   }
 
+   /**
+   * @description logs out a user
+   * @param req - userId
+  */ 
   export async function logoutHandler(req: NewUserProp, res: Response){
     try{
       const { userId } = req.params
@@ -250,6 +278,10 @@ interface EmailProps extends Request{
     }
   }
 
+   /**
+   * @description receives a request to reset user password
+   * @param query - email
+  */ 
   export function forgetPassword(req: Request, res: Response){
     asyncFunc(res, async () => {
       const { email } = req.query
@@ -270,6 +302,10 @@ interface EmailProps extends Request{
     })
   }
 
+  /**
+   * @description confirms password request and sends back a password_reset link
+   * @param query - token
+  */ 
   export function passwordResetRedirectLink(req: QueryProps, res: Response){
     asyncFunc(res, async () => {
       const { token } = req.query
@@ -288,6 +324,10 @@ interface EmailProps extends Request{
     })
   }
 
+   /**
+   * @description resets user password
+   * @param boby - email, resetPass
+  */ 
   export function passwordReset(req: EmailProps, res: Response){
     asyncFunc(res, async () => {
       const {resetPass, email} = req.body
@@ -307,6 +347,11 @@ interface EmailProps extends Request{
       else return responseType({res, status:401, message:'unauthorised'})
     })
   }
+
+  /**
+   * @description confirms user password
+   * @param req - email, password
+  */ 
   export function confirmUserByPassword(req: EmailProps, res: Response){
     asyncFunc(res, async () => {
       const {password, email} = req.body
@@ -319,6 +364,10 @@ interface EmailProps extends Request{
     })
   }
 
+  /**
+   * @description toggles assigning admin role by admin
+   * @param req - adminId and userId
+  */ 
   export function toggleAdminRole(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {adminId, userId} = req.params
@@ -346,11 +395,14 @@ interface EmailProps extends Request{
     })
   }
 
-async function redisFunc(){
-  objInstance.reset();
-  if(redisClient.isOpen){
-    await redisClient.flushAll();
-    await redisClient.quit();
+  /**
+   * @description disconnects redis connection
+  */ 
+  async function redisFunc(){
+    objInstance.reset();
+    if(redisClient.isOpen){
+      await redisClient.flushAll();
+      await redisClient.quit();
+    }
+    return;
   }
-  return;
-}

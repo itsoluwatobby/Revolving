@@ -81,13 +81,18 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         </div>
 
         <div className='flex items-center gap-4'>
-          <p>
-            followers <span className="font-bold">{checkCount(user?.followers as string[])}</span>
-          </p>
-          <p>
-            following <span className="font-bold">{checkCount(user?.followings as string[])}</span>
-          </p>
+          <Link to={`/follows/${userId}`}>
+            <p>
+              followers <span className="font-bold">{checkCount(user?.followers as string[])}</span>
+            </p>
+          </Link>
+          <Link to={`/follows/${userId}`}>
+            <p>
+              following <span className="font-bold">{checkCount(user?.followings as string[])}</span>
+            </p>
+          </Link>
         </div>
+        
       </div>
     </>
   )

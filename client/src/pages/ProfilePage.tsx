@@ -170,14 +170,14 @@ export default function ProfilePage() {
           :
           <>
             <ProfileTop 
-              userProfile={userProfile as UserProps} 
-              handleImage={handleImage} imageType={imageType}
               isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
               clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
+              handleImage={handleImage} imageType={imageType} userId={userId as string}
+              userProfile={userProfile as UserProps} setLoginPrompt={setLoginPrompt}
             />
             <ProfileMid 
-              setRevealEditModal={setRevealEditModal} 
               userProfile={userProfile as UserProps} theme={theme} 
+              setRevealEditModal={setRevealEditModal} userId={userId as string}
             />
           </>
         }

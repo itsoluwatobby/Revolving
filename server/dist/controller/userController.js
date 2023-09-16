@@ -144,19 +144,42 @@ export function subscribeToNotification(req, res) {
         if (!subscribe)
             return responseType({ res, status: 404, message: 'User not found' });
         if ((_a = subscribe === null || subscribe === void 0 ? void 0 : subscribe.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.includes(subscriberId)) {
-            subscribe.updateOne({ $pull: { notificationSubscribers: { subscriberId } } })
+            subscribe.updateOne({ $pull: { notificationSubscribers: subscriberId } })
                 .then(() => __awaiter(this, void 0, void 0, function* () {
-                yield subscribee.updateOne({ $pull: { subscribed: { subscribeId } } });
-                return responseType({ res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL' });
+                yield subscribee.updateOne({ $pull: { subscribed: subscribeId } });
+                return responseType({ res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED' });
             })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
         }
         else {
-            subscribe.updateOne({ $push: { notificationSubscribers: { subscriberId } } })
+            subscribe.updateOne({ $push: { notificationSubscribers: subscriberId } })
                 .then(() => __awaiter(this, void 0, void 0, function* () {
-                yield subscribee.updateOne({ $push: { subscribed: { subscribeId } } });
-                return responseType({ res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED' });
+                yield subscribee.updateOne({ $push: { subscribed: subscribeId } });
+                return responseType({ res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL' });
             })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
         }
     }));
 }
+export const getSubscriptions = (req, res) => {
+    asyncFunc(res, () => __awaiter(void 0, void 0, void 0, function* () {
+        const { userId } = req.params;
+        if (!userId)
+            return res.sendStatus(400);
+        const user = yield getUserById(userId);
+        if (!user)
+            return responseType({ res, status: 404, message: 'You do not have an account' });
+        yield autoDeleteOnExpire(userId);
+        getCachedResponse({ key: `userSubscriptions:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
+                var _a;
+                const allSubscriptions = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.map(id => {
+                    return getUserById(id);
+                }));
+                return allSubscriptions;
+            }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+            .then((allSubscriptions) => {
+            if (!(allSubscriptions === null || allSubscriptions === void 0 ? void 0 : allSubscriptions.length))
+                return responseType({ res, status: 404, message: 'You have no subscriptions' });
+            return responseType({ res, status: 200, message: 'success', count: allSubscriptions === null || allSubscriptions === void 0 ? void 0 : allSubscriptions.length, data: allSubscriptions });
+        }).catch((error) => responseType({ res, status: 400, message: error === null || error === void 0 ? void 0 : error.message }));
+    }));
+};
 //# sourceMappingURL=userController.js.map
