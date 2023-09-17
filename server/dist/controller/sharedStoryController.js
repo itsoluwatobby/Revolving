@@ -13,6 +13,9 @@ import { createShareStory, getAllSharedStories, getSharedStoryById, getUserShare
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 ;
 // Only for admin page
+/**
+ * @description fetches all shared stories
+*/
 export function fetchSharedStories(req, res) {
     asyncFunc(res, () => {
         getCachedResponse({ key: 'allSharedStoriesCache', cb: () => __awaiter(this, void 0, void 0, function* () {
@@ -26,6 +29,10 @@ export function fetchSharedStories(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     });
 }
+/**
+ * @description fetches a single shared story
+ * @param req - shared story id
+*/
 export function getSingleShared(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { sharedId } = req.params;
@@ -42,6 +49,10 @@ export function getSingleShared(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+ * @description shares a story
+ * @param req - userId and story id
+*/
 export function shareStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId, storyId } = req.params;
@@ -54,6 +65,10 @@ export function shareStory(req, res) {
             .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+ * @description unshares a story
+ * @param req - userId and shared story id
+*/
 export function unShareUserStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId, sharedId } = req.params;
@@ -68,6 +83,10 @@ export function unShareUserStory(req, res) {
             : responseType({ res, status: 201, count: 1, message: 'story unshared' });
     }));
 }
+/**
+ * @description fetches shared stories user
+ * @param req - userId
+*/
 export function getSharedStoriesByUser(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId } = req.params;
@@ -85,6 +104,10 @@ export function getSharedStoriesByUser(req, res) {
         }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
     }));
 }
+/**
+ * @description likes a shared story
+ * @param req - userId and shared story id
+*/
 export function like_Unlike_SharedStory(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
         const { userId, sharedId } = req.params;

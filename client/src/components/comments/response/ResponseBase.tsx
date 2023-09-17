@@ -1,32 +1,31 @@
-import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs'
-import { MdOutlineInsertComment } from 'react-icons/md';
-import { PromptLiterals, Theme, ThemeContextType } from '../../../posts';
-import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../../data';
-import { useThemeContext } from '../../../hooks/useThemeContext';
-import WriteModal from './WriteModal';
 import { useEffect } from 'react';
+import WriteModal from './WriteModal';
 import { toast } from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { MdOutlineInsertComment } from 'react-icons/md';
+import { useThemeContext } from '../../../hooks/useThemeContext';
 import { ErrorStyle, checkCount } from '../../../utils/navigator';
 import { setEditResponse } from '../../../features/story/commentSlice';
-import { useDispatch } from 'react-redux';
+import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs';
+import { PromptLiterals, Theme, ThemeContextType } from '../../../posts';
 import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
-import { commentApiSlice } from '../../../app/api/commentApiSlice';
+import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../../data';
 
 type BaseProps = {
-  mini?: boolean
-  reveal?: boolean
-  userId: string,
   theme: Theme,
+  mini?: boolean,
+  userId: string,
+  reveal?: boolean,
   writeReply: string,
   openReply: OpenReply,
+  comment: CommentProps,
   keepPrompt: PromptLiterals,
+  response: CommentResponseProps,
   responseRef: React.MutableRefObject<HTMLTextAreaElement>,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
-  setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
+  setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>,
-  response: CommentResponseProps,
-  comment: CommentProps
 }
 
 function modalButton(theme: Theme){ 
@@ -78,68 +77,62 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
 
   return (
     <>
-        <p className="flex items-center gap-1.5">
-          <MdOutlineInsertComment 
-            title='responses'
-            //onClick={() => expandResponse(response._id, true)}
-            className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
-          />
-          <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
-            {checkCount(response?.responseTags)}
-          </span>
-        </p>
-        <p className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
-          {userId && response?.likes?.includes(userId)
-            ?
-            <BsFillHandThumbsUpFill 
-              title='like' 
-              onClick={likeUnlikeResponse}
-              className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
-            :
-            <BsHandThumbsUp 
-              title='like' 
-              onClick={likeUnlikeResponse}
-              className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${response?.likes.includes(userId) && 'text-red-500'}`} />
-          }
-          <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
-            {checkCount(response?.likes)}
-          </span>
-        </p>
-        {(!reveal && mini && response?.response) && (
-            response?.response.split(' ').length >= 60 &&
-              <small 
-                onClick={() => expandResponse(response?._id, false)}
-                className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-gray-200`}>Read more</small>
-          )
+      <p className="flex items-center gap-1.5">
+        <MdOutlineInsertComment 
+          title='responses'
+          //onClick={() => expandResponse(response._id, true)}
+          className={`font-sans cursor-pointer ${theme == 'light' ? 'text-black' : 'text-gray-300'} hover:text-blue-800`}
+        />
+        <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
+          {checkCount(response?.responseTags)}
+        </span>
+      </p>
+
+      <p className={`flex items-center gap-1 ${isLikeLoading && 'animate-bounce'}`}>
+        {userId && response?.likes?.includes(userId)
+          ?
+          <BsFillHandThumbsUpFill 
+            title='like' 
+            onClick={likeUnlikeResponse}
+            className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-green-800' : ''}`} />
+          :
+          <BsHandThumbsUp 
+            title='like' 
+            onClick={likeUnlikeResponse}
+            className={`hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${response?.likes.includes(userId) && 'text-red-500'}`} />
         }
-        <span
-          onClick={replyModal}
-          className="cursor-pointer hover:opacity-70">reply</span>
+        <span className={`font-mono text-xs ${theme == 'dark' && 'text-white'}`}>
+          {checkCount(response?.likes)}
+        </span>
+      </p>
+
+      {(!reveal && mini && response?.response) && (
+          response?.response.split(' ').length >= 60 &&
+            <small 
+              onClick={() => expandResponse(response?._id, false)}
+              className={`font-sans cursor-grab ${theme == 'light' ? 'text-gray-900' : 'text-gray-300'} hover:text-gray-200`}>Read more</small>
+        )
+      }
+      <span
+        onClick={replyModal}
+        className="cursor-pointer hover:opacity-70 text-xs">reply</span>
+
       {(openReply.assert || keepPrompt == 'Show') 
-            ? <WriteModal 
-                responseRef={responseRef}
-                writeReply={writeReply}
-                keepPrompt={keepPrompt}
-                setKeepPrompt={setKeepPrompt}
-                openReply={openReply}
-                setOpenReply={setOpenReply}
-                setWriteReply={setWriteReply}
-                setPrompt={setPrompt as React.Dispatch<React.SetStateAction<Prompted>>}
-                currentUserId={userId}
-                response={response}
-                comment={comment}
-              /> 
-              : null
+          ? <WriteModal 
+              setPrompt={setPrompt as React.Dispatch<React.SetStateAction<Prompted>>}
+              responseRef={responseRef} writeReply={writeReply} keepPrompt={keepPrompt}
+              setKeepPrompt={setKeepPrompt} openReply={openReply} setOpenReply={setOpenReply}
+              currentUserId={userId} response={response} comment={comment} setWriteReply={setWriteReply}
+            /> 
+          : null
       }
       {
         keepPrompt == 'Show' 
           ? <PopUpPrompt 
-              enlarge={enlarge}
-              responseRef={responseRef} 
-              setKeepPrompt={setKeepPrompt}
-              theme={theme} 
+              enlarge={enlarge} responseRef={responseRef} 
+              setKeepPrompt={setKeepPrompt} theme={theme} 
             /> 
-            : null
+          : null
       }
     </>
   )
@@ -157,9 +150,8 @@ export function PopUpPrompt({ enlarge, responseRef, setKeepPrompt, theme }: PopT
   const keepFocus = () => {
     setKeepPrompt('Retain')
     if(responseRef.current) responseRef?.current.focus()
-
-    console.log('running too')
   }
+
   return (
     <section className={`absolute flex p-4 rounded-lg z-50 shadow-2xl items-center gap-2 right-20 ${theme == 'light' ? 'bg-slate-700 shadow-slate-800' : 'bg-slate-800 shadow-slate-700'} ${enlarge.assert ? '-bottom-16' : 'top-4'}`}>
       <p 

@@ -180,6 +180,10 @@ export function generateOTP(MAXLENGTH = 6) {
     }
     return generatedOTP;
 }
+/**
+  * @description checks token expiration time
+  * @param req - createdTime
+ */
 export function checksExpiration(createdTime) {
     const EXPIRES_IN_30_MINUTES = 30 * 60 * 1000; // 30 minutes
     const presentTime = new Date();

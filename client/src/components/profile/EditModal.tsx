@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { UserProps } from '../../data'
 import { ImageTypeProp, Theme } from '../../posts'
 import { RiEdit2Line } from 'react-icons/ri'
+import { useParams } from 'react-router-dom'
 
 type EditModalProps = {
   theme: Theme,
@@ -14,6 +15,8 @@ type EditModalProps = {
 }
 
 export default function EditModal({ theme, cover, revealEditModal, hoverDp, userProfile, setRevealEditModal, clearPhoto }: EditModalProps) {
+  const { userId } = useParams()
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   const [toggler, setToggler] = useState<ImageTypeProp>('DP')
 // "COVER" | "DP"
   const toggleModal = () => {
@@ -23,7 +26,7 @@ export default function EditModal({ theme, cover, revealEditModal, hoverDp, user
       setToggler('DP')
     }
     else{
-      setRevealEditModal(prev => cover === 'COVER' ? prev = 'COVER' : cover === 'DP' ? prev = 'DP' : prev = 'NIL')
+      setRevealEditModal(prev => (cover === 'COVER' ? prev = 'COVER' : cover === 'DP' ? prev = 'DP' : prev = 'NIL'))
     }
   }
 
@@ -31,7 +34,7 @@ export default function EditModal({ theme, cover, revealEditModal, hoverDp, user
     <>
       <div 
         onClick={toggleModal}
-        className={`absolute ${theme === 'light' ? 'bg-gray-600' : 'bg-gray-900'} ${cover === 'COVER' ? 'w-14 h-6 bottom-1 left-1' : 'w-14 h-6 bottom-3 -right-4'} rounded-md rounded-tl-none rounded-br-none px-0.5 text-white flex gap-2 items-center cursor-pointer ${hoverDp === cover || revealEditModal === cover ? 'scale-[1.02]' : 'scale-0'} hover:bg-gray-800 active:bg-gray-950 transition-all`} >
+        className={`absolute ${theme === 'light' ? 'bg-gray-600' : 'bg-gray-900'} ${cover === 'COVER' ? 'w-14 h-6 bottom-1 left-1' : 'w-14 h-6 bottom-3 -right-4'} rounded-md rounded-tl-none rounded-br-none px-0.5 text-white ${ userId === currentUserId ? 'flex' : 'hidden'} gap-2 items-center cursor-pointer ${hoverDp === cover || revealEditModal === cover ? 'scale-[1.02]' : 'scale-0'} hover:bg-gray-800 active:bg-gray-950 transition-all`} >
         <RiEdit2Line className='text-lg' />
         <p className='text-base'>Edit</p>
       </div>

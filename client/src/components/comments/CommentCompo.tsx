@@ -1,19 +1,19 @@
-import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../data"
-import { PromptLiterals, ThemeContextType } from "../../posts";
-import { useEffect, useRef, useState } from "react";
-import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
 import { toast } from "react-hot-toast";
-import { useThemeContext } from "../../hooks/useThemeContext";
-import { storyApiSlice } from "../../app/api/storyApiSlice";
-import { getTabCategory } from "../../features/story/navigationSlice";
-import BodyComponent from "./BodyComponent";
 import { useSelector } from "react-redux";
+import BodyComponent from "./BodyComponent";
+import { ThemeContextType } from "../../posts";
 import { ErrorStyle } from "../../utils/navigator";
+import { useEffect, useRef, useState } from "react";
+import { storyApiSlice } from "../../app/api/storyApiSlice";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { getTabCategory } from "../../features/story/navigationSlice";
+import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
+import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../data";
 
 type CommentType = {
   comment: CommentProps,
-  setDeactivateInputBox: React.Dispatch<React.SetStateAction<boolean>>,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
+  setDeactivateInputBox: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox }: CommentType) {
@@ -61,18 +61,10 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
         responseRef={
           responseRef as React.MutableRefObject<HTMLTextAreaElement>
         }
-        currentUserId={currentUserId} 
-        comment={comment} 
-        reveal={reveal}
-        expand={expand}
-        writeReply={writeReply} 
-        setWriteReply={setWriteReply} 
-        openReply={openReply} 
-        setOpenReply={setOpenReply}
-        setPrompt={setPrompt}  
-        deleteSingleComment={deleteSingleComment}
-        setExpand={setExpand} 
-        setReveal={setReveal}
+        setWriteReply={setWriteReply} currentUserId={currentUserId} 
+        setReveal={setReveal} writeReply={writeReply} setOpenReply={setOpenReply} 
+        deleteSingleComment={deleteSingleComment} comment={comment} reveal={reveal} 
+        expand={expand} openReply={openReply} setPrompt={setPrompt} setExpand={setExpand} 
       />
     </article>
   )

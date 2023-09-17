@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { USERROLES } from "../data";
 import { useDispatch, useSelector } from "react-redux";
 import { IsLayoutLoading } from "../components/IsLayoutLoading";
-import { Outlet, Navigate, useLocation, useNavigate } from "react-router-dom"
+import { Outlet, Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import { setGrantedPermission, grantedPermission } from "../features/auth/userSlice";
 
@@ -12,9 +12,11 @@ type AllowedRolesProp={
 
 export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
   const dispatch = useDispatch()
+  const { userId } = useParams()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const getPermission = useSelector(grantedPermission)
+  const currentUserId = localStorage.getItem('revolving_userId') as string
 
   useEffect(() => {
     let isMounted = true
@@ -23,6 +25,7 @@ export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
       return
     }
     const permitted = () => {
+      if(userId !== currentUserId) return navigate(-1)
       const ALLOWEDROLES = [1120, 1159]
       const grantPermission = roles?.some(allowed => ALLOWEDROLES?.includes(allowed))
       dispatch(setGrantedPermission(grantPermission ? 'ALLOWED' : 'FORBIDDEN'))
@@ -31,7 +34,7 @@ export const ProtectedRoute = ({ roles }: AllowedRolesProp) => {
     return () => {
       isMounted = false
     }
-  }, [roles, pathname, dispatch])
+  }, [roles, pathname, dispatch, userId, navigate, currentUserId])
 
   useEffect(() => {
     let timerId: TimeoutId

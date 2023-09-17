@@ -13,7 +13,7 @@ import { logoutHandler } from '../controller/authController.js';
 import { getUser, getUsers } from '../controller/userController.js';
 import { getComment, getStoryComments } from '../controller/commentController.js';
 import { getResponse, getResponseByComment } from '../controller/responseController.js';
-import { getStories, getStory, getStoryByCategory } from '../controller/storyController.js';
+import { getStories, getStoriesWithUserId, getStory, getStoryByCategory, getStoryLikes } from '../controller/storyController.js';
 import { getTask, getTasksInBin, getUserTask } from '../controller/taskManagerController.js';
 import { fetchSharedStories, getSingleShared } from '../controller/sharedStoryController.js';
 
@@ -49,6 +49,8 @@ export class RevolvingApplication{
 
   //public routes
     this.app.get('/revolving/story', getStories);
+    this.app.get('/revolving/story/user/likesUsersInStory/:userId', getStoryLikes)
+    this.app.get('/revolving/story/user/storyWithUserId/:userId', getStoriesWithUserId)
   
   // comments
     this.app.get('/revolving/comment_in_story/:storyId', getStoryComments);

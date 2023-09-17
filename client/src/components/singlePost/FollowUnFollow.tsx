@@ -10,12 +10,6 @@ type FollowUnFollowProps = {
   position: PositionType
 }
 
-// function buttonClass(isMutating: boolean, theme?: Theme, position?: PositionType){
-//   return `
-//   rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
-//   `
-// }
-
 export default function FollowUnFollow({ userId, position }: FollowUnFollowProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
@@ -26,7 +20,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const buttonClass = useCallback((isMutating: boolean, theme?: Theme, position?: PositionType) => {
     return `
-    rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow duration-150 active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
+    rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
     `
   }, [])
 
@@ -68,7 +62,8 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
               onClick={followOrUnfollow}
               onMouseEnter={() => setHoverThis('unfollow')}
               onMouseLeave={() => setHoverThis('following')}
-              className={buttonClass(isMutating, theme, position)}>{hoverThis == 'unfollow' ? 'unfollow' : 'following'}
+              className={buttonClass(isMutating, theme, position)}>
+                {hoverThis == 'unfollow' ? 'unfollow' : 'following'}
             </button>
           )
         ) : null

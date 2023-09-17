@@ -1,4 +1,10 @@
 import { Schema, model } from 'mongoose';
+const CodeSchema = new Schema({
+    language: { type: String, required: [true, 'Language name required'], trim: true },
+    body: { type: String, default: '' }
+}, {
+    timestamps: true
+});
 const STORYSCHEMA = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
@@ -13,6 +19,7 @@ const STORYSCHEMA = new Schema({
         default: []
     },
     isShared: { type: Array, default: [] },
+    code: [CodeSchema],
     likes: { type: Array, default: [] },
     fontFamily: { type: String, default: 'open_sans' },
     edited: { type: Boolean, default: false },

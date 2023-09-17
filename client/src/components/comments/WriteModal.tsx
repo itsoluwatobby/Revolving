@@ -1,27 +1,27 @@
-import { ChangeEvent, useEffect } from 'react'
-import { BsSend } from 'react-icons/bs'
-import { AiFillCloseSquare } from 'react-icons/ai'
-import { useThemeContext } from '../../hooks/useThemeContext'
-import { PromptLiterals, ThemeContextType } from '../../posts'
-import { useDispatch, useSelector } from 'react-redux';
-import { getEditComments, setEditComment } from '../../features/story/commentSlice';
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
-import { commentApiSlice, useUpdateCommentMutation } from '../../app/api/commentApiSlice';
+import { BsSend } from 'react-icons/bs';
 import { toast } from 'react-hot-toast';
+import { ChangeEvent, useEffect } from 'react';
+import { ErrorStyle } from '../../utils/navigator';
+import { AiFillCloseSquare } from 'react-icons/ai';
+import { useDispatch, useSelector } from 'react-redux';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { PromptLiterals, ThemeContextType } from '../../posts';
 import { useCreateResponseMutation } from '../../app/api/responseApiSlice';
-import { ErrorStyle } from '../../utils/navigator'
+import { getEditComments, setEditComment } from '../../features/story/commentSlice';
+import { commentApiSlice, useUpdateCommentMutation } from '../../app/api/commentApiSlice';
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
 
 type WriteProp={
   writeReply: string,
-  keepPrompt: PromptLiterals,
   enlarged?: boolean,
+  openReply: OpenReply,
   currentUserId: string,
   comment: CommentProps,
-  openReply: OpenReply,
+  keepPrompt: PromptLiterals,
   responseRef: React.MutableRefObject<HTMLTextAreaElement>,
+  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
-  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>
 }
 

@@ -6,7 +6,15 @@ type ChildrenProp = {
 }
 
 type MakeToButtom = PostType & Pick<SharedProps, 'sharedLikes'>
-  
+type CodeProps =  { 
+  _id?: string,
+  body: string,
+  codeId?: string,
+  language: string,
+  createdAt: string,
+  updatedAt: string, 
+}
+
 type PostType = {
   _id: string,
   userId: string,
@@ -19,6 +27,7 @@ type PostType = {
   category: Categories[] | Categories,
   fontFamily?: string | 'sans',
   commentIds?: string[],
+  code: CodeProps[],
   edited: false,
   sharerId?: string,
   sharedId?: string,
@@ -64,14 +73,16 @@ type PostContextType = {
   navPosts: PostType[],
   imagesFiles: ImageType[]
   typingEvent: TypingEvent,
+  submitToSend: CodeProps[],
   inputValue: CodeStoreType,
   codeStore: CodeStoreType[],
   filteredStories: PostType[],
   setSearch: React.Dispatch<React.SetStateAction<string>>,
   setCanPost: React.Dispatch<React.SetStateAction<boolean>>,
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
-  setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>,
   setTypingEvent: React.Dispatch<React.SetStateAction<TypingEvent>>,
+  setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>,
+  setSubmitToSend: React.Dispatch<React.SetStateAction<CodeProps[]>>,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>,
 }

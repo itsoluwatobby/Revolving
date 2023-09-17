@@ -23,7 +23,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
   const { theme, setRollout } = useThemeContext() as ThemeContextType
   const excludeRoute = ['/new_story', `/edit_story`, `/story/${storyId}`]
 
-  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
+  const address = ['/new_story', `/edit_story/${storyId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
   const modalClass = useCallback((theme: Theme) => { 
@@ -31,12 +31,12 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
   }, [])
 
   const arrow_class = useCallback(() => {
-    return ("text-xl text-gray-500 cursor-pointer shadow-lg hover:scale-[1.05] active:scale-[0.98] hover:text-gray-500 transition-all ease-in-out")
+    return ("text-xl text-gray-700 cursor-pointer shadow-lg hover:scale-[1.05] active:scale-[0.98] hover:text-gray-600 transition-all ease-in-out")
   }, [])
 // sm:flex-auto
   return (
     <div 
-      className={`midscreen:absolute midscreen:h-full midscreen:z-50 midscreen:rounded-md tracking-widest ${rollout ? '' : 'midscreen:-translate-x-96 midscreen:hidden'} midscreen:right-0 midscreen:w-full midscreen:bg-opacity-80 midscreen:flex midscreen:flex-col midscreen:items-center midscreen:top-0 text-sm ${theme == 'light' ? 'midscreen:bg-slate-100' : 'midscreen:bg-slate-800'} transition-all last:border-0 p-2 midscreen:p-0 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] flex-auto lg:-translate-x-24 lg:w-[13%] justify-between`}>
+      className={`midscreen:fixed midscreen:h-full midscreen:z-50 midscreen:rounded-md tracking-widest ${rollout ? '' : 'midscreen:-translate-x-96 midscreen:hidden'} midscreen:right-0 midscreen:w-full midscreen:bg-opacity-80 midscreen:flex midscreen:flex-col midscreen:items-center midscreen:top-0 text-sm ${theme == 'light' ? 'midscreen:bg-slate-100' : 'midscreen:bg-slate-800'} transition-all last:border-0 p-2 midscreen:p-0 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] flex-auto lg:-translate-x-24 lg:w-[13%] justify-between`}>
       <div className={`md:flex-auto md:block sm:hidden midscreen:font-medium ${theme === 'light' ? 'midscreen:bg-gray-400' : 'midscreen:bg-slate-900'} midscreen:self-end midscreen:flex midscreen:flex-col midscreen:gap-3 midscreen:h-full midscreen:w-1/3`}>
 
         <div className="midscreen:flex flex-row-reverse items-center justify-between p-1 px-2 sm:hidden">

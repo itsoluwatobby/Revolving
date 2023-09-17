@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { UserProps } from "../../types.js";
+import { GetFollowsType, GetSubscriptionType, UserProps } from "../../types.js";
 import { Request, Response } from "express";
 import { ROLES } from "../config/allowedRoles.js";
 import { getCachedResponse } from "../helpers/redis.js";
@@ -8,6 +8,9 @@ import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.j
 import { UserModel } from '../models/User.js';
 
 
+  /**
+   * @description fetches all users
+  */
   export function getUsers(req: Request, res: Response){
     asyncFunc(res, () => { 
       getCachedResponse({key:`allUsers`, cb: async() => {
@@ -22,6 +25,10 @@ import { UserModel } from '../models/User.js';
     })
   }
 
+   /**
+   * @description fetches a user information
+   * @param req - userid
+  */
   export function getUser(req: Request, res: Response){
     asyncFunc(res, () => { 
       const {userId} = req.params
@@ -39,6 +46,10 @@ import { UserModel } from '../models/User.js';
     })
   }
 
+  /**
+   * @description follow or unfollow a user
+   * @param req - followerId, followingId
+  */
   export function followUnFollowUser(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {followerId, followingId} = req.params
@@ -53,6 +64,11 @@ import { UserModel } from '../models/User.js';
     })
   }
 
+  /**
+   * @description upadates user information
+   * @param req - userid
+   * @body body - updated user information
+  */
   export function updateUserInfo(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId} = req.params
@@ -80,6 +96,11 @@ import { UserModel } from '../models/User.js';
     })
   }
 
+  /**
+   * @description deletes user account by admin user
+   * @param req - userid
+   * @query query - adminId
+  */
   export function deleteUserAccount(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId} = req.params
@@ -97,6 +118,11 @@ import { UserModel } from '../models/User.js';
     })
   }
 
+  /**
+   * @description lock and unlock user account by admin user
+   * @param req - userid
+   * @query query - adminId
+  */
   export function lockAndUnlockUserAccount(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId} = req.params
@@ -121,6 +147,10 @@ import { UserModel } from '../models/User.js';
     })
   }
 
+  /**
+   * @description subscribe to user post
+   * @param req - subscribeId, subscriberId 
+  */
   export function subscribeToNotification(req: Request, res: Response){
     asyncFunc(res, async() => {
       const {subscribeId, subscriberId} = req.params
@@ -131,18 +161,76 @@ import { UserModel } from '../models/User.js';
       if(!subscribe) return responseType({res, status: 404, message: 'User not found'})
 
       if(subscribe?.notificationSubscribers?.includes(subscriberId)){
-        subscribe.updateOne({$pull: {notificationSubscribers: { subscriberId }}})
+        subscribe.updateOne({$pull: { notificationSubscribers: subscriberId }})
         .then(async() => {
-          await subscribee.updateOne({$pull: { subscribed: { subscribeId } }})
-          return responseType({res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL'})
-        }).catch(() => responseType({res, status: 400, message: 'unable to subscribe'}))
-      }
-      else{
-        subscribe.updateOne({$push: {notificationSubscribers: { subscriberId }}})
-        .then(async() => {
-          await subscribee.updateOne({$push: { subscribed: { subscribeId } }})
+          await subscribee.updateOne({$pull: { subscribed: subscribeId }})
           return responseType({res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED'})
         }).catch(() => responseType({res, status: 400, message: 'unable to subscribe'}))
       }
+      else{
+        subscribe.updateOne({$push: { notificationSubscribers: subscriberId }})
+        .then(async() => {
+          await subscribee.updateOne({$push: { subscribed: subscribeId }})
+          return responseType({res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL'})
+        }).catch(() => responseType({res, status: 400, message: 'unable to subscribe'}))
+      }
+    })
+  }
+
+  /**
+   * @description fetches user subscriptions
+   * @param req - userid 
+  */
+  export const getSubscriptions = (req: Request, res: Response) => {
+    asyncFunc(res, async() => {
+      const {userId} = req.params
+      if(!userId) return res.sendStatus(400)
+      const user = await getUserById(userId);
+      if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
+      await autoDeleteOnExpire(userId)
+      getCachedResponse({key: `userSubscriptions:${userId}`, cb: async() => {
+        const subscriptions = await Promise.all(user?.notificationSubscribers?.map(async(id) => {
+          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
+          return { _id, email, firstName, lastName, followers, followings }
+        })) as Partial<UserProps[]>
+        const subscribed = await Promise.all(user?.subscribed?.map(async(id) => {
+          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
+          return { _id, email, firstName, lastName, followers, followings }
+        })) as Partial<UserProps[]>
+        return { subscriptions, subscribed }
+      }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
+      .then((allSubscriptions: GetSubscriptionType) => {
+        if(!allSubscriptions?.subscriptions?.length && !allSubscriptions?.subscribed?.length) return responseType({res, status: 404, message: 'You have no subscriptions'})
+        return responseType({res, status: 200, message: 'success', data: allSubscriptions})
+      }).catch((error) => responseType({res, status: 400, message: error?.message}))
+    })
+  }
+  
+  /**
+   * @description fetches user followers and followings
+   * @param req - userid 
+  */
+  export const getUserFollows = (req: Request, res: Response) => {
+    asyncFunc(res, async() => {
+      const {userId} = req.params
+      if(!userId) return res.sendStatus(400)
+      const user = await getUserById(userId);
+      if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
+      await autoDeleteOnExpire(userId)
+      getCachedResponse({key: `userFollows:${userId}`, cb: async() => {
+        const followings = await Promise.all(user?.followings?.map(async(id) => {
+          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
+          return { _id, email, firstName, lastName, followers, followings }
+        })) as Partial<UserProps[]>
+        const followers = await Promise.all(user?.followers?.map(async(id) => {
+          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
+          return { _id, email, firstName, lastName, followers, followings }
+        })) as Partial<UserProps[]>
+        return { followings, followers }
+      }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
+      .then((allFollows: GetFollowsType) => {
+        if(!allFollows?.followers?.length && !allFollows?.follows?.length) return responseType({res, status: 404, message: 'You have no follows or followings'})
+        return responseType({res, status: 200, message: 'success', data: allFollows})
+      }).catch((error) => responseType({res, status: 400, message: error?.message}))
     })
   }

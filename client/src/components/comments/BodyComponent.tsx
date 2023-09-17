@@ -1,39 +1,39 @@
-import React, { useState } from 'react'
-import CommentBase from './CommentBase'
-import { reduceLength } from '../../utils/navigator'
-import { MdOutlineExpandMore } from 'react-icons/md'
-import { format } from 'timeago.js'
-import { useDispatch } from 'react-redux'
-import { CommentProps, OpenReply, Prompted } from '../../data'
-import { PromptLiterals, Theme, ThemeContextType } from '../../posts'
-import { setEditComment } from '../../features/story/commentSlice'
-import { useThemeContext } from '../../hooks/useThemeContext'
+import { format } from 'timeago.js';
+import React, { useState, useCallback } from 'react';
+import CommentBase from './CommentBase';
+import { useDispatch } from 'react-redux';
+import { reduceLength } from '../../utils/navigator';
+import { MdOutlineExpandMore } from 'react-icons/md';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { CommentProps, OpenReply, Prompted } from '../../data';
+import { setEditComment } from '../../features/story/commentSlice';
+import { PromptLiterals, Theme, ThemeContextType } from '../../posts';
 
 type BodyComponentProps = {
-  comment: CommentProps,
-  responseCom?: boolean,
-  reveal: boolean
-  expand: boolean
-  currentUserId: string,
+  reveal: boolean,
+  expand: boolean,
   writeReply: string,
   openReply: OpenReply,
-  responseRef: React.MutableRefObject<HTMLTextAreaElement>,
+  responseCom?: boolean,
+  comment: CommentProps,
+  currentUserId: string,
   deleteSingleComment: () => void,
-  setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
-  setWriteReply: React.Dispatch<React.SetStateAction<string>>,
+  responseRef: React.MutableRefObject<HTMLTextAreaElement>,
   setExpand: React.Dispatch<React.SetStateAction<boolean>>,
   setReveal: React.Dispatch<React.SetStateAction<boolean>>,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
-}
-
-function buttonOptClass(theme: Theme){
-  return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
+  setWriteReply: React.Dispatch<React.SetStateAction<string>>,
+  setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
 }
 
 export default function BodyComponent({ currentUserId, expand, reveal, comment, responseRef, writeReply, openReply, setPrompt, setExpand, setReveal, setOpenReply, setWriteReply, deleteSingleComment }: BodyComponentProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const dispatch = useDispatch();
+
+  const buttonOptClass = useCallback((theme: Theme) => {
+    return `shadow-2xl shadow-slate-900 hover:scale-[1.01] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
+  }, [])
 
   const closeInput = () => {
     !writeReply ? setOpenReply({type: 'nil', assert: false}) : setKeepPrompt('Show');
@@ -48,7 +48,7 @@ export default function BodyComponent({ currentUserId, expand, reveal, comment, 
 
   return (
     <>
-        <div className={`flex items-center justify-between pr-2`}>
+      <div className={`flex items-center justify-between pr-2`}>
         <div 
           onClick={closeInput}
           className={`flex items-center gap-1 ${theme == 'light' ? 'bg-slate-200' : 'bg-slate-400'} w-fit rounded-full pl-2 pr-2`}>
@@ -88,19 +88,13 @@ export default function BodyComponent({ currentUserId, expand, reveal, comment, 
       </p>
       <section className="relative flex items-center gap-4">
         <CommentBase mini 
+          theme={theme}
           responseRef={
             responseRef as React.MutableRefObject<HTMLTextAreaElement>
           }
-          userId={currentUserId} theme={theme} 
-          comment={comment} 
-          reveal={reveal}
-          writeReply={writeReply} 
-          setWriteReply={setWriteReply} 
-          openReply={openReply} 
-          setOpenReply={setOpenReply}
-          keepPrompt={keepPrompt} 
-          setKeepPrompt={setKeepPrompt}
-          setPrompt={setPrompt}
+          writeReply={writeReply} keepPrompt={keepPrompt} setOpenReply={setOpenReply}
+          reveal={reveal} comment={comment} setPrompt={setPrompt} openReply={openReply} 
+          setWriteReply={setWriteReply} setKeepPrompt={setKeepPrompt} userId={currentUserId} 
         />
       </section>
     </>

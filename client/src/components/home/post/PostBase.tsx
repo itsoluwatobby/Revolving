@@ -1,19 +1,19 @@
-import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs"
-import { MdOutlineInsertComment } from "react-icons/md"
-import { useThemeContext } from "../../../hooks/useThemeContext"
-import { MakeToButtom, ThemeContextType } from "../../../posts"
-import { Link } from "react-router-dom"
-import { AiOutlineRetweet } from "react-icons/ai"
-import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice"
 import { toast } from "react-hot-toast";
-import { ErrorResponse, PageType } from "../../../data"
-import { ErrorStyle, SuccessStyle, checkCount } from "../../../utils/navigator"
-import { useLikeAndUnlikeSharedStoryMutation, useShareStoryMutation } from "../../../app/api/sharedStorySlice"
+import { Link } from "react-router-dom";
+import { AiOutlineRetweet } from "react-icons/ai";
+import { MdOutlineInsertComment } from "react-icons/md";
+import { ErrorResponse, PageType } from "../../../data";
+import { MakeToButtom, ThemeContextType } from "../../../posts";
+import { useThemeContext } from "../../../hooks/useThemeContext";
+import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs";
+import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice";
+import { ErrorStyle, SuccessStyle, checkCount } from "../../../utils/navigator";
+import { useLikeAndUnlikeSharedStoryMutation, useShareStoryMutation } from "../../../app/api/sharedStorySlice";
 
 type PostButtomProps = {
+  page?: PageType,
   story: MakeToButtom,
   averageReadingTime: string,
-  page?: PageType
 }
 
 export default function PostBase({ story, averageReadingTime, page }: PostButtomProps) {

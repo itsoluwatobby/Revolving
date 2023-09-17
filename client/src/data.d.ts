@@ -33,22 +33,34 @@ type TextProp = {
 }
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+type CodeProps =  { 
+  _id?: string,
+  body: string,
+  codeId?: string,
+  language: string,
+  createdAt: string,
+  updatedAt: string, 
+}
 
 type StoryProps = {
-  _id: string
-  userId: string
-  title: string
-  picture: string[]
-  body: string
-  category: Categories[]
-  commentIds?: string[]
-  isShared?: string[]
-  likes: string[]
-  edited: false
-  author: string
-  sharedAuthor: string
-  sharedLikes: string[]
-  sharedDate: string
+  _id: string,
+  userId: string,
+  title: string,
+  picture: string[],
+  body: string,
+  author: string | 'anonymous',
+  likes: string[],
+  isShared?: string[],
+  category: Categories[] | Categories,
+  fontFamily?: string | 'sans',
+  commentIds?: string[],
+  code: CodeProps[],
+  edited: false,
+  sharerId?: string,
+  sharedId?: string,
+  sharedAuthor?: string,
+  sharedLikes?: string[],
+  sharedDate?: string,
   createdAt: string,
   updatedAt: string
 }
@@ -82,7 +94,7 @@ type InputTaskProp = {
   isTyping?: TypingEvent
 }
 
-type ButtonType = 'EDIT' | 'DELETE'
+type ButtonType = 'EDIT' | 'DELETE' | 'CHECK'
 type TypingEvent = 'typing' | 'notTyping'
 
 type EditTaskOption = 'EDIT' | 'VIEW' | 'NIL'
@@ -245,6 +257,16 @@ type AuthType={
   accessToken: string,
   roles: USERROLES[],
   updatedAt: string
+}
+
+type GetFollowsType = {
+  follows: Partial<UserProps[]>,
+  followers: Partial<UserProps[]>
+}
+
+type GetSubscriptionType = {
+  subscriptions: Partial<UserProps[]>,
+  subscribed: Partial<UserProps[]>
 }
 
 type ApiSliceType = {

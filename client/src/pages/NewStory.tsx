@@ -176,6 +176,7 @@ export const NewStory = () => {
         title: inputValue,
         body: textareaValue,
         category: postCategory,
+        code: [],
         fontFamily
       } : {
         title: inputValue, 

@@ -10,6 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { createClient } from 'redis';
 import { objInstance } from './helper.js';
 export const redisClient = createClient();
+/**
+ * @description caches all GET requests
+ * @param object - containing {req, timeTaken, cb, reqMtd}
+*/
 export function getCachedResponse({ key, timeTaken = 7200, cb, reqMtd = [] }) {
     return __awaiter(this, void 0, void 0, function* () {
         redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage));

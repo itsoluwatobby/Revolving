@@ -11,7 +11,11 @@ type RedisOptionProps<T>={
 }
 export const redisClient = createClient();
 
-export async function getCachedResponse<T>({key, timeTaken=7200, cb, reqMtd=[]}): Promise<T> {
+/**
+ * @description caches all GET requests
+ * @param object - containing {req, timeTaken, cb, reqMtd}
+*/ 
+export async function getCachedResponse<T>({key, timeTaken=7200, cb, reqMtd=[]}): Promise<T | T[]> {
   redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage))
   if(!redisClient.isOpen) await redisClient.connect();
   try{

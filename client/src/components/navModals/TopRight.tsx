@@ -1,21 +1,19 @@
-import { BsMoonStars } from "react-icons/bs"
-import { FiSun } from "react-icons/fi"
-import { useThemeContext } from "../../hooks/useThemeContext"
-import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts"
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
-import { FiEdit } from 'react-icons/fi'
-import { IoIosArrowDown, IoIosMore } from 'react-icons/io'
-import profileImage from "../../images/bg_image3.jpg"
-import { usePostContext } from "../../hooks/usePostContext"
-import { useState } from "react"
+import { sub } from "date-fns";
+import { FiSun } from "react-icons/fi";
 import { toast } from "react-hot-toast";
-import { ErrorResponse, UserProps } from "../../data"
-import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice"
-import { useDispatch, useSelector } from "react-redux"
-import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice"
-import { nanoid } from "@reduxjs/toolkit"
-import { sub } from "date-fns"
-import { ErrorStyle, SuccessStyle } from "../../utils/navigator"
+import { FiEdit } from 'react-icons/fi';
+import { nanoid } from "@reduxjs/toolkit";
+import { IoIosMore } from 'react-icons/io';
+import { BsMoonStars } from "react-icons/bs";
+import { ErrorResponse, UserProps } from "../../data";
+import { useDispatch, useSelector } from "react-redux";
+import { usePostContext } from "../../hooks/usePostContext";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { ErrorStyle, SuccessStyle } from "../../utils/navigator";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts";
+import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice";
+import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice";
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -29,7 +27,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
   const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
-  const { canPost, inputValue, setCodeStore, setImagesFiles } = usePostContext() as PostContextType
+  const { canPost, inputValue, setCodeStore, submitToSend, setImagesFiles } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData)
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -43,10 +41,14 @@ export default function TopRight({ currentUser }: TopRightProps) {
   const createNewStory = async() => {
     if(!storyData.userId) return setLoginPrompt('Open')
     if(storyData){
+      const adjustCodes = submitToSend?.map(code => {
+        const { codeId, ...rest } = code
+        return rest
+      })
       dispatch(setLoading(true))
       const urls = url.map(ur => ur.url)
       const userId = storyData.userId as string
-      const story = {...storyData, picture: [...urls]} as PostType
+      const story = {...storyData, picture: [...urls], code: [...adjustCodes]} as PostType
       try{
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
@@ -71,9 +73,13 @@ export default function TopRight({ currentUser }: TopRightProps) {
 
   const updatedPost = async() => {
     if(storyData){
+      const adjustCodes = submitToSend?.map(code => {
+        const { codeId, ...rest } = code
+        return rest
+      })
       dispatch(setLoading(isLoadingUpdate))
       const userId = storyData.userId as string
-      const story = storyData as PostType
+      const story = {...storyData, code: [...adjustCodes]} as PostType
       try{
         await updateStory({ userId, storyId: story?._id, story }).unwrap()
         localStorage.removeItem(`editTitle?id=${userId}`)
