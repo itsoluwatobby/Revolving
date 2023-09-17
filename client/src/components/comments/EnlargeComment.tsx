@@ -1,15 +1,15 @@
+import CommentBase from './CommentBase';
+import SingleComment from './SingleComment';
+import { checkCount } from '../../utils/navigator';
+import { RiArrowGoBackLine } from 'react-icons/ri';
 import { useEffect, useRef, useState } from 'react';
+import { ResponseBody } from './response/ResponseBody';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { PromptLiterals, ThemeContextType } from '../../posts';
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
-import { RiArrowGoBackLine } from 'react-icons/ri';
-import { useGetCommentQuery } from '../../app/api/commentApiSlice';
 import { SkeletonComment } from '../skeletons/SkeletonComment';
+import { useGetCommentQuery } from '../../app/api/commentApiSlice';
 import { useGetResponsesQuery } from '../../app/api/responseApiSlice';
-import SingleComment from './SingleComment';
-import CommentBase from './CommentBase';
-import { ResponseBody } from './response/ResponseBody';
-import { checkCount } from '../../utils/navigator';
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
 
 export default function EnlargeComment() {
   const { theme, parseId, enlarge, setEnlarge } = useThemeContext() as ThemeContextType
@@ -61,23 +61,17 @@ export default function EnlargeComment() {
       {!isLoading && targetComment ? 
         <>
           <SingleComment 
+            closeInput={closeInput} theme={theme}
             targetComment={targetComment as CommentProps}
-            closeInput={closeInput}
-            theme={theme}
           />
           <div className="relative flex items-center gap-4">
             <CommentBase enlarged
               responseRef={
                 responseRef as React.MutableRefObject<HTMLTextAreaElement>
               }
-              userId={userId} theme={theme} 
-              comment={targetComment as CommentProps} 
-              writeReply={writeReply} 
-              setWriteReply={setWriteReply} 
-              openReply={openReply} 
-              setOpenReply={setOpenReply} 
-              keepPrompt={keepPrompt} 
-              setKeepPrompt={setKeepPrompt}
+              userId={userId} theme={theme} comment={targetComment as CommentProps} 
+              writeReply={writeReply} setWriteReply={setWriteReply} openReply={openReply} 
+              setOpenReply={setOpenReply} keepPrompt={keepPrompt} setKeepPrompt={setKeepPrompt}
             />
           </div>
         </>
@@ -107,15 +101,12 @@ export default function EnlargeComment() {
               </p>
               ) : (
                   !isLoadingResponses && responses?.length ? (
-                    responses.map(response => (
+                    responses?.map(response => (
                       <ResponseBody 
-                        key={response._id}
-                        userId={userId}
-                        response={response} 
-                        prompt={prompt}
-                        setPrompt={setPrompt} 
-                        targetComment={targetComment as CommentProps}
-                        isLoadingResponses={isLoadingResponses}
+                        // prompt={prompt}  
+                        key={response._id} 
+                        userId={userId} response={response} setPrompt={setPrompt} 
+                        targetComment={targetComment as CommentProps} isLoadingResponses={isLoadingResponses}
                       />
                     ))
                   ) : null

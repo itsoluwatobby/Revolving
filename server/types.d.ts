@@ -32,6 +32,12 @@ type SharedInfo = {
   userId: string,
   sharedId: string
 }
+type CodeProps =  { 
+  body: string,
+  language: string,
+  createdAt: string,
+  updatedAt: string, 
+}
 
 interface StoryProps extends Document{
   userId: Types.ObjectId
@@ -42,6 +48,7 @@ interface StoryProps extends Document{
   category: Categories[]
   commentIds?: string[]
   isShared?: SharedInfo[]
+  code: CodeProps[]
   likes: string[]
   edited: false
   author: string

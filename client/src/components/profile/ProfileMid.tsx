@@ -5,6 +5,7 @@ import { MdAttachEmail } from 'react-icons/md';
 import { ImageTypeProp, Theme } from '../../posts';
 import { FaGithub, FaTwitterSquare } from 'react-icons/fa';
 import { checkCount, reduceLength } from '../../utils/navigator';
+import { format } from 'timeago.js';
 
 type Props = {
   theme: Theme,
@@ -45,7 +46,13 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
                   <Link to={`/follows/${userId}`}>
                     <p className='opacity-90 hover:underline underline-offset-2'>followings: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followings as string[])}</span></p>
                   </Link>
+
                 </div>
+
+                <p className='flex items-center gap-2 opacity-90'>
+                  <span>Joined</span>
+                  <span>{format(userProfile?.registrationDate)}</span>
+                </p>
 
               </div>
               

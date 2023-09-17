@@ -1,17 +1,17 @@
+import CodeCard from "./CodeCard";
+import { useEffect } from 'react';
+import ImageCard from "./ImageCard";
 import { OpenSnippet } from "../../data"
 import { usePostContext } from "../../hooks/usePostContext"
-import { ConflictType, PostContextType, Theme, UpdateSuccess } from "../../posts"
-import { useEffect } from 'react';
+import { ConflictType, PostContextType, Theme, UpdateSuccess } from "../../posts";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
-import CodeCard from "./CodeCard";
-import ImageCard from "./ImageCard";
 
 type CodeSnippetProps = {
   theme: Theme,
   codeEditor: boolean,
-  isPresent: ConflictType,
   snippet: OpenSnippet,
   success: UpdateSuccess,
+  isPresent: ConflictType,
   setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>
   setSnippet: React.Dispatch<React.SetStateAction<OpenSnippet>>
   setSuccess: React.Dispatch<React.SetStateAction<UpdateSuccess>>
@@ -20,7 +20,7 @@ type CodeSnippetProps = {
 let prevCodeLength = 0
 let prevImageLength = 0
 export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess, snippet, setIsPresent, codeEditor }: CodeSnippetProps) => {
-  const { codeStore, imagesFiles, setImagesFiles, setCodeStore, setInputValue } = usePostContext() as PostContextType;
+  const { codeStore, imagesFiles, submitToSend, setImagesFiles, setCodeStore, setInputValue, setSubmitToSend } = usePostContext() as PostContextType;
 
   const sortedStoreCode = codeStore.slice().sort((a, b) => b.date.localeCompare(a.date))
 
@@ -65,21 +65,15 @@ export const CodeSnippets = ({ theme, isPresent, success, setSnippet, setSuccess
         snippet !== 'Image' ? (
           sortedStoreCode?.map((code, index) => (
             <CodeCard key={code.codeId}
-              code={code}
-              codeStore={codeStore}
-              setCodeStore={setCodeStore} 
-              setInputValue={setInputValue}
-              count={index}
+              code={code} setSubmitToSend={setSubmitToSend} codeStore={codeStore} count={index}
+              setCodeStore={setCodeStore} setInputValue={setInputValue} submitToSend={submitToSend}
             />
           ))
         ) : ( 
           imagesFiles?.map((image, index) => (
             <ImageCard key={image.imageId} 
-              image={image} 
-              theme={theme}
-              count={index}
-              imagesFiles={imagesFiles}
-              setImagesFiles={setImagesFiles}
+              image={image} theme={theme} count={index}
+              imagesFiles={imagesFiles} setImagesFiles={setImagesFiles}
             />
           ))
         )

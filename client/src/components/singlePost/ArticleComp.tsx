@@ -1,26 +1,36 @@
-import { PostType, ThemeContextType } from '../../posts'
-import { useThemeContext } from '../../hooks/useThemeContext'
-import { format } from 'timeago.js';
-import { useRef, useCallback } from 'react';
-import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
-import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import LikeStory from './LikeStory';
-import FollowUnFollow from './FollowUnFollow';
+import { format } from 'timeago.js';
 import PostImage from '../PostImages';
 import { Link } from 'react-router-dom';
+import Comments from '../comments/Comments';
+import FollowUnFollow from './FollowUnFollow';
+import { useRef, useCallback, useState } from 'react';
+import { RiSignalWifiErrorLine } from 'react-icons/ri';
+import { MdOutlineInsertComment } from 'react-icons/md';
+import { PostType, ThemeContextType } from '../../posts';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { BsFillFileEarmarkPdfFill } from 'react-icons/bs';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type ArticleProps = {
   story: PostType,
   sidebar: boolean,
+  isError: boolean,
+  isLoading: boolean,
   bodyContent: JSX.Element[],
   averageReadingTime: string,
-  isLoading: boolean,
-  isError: boolean,
+  triggerPrint: () => void,
+  storyRef: React.RefObject<HTMLDivElement>,
 }
 
-export default function ArticleComp({ isError, story, bodyContent, sidebar, averageReadingTime, isLoading }: ArticleProps) {
-  const { theme, notintersecting, setNotIntersecting } = useThemeContext() as ThemeContextType
+export default function ArticleComp({ isError, story, storyRef, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint }: ArticleProps) {
+  const { theme, notintersecting, setNotIntersecting, setOpenComment } = useThemeContext() as ThemeContextType
+  const [reveal, setReveal] = useState<boolean>(false)
   const observerRef = useRef<IntersectionObserver>(null)
+  
   const headingRef = useCallback((node: HTMLHeadingElement) => {
     if(observerRef.current) observerRef.current.disconnect()
     observerRef.current = new IntersectionObserver(entries => {
@@ -36,7 +46,15 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
     if(node) observerRef.current.observe(node as unknown as Element)
   }, [setNotIntersecting])
 
-  let content;
+  const customCodeStyle = { 
+    'backgroundColor': 'black', 
+    'width': '100%',
+    'min-height': '5rem',
+    'max-height': '15rem',
+    'border-width': '3px',
+  } as {[index: string]: string}
+
+  let content: JSX.Element;
 
   isLoading ? 
       content = <SkeletonSinglePage  />
@@ -46,20 +64,35 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
   <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
   </p> 
   : content = (
-    <>
-      <div className='relative flex items-center gap-3'>
-        <Link to={`/profile/${story?.userId}`}>
-          <p className='capitalize hover:underline underline-offset-1'>{story?.author || 'anonymous'}</p>
-        </Link>
-        <span>.</span>
-        <p>{format(story?.createdAt, 'en-US')}</p>
+    <div>
+      <div className='relative flex items-center justify-between pr-2 pb-1'>
+        <div className='flex items-center gap-3'>
+          <Link to={`/profile/${story?.userId}`}>
+            <p className='capitalize hover:underline underline-offset-1'>{story?.author || 'anonymous'}</p>
+          </Link>
+          <span>.</span>
+          <p>{format(story?.createdAt, 'en-US')}</p>
 
-        <FollowUnFollow userId={story?.userId} position='others' />
+          <FollowUnFollow userId={story?.userId} position='others' />
+        </div>
+
+        <BsFillFileEarmarkPdfFill 
+          title='print as PDF'
+          onMouseEnter={() => setReveal(true)}
+          onMouseLeave={() => setReveal(false)}
+          onClick={triggerPrint}
+          className='text-3xl fixed right-4 cursor-pointe opacity-50 hover:opacity-80 hover:scale-[1.01] active:opacity-100 active:scale-1 transition-all' 
+        />
       
       </div>
+
+      <div 
+        ref={storyRef}
+      >
+
         <h1 
           ref={headingRef as React.LegacyRef<HTMLHeadingElement>}
-          className='whitespace-pre-wrap font-bold text-3xl uppercase text-justify break-all'>{story?.title}
+          className='whitespace-pre-wrap font-bold text-3xl uppercase text-justify break-all py-1'>{story?.title}
         </h1>
         <p 
           className={`whitespace-pre-wrap font-sans tracking-wider text-justify`}>
@@ -68,23 +101,51 @@ export default function ArticleComp({ isError, story, bodyContent, sidebar, aver
 
         <PostImage story={story} position='single' />
 
-      <div className={`sticky z-50 bottom-3 shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 flex items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 
+      </div>
+
+      <div className={`flex items-center flex-row gap-x-2 gap-y-3 midscreen:flex-col w-full p-3 pb-1`}>
+        {
+          story?.code?.map(snippetString => (
+            <SyntaxHighlighter key={snippetString?._id as string} 
+              customStyle={customCodeStyle}
+              language={snippetString?.language} style={theme === 'light' ? dark : docco}
+            >
+              {snippetString?.body}
+            </SyntaxHighlighter>
+          ))
+        }
+      </div>
+
+      <div className={`sticky z-50 bottom-3 ${reveal ? 'hidden' : 'flex'} shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 
         <div className={`flex flex-wrap items-center justify-between w-full text-gray-300 text-xs`}>
           <p>{averageReadingTime} read</p>
-              <LikeStory 
-                story={story}
-                position='others' 
-              />
+
+          <p className={`flex items-center gap-1.5 ${theme == 'light' ? '' : ''}`}>
+            <MdOutlineInsertComment
+              title='comments'
+              onClick={() => setOpenComment({option: 'Open', storyId: story._id})}
+              className={`font-sans text-lg cursor-pointer ${theme == 'light' ? '' : ''} hover:text-gray-400`}/>
+            <span className="">
+              {story?.commentIds?.length}
+            </span>
+          </p>
+
+          <LikeStory 
+            story={story}
+            position='others' 
+          />
           {story?.edited && <p className='text-center text-xs'>edited {format(story?.updatedAt)}</p>}
         </div>
       </div>
-    </>
+
+    </div>
   )
 
   return (
     <article 
-      className={`app mt-2 flex-grow flex flex-col gap-3 overflow-y-scroll ${story?.fontFamily} p-2 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
+      className={`app mt-2 flex-grow flex flex-col gap-3 overflow-y-scroll ${story?.fontFamily} p-2 px-4 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
         {content}
+        <Comments />
       </article>
   )
 }

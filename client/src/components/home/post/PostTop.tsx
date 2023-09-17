@@ -1,18 +1,18 @@
-import { format } from "timeago.js"
-import { ErrorResponse, PageType } from "../../../data"
-import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator"
-import { FiMoreVertical } from "react-icons/fi"
-import { Link } from "react-router-dom"
-import { useThemeContext } from "../../../hooks/useThemeContext"
-import { ChatOption, PostType, Theme, ThemeContextType } from "../../../posts"
+import { format } from "timeago.js";
 import { useCallback } from 'react';
-import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApiSlice"
-import { toast } from "react-hot-toast"
+import UserCard from "../../UserCard";
+import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useState, useRef } from 'react';
-import { useDeleteSharedStoryMutation } from "../../../app/api/sharedStorySlice"
-import { useDispatch } from "react-redux"
-import UserCard from "../../UserCard"
-import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
+import { ErrorResponse, PageType } from "../../../data";
+import { useThemeContext } from "../../../hooks/useThemeContext";
+import { ChatOption, PostType, Theme, ThemeContextType } from "../../../posts";
+import { useDeleteSharedStoryMutation } from "../../../app/api/sharedStorySlice";
+import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator";
+import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApiSlice";
 
 type PostTopProps = {
   story: PostType,
@@ -143,11 +143,8 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
        
         <UserCard 
           userId={story?.sharedId ? (story?.sharerId as string) : story.userId}
-          cardRef={cardRef as React.LegacyRef<HTMLElement>}
-          setRevealCard={setRevealCard}
-          revealCard={revealCard}
-          closeUserCard={closeUserCard}
-          setOnCard={setOnCard}
+          revealCard={revealCard} closeUserCard={closeUserCard} setOnCard={setOnCard}
+          cardRef={cardRef as React.LegacyRef<HTMLElement>} setRevealCard={setRevealCard}
         />
         
       </div>
@@ -172,12 +169,9 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
         
           {!story?.sharedAuthor ?
             <UserCard 
-              userId={story.userId}
-              cardRef={cardRef as React.LegacyRef<HTMLElement>}
-              setRevealCard={setRevealCard}
-              revealCard={revealCard}
               closeUserCard={closeUserCard}
-              setOnCard={setOnCard}
+              userId={story.userId} cardRef={cardRef as React.LegacyRef<HTMLElement>}
+              setRevealCard={setRevealCard} revealCard={revealCard} setOnCard={setOnCard}
             />
             : null 
           } 

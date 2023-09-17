@@ -1,9 +1,9 @@
-import { createContext, useEffect, useState } from 'react';
-import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
-import { useGetCurrentUserMutation } from "../app/api/usersApiSlice"
-import { setLoggedInUser } from "../features/auth/userSlice";
 import { useDispatch } from 'react-redux';
-import { TypingEvent } from '../data';
+import { CodeProps, TypingEvent } from '../data';
+import { createContext, useEffect, useState } from 'react';
+import { setLoggedInUser } from "../features/auth/userSlice";
+import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
+import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
 
 export const PostContext = createContext<PostContextType | null>(null)
 
@@ -19,6 +19,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
 
   const userId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
+  const [submitToSend, setSubmitToSend] = useState<CodeProps[]>([])
 
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
   const [getLoggedInUser] = useGetCurrentUserMutation()
@@ -61,7 +62,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }, [search, navPosts])
 
   const value = {
-    filteredStories, search, typingEvent, navPosts, canPost, codeStore, inputValue, imagesFiles, setImagesFiles, setInputValue, setCodeStore, setSearch, setTypingEvent, setCanPost, setNavPosts
+    filteredStories, search, typingEvent, navPosts, canPost, codeStore, inputValue, imagesFiles, submitToSend, setSubmitToSend, setImagesFiles, setInputValue, setCodeStore, setSearch, setTypingEvent, setCanPost, setNavPosts
   }
 
   return (

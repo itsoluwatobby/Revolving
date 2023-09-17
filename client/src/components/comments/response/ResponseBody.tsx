@@ -1,32 +1,28 @@
 import { format } from "timeago.js";
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from "../../../data";
-import { ErrorStyle, reduceLength } from "../../../utils/navigator";
-import { PromptLiterals, Theme, ThemeContextType } from "../../../posts";
-import { useState, useRef } from 'react';
-import { MdOutlineExpandMore } from "react-icons/md";
-import { useDispatch } from "react-redux";
-import { setEditResponse } from "../../../features/story/commentSlice";
-import ResponseBase from "./ResponseBase";
-import { useDeleteResponseMutation } from "../../../app/api/responseApiSlice";
-import { useThemeContext } from "../../../hooks/useThemeContext";
 import { toast } from "react-hot-toast";
+import { useState, useCallback, useRef } from 'react';
+import ResponseBase from "./ResponseBase";
+import { useDispatch } from "react-redux";
+import { MdOutlineExpandMore } from "react-icons/md";
+import { useThemeContext } from "../../../hooks/useThemeContext";
 import { commentApiSlice } from "../../../app/api/commentApiSlice";
+import { ErrorStyle, reduceLength } from "../../../utils/navigator";
+import { setEditResponse } from "../../../features/story/commentSlice";
+import { PromptLiterals, Theme, ThemeContextType } from "../../../posts";
+import { useDeleteResponseMutation } from "../../../app/api/responseApiSlice";
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from "../../../data";
 
 
 type ResponseBodyProps = {
-  response: CommentResponseProps,
   userId: string,
+  // prompt: Prompted,
+  isLoadingResponses: boolean,
   targetComment: CommentProps,
-  prompt: Prompted,
+  response: CommentResponseProps,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
-  isLoadingResponses: boolean
 }
 
-function buttonOptClass(theme: Theme){
-  return `shadow-2xl shadow-slate-900 hover:scale-[1.04] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
-}
-
-export const ResponseBody = ({ response, prompt, setPrompt, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
+export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
   const [reveal, setReveal] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(false);
   const { theme, setLoginPrompt, parseId } = useThemeContext() as ThemeContextType
@@ -36,6 +32,11 @@ export const ResponseBody = ({ response, prompt, setPrompt, userId, targetCommen
   const responseRef = useRef<HTMLTextAreaElement>();
   const [deleteResponse, {isError, error}] = useDeleteResponseMutation()
   const dispatch = useDispatch();
+
+  const buttonOptClass = useCallback((theme: Theme) => {
+    return `shadow-2xl shadow-slate-900 hover:scale-[1.01] active:scale-[1] transition-all text-center cursor-pointer p-1 pt-0.5 pb-0.5 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-300 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
+  }, [])
+  
 
   const closeInput = () => {
     !writeReply.length ? setOpenReply({type: 'nil', assert: false}) : setKeepPrompt('Show');

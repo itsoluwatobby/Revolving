@@ -1,30 +1,42 @@
-import { useParams } from "react-router-dom"
-import { PostType, ThemeContextType } from "../posts"
-import { useWordCount } from "../hooks/useWordCount"
 import { TextRules } from "../fonts";
+import { useParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 import { BsArrowBarRight } from 'react-icons/bs';
-import { useEffect, useState } from "react";
-import { WindowScroll } from "../components/WindowScroll";
 import Aside from "../components/singlePost/Aside";
+import { useEffect, useRef, useState } from "react";
+import { PostType, ThemeContextType } from "../posts";
+import { WindowScroll } from "../components/WindowScroll";
+import { useThemeContext } from "../hooks/useThemeContext";
 import ArticleComp from "../components/singlePost/ArticleComp";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
-import { useThemeContext } from "../hooks/useThemeContext";
+import { useAverageReadTimePerStory } from "../hooks/useAverageReadTimePerStory";
+import { SinglePageSidebar } from "../components/singlePost/SinglePageSidebar";
 
 export default function SingleStoryPage() {
   const { storyId } = useParams() as {storyId: string}
   const [sidebar, setSidebar] = useState<boolean>(false);
-  const { loginPrompt } = useThemeContext() as ThemeContextType
+  const { loginPrompt, fontOption, setFontOption, theme } = useThemeContext() as ThemeContextType
   const { data: target, isLoading, isError } = useGetStoryQuery(storyId);
   const { data, isLoading: loading } = useGetStoriesQuery()
   const [stories, setStories] = useState<PostType[]>([])
+  const [options, setOptions] = useState<string>('')
   const [isBarOpen, setIsBarOpen] = useState<boolean>(false)
   const [targetStory, setTargetStory] = useState<PostType>();
-
-  let averageReadingTime = useWordCount(targetStory?.body as string)
+  const averageReadingTime = useAverageReadTimePerStory(targetStory?.body as string)
   const watchWords = TextRules.keywords as string[]
+  const storyRef = useRef<HTMLDivElement>(null)
 
-  const end = averageReadingTime.split(' ')[1]
-  averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end;
+  const printPDF = useReactToPrint({
+    content: () => storyRef?.current,
+    pageStyle: `{ padding: 2rem 1rem 1rem }`,
+    documentTitle: target?.title?.toUpperCase(),
+    onAfterPrint: () => alert('Document downloaded successsfully'),
+    onPrintError: () => alert('Error printing document')
+  })
+
+  // const end = averageReadingTime.split(' ')[1]
+  // averageReadingTime = Math.floor(+averageReadingTime.split(' ')[0]) + ' ' + end;
+  const triggerPrint = () => printPDF()
 
   useEffect(() => {
     let isMounted = true
@@ -44,7 +56,7 @@ export default function SingleStoryPage() {
   
   const bodyContent = targetStory ? targetStory?.body.split(' ').map((word, index) => {
     return (
-      <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-600 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-600 bg-gray-600 rounded-sm' : ''}`}>{word}{' '}</span>
+      <span key={index} className={`${watchWords.includes(word) ? 'bg-gray-400 rounded-sm text-yellow-500' : (word.includes('(') || word.endsWith(').')) || word.slice(-1) == ')' ? 'text-red-500 bg-gray-400 rounded-sm' : ''}`}>{word}{' '}</span>
     )
   }) : 'No content'
 
@@ -54,25 +66,28 @@ export default function SingleStoryPage() {
         <div className="flex h-full">
           {(Array.isArray(stories) && stories.length)
             ? <Aside 
-                setSidebar={setSidebar} 
-                stories={stories as PostType[]} 
                 sidebar={sidebar} setIsBarOpen={setIsBarOpen}
+                setSidebar={setSidebar} stories={stories as PostType[]} 
               /> 
-              : null
+            : null
           }
           <ArticleComp 
-            story={targetStory as PostType} 
-            bodyContent={bodyContent as JSX.Element[]}
-            averageReadingTime={averageReadingTime} 
-            sidebar={sidebar} 
-            isLoading={isLoading} 
-            isError={isError}
+            isError={isError} storyRef={storyRef} triggerPrint={triggerPrint}
+            story={targetStory as PostType} bodyContent={bodyContent as JSX.Element[]}
+            averageReadingTime={averageReadingTime} sidebar={sidebar} isLoading={isLoading} 
           />
         </div>
         <BsArrowBarRight 
           title='Recent stories'
           onClick={() => setSidebar(true)}
           className={`${isBarOpen ? '' : 'hidden'} fixed md:hidden left-0 top-[40%] opacity-30 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:opacity-80 p-1 text-[30px]`} />
+
+        {
+          <SinglePageSidebar
+          fontOption={fontOption} options={options} triggerPrint={triggerPrint}
+          setOptions={setOptions} storyId={storyId} theme={theme} setFontOption={setFontOption}
+          />  
+        }
       </main>
     </WindowScroll>
   )

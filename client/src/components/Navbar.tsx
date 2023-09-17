@@ -14,11 +14,8 @@ import MidModal from './navModals/MidModal.js';
 import { TypingEvent, UserProps } from '../data.js';
 import { getCurrentUser } from '../features/auth/userSlice.js';
 
-const postOptions = ['home', 'pdf', 'edit', 'delete', 'logout']
 
-const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-0.5 transition-all hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 duration-200 ease-in-out rounded-md';
-
-const option_styles = 'bg-slate-400 cursor-pointer p-1 hover:pb-1.5 uppercase text-center text-xs hover:bg-slate-400 hover:opacity-60 duration-200 ease-in-out rounded-sm';
+const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1.5 transition-all hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 duration-200 ease-in-out rounded-sm';
 
 export const Navbar = () => {
   const { pathname } = useLocation();
@@ -30,7 +27,6 @@ export const Navbar = () => {
   const {data} = useGetStoriesByCategoryQuery(getNavigation)
   const [targetStory, setTargetStory] = useState<PostType>()
   const [delayedSaving, setDelayedSaving] = useState<TypingEvent>('notTyping')
-  const [options, setOptions] = useState<string>('')
   const designatedPath =  `/story/${storyId}`
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
 
@@ -83,7 +79,7 @@ export const Navbar = () => {
       </div>
      { 
       address.slice(0, 2).includes(pathname) ? (
-          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md p-1 text-sm ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900' : 'bg-slate-400'}`}>
+          <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-5 top-12 border z-50 rounded-md p-2 text-sm ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900' : 'bg-slate-400'}`}>
             {
               Object.entries(custom_fonts).map(([key, options]) => (
                 <li
@@ -96,45 +92,9 @@ export const Navbar = () => {
             
             }
           </ul>
-        ) : 
-        <ButtonFunc 
-            pathname={pathname} setOptions={setOptions}
-            storyId={storyId} theme={theme} fontOption={fontOption}
-            options={options}
-        />  
+        ): null
       }
       {/* <Drawdown rollout={rollout} /> */}
     </nav>
   )
 }
-
-type ButtonFuncProps = {
-  pathname: string,
-  storyId?: string,
-  theme: string,
-  options: string,
-  fontOption: boolean,
-  setOptions: React.Dispatch<React.SetStateAction<string>>
-}
-
-const ButtonFunc = ({ pathname, setOptions, storyId, theme, fontOption, options } : ButtonFuncProps) => {
-
-  return (
-    <ul className={`${theme == 'dark' ? 'text-black font-medium' : ''} absolute shadow-lg right-6 top-12 border z-50 rounded-md ${fontOption ? '' : '-translate-y-96'} duration-300 ease-in-out ${pathname == `/story/${storyId}` ? 'bg-slate-900 p-1' : 'bg-slate-400'}`}>
-        {
-          pathname == `/story/${storyId}` && (
-            postOptions.map(option => (
-                <li title={`${option == 'pdf' ? 'save as pdf' : option}`}
-                  onClick={() => setOptions(option)}
-                  className={`${option_styles} ${option == options ? 'bg-slate-500' : null}`} key={option}
-                  >
-                  {option}
-                </li>
-              )
-            )
-          )
-        }
-    </ul>
-  )
-}
-

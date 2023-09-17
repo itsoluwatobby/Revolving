@@ -1,12 +1,12 @@
-import { CommentProps } from '../../data'
-import { Theme } from '../../posts'
-import { reduceLength } from '../../utils/navigator'
-import { format } from 'timeago.js'
+import { format } from 'timeago.js';
+import { Theme } from '../../posts';
+import { CommentProps } from '../../data';
+import { reduceLength } from '../../utils/navigator';
 
 type SimgleCommentProps = {
   theme: Theme,
-  targetComment: CommentProps
-  closeInput: () => void
+  closeInput: () => void,
+  targetComment: CommentProps,
 }
 
 export default function SingleComment({ theme, targetComment, closeInput }: SimgleCommentProps) {

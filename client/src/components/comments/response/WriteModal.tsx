@@ -1,27 +1,27 @@
-import { ChangeEvent, useEffect } from 'react'
-import { BsSend } from 'react-icons/bs'
-import { AiFillCloseSquare } from 'react-icons/ai'
-import { useThemeContext } from '../../../hooks/useThemeContext'
-import { PromptLiterals, ThemeContextType } from '../../../posts'
+import { BsSend } from 'react-icons/bs';
+import { toast } from 'react-hot-toast';
+import { ChangeEvent, useEffect } from 'react';
+import { AiFillCloseSquare } from 'react-icons/ai';
+import { ErrorStyle } from '../../../utils/navigator';
 import { useDispatch, useSelector } from 'react-redux';
+import { useThemeContext } from '../../../hooks/useThemeContext';
+import { PromptLiterals, ThemeContextType } from '../../../posts';
+import { commentApiSlice } from '../../../app/api/commentApiSlice';
 import { getEditResponse, setEditResponse } from '../../../features/story/commentSlice';
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../../data';
-import { commentApiSlice } from '../../../app/api/commentApiSlice';
-import { toast } from 'react-hot-toast';
 import { useCreateResponseMutation, useUpdateResponseMutation } from '../../../app/api/responseApiSlice';
-import { ErrorStyle } from '../../../utils/navigator'
 
 type WriteProp={
   writeReply: string,
-  keepPrompt: PromptLiterals,
-  currentUserId: string,
-  response: CommentResponseProps,
-  comment: CommentProps,
   openReply: OpenReply,
+  comment: CommentProps,
+  currentUserId: string,
+  keepPrompt: PromptLiterals,
+  response: CommentResponseProps,
   responseRef: React.MutableRefObject<HTMLTextAreaElement>,
+  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
-  setPrompt: React.Dispatch<React.SetStateAction<Prompted>>
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>
 }
 

@@ -1,6 +1,16 @@
 import { Schema, model } from 'mongoose';
 import { StoryProps } from '../../types.js';
 
+const CodeSchema = new Schema(
+  {
+    language: { type: String, required: [true, 'Language name required'], trim: true },
+    body: { type: String, default: '' }
+  },
+  {
+    timestamps: true
+  }
+)
+
 const STORYSCHEMA: Schema = new Schema(
   {
     userId: { 
@@ -16,6 +26,7 @@ const STORYSCHEMA: Schema = new Schema(
       default: []
     },
     isShared: { type: Array, default: [] },
+    code: [CodeSchema],
     likes: { type: Array, default: [] },
     fontFamily: { type: String, default: 'open_sans' },
     edited: { type: Boolean, default: false },
