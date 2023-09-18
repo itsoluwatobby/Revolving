@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuthType } from "../../data";
 import { RootState } from "../../app/store";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserAuthType extends AuthType{
   persistedLogin: boolean

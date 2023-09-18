@@ -1,10 +1,10 @@
+import { Link } from 'react-router-dom';
 import { BsCheck } from 'react-icons/bs';
 import { FaTimes } from 'react-icons/fa';
 import { RegistrationProps } from '../../data';
-import { Link } from 'react-router-dom';
-import { useThemeContext } from '../../hooks/useThemeContext';
 import { ThemeContextType } from '../../posts';
 import PasswordInput from './components/PasswordInput';
+import { useThemeContext } from '../../hooks/useThemeContext';
 
 export default function RegistrationForm({
   handleSubmit, handleEmail, handlePassword, handleUsername, handleConfirmPassword, loading, validEmail, match, username, email, password, confirmPassword, revealPassword, setRevealPassword, confirmationBy, setConfirmationBy

@@ -6,7 +6,7 @@ type SinglePageSidebarProps = {
   storyId: string,
   fontOption: boolean,
   triggerPrint: () => void,
-  setOptions: React.Dispatch<React.SetStateAction<string>>
+  setOptions: React.Dispatch<React.SetStateAction<string>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>
 }
 

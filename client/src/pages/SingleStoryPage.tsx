@@ -8,9 +8,9 @@ import { PostType, ThemeContextType } from "../posts";
 import { WindowScroll } from "../components/WindowScroll";
 import { useThemeContext } from "../hooks/useThemeContext";
 import ArticleComp from "../components/singlePost/ArticleComp";
+import { SinglePageSidebar } from "../components/singlePost/SinglePageSidebar";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
 import { useAverageReadTimePerStory } from "../hooks/useAverageReadTimePerStory";
-import { SinglePageSidebar } from "../components/singlePost/SinglePageSidebar";
 
 export default function SingleStoryPage() {
   const { storyId } = useParams() as {storyId: string}

@@ -5,6 +5,8 @@ type ChildrenProp = {
   children: React.ReactNode
 }
 
+type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+
 type MakeToButtom = PostType & Pick<SharedProps, 'sharedLikes'>
 type CodeProps =  { 
   _id?: string,
@@ -24,11 +26,11 @@ type PostType = {
   author: string | 'anonymous',
   likes: string[],
   isShared?: string[],
-  category: Categories[] | Categories,
+  category: Categories[],
   fontFamily?: string | 'sans',
   commentIds?: string[],
   code: CodeProps[],
-  edited: false,
+  edited: boolean,
   sharerId?: string,
   sharedId?: string,
   sharedAuthor?: string,

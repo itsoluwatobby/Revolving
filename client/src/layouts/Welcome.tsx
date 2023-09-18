@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom";
 import Wave from "../components/Wave";
+import { Outlet } from "react-router-dom";
 
 export default function Welcome() {
  

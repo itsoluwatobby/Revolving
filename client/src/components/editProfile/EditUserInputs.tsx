@@ -1,16 +1,16 @@
 import toast from 'react-hot-toast';
 import { InputField } from './InputField';
 import DPComponent from '../profile/DPComponent';
-import { ErrorResponse, Gender, SocialMediaAccoutProp, UserProps } from '../../data';
-import { ChangeEvent, useState, useEffect, useRef, useCallback } from 'react';
-import PasswordInput from '../modals/components/PasswordInput';
-import { useConfirmPasswordMutation } from '../../app/api/authApiSlice';
-import { ChatOption, ImageTypeProp, NameType, TargetImageType, Theme } from '../../posts';
-import { IsLoadingSpinner } from '../IsLoadingSpinner';
-import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
-import { useUpdateInfoMutation } from '../../app/api/usersApiSlice';
 import { ArrayComponent } from './ArrayComponent';
+import { IsLoadingSpinner } from '../IsLoadingSpinner';
+import PasswordInput from '../modals/components/PasswordInput';
 import { ErrorStyle, SuccessStyle } from '../../utils/navigator';
+import { useUpdateInfoMutation } from '../../app/api/usersApiSlice';
+import { useConfirmPasswordMutation } from '../../app/api/authApiSlice';
+import { ChangeEvent, useState, useEffect, useRef, useCallback } from 'react';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import { ErrorResponse, Gender, SocialMediaAccoutProp, UserProps } from '../../data';
+import { ChatOption, ImageTypeProp, NameType, TargetImageType, Theme } from '../../posts';
 
 type UserInputsProps = {
   theme: Theme,

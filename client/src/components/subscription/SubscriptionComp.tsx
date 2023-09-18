@@ -1,6 +1,6 @@
-import { GetSubscriptionType } from '../../data'
-import { Theme } from '../../posts'
-import SkeletonSubscription from '../skeletons/SkeletonSubscription'
+import { Theme } from '../../posts';
+import { GetSubscriptionType } from '../../data';
+import SkeletonSubscription from '../skeletons/SkeletonSubscription';
 
 type SubscriptionCompProps = { 
   theme: Theme,

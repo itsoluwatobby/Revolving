@@ -1,11 +1,11 @@
 import { Post } from '../home/Post';
-import { ErrorResponse, UserProps } from '../../data';
 import { BiErrorAlt } from 'react-icons/bi'
 import { useState, useEffect } from 'react';
-import { ImageTypeProp, PostType, Theme } from '../../posts';
 import { SerializedError } from '@reduxjs/toolkit';
+import { ErrorResponse, UserProps } from '../../data';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { SkeletonBlog } from '../skeletons/SkeletonBlog';
+import { ImageTypeProp, PostType, Theme } from '../../posts';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 
 type Props = {

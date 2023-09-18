@@ -1,5 +1,5 @@
-import { PageType } from "../data"
-import { PostType } from "../posts"
+import { PageType } from "../data";
+import { PostType } from "../posts";
 
 type ImageProp={
   story: PostType

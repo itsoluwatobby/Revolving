@@ -1,10 +1,10 @@
-import { TaskProp, UserProps } from '../data'
-import { checkCount } from '../utils/navigator'
-import { useGetUserStoriesQuery } from '../app/api/storyApiSlice';
+import { TaskProp, UserProps } from '../data';
+import { checkCount } from '../utils/navigator';
 import { useEffect, useState, useCallback } from 'react';
+import { useThemeContext } from '../hooks/useThemeContext';
 import { PostType, Theme, ThemeContextType } from '../posts';
 import { useGetUserByIdQuery } from '../app/api/usersApiSlice';
-import { useThemeContext } from '../hooks/useThemeContext';
+import { useGetUserStoriesQuery } from '../app/api/storyApiSlice';
 
 type FooterProps = {
   tasks: TaskProp[],

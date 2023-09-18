@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { LeftSection } from '../components/LeftSection';
 import { IsLayoutLoading } from '../components/IsLayoutLoading';
+import useNotPersistedLogin from '../hooks/useNotPersistedLogin';
 import { useNewAccessTokenMutation } from '../app/api/authApiSlice';
 import { persisted, selectCurrentToken, setCredentials } from '../features/auth/authSlice';
-import useNotPersistedLogin from '../hooks/useNotPersistedLogin';
 
 export const PersistedLogin = () => {
   const dispatch = useDispatch()

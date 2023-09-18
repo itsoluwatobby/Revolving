@@ -51,7 +51,7 @@ type StoryProps = {
   author: string | 'anonymous',
   likes: string[],
   isShared?: string[],
-  category: Categories[] | Categories,
+  category: Categories[],
   fontFamily?: string | 'sans',
   commentIds?: string[],
   code: CodeProps[],

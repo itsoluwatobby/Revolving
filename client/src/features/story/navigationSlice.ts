@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { Components, NAVIGATE } from "../../utils/navigator";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
   navigationTab: localStorage.getItem('NAVIGATE') as Components || NAVIGATE.GENERAL

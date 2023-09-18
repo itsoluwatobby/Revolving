@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
 import { LoginProps } from "../../data";
-import { useThemeContext } from "../../hooks/useThemeContext";
+import { Link } from "react-router-dom";
+import { useSelector } from 'react-redux';
 import { ThemeContextType } from "../../posts";
-import { useSelector } from 'react-redux'
 import { persisted } from "../../features/auth/authSlice";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 
 export default function LoginComponent({ 
   handleSubmit, handleEmail, loading, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot

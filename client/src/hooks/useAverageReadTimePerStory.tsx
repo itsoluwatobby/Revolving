@@ -16,12 +16,12 @@ export const useAverageReadTimePerStory = (post: string) => {
       // prev = sentence per minute
       prev = (totalWords/AVERAGE_WORDS_PER_MINUTE).toString()
       if(+prev < 1){
-          prev = ((+prev * 60).toFixed(1)).toString()
+          prev = Math.ceil(+prev * 60)?.toString()
           return +prev == 1 ? prev + ' second' : prev + ' seconds'
         }
       else if(+prev > 1 && +prev < 60) {
         prev = (+prev * 60).toString(); // average time in seconds
-        const minutes = ((+prev / 60).toFixed(1)).toString(); // average time in minutes
+        const minutes = Math.ceil(+prev / 60)?.toString(); // average time in minutes
         prev = minutes.padStart(2, '0')
         return +prev === 1 ? prev + ' minute' : prev + ' minutes'
       }

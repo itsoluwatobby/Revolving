@@ -1,12 +1,12 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { useThemeContext } from '../hooks/useThemeContext';
-import { ThemeContextType } from '../posts';
 import { toast } from 'react-hot-toast';
-import RegistrationForm from '../components/modals/RegistrationForm';
-import { ConfirmationMethodType, ErrorResponse } from '../data';
+import { ThemeContextType } from '../posts';
+import { useNavigate } from 'react-router-dom';
+import { useThemeContext } from '../hooks/useThemeContext';
 import { useSignUpMutation } from '../app/api/authApiSlice';
 import { ErrorStyle, SuccessStyle } from '../utils/navigator';
-import { useNavigate } from 'react-router-dom';
+import { ConfirmationMethodType, ErrorResponse } from '../data';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import RegistrationForm from '../components/modals/RegistrationForm';
 
 export default function RegisterModal() {
   const [username, setUsername] = useState<string>('')

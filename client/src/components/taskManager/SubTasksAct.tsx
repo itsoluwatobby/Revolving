@@ -1,8 +1,8 @@
-import { ChangeEvent, useState } from "react"
-import { ButtonType, SubTasks } from "../../data"
-import { IoMdAdd } from "react-icons/io"
-import { BsTrash } from "react-icons/bs"
-import { Theme } from "../../posts"
+import { Theme } from "../../posts";
+import { BsTrash } from "react-icons/bs";
+import { IoMdAdd } from "react-icons/io";
+import { ChangeEvent, useState } from "react";
+import { ButtonType, SubTasks } from "../../data";
 
 type SubTasksProps = {
   sub: SubTasks,

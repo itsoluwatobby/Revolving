@@ -1,6 +1,6 @@
-import { MdOutlineDeleteForever, MdOutlineRestore } from 'react-icons/md'
-import { Button, FunctionOption, Position, TaskProp } from '../../../data'
-import { Theme } from '../../../posts'
+import { Theme } from '../../../posts';
+import { MdOutlineDeleteForever, MdOutlineRestore } from 'react-icons/md';
+import { Button, FunctionOption, Position, TaskProp } from '../../../data';
 
 type BinContentProps = {
   task: TaskProp,

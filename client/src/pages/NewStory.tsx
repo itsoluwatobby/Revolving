@@ -13,7 +13,7 @@ import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
 import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
-import { ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
+import { CodeStoreType, ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
 
 let uploadedImageIds = [] as string[]
 let imagesNames = [] as string[]
@@ -21,7 +21,7 @@ export const NewStory = () => {
   const MAX_SIZE = 800_000 as const // 800kb 
   const { storyId } = useParams()
   const loading = useSelector(getLoading)
-  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore } = usePostContext() as PostContextType;
+  const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, setCodeStore } = usePostContext() as PostContextType;
   const [getStoryCond, { data: target, isLoading, isError }] = useGetStoryCondMutation()
   const { theme, isPresent, success, fontFamily, codeEditor, setCodeEditor, setIsPresent, setLoginPrompt, setSuccess } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
@@ -38,7 +38,6 @@ export const NewStory = () => {
     1000) as DebounceProps;
   const url = useSelector(getUrl);
   const dispatch = useDispatch();
-
   const { pathname } = useLocation()
 
   const handleImages = (event: ChangeEvent<HTMLInputElement>) => {
@@ -104,19 +103,18 @@ export const NewStory = () => {
     const uploadImages = async() => {
       await Promise.all(imagesFiles.map(async(image) => {
         if(uploadedImageIds.includes(image.imageId)) return
-          const imageData = new FormData()
-          imageData.append('image', image.image)
-          await uploadToServer(imageData).unwrap()
-          .then((data) => {
-            const res = data as unknown as { url: string }
-            const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
-            dispatch(setUrl(composed))
-            uploadedImageIds.push(image.imageId)
-          }).catch((error: unknown) => {
-            const errors = error as ErrorResponse
-            errors?.originalStatus == 401 && setLoginPrompt('Open')
-          })
-        //}
+        const imageData = new FormData()
+        imageData.append('image', image.image)
+        await uploadToServer(imageData).unwrap()
+        .then((data) => {
+          const res = data as unknown as { url: string }
+          const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
+          dispatch(setUrl(composed))
+          uploadedImageIds.push(image.imageId)
+        }).catch((error: unknown) => {
+          const errors = error as ErrorResponse
+          errors?.originalStatus == 401 && setLoginPrompt('Open')
+        })
       }))
     }
     (isMounted && imagesFiles.length >= 1) ? uploadImages() : null
@@ -153,20 +151,52 @@ export const NewStory = () => {
   }, [storyId, target])
 
   useEffect(() => {
-    const savedTitle = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
-    const savedBody = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : (localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body)
+    let isMounted = true
+    if(isMounted){
+      const savedTitle = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
+      const savedBody = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : (localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body)
+      const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
+      if(targetStory?.code?.length){
+        const putInStore = targetStory?.code?.map(code => {
+          return { 
+            langType: code?.language, code: code?.body, 
+            codeId: nanoid(8), date: code?.createdAt 
+          }
+        })
+        const codeBodies = putInStore?.map(code => code?.code)
+        const isPresent = getStore?.find(code => codeBodies?.includes(code?.code as string))
+        if(!isPresent){
+          const allCodes = [...putInStore, ...getStore]
+          localStorage.setItem('revolving-codeStore', JSON.stringify([...allCodes]))
+          setCodeStore([...allCodes])
+        }
+      }
+      else{
+        // localStorage.setItem('revolving-codeStore', JSON.stringify([...getStore]))
+        setCodeStore([])
+      }
 
-    setInputValue(savedTitle || '')
-    setTextareaValue(savedBody || '')
-    setTypingEvent(debounceValue?.typing)
-  }, [setTypingEvent, debounceValue.typing, targetStory?.title, targetStory?.body, currentUserId, storyId, pathname])
+      setInputValue(savedTitle || '')
+      setTextareaValue(savedBody || '')
+      setTypingEvent(debounceValue?.typing)
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [setTypingEvent, debounceValue.typing, targetStory?.code, setCodeStore, targetStory?.title, targetStory?.body, currentUserId, storyId, pathname])
 
   useEffect(() => {
     if(inputRef.current) inputRef.current.focus()
   }, [])
 
   useEffect(() => {
-    targetStory && setPostCategory(targetStory?.category)
+    let isMounted = true
+    if(isMounted){
+      targetStory && setPostCategory(targetStory?.category)
+    }
+  return () => {
+    isMounted = false
+  }
   }, [targetStory])
 
   useEffect(() => {
@@ -218,16 +248,13 @@ export const NewStory = () => {
         : (
             <>
               <input 
-                type="text"
-                ref={inputRef}
-                placeholder='Title'
-                value={inputValue}
+                type="text" ref={inputRef}
+                placeholder='Title' value={inputValue}
                 onChange={handleTitle}
                 className={`${(isLoading || loading) ? 'animate-pulse cursor-none' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 rounded-md text-5xl placeholder:text-gray-300 focus:outline-none pl-2 p-1 ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-gray-200 shadow-2xl'}`}
               />
               <textarea 
-                name="story" id=""
-                key={currentUserId}
+                name="story" key={currentUserId}
                 placeholder='Share your story...'
                 value={textareaValue}
                 cols={30} rows={8}
@@ -259,13 +286,17 @@ export const NewStory = () => {
             </label>
           </button>
         </div>
+
       <div className='w-full flex items-center justify-between sm:w-[80%] md:w-3/4 lg:w-3/5'>
 
         <div className={`${theme == 'light' ? 'bg-slate-200' : 'bg-slate-500'} transition-all ${codeEditor ? 'w-10' : 'max-w-[50%] sm:w-1/2'} p-1.5 rounded-md gap-2 flex items-center`}>
+
           <BiCodeAlt 
             onClick={() => setCodeEditor(prev => !prev)}
-            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-90 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-200 bg-gray-600'}`} />
-          <div title='Scroll left | right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-scroll rounded-md skew-x-6 py-1 pl-2 pr-2 shadow-inner shadow-slate-900 ${theme == 'light' ? 'text-white' : ''}`}>
+            title='Code Editor' className={`text-3xl min-w-fit border-2 border-slate-600 cursor-pointer rounded-lg hover:opacity-90 ${codeEditor ? 'text-slate-800 bg-gray-300' : 'text-gray-200 bg-gray-600'}`} 
+          />
+
+          <div title='Scroll left | right' className={`hidebars text-sm ${codeEditor ? 'hidden' : 'flex'} items-center w-full font-sans gap-1 h-full overflow-x-scroll rounded-md py-1 pl-2 pr-2 shadow-inner shadow-slate-900 text-white`}>
             {
               Object.values(NAVIGATE).map(category => (
                 <p
@@ -277,6 +308,7 @@ export const NewStory = () => {
               ))
             }
           </div>
+
         </div>
 
         <div className={`${(codeStore.length >= 1 || imagesFiles.length >= 1) ? 'scale-100' : 'scale-0'} flex items-center transition-all ${theme == 'light' ? 'text-white bg-slate-300 ' : 'bg-slate-500'} w-fit gap-2 p-1 text-sm font-sans rounded-md shadow-lg`}>

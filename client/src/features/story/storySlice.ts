@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { ImageUrlsType, PostType } from "../../posts";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
   storyData: {} as Partial<PostType>,

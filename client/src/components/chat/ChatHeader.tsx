@@ -1,6 +1,6 @@
-import { Theme, ThemeContextType } from '../../posts'
-import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg'
-import { useThemeContext } from '../../hooks/useThemeContext'
+import { Theme, ThemeContextType } from '../../posts';
+import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg';
+import { useThemeContext } from '../../hooks/useThemeContext';
 
 type ChatHeaderProp={
   theme: Theme

@@ -1,11 +1,11 @@
 import { useState } from 'react';
+import { format } from 'timeago.js';
 import { UserProps } from '../../data';
 import { Link } from 'react-router-dom';
 import { MdAttachEmail } from 'react-icons/md';
 import { ImageTypeProp, Theme } from '../../posts';
 import { FaGithub, FaTwitterSquare } from 'react-icons/fa';
 import { checkCount, reduceLength } from '../../utils/navigator';
-import { format } from 'timeago.js';
 
 type Props = {
   theme: Theme,

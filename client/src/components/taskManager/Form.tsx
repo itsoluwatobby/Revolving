@@ -1,16 +1,16 @@
-import { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState  } from "react"
-import { FaHourglassEnd } from "react-icons/fa"
-import { IoIosSend, IoMdAdd } from "react-icons/io"
-import { ChatOption, Theme, ThemeContextType } from "../../posts"
-import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
-import { CreatePrompt, ErrorResponse, InputTaskProp, TaskProp } from "../../data"
-import { useDispatch, useSelector } from "react-redux"
-import { getTask, setTask, singleTask } from "../../features/story/taskManagerSlice"
-import { useCreateTaskMutation, useUpdateTaskMutation } from "../../app/api/taskApiSlice"
-import { RootState } from "../../app/store"
-import { toast } from "react-hot-toast"
-import { useThemeContext } from "../../hooks/useThemeContext"
-import { ErrorStyle } from "../../utils/navigator"
+import { toast } from "react-hot-toast";
+import { RootState } from "../../app/store";
+import { FaHourglassEnd } from "react-icons/fa";
+import { ErrorStyle } from "../../utils/navigator";
+import { IoIosSend, IoMdAdd } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { ChatOption, Theme, ThemeContextType } from "../../posts";
+import { CreatePrompt, ErrorResponse, InputTaskProp, TaskProp } from "../../data";
+import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { getTask, setTask, singleTask } from "../../features/story/taskManagerSlice";
+import { useCreateTaskMutation, useUpdateTaskMutation } from "../../app/api/taskApiSlice";
+import { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState  } from "react";
 
 type FormProps = {
   currentUserId: string

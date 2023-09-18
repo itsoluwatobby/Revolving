@@ -4,10 +4,10 @@ import { Link, useParams } from 'react-router-dom';
 import { ErrorResponse, UserProps } from '../data';
 import { ChangeEvent, useState, useEffect } from 'react';
 import { useThemeContext } from '../hooks/useThemeContext';
+import EditUserInputs from '../components/editProfile/EditUserInputs';
 import { ImageTypeProp, TargetImageType, Theme, ThemeContextType } from '../posts';
 import { useGetUserByIdQuery, useUpdateInfoMutation } from '../app/api/usersApiSlice';
 import { useDeleteImageMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
-import EditUserInputs from '../components/editProfile/EditUserInputs';
 
 const initialState = {name: null, data: null}
 type SocialMediaAccoutProp = {

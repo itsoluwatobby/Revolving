@@ -1,7 +1,7 @@
-import { ChangeEvent } from "react"
-import { Theme } from "../../posts"
-import { InputField } from "./InputField"
-import { FaTimesCircle } from "react-icons/fa"
+import { ChangeEvent } from "react";
+import { Theme } from "../../posts";
+import { InputField } from "./InputField";
+import { FaTimesCircle } from "react-icons/fa";
 
 type ArrayFieldType = {
   max: number,

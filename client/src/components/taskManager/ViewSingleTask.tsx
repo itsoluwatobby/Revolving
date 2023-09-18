@@ -1,9 +1,9 @@
-import { useSelector } from "react-redux"
-import { getTask, singleTask } from "../../features/story/taskManagerSlice"
-import { ChatOption, Theme } from "../../posts"
-import { MdOutlineCancelPresentation } from "react-icons/md"
-import SubTasksAct from "./SubTasksAct"
-import { RootState } from "../../app/store"
+import SubTasksAct from "./SubTasksAct";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import { ChatOption, Theme } from "../../posts";
+import { MdOutlineCancelPresentation } from "react-icons/md";
+import { getTask, singleTask } from "../../features/story/taskManagerSlice";
 
 type TaskType = {
   theme: Theme,

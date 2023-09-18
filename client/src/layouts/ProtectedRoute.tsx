@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { USERROLES } from "../data";
 import { useDispatch, useSelector } from "react-redux";
 import { IsLayoutLoading } from "../components/IsLayoutLoading";
-import { Outlet, Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import { setGrantedPermission, grantedPermission } from "../features/auth/userSlice";
+import { Outlet, Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 
 type AllowedRolesProp={
   roles: USERROLES[]

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
-import { ObjectUnknown } from "../data"
-import { PostType } from "../posts"
+import { PostType } from "../posts";
+import { ObjectUnknown } from "../data";
+import { useEffect, useState } from "react";
 
 
 export default function useRevolvingPostFeed<T>(entry: ObjectUnknown<T>[], post: PostType[], numLikes=70) {

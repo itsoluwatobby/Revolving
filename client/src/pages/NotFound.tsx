@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
-import { TbError404 } from 'react-icons/tb'
-import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react';
+import { TbError404 } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotFound() {
   const navigate = useNavigate()

@@ -1,6 +1,6 @@
-import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
-import { ChatProps, UserProps } from "../../data";
 import { RootState } from "../../app/store";
+import { ChatProps, UserProps } from "../../data";
+import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
 // import { sub } from "date-fns";
 
 //const dateTime = sub(new Date, { minutes: 0 }).toISOString();

@@ -1,7 +1,7 @@
-import { ChangeEvent, FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useForgotPasswordMutation } from "../../app/api/authApiSlice";
 
 type ForgotProps={

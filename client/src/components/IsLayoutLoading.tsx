@@ -1,7 +1,7 @@
-import whiteBGloader from '../assets/whiteloader.svg'
-import darkBGloader from '../assets/darkLoader.svg'
-import { useThemeContext } from '../hooks/useThemeContext'
-import { ThemeContextType } from '../posts'
+import { ThemeContextType } from '../posts';
+import darkBGloader from '../assets/darkLoader.svg';
+import whiteBGloader from '../assets/whiteloader.svg';
+import { useThemeContext } from '../hooks/useThemeContext';
 
 export const IsLayoutLoading = () => {
   const { theme } = useThemeContext() as ThemeContextType

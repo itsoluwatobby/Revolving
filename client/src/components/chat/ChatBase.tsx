@@ -1,11 +1,10 @@
-import { useState, useEffect, ChangeEvent, useRef } from 'react';
-import { BsSend } from 'react-icons/bs';
-import { Theme } from '../../posts'
 import { sub } from 'date-fns';
+import { Theme } from '../../posts';
+import { BsSend } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
-import { createChatMessage } from '../../features/chat/chatSlice';
-import { ChatProps } from '../../data';
 import { nanoid } from '@reduxjs/toolkit';
+import { useEffect, ChangeEvent, useRef } from 'react';
+import { createChatMessage } from '../../features/chat/chatSlice';
 
 type ChatBaseProp={
   theme: Theme

@@ -1,13 +1,13 @@
-import { useGetUserByIdQuery } from "../app/api/usersApiSlice";
 import { UserProps } from "../data";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
-import { useThemeContext } from "../hooks/useThemeContext";
 import { ChatOption, ThemeContextType } from "../posts";
 import { SkeletonUser } from "./skeletons/SkeletonUser";
-import { MdOutlineRunningWithErrors } from 'react-icons/md';
 import FollowUnFollow from "./singlePost/FollowUnFollow";
+import { useThemeContext } from "../hooks/useThemeContext";
+import { MdOutlineRunningWithErrors } from 'react-icons/md';
 import { checkCount, reduceLength } from "../utils/navigator";
-import { Link } from "react-router-dom";
+import { useGetUserByIdQuery } from "../app/api/usersApiSlice";
 
 type UserCardProps = {
   userId: string,

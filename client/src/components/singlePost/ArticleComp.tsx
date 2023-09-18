@@ -47,11 +47,12 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
   }, [setNotIntersecting])
 
   const customCodeStyle = { 
-    'backgroundColor': 'black', 
     'width': '100%',
-    'min-height': '5rem',
-    'max-height': '15rem',
-    'border-width': '3px',
+    'minHeight': '5rem',
+    'maxHeight': '15rem',
+    'borderWidth': '3px',
+    'borderRadius': '5px',
+    'backgroundColor': 'black',
   } as {[index: string]: string}
 
   let content: JSX.Element;

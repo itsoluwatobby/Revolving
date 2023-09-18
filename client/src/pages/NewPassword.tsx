@@ -1,12 +1,12 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import PasswordInput from "../components/modals/components/PasswordInput";
-import { useNewPasswordMutation } from "../app/api/authApiSlice";
-import { useThemeContext } from "../hooks/useThemeContext";
-import { ThemeContextType } from "../posts";
-import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../data";
+import { toast } from "react-hot-toast";
+import { ThemeContextType } from "../posts";
 import { SuccessStyle } from "../utils/navigator";
+import { Link, useLocation } from "react-router-dom";
+import { useThemeContext } from "../hooks/useThemeContext";
+import { useNewPasswordMutation } from "../app/api/authApiSlice";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import PasswordInput from "../components/modals/components/PasswordInput";
 
 export default function NewPassword() {
   const [password, setPassword] = useState<string>('')

@@ -1,10 +1,10 @@
-import { toast } from "react-hot-toast"
-import { ThemeContextType } from "../posts"
-import { useThemeContext } from "./useThemeContext"
-import { useDispatch } from "react-redux"
-import { signUserOut } from "../features/auth/authSlice"
-import { useLocation, useNavigate } from "react-router-dom"
-import { useSignOutMutation } from "../app/api/authApiSlice"
+import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { ThemeContextType } from "../posts";
+import { useThemeContext } from "./useThemeContext";
+import { signUserOut } from "../features/auth/authSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSignOutMutation } from "../app/api/authApiSlice";
 
 type SignOutType = 'dont' | 'use'
 
