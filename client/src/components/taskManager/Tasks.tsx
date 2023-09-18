@@ -1,15 +1,15 @@
-import React, { useCallback } from 'react'
-import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data'
-import { ErrorStyle, reduceLength } from '../../utils/navigator'
-import { format } from 'timeago.js'
-import { CiEdit } from 'react-icons/ci'
-import { BsTrash } from 'react-icons/bs'
-import { ChatOption, Theme, ThemeContextType } from '../../posts'
+import { format } from 'timeago.js';
+import { toast } from 'react-hot-toast';
+import { CiEdit } from 'react-icons/ci';
+import { BsTrash } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
-import { setTask } from '../../features/story/taskManagerSlice'
-import { useDeleteTaskMutation, useUpdateTaskMutation } from '../../app/api/taskApiSlice'
-import { toast } from 'react-hot-toast'
-import { useThemeContext } from '../../hooks/useThemeContext'
+import React, { useCallback } from 'react';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { setTask } from '../../features/story/taskManagerSlice';
+import { ErrorStyle, reduceLength } from '../../utils/navigator';
+import { ChatOption, Theme, ThemeContextType } from '../../posts';
+import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data';
+import { useDeleteTaskMutation, useUpdateTaskMutation } from '../../app/api/taskApiSlice';
 
 type TaskProps = {
   task: TaskProp,

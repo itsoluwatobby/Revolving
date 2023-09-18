@@ -1,12 +1,12 @@
-import { Link, useLocation, useParams } from "react-router-dom";
-import { CiSearch } from 'react-icons/ci'
-import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg'
-import { usePostContext } from "../../hooks/usePostContext";
-import { PostContextType, ThemeContextType } from "../../posts";
-import { useThemeContext } from "../../hooks/useThemeContext";
-import { useSelector } from "react-redux";
-import { getStoryData } from "../../features/story/storySlice";
 import { TypingEvent } from "../../data";
+import { CiSearch } from 'react-icons/ci';
+import { useSelector } from "react-redux";
+import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg';
+import { usePostContext } from "../../hooks/usePostContext";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { getStoryData } from "../../features/story/storySlice";
+import { PostContextType, ThemeContextType } from "../../posts";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 type TopLeftProp={
   delayedSaving: TypingEvent

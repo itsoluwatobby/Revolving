@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { UserProps } from '../../data'
-import { ImageTypeProp, Theme } from '../../posts'
-import { RiEdit2Line } from 'react-icons/ri'
-import { useParams } from 'react-router-dom'
+import { UserProps } from '../../data';
+import React, { useState } from 'react';
+import { RiEdit2Line } from 'react-icons/ri';
+import { useParams } from 'react-router-dom';
+import { ImageTypeProp, Theme } from '../../posts';
 
 type EditModalProps = {
   theme: Theme,

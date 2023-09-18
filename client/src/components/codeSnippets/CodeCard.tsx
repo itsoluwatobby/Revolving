@@ -29,7 +29,7 @@ export default function CodeCard({ code, count, codeStore, setCodeStore, submitT
   }, [])
 
   const editCode = (codeId: string) => {
-    const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
+    const getStore = (JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[]) ?? []
     const target = getStore.find(code => code?.codeId == codeId) as CodeStoreType
     setInputValue(target)
     if(editing.codeId !== target.codeId){
@@ -41,7 +41,7 @@ export default function CodeCard({ code, count, codeStore, setCodeStore, submitT
   }
 
   const acceptToSubmit = (codeId: string) => {
-    const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
+    const getStore = (JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[]) ?? []
     const target = getStore.find(code => code?.codeId == codeId) as CodeStoreType
     const targetCode = { codeId: target?.codeId, language: target?.langType, body: target?.code } as CodeProps
     const findConflict = includesId?.find(id => id === targetCode?.codeId)

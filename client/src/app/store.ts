@@ -1,14 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { setupListeners } from '@reduxjs/toolkit/query';
 import { apiSlice } from './api/apiSlice';
-import authReducer from '../features/auth/authSlice'
-import commentReducer from '../features/story/commentSlice'
-import navigationTabReducer from '../features/story/navigationSlice';
-import storyReducer from '../features/story/storySlice';
-import codeReducer from '../features/story/codeSlice';
-import taskReducer from '../features/story/taskManagerSlice';
+import { configureStore } from '@reduxjs/toolkit';
 import chatReducer from '../features/chat/chatSlice';
-import userReducer from '../features/auth/userSlice'
+import userReducer from '../features/auth/userSlice';
+import authReducer from '../features/auth/authSlice';
+import codeReducer from '../features/story/codeSlice';
+import storyReducer from '../features/story/storySlice';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import commentReducer from '../features/story/commentSlice';
+import taskReducer from '../features/story/taskManagerSlice';
+import navigationTabReducer from '../features/story/navigationSlice';
 
 export const store = configureStore({
   reducer: {

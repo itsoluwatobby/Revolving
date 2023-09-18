@@ -1,9 +1,9 @@
 import { format } from 'timeago.js';
-import React, { useState, useCallback } from 'react';
 import CommentBase from './CommentBase';
 import { useDispatch } from 'react-redux';
-import { reduceLength } from '../../utils/navigator';
 import { MdOutlineExpandMore } from 'react-icons/md';
+import React, { useState, useCallback } from 'react';
+import { reduceLength } from '../../utils/navigator';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { CommentProps, OpenReply, Prompted } from '../../data';
 import { setEditComment } from '../../features/story/commentSlice';

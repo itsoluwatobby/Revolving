@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { TypingEvent } from "../data"
+import { TypingEvent } from "../data";
+import { useEffect, useState } from "react";
 
 export type DebounceProps = { savedTitle: string, savedBody: string, typing: TypingEvent, savedFontFamily: string }
 

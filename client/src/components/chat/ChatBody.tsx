@@ -1,11 +1,11 @@
 import { format } from 'timeago.js';
-import { ChatProps } from '../../data'
-import { useSelector } from 'react-redux'
-import { Theme, ThemeContextType } from '../../posts'
-import { useState, useEffect, useCallback } from 'react'
-import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg'
-import { useThemeContext } from '../../hooks/useThemeContext'
-import { getChatMessages } from '../../features/chat/chatSlice'
+import { ChatProps } from '../../data';
+import { useSelector } from 'react-redux';
+import { Theme, ThemeContextType } from '../../posts';
+import { useState, useEffect, useCallback } from 'react';
+import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { getChatMessages } from '../../features/chat/chatSlice';
 
 const DELAY = 250 as const
 

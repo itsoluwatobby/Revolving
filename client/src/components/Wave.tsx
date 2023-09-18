@@ -1,5 +1,5 @@
+import { ThemeContextType } from "../posts";
 import { useThemeContext } from "../hooks/useThemeContext"
-import { ThemeContextType } from "../posts"
 
 export default function Wave() {
   const { setOpenChat } = useThemeContext() as ThemeContextType

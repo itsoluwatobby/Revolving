@@ -1,9 +1,9 @@
-import LikeStory from '../singlePost/LikeStory'
-import FollowUnFollow from '../singlePost/FollowUnFollow'
-import { reduceLength } from '../../utils/navigator'
-import { ChatOption, PostType, Theme } from '../../posts'
-import { format } from 'timeago.js'
-import { Link } from 'react-router-dom'
+import { format } from 'timeago.js';
+import { Link } from 'react-router-dom';
+import LikeStory from '../singlePost/LikeStory';
+import { reduceLength } from '../../utils/navigator';
+import { ChatOption, PostType, Theme } from '../../posts';
+import FollowUnFollow from '../singlePost/FollowUnFollow';
 
 type Props = {
   targetStory: PostType,

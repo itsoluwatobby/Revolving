@@ -53,6 +53,11 @@ export default function TopRight({ currentUser }: TopRightProps) {
           await createStory({ userId, story }).unwrap()
           localStorage.removeItem(`newTitle?id=${userId}`)
           localStorage.removeItem(`newBody?id=${userId}`)
+          submitToSend.map(lang => {
+            localStorage.removeItem(`revolving-${lang?.language}`)
+          })
+          // localStorage.removeItem('revolving-codeStore')
+            
           toast.success('Success!! Post added', SuccessStyle)
           dispatch(resetUrl())
           setImagesFiles([])
@@ -84,6 +89,9 @@ export default function TopRight({ currentUser }: TopRightProps) {
         await updateStory({ userId, storyId: story?._id, story }).unwrap()
         localStorage.removeItem(`editTitle?id=${userId}`)
         localStorage.removeItem(`editBody?id=${userId}`)
+        submitToSend.map(lang => {
+          localStorage.removeItem(`revolving-${lang?.language}`)
+        })
         
         toast.success('Success!! Post Updated', SuccessStyle)  
         navigate('/')

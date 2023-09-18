@@ -1,8 +1,8 @@
-import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react'
-import { setCredentials, signUserOut } from '../../features/auth/authSlice'
-import { ApiSliceType, AuthType, RefreshTokenType } from '../../data'
-import { RootState } from '../store'
-import { BaseQueryFn } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
+import { RootState } from '../store';
+import { ApiSliceType, AuthType, RefreshTokenType } from '../../data';
+import { BaseQueryFn } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
+import { setCredentials, signUserOut } from '../../features/auth/authSlice';
+import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react';
 
 export const BASEURL = 'http://localhost:4000/revolving'
 

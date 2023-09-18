@@ -1,9 +1,9 @@
-import { ThemeContextType } from "../posts"
-import { useThemeContext } from "../hooks/useThemeContext"
-import { Link, useLocation } from "react-router-dom"
-import { reduceLength } from "../utils/navigator"
-import { useSelector } from "react-redux"
-import { getCurrentUser } from "../features/auth/userSlice"
+import { useSelector } from "react-redux";
+import { ThemeContextType } from "../posts";
+import { reduceLength } from "../utils/navigator";
+import { Link, useLocation } from "react-router-dom";
+import { useThemeContext } from "../hooks/useThemeContext";
+import { getCurrentUser } from "../features/auth/userSlice";
 
 type RouteProps = {
   name: string,

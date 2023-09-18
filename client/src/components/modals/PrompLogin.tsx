@@ -1,7 +1,7 @@
-import useLogout from "../../hooks/useLogout"
-import { useThemeContext } from "../../hooks/useThemeContext"
-import { ThemeContextType } from "../../posts"
-import { Link, useLocation } from "react-router-dom"
+import useLogout from "../../hooks/useLogout";
+import { ThemeContextType } from "../../posts";
+import { Link, useLocation } from "react-router-dom";
+import { useThemeContext } from "../../hooks/useThemeContext";
 
 export default function PrompLogin() {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType

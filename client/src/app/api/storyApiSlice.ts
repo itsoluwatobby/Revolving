@@ -1,7 +1,7 @@
-import { Categories, UserProps } from "../../data";
-import { ImageRes, PostType } from "../../posts";
-import { providesTag } from "../../utils/helperFunc";
 import { apiSlice } from "./apiSlice";
+import { ImageRes, PostType } from "../../posts";
+import { Categories, UserProps } from "../../data";
+import { providesTag } from "../../utils/helperFunc";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type StoryArgs = {

@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store'
-import { UserProps } from '../../data'
+import { UserProps } from '../../data';
+import { RootState } from '../../app/store';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type PermissionType = 'ALLOWED' | 'FORBIDDEN' | 'AUTHENTICATING'
 interface Permission{

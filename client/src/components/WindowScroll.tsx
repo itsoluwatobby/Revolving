@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { ChildrenProp } from "../posts";
+import { useState, useEffect } from "react";
 
 export const WindowScroll = ({ children }: ChildrenProp) => {
   const [windowSize, setWindowSize] = useState({

@@ -1,6 +1,6 @@
-import { GetFollowsType, GetSubscriptionType, UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
+import { GetFollowsType, GetSubscriptionType, UserProps } from "../../data";
 
 type SubscribeType = {
   meta: {

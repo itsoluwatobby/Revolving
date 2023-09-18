@@ -1,22 +1,20 @@
+import { useSelector } from 'react-redux';
+import { custom_fonts } from '../fonts.js';
 import { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom'
-import { usePostContext } from '../hooks/usePostContext'
-import { PostContextType, PostType, ThemeContextType } from '../posts'
-import { useThemeContext } from '../hooks/useThemeContext'
-import { custom_fonts } from '../fonts.js'
+import TopLeft from './navModals/TopLeft.js';
 import Drawdown from './navModals/Drawdown.js';
 import TopRight from './navModals/TopRight.js';
-import TopLeft from './navModals/TopLeft.js';
-import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
-import { useSelector } from 'react-redux';
-import { getTabCategory } from '../features/story/navigationSlice.js';
 import MidModal from './navModals/MidModal.js';
 import { TypingEvent, UserProps } from '../data.js';
+import { usePostContext } from '../hooks/usePostContext';
+import { useLocation, useParams } from 'react-router-dom';
+import { useThemeContext } from '../hooks/useThemeContext';
 import { getCurrentUser } from '../features/auth/userSlice.js';
+import { getTabCategory } from '../features/story/navigationSlice.js';
+import { PostContextType, PostType, ThemeContextType } from '../posts';
+import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
 
-
-const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1.5 transition-all hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 duration-200 ease-in-out rounded-sm';
-
+const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1.5 transition-all hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 ease-in-out rounded-sm';
 export const Navbar = () => {
   const { pathname } = useLocation();
   const currentUser = useSelector(getCurrentUser)
@@ -74,7 +72,7 @@ export const Navbar = () => {
         currentUser={currentUser as UserProps}
       />
       
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-30 ${pathname != `/story/${storyId}` ? 'w-40 mobile:w-36' : 'mobile:w-28 mobile:pr-0 w-[120px] minmobile:w-20'}`}>
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-30 ${pathname !== `/story/${storyId}` ? 'w-fit' : ''} ${pathname === `/edit_story/${storyId}` ? 'mobile:gap-x-2' : 'mobile:gap-x-1 gap-x-2'}`}>
         <TopRight currentUser={currentUser as UserProps} />
       </div>
      { 

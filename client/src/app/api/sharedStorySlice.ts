@@ -1,6 +1,6 @@
+import { apiSlice } from "./apiSlice";
 import { SharedProps } from "../../data";
 import { providesTag } from "../../utils/helperFunc";
-import { apiSlice } from "./apiSlice";
 
 type SharedStoryArgs = {
   userId: string, 

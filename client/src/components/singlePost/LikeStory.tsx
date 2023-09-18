@@ -1,12 +1,12 @@
-import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs"
-import { PostType, ThemeContextType } from "../../posts"
-import { checkCount } from "../../utils/navigator"
-import { storyApiSlice, useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice"
-import { useDispatch } from "react-redux"
-import { ErrorResponse, PositionType } from "../../data"
-import { useThemeContext } from "../../hooks/useThemeContext"
-import { toast } from "react-hot-toast"
-import { sharedStoryApiSlice, useLikeAndUnlikeSharedStoryMutation } from "../../app/api/sharedStorySlice"
+import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { checkCount } from "../../utils/navigator";
+import { ErrorResponse, PositionType } from "../../data";
+import { PostType, ThemeContextType } from "../../posts";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs";
+import { storyApiSlice, useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice";
+import { sharedStoryApiSlice, useLikeAndUnlikeSharedStoryMutation } from "../../app/api/sharedStorySlice";
 
 type LikeStoryProps = {
   story: PostType,

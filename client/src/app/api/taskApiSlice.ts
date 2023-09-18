@@ -1,6 +1,6 @@
+import { apiSlice } from "./apiSlice";
 import { TaskBin, TaskProp } from "../../data";
 import { providesTag } from "../../utils/helperFunc";
-import { apiSlice } from "./apiSlice";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type TaskArgs = {

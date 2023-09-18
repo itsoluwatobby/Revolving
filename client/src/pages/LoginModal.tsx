@@ -1,17 +1,16 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
-import ForgotPassword from '../components/modals/ForgotPassword'
-import LoginComponent from '../components/modals/LoginComponent'
-import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { useThemeContext } from '../hooks/useThemeContext';
-import { PostContextType, ThemeContextType } from '../posts';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../features/auth/authSlice';
-import { persistLogin } from '../features/auth/authSlice';
-import { useSignInMutation } from '../app/api/authApiSlice';
 import { ErrorResponse } from '../data';
+import { toast } from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { ThemeContextType } from '../posts';
 import { SuccessStyle } from '../utils/navigator';
-import { usePostContext } from '../hooks/usePostContext';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { persistLogin } from '../features/auth/authSlice';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { setCredentials } from '../features/auth/authSlice';
+import { useSignInMutation } from '../app/api/authApiSlice';
+import ForgotPassword from '../components/modals/ForgotPassword';
+import LoginComponent from '../components/modals/LoginComponent';
 
 export default function Login() {
   const dispatch = useDispatch()

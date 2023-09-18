@@ -8,11 +8,11 @@ import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { SkeletonBlog } from '../skeletons/SkeletonBlog';
 import { usePostContext } from '../../hooks/usePostContext';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { getTabCategory } from '../../features/story/navigationSlice';
 import { PostContextType, PostType, ThemeContextType } from '../../posts'
 import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
-import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 
 export const Posts = () => {
   const getNavigation = useSelector(getTabCategory)

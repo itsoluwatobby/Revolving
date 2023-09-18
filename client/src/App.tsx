@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound";
 import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/AdminPage";
+import Followers from "./pages/Followers";
 import { ThemeContextType } from "./posts";
 import { OTPEntry } from "./pages/OTPEntry";
 import { NewStory } from "./pages/NewStory";
@@ -16,18 +17,17 @@ import TaskManager from "./pages/TaskManager";
 import { BsChatTextFill } from 'react-icons/bs';
 import { Routes, Route } from 'react-router-dom';
 import RegisterModal from "./pages/RegisterModel";
+import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
 import ExpensePlanner from "./pages/ExpensePlanner";
 import ChatModal from "./pages/chatAdmin/ChatModal";
 import SingleStoryPage from "./pages/SingleStoryPage";
+import EditProfilePage from "./pages/EditProfilePage";
 import PrompLogin from "./components/modals/PrompLogin";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { selectCurrentRoles } from "./features/auth/authSlice";
-import EditProfilePage from "./pages/EditProfilePage";
-import Followers from "./pages/Followers";
-import Subscriptions from "./pages/Subscriptions";
  
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;

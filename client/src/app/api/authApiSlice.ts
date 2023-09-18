@@ -1,5 +1,5 @@
-import { AuthType, ConfirmType, ConfirmationMethodType, DataType, OptionType, RefreshType, UserDataType, UserProps } from "../../data";
 import { apiSlice } from "./apiSlice";
+import { AuthType, ConfirmType, ConfirmationMethodType, DataType, OptionType, RefreshType, UserDataType, UserProps } from "../../data";
 
 type NewUser = {
   username: string,

@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
-import { GiHamburgerMenu} from 'react-icons/gi'
-import { useThemeContext } from '../../hooks/useThemeContext';
 import { ThemeContextType } from '../../posts';
-import { Components, NAVIGATE } from '../../utils/navigator';
+import { GiHamburgerMenu} from 'react-icons/gi';
 import { useSelector, useDispatch } from 'react-redux';
+import { NAVIGATE } from '../../utils/navigator';
+import { useThemeContext } from '../../hooks/useThemeContext';
 import { getTabCategory, setNavigation } from '../../features/story/navigationSlice';
 
 const list_style = 'cursor-pointer touch-pan-x whitespace-nowrap text-gray-500 active:text-gray-500 duration-200 ease-in-out';

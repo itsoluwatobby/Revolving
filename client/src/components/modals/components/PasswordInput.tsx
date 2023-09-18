@@ -1,8 +1,8 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
-import PasswordChecker from './PasswordChecker'
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { BsCheck } from 'react-icons/bs';
 import { FaTimes } from 'react-icons/fa';
+import PasswordChecker from './PasswordChecker';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 type PasswordCompoProps = {

@@ -1,13 +1,13 @@
-import { useClearTaskBinMutation, useGetTaskBinQuery, usePermanentlyDeleteTasksMutation, useRestoreTasksMutation } from "../../../app/api/taskApiSlice"
-import { useState, useEffect, useCallback } from "react"
-import { ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data"
-import { Theme, ThemeContextType } from "../../../posts"
-import { toast } from "react-hot-toast"
-import { useThemeContext } from "../../../hooks/useThemeContext"
-import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types"
-import { ErrorStyle, REFRESH_RATE } from "../../../utils/navigator"
-import BinContent from "./BinContent"
-import BinTop from "./BinTop"
+import BinTop from "./BinTop";
+import BinContent from "./BinContent";
+import { toast } from "react-hot-toast";
+import { useState, useEffect, useCallback } from "react";
+import { Theme, ThemeContextType } from "../../../posts";
+import { useThemeContext } from "../../../hooks/useThemeContext";
+import { ErrorStyle, REFRESH_RATE } from "../../../utils/navigator";
+import { ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data";
+import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { useClearTaskBinMutation, useGetTaskBinQuery, usePermanentlyDeleteTasksMutation, useRestoreTasksMutation } from "../../../app/api/taskApiSlice";
 
 type TaskBinProp = {
   userId: string,

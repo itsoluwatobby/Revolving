@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import { useGetStoriesQuery } from "../../app/api/storyApiSlice";
-import { PostType, ThemeContextType } from "../../posts";
-import { reduceLength } from "../../utils/navigator";
-import { useState, useEffect } from 'react';
-import { useThemeContext } from "../../hooks/useThemeContext";
 import PostImage from "../PostImages";
+import { Link } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { reduceLength } from "../../utils/navigator";
+import { PostType, ThemeContextType } from "../../posts";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { useGetStoriesQuery } from "../../app/api/storyApiSlice";
 
 export default function RightSection() {
   const { theme } = useThemeContext() as ThemeContextType

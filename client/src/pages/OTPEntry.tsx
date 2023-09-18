@@ -1,13 +1,12 @@
-
-import { toast } from 'react-hot-toast'
-import OTPComp from '../components/OTPComp'
-import { ErrorResponse } from '../data'
-import { useThemeContext } from '../hooks/useThemeContext'
-import { ThemeContextType } from '../posts'
-import { useEffect, useState } from 'react'
-import { useConfirmOTPMutation } from '../app/api/authApiSlice'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { SuccessStyle } from '../utils/navigator'
+import { ErrorResponse } from '../data';
+import { toast } from 'react-hot-toast';
+import { ThemeContextType } from '../posts';
+import { useEffect, useState } from 'react';
+import OTPComp from '../components/OTPComp';
+import { SuccessStyle } from '../utils/navigator';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useConfirmOTPMutation } from '../app/api/authApiSlice';
 
 const initialState = { 
   entry1: '', entry2: '', entry3: '', entry4: '', entry5: '', entry6: ''

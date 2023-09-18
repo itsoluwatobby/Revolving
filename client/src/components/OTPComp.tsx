@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState, ChangeEvent } from 'react'
-import { useThemeContext } from '../hooks/useThemeContext'
-import { ThemeContextType } from '../posts';
+import { toast } from 'react-hot-toast';
 import { BsCheck } from 'react-icons/bs';
 import { FaTimes } from 'react-icons/fa';
-import { useGenerateOTPMutation } from '../app/api/authApiSlice';
-import { IsLoadingSpinner } from './IsLoadingSpinner';
-import { toast } from 'react-hot-toast';
+import { ThemeContextType } from '../posts';
 import { DataType, ErrorResponse } from '../data';
 import { SuccessStyle } from '../utils/navigator';
+import { IsLoadingSpinner } from './IsLoadingSpinner';
+import { useThemeContext } from '../hooks/useThemeContext';
+import { useGenerateOTPMutation } from '../app/api/authApiSlice';
+import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 
 const initialState = { 
   entry1: '', entry2: '', entry3: '', entry4: '', entry5: '', entry6: ''

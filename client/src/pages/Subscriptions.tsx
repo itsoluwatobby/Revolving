@@ -1,10 +1,10 @@
-import { GetSubscriptionType } from "../data";
-import { useEffect, useState } from 'react';
-import { Link, useParams } from "react-router-dom"
-import { useGetSubscriptionsQuery } from "../app/api/usersApiSlice"
-import SubscriptionComp from "../components/subscription/SubscriptionComp";
-import { useThemeContext } from "../hooks/useThemeContext";
 import { ThemeContextType } from "../posts";
+import { useEffect, useState } from 'react';
+import { GetSubscriptionType } from "../data";
+import { Link, useParams } from "react-router-dom";
+import { useThemeContext } from "../hooks/useThemeContext";
+import { useGetSubscriptionsQuery } from "../app/api/usersApiSlice";
+import SubscriptionComp from "../components/subscription/SubscriptionComp";
 
 export default function Subscriptions() {
   const { userId } = useParams()
