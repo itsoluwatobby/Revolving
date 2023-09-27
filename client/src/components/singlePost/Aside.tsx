@@ -37,7 +37,7 @@ export default function Aside({ stories, setSidebar, sidebar, setIsBarOpen }: As
         </button>
       </div>
       {
-        stories?.length ? (
+        recentStories?.length ? (
           <ul className="flex flex-col font-sans text-sm p-1 justify-center rounded-md pb-3 transition-all duration-200 gap-1">
             {
               recentStories?.map(story => (

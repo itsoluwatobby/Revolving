@@ -52,7 +52,6 @@ export default function ChatBody() {
       isMounted = false
     }
   }, [openChat, getChats])
-  console.log(2)
 
   const chatContent = (
     getChats?.length && getChats.map(chat => (

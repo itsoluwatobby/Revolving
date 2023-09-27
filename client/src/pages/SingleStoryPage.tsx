@@ -72,9 +72,9 @@ export default function SingleStoryPage() {
             : null
           }
           <ArticleComp 
-            isError={isError} storyRef={storyRef} triggerPrint={triggerPrint}
             story={targetStory as PostType} bodyContent={bodyContent as JSX.Element[]}
             averageReadingTime={averageReadingTime} sidebar={sidebar} isLoading={isLoading} 
+            isError={isError} storyRef={storyRef} triggerPrint={triggerPrint} isBarOpen={isBarOpen}
           />
         </div>
         <BsArrowBarRight 

@@ -66,7 +66,7 @@ export const Navbar = () => {
         theme={theme} designatedPath={designatedPath}
         pathname={pathname} notintersecting={notintersecting}
       />
-      {/* {pathname === '/' ? <Drawdown rollout={rollout} /> : ''} */}
+      
       <Drawdown 
         rollout={rollout} storyId={storyId as string} 
         currentUser={currentUser as UserProps}
@@ -92,7 +92,6 @@ export const Navbar = () => {
           </ul>
         ): null
       }
-      {/* <Drawdown rollout={rollout} /> */}
     </nav>
   )
 }

@@ -6,6 +6,7 @@ import { MdAttachEmail } from 'react-icons/md';
 import { ImageTypeProp, Theme } from '../../posts';
 import { FaGithub, FaTwitterSquare } from 'react-icons/fa';
 import { checkCount, reduceLength } from '../../utils/navigator';
+import FollowUnFollow from '../singlePost/FollowUnFollow';
 
 type Props = {
   theme: Theme,
@@ -25,12 +26,13 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
       className="relative flex py-2 pt-3 md:mt-0 mt-16 flex-col w-full">
       {
         <>
+     
           <article className="flex items-center justify-between w-full md:flex-wrap lg:flex-nowrap">
-
+           
             <div className="flex flex-col gap-1 w-full flex-auto">
-
+             
               <div className={`${userProfile?.firstName ? 'flex' : 'flex'} flex-col gap-1.5 mb-2`}>
-
+               
                 <div className='flex items-center gap-2'>
                   <p className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'}`}>Name:</p>
                   <p className="font-medium capitalize cursor-pointer whitespace-pre-wrap tracking-wide">
@@ -38,21 +40,29 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
                     {reduceLength(userProfile?.lastName as string, 20, 'letter')}
                   </p>
                 </div>
-
+              
                 <div className='flex items-center gap-5 capitalize'>
+
                   <Link to={`/follows/${userId}`}>
-                    <p className='opacity-90 hover:underline underline-offset-2'>followers: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followers as string[])}</span></p>
+                    <p className='opacity-90 hover:underline underline-offset-2'>followers: &nbsp;<span className='opacity-100 font-medium'>{checkCount(userProfile?.followers as string[])}</span></p>
                   </Link>
                   <Link to={`/follows/${userId}`}>
-                    <p className='opacity-90 hover:underline underline-offset-2'>followings: &nbsp;<span className='opacity-100'>{checkCount(userProfile?.followings as string[])}</span></p>
+                    <p className='opacity-90 hover:underline underline-offset-2'>followings: &nbsp;<span className='opacity-100 font-medium'>{checkCount(userProfile?.followings as string[])}</span></p>
                   </Link>
 
                 </div>
 
-                <p className='flex items-center gap-2 opacity-90'>
-                  <span>Joined</span>
-                  <span>{format(userProfile?.registrationDate)}</span>
-                </p>
+                <div className='flex items-center gap-3'>
+                  <p className='flex items-center text-[13px] gap-1 opacity-90'>
+                    <span>Joined</span>
+                    <span className='opacity-100 font-medium'>{format(userProfile?.registrationDate)}</span>
+                  </p>
+                  
+                  <p className='flex items-center gap-1 text-[12px]'>
+                    <span className='opacity-95'>Last seen</span>
+                    <span className='font-medium'>{format(userProfile?.lastSeen)}</span>
+                  </p>
+                </div>
 
               </div>
               
@@ -79,8 +89,8 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
               </a>
 
             </div>
-
-            <div className={`flex-none w-[20%] md:translate-x-7 lg:translate-x-0 md:mt-6 lg:mt-0 ${userProfile?.stack?.length ? 'flex' : 'hidden'} items-center flex-col gap-3 mobile:-translate-x-5`}>
+    
+            <div className={`self-start md:mt-4 items-start gap-3 mobile:-translate-x-5`}>
 
               <Link to={`/subscriptions/${userProfile?._id}`} 
                 className={`${userId === currentUserId ? 'block' : 'hidden'}`}>
@@ -91,26 +101,32 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
                 </button>
               </Link>
 
-              <div className='flex flex-col gap-2 md:pl-2'>
-                <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
-                <div className={`stackflow overflow-y-scroll h-12 p-1 py-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
-                  {
-                    userProfile?.stack?.map(skill => (
-                      <p 
-                        key={skill}
-                        className="rounded-md hover:opacity-80 tracking-wide capitalize transition-all cursor-default">
-                          {skill}
-                      </p>
-                    ))
-                  }
+              <div className='flex flex-col justify-between gap-4 h-full'>
+
+                <FollowUnFollow userId={userProfile?._id} position={['profile']} />  
+
+                <div className={`${userProfile?.stack?.length ? 'flex' : 'hidden'} flex-col md:pl-2`}>
+                  <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
+                  <div className={`stackflow overflow-y-scroll h-12 p-1 py-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
+                    {
+                      userProfile?.stack?.map(skill => (
+                        <p 
+                          key={skill}
+                          className="rounded-md hover:opacity-80 tracking-wide capitalize transition-all cursor-default">
+                            {skill}
+                        </p>
+                      ))
+                    }
+                  </div>
                 </div>
+
               </div>
 
             </div>
-
+         
           </article>
-
-          <div className={`${userProfile?.hobbies?.length ? 'flex' : 'hidden'} py-2 lg:mt-6 flex-col`}>
+          
+          <div className={`${userProfile?.hobbies?.length ? 'flex' : 'hidden'} py-2 flex-col`}>
             <p>Hobbies:</p>
             <div className='flex items-center gap-2 flex-wrap'>
               {

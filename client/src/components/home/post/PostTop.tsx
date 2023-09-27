@@ -29,7 +29,6 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
   const [revealCard, setRevealCard] = useState<ChatOption>('Hide')
   const [hovering, setHovering] = useState<boolean>(false)
   const [onCard, setOnCard] = useState<boolean>(false)
-  const [intersect, setIntersect] = useState<boolean>(false)
   const dispatch = useDispatch()
   const cardRef = useRef<HTMLElement>(null)
   const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError }] = useDeleteStoryMutation()
@@ -38,21 +37,6 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
     return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
   }, [])
   const observerRef = useRef<HTMLDivElement>(null)
-
-  // const headingRef = useCallback((node: HTMLDivElement) => {
-  //   if(observerRef.current) observerRef.current.disconnect()
-  //   observerRef.current = new IntersectionObserver(entries => {
-  //     if(entries[0].isIntersecting){
-  //       setIntersect(true)
-  //     }
-  //     else setIntersect(false)
-  //   },
-  //   { threshold: 0,
-  //     //rootMargin: '-180px'
-  //   }
-  //   )
-  //   if(node) observerRef.current.observe(node as unknown as Element)
-  // }, [])
 
   const deleted = async(id: string) => {
     try{
@@ -97,9 +81,9 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
       ref={observerRef as React.LegacyRef<HTMLDivElement>}
       className={`maxmobile:text-base ${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
       <div 
-        // onClick={() => setOpen(false)}
         className='relative flex items-center gap-3'>
         <p 
+          onClick={() => setHovering(prev => !prev)}
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           className='capitalize font-sans maxmobile:text-base cursor-pointer hover:opacity-90 transition-all'>{
@@ -112,7 +96,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
           {story?.sharedId ? format(story?.sharedDate as string) : format(story?.createdAt)}
           {story?.sharedId ? <Link to={`/story/${story?._id}`} title="link to story" className="text-gray-400 cursor-pointer">shared</Link> : null}
         </p>
-        {userId == story?.userId && (
+        {(story?.sharedId ? userId === story?.sharerId : userId === story?.userId ) && (
           <FiMoreVertical
             onClick={() => setOpen(prev => !prev)}
             title='Options'
@@ -121,24 +105,11 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
           )
         }
       
-        {(userId == story?.userId || userId == story?.sharedId) &&
-          <p className={`absolute ${open ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-3 top-4 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'bg-slate-500 text-white' : 'border-gray-500 shadow-slate-800 bg-slate-900'}`}>
-              {!story?.sharedId &&
-                <span 
-                title='Edit post'
-                className={buttonOptClass(theme)}>
-                  <Link to={`/edit_story/${story?._id}`} >  
-                    Edit
-                  </Link>
-                </span>
-              }
-            <span 
-              onClick={() => deleted(story?._id)}
-              title='Delete post'
-              className={buttonOptClass(theme)}>
-              {story?.sharedId ? 'Unshare' : 'Delete'}
-            </span>
-          </p>
+        {(userId == story?.userId || userId == story?.sharerId) &&
+          <ActionModal  
+            theme={theme} story={story} open={open}
+            buttonOptClass={buttonOptClass} deleted={deleted}
+          />
         }
        
         <UserCard 
@@ -149,7 +120,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
         
       </div>
       
-      <div className={`flex flex-col w-full ${story?.sharedId ? 'shadow-inner shadow-slate-300 rounded-md p-1 pt-2' : ''} ${theme === 'light' ? 'shadow-slate-300' : 'dark:shadow-slate-700'}`}>
+      <div className={`flex flex-col w-full ${story?.sharedId ? 'shadow-inner shadow-slate-300 rounded-md p-1 pt-2' : ''} ${theme === 'light' ? (story?.sharedId ? 'shadow-slate-300 bg-slate-100' : '') : (story?.sharedId ? 'dark:shadow-slate-700 bg-slate-700' : '')}`}>
 
         <div 
           // onClick={() => setOpen(false)}
@@ -167,12 +138,12 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
 
           <p className="font-sans flex items-center text-sm gap-2">{format(story?.createdAt)}</p>
         
-          {!story?.sharedAuthor ?
+          {!story?.sharedAuthor  ?
             <UserCard 
               closeUserCard={closeUserCard}
               userId={story.userId} cardRef={cardRef as React.LegacyRef<HTMLElement>}
               setRevealCard={setRevealCard} revealCard={revealCard} setOnCard={setOnCard}
-            />
+            /> 
             : null 
           } 
         </div>
@@ -182,7 +153,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
         <Link to={`/story/${story?._id}`} >
           <p 
             onClick={openText}
-            className={`whitespace-pre-wrap text-justify text-sm first-letter:ml-3 first-letter:text-lg ${theme == 'light' ? 'text-black' : 'text-white'} first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
+            className={`whitespace-pre-wrap text-justify text-sm first-letter:ml-3 px-1 first-letter:text-lg ${theme == 'light' ? 'text-black' : 'text-white'} first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
               {bodyContent}
           </p>
         </Link> 
@@ -193,8 +164,33 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
   )
 }
 
-// function buttonOptClass(theme: Theme){
-//   return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
-// }
+type ActionModalProp = {
+  story: PostType,
+  open: boolean,
+  theme: Theme,
+  deleted: (id: string) => void
+  buttonOptClass: (theme: Theme) => string
+}
 
+const ActionModal = ({ story, open, theme, buttonOptClass, deleted }: ActionModalProp) => {
 
+  return (
+    <p className={`absolute ${open ? 'block' : 'hidden'} p-0.5 gap-0.5 shadow-lg transition-all right-3 top-4 flex flex-col items-center border border-1 rounded-md text-xs ${theme == 'light' ? 'bg-slate-500 text-white' : 'border-gray-500 shadow-slate-800 bg-slate-900'}`}>
+    {!story?.sharedId &&
+      <span 
+      title='Edit post'
+      className={buttonOptClass(theme)}>
+        <Link to={`/edit_story/${story?._id}`} >  
+          Edit
+        </Link>
+      </span>
+      }
+    <span 
+      onClick={() => deleted(story?._id)}
+      title='Delete post'
+      className={buttonOptClass(theme)}>
+      {story?.sharedId ? 'Unshare' : 'Delete'}
+    </span>
+  </p>
+  )
+}

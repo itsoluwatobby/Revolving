@@ -32,7 +32,7 @@ export default function PostBase({ story, averageReadingTime, page }: PostButtom
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
-      (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
+      (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
       (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`,ErrorStyle)
     }
   }
@@ -45,7 +45,7 @@ export default function PostBase({ story, averageReadingTime, page }: PostButtom
     }
     catch(err: unknown){
       const errors = sharedError as Partial<ErrorResponse>
-      (!errors || errors?.originalStatus == 401) && setLoginPrompt('Open')
+      (!currentUserId || !errors || errors?.originalStatus == 401) && setLoginPrompt('Open')
       isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

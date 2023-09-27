@@ -3,6 +3,8 @@ const SocialMedia = new Schema({
     name: { type: String, default: '' },
     link: { type: String, default: '' }
 });
+const EachSubscriptions = { createdAt: String, subscriberId: String };
+const SubscriptionsTo = { createdAt: String, subscribeRecipientId: String };
 const USERSCHEMA = new Schema({
     username: { type: String, required: [true, 'Username is required'], trim: true },
     password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
@@ -38,8 +40,8 @@ const USERSCHEMA = new Schema({
     edited: { type: Boolean, default: false },
     gender: { type: String, enum: ['Female', 'Male', 'Others', 'Undecided'] },
     taskIds: { type: Array, default: [] },
-    notificationSubscribers: { type: Array, default: [] },
-    subscribed: { type: Array, default: [] },
+    notificationSubscribers: [EachSubscriptions],
+    subscribed: [SubscriptionsTo],
     stack: { type: Array, default: [] },
     socialMediaAccounts: [SocialMedia],
     country: { type: String, default: '' },

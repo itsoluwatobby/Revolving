@@ -148,8 +148,10 @@ interface TaskProp{
   updatedAt?: string,
 }
 
+type Positions = 'navbar' | 'profile' | 'others'
+
 type HoverType = 'unfollow' | 'following'
-type PositionType = 'navbar' | 'others'
+type PositionType = Positions[]
 type OptionType = 'EMAIL' | 'DIRECT'
 
 type EnlargeCompo = {
@@ -178,6 +180,9 @@ type SocialMediaAccoutProp = {
   name: string,
   link: string
 }
+
+type EachSubs  =  { createdAt: string, subscriberId: string }
+type SubscriptionTo  =  { createdAt: string, subscribeRecipientId: string }
 
 interface UserProps{
   _id: string,
@@ -210,11 +215,23 @@ interface UserProps{
   stack: string[],
   country: string,
   socialMediaAccounts: SocialMediaAccoutProp[],
-  notificationSubscribers: string[],
-  subscribed: string[],
+  notificationSubscribers: EachSubs[],
+  subscribed: SubscriptionTo[],
   createdAt: string,
   updatedAt: string
 }
+
+type SubUser = {
+  _id: string, 
+  subDate: string,
+  lastName: string, 
+  firstName: string, 
+  description: string, 
+  followers: string[], 
+  followings: string[], 
+  displayPicture: string,
+}
+
 
 type ChatProps = {
   _id?: string,
@@ -265,8 +282,8 @@ type GetFollowsType = {
 }
 
 type GetSubscriptionType = {
-  subscriptions: Partial<UserProps[]>,
-  subscribed: Partial<UserProps[]>
+  subscriptions: SubUser[],
+  subscribed: SubUser[]
 }
 
 type ApiSliceType = {

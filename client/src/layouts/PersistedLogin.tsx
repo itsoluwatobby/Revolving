@@ -36,29 +36,23 @@ export const PersistedLogin = () => {
   }, [])
 
   return (
-    <main className={`welcome flex items-center h-full`}>
-
-      <LeftSection />
-
-      <div className='h-full w-full md:w-full'>
-        {
-          !token ? 
-            <Outlet />
-            :
-            isLoading ?  
-              <IsLayoutLoading />
-            :
-            (
-              (!persistLogin && token) ? 
-                <Outlet />
-                :
-              (token && persistLogin) ? 
-                <Outlet />
-                  : isError && <Navigate to='/signIn' state={{ from: location }} replace />
-            )
-        }
-      </div>
-
+    <main className={`welcome w-full h-full`}>   
+      {
+        !token ? 
+          <Outlet />
+          :
+          isLoading ?  
+            <IsLayoutLoading />
+          :
+          (
+            (!persistLogin && token) ? 
+              <Outlet />
+              :
+            (token && persistLogin) ? 
+              <Outlet />
+                : isError && <Navigate to='/signIn' state={{ from: location }} replace />
+          )
+      }
     </main>
   )
 }

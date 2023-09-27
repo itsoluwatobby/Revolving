@@ -20,7 +20,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const buttonClass = useCallback((isMutating: boolean, theme?: Theme, position?: PositionType) => {
     return `
-    rounded-md p-1 pl-1.5 pr-1.5 ${position == 'others' ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
+    ${position?.includes('profile') ? 'rounded-sm p-2 px-0 text-sm' : 'rounded-md p-1 px-1.5'} ${position?.includes('others') ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
     `
   }, [])
 
@@ -38,7 +38,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
     }
     catch(err: unknown){
       const errors = followError as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+     (!currentUserId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
       isFollowError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'

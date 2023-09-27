@@ -6,6 +6,7 @@ type ChildrenProp = {
 }
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
+type IsIntersectingType = 'INTERSECTING' | 'NOT_INTERSECTING'
 
 type MakeToButtom = PostType & Pick<SharedProps, 'sharedLikes'>
 type CodeProps =  { 
@@ -143,9 +144,9 @@ type ThemeContextType = {
   isPresent: ConflictType,
   loginPrompt: ChatOption,
   openEditPage: ChatOption,
-  notintersecting: ChatOption,
   openComment: CommentOptionProp,
   revealEditModal: ImageTypeProp, 
+  notintersecting: IsIntersectingType,
   changeTheme: (mode: string) => void,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>,
@@ -160,7 +161,7 @@ type ThemeContextType = {
   setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
   setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
   setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
-  setNotIntersecting: React.Dispatch<React.SetStateAction<ChatOption>>
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
+  setNotIntersecting: React.Dispatch<React.SetStateAction<IsIntersectingType>>
 }

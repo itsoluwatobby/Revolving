@@ -7,7 +7,8 @@ const SocialMedia: Schema = new Schema(
     link: { type: String, default: '' }
   }
 ) 
-
+const EachSubscriptions  =  { createdAt: String, subscriberId: String }
+const SubscriptionsTo  =  { createdAt: String, subscribeRecipientId: String }
 
 const USERSCHEMA: Schema = new Schema(
   {
@@ -45,8 +46,8 @@ const USERSCHEMA: Schema = new Schema(
     edited: { type: Boolean, default: false },
     gender: { type: String, enum: ['Female', 'Male', 'Others', 'Undecided'] },
     taskIds: { type: Array, default: [] },
-    notificationSubscribers: { type: Array, default: [] },
-    subscribed: { type: Array, default: [] },
+    notificationSubscribers: [EachSubscriptions],
+    subscribed: [SubscriptionsTo],
     stack: { type: Array, default: [] },
     socialMediaAccounts: [SocialMedia],
     country: { type: String, default: '' },

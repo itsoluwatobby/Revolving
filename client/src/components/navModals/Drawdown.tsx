@@ -27,16 +27,16 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
   const modalClass = useCallback((theme: Theme) => { 
-    return `hover:scale-[1.01] hover:border-b-2 whitespace-nowrap border-none transition-all hover:opacity-90 cursor-pointer midscreen:rounded-sm midscreen:p-3 capitalize flex items-center p-1 midscreen:drop-shadow-2xl midscreen:w-full midscreen:grid midscreen:place-content-center midscreen:border-b-[1px] midscreen:bg-opacity-80 midscreen:hover:opacity-90 ${theme == 'light' ? 'midscreen:hover:bg-slate-200' : 'midscreen:hover:bg-slate-600'}`
+    return `hover:scale-[1.01] hover:border-b-2 whitespace-nowrap border-none transition-all hover:opacity-90 cursor-pointer midscreen:rounded-sm midscreen:p-4 capitalize flex items-center p-1 midscreen:drop-shadow-2xl midscreen:w-full midscreen:grid midscreen:place-content-center midscreen:border-b-[1px] midscreen:bg-opacity-80 midscreen:hover:opacity-90 ${theme == 'light' ? 'midscreen:hover:bg-slate-200' : 'midscreen:hover:bg-slate-600'}`
   }, [])
 
   const arrow_class = useCallback(() => {
     return ("text-xl text-gray-700 cursor-pointer shadow-lg hover:scale-[1.05] active:scale-[0.98] hover:text-gray-600 transition-all ease-in-out")
   }, [])
-// sm:flex-auto
+// lg:-translate-x-24 lg:w-[13%]
   return (
     <div 
-      className={`midscreen:fixed midscreen:h-full midscreen:z-50 midscreen:rounded-md tracking-widest ${rollout ? '' : 'midscreen:-translate-x-96 midscreen:hidden'} midscreen:right-0 midscreen:w-full midscreen:bg-opacity-80 midscreen:flex midscreen:flex-col midscreen:items-center midscreen:top-0 text-sm ${theme == 'light' ? 'midscreen:bg-slate-100' : 'midscreen:bg-slate-800'} transition-all last:border-0 p-2 midscreen:p-0 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] flex-auto lg:-translate-x-24 lg:w-[13%] justify-between`}>
+      className={`midscreen:fixed midscreen:h-full midscreen:z-50 midscreen:rounded-md tracking-widest ${rollout ? '' : 'midscreen:-translate-x-96 midscreen:hidden'} midscreen:right-0 midscreen:w-full midscreen:bg-opacity-80 midscreen:flex midscreen:flex-col midscreen:items-center midscreen:top-0 text-sm ${theme == 'light' ? 'midscreen:bg-slate-100' : 'midscreen:bg-slate-800'} transition-all last:border-0 p-2 midscreen:p-0 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] justify-between`}>
       <div className={`md:flex-auto md:block sm:hidden midscreen:font-medium ${theme === 'light' ? 'midscreen:bg-gray-400' : 'midscreen:bg-slate-900'} midscreen:self-end midscreen:flex midscreen:flex-col midscreen:gap-3 midscreen:h-full midscreen:w-1/3`}>
 
         <div className="midscreen:flex flex-row-reverse items-center justify-between p-1 px-2 sm:hidden">
@@ -103,6 +103,19 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
             : null
           }
           {
+            (userRoles?.length && pathname !== `/notifications/${userId}`) ?
+              (
+                <Link 
+                  onClick={() => setRollout(false)}
+                  to={`/notifications/${userId}`}
+                  className={modalClass(theme)}
+                >
+                  Notifications
+                </Link>
+              )
+            : null
+          }
+          {
             (userRoles?.length && pathname !== `/taskManager/${userId}`) ?
               (
                 <Link 
@@ -111,7 +124,6 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                   className={modalClass(theme)}
                 >
                   Task manager
-                  {/* <IoIosArrowDown /> */}
                 </Link>
               )
             : null

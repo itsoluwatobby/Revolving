@@ -4,7 +4,7 @@ import PostImage from '../PostImages';
 import { Link } from 'react-router-dom';
 import Comments from '../comments/Comments';
 import FollowUnFollow from './FollowUnFollow';
-import { useRef, useCallback, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { MdOutlineInsertComment } from 'react-icons/md';
 import { PostType, ThemeContextType } from '../../posts';
@@ -14,11 +14,13 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 
 type ArticleProps = {
   story: PostType,
   sidebar: boolean,
   isError: boolean,
+  isBarOpen: boolean,
   isLoading: boolean,
   bodyContent: JSX.Element[],
   averageReadingTime: string,
@@ -26,25 +28,18 @@ type ArticleProps = {
   storyRef: React.RefObject<HTMLDivElement>,
 }
 
-export default function ArticleComp({ isError, story, storyRef, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint }: ArticleProps) {
-  const { theme, notintersecting, setNotIntersecting, setOpenComment } = useThemeContext() as ThemeContextType
+export default function ArticleComp({ isError, story, storyRef, isBarOpen, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint }: ArticleProps) {
+  const { theme, setNotIntersecting, setOpenComment } = useThemeContext() as ThemeContextType
   const [reveal, setReveal] = useState<boolean>(false)
-  const observerRef = useRef<IntersectionObserver>(null)
+  const { isIntersecting, observerRef } = useRevolvingObserver({ screenPosition: '-180px' })
   
-  const headingRef = useCallback((node: HTMLHeadingElement) => {
-    if(observerRef.current) observerRef.current.disconnect()
-    observerRef.current = new IntersectionObserver(entries => {
-      if(entries[0].isIntersecting){
-        setNotIntersecting('Hide')
-      }
-      else setNotIntersecting('Open')
-    },
-    { threshold: 0,
-      rootMargin: '-180px'
+  useEffect(() => {
+    let isMounted = true
+    isMounted ? setNotIntersecting(isIntersecting) : null
+    return () => {
+      isMounted = false
     }
-    )
-    if(node) observerRef.current.observe(node as unknown as Element)
-  }, [setNotIntersecting])
+  }, [isIntersecting, setNotIntersecting])
 
   const customCodeStyle = { 
     'width': '100%',
@@ -74,7 +69,7 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
           <span>.</span>
           <p>{format(story?.createdAt, 'en-US')}</p>
 
-          <FollowUnFollow userId={story?.userId} position='others' />
+          <FollowUnFollow userId={story?.userId} position={['others']} />
         </div>
 
         <BsFillFileEarmarkPdfFill 
@@ -82,7 +77,7 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
           onMouseEnter={() => setReveal(true)}
           onMouseLeave={() => setReveal(false)}
           onClick={triggerPrint}
-          className='text-3xl fixed right-4 cursor-pointe opacity-50 hover:opacity-80 hover:scale-[1.01] active:opacity-100 active:scale-1 transition-all' 
+          className={`text-3xl fixed right-4 opacity-50 hover:opacity-80 hover:scale-[1.01] active:opacity-100 active:scale-1 transition-all`} 
         />
       
       </div>
@@ -92,8 +87,8 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
       >
 
         <h1 
-          ref={headingRef as React.LegacyRef<HTMLHeadingElement>}
-          className='whitespace-pre-wrap font-bold text-3xl uppercase text-justify break-all py-1'>{story?.title}
+          ref={observerRef as React.LegacyRef<HTMLHeadingElement>}
+          className='whitespace-pre-wrap font-bold text-3xl uppercase break-keep py-1'>{story?.title}
         </h1>
         <p 
           className={`whitespace-pre-wrap font-sans tracking-wider text-justify`}>
@@ -117,7 +112,7 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
         }
       </div>
 
-      <div className={`sticky z-50 bottom-3 ${reveal ? 'hidden' : 'flex'} shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && notintersecting === 'Hide') ? 'scale-100' : 'scale-0'}`}> 
+      <div className={`sticky z-50 bottom-3 ${reveal ? 'hidden' : 'flex'} shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && isIntersecting === 'INTERSECTING') ? 'scale-100' : 'scale-0'}`}> 
         <div className={`flex flex-wrap items-center justify-between w-full text-gray-300 text-xs`}>
           <p>{averageReadingTime} read</p>
 
@@ -133,7 +128,7 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
 
           <LikeStory 
             story={story}
-            position='others' 
+            position={['others']} 
           />
           {story?.edited && <p className='text-center text-xs'>edited {format(story?.updatedAt)}</p>}
         </div>
@@ -144,7 +139,7 @@ export default function ArticleComp({ isError, story, storyRef, bodyContent, sid
 
   return (
     <article 
-      className={`app mt-2 flex-grow flex flex-col gap-3 overflow-y-scroll ${story?.fontFamily} p-2 px-4 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
+      className={`app mt-2 flex-grow flex flex-col gap-3 ${isBarOpen ? '' : 'px-32 midscreen:px-6 mobile:px-4'} overflow-y-scroll ${story?.fontFamily} p-2 px-6 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
         {content}
         <Comments />
       </article>

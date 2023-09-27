@@ -2,7 +2,7 @@ import EditModal from './EditModal';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import DPComponent from './DPComponent';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
 import { ErrorResponse, UserProps } from '../../data';
 import { IsLoadingSpinner } from '../IsLoadingSpinner';
 import { MdNotificationsActive } from 'react-icons/md';
@@ -29,8 +29,18 @@ export default function ProfileTop({ userId, userProfile, imageType, handleImage
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [subscribe, { isLoading: isLoadingSubscribe }] = useSubscribeMutation()
   const { theme, revealEditModal, setRevealEditModal } = useThemeContext() as ThemeContextType
+  const [hasUserId, setHasUserId] = useState<boolean>(false)
 
-  console.log(userProfile)
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && currentUserId !== userProfile?._id){
+      setHasUserId(() => userProfile?.notificationSubscribers?.find(sub => sub?.subscriberId === currentUserId) ? true : false)
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [userProfile?._id, userProfile?.notificationSubscribers, currentUserId])
+
   const subscribeToNotification = async() => {
     if(isLoadingSubscribe) return
     try{
@@ -107,7 +117,7 @@ export default function ProfileTop({ userId, userProfile, imageType, handleImage
             <MdNotificationsActive
               title='Notification'
               onClick={subscribeToNotification}
-              className={`text-2xl ${userProfile ? 'block' : 'hidden'} z-10 ${isLoadingSubscribe ? 'animate-bounce' : 'animate-none'} cursor-pointer ${userProfile?.notificationSubscribers?.includes(currentUserId) ? 'text-green-500' : 'text-gray-400'} hover:scale-[1.02] active:scale-[1] transition-all`}
+              className={`text-2xl ${userProfile ? 'block' : 'hidden'} z-10 ${isLoadingSubscribe ? 'animate-bounce' : 'animate-none'} cursor-pointer ${hasUserId ? 'text-green-500' : 'text-gray-400'} hover:scale-[1.02] active:scale-[1] transition-all`}
             />
         }
       </div>

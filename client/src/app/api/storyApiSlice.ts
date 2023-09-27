@@ -85,7 +85,10 @@ export const storyApiSlice = apiSlice.injectEndpoints({
     getStoriesByCategory: builder.query<PostType[], Categories>({
       query: (category) => `story/category?category=${category}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
-        const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
+        const mapStories = baseQueryReturnValue?.data?.map(story => {
+          return { ...story, mutualDate: story?.sharedDate ? story?.sharedDate : story?.createdAt }
+        })
+        const response = mapStories?.sort((prev, next) => next?.mutualDate.localeCompare(prev?.mutualDate))
         return response
       }, 
       providesTags:(result) => providesTag(result as PostType[], 'STORY')

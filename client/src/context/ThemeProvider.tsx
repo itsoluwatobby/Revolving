@@ -1,6 +1,6 @@
 import { EnlargeCompo } from '../data';
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, CommentOptionProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, ImageTypeProp } from '../posts';
+import { ChatOption, ChildrenProp, CommentOptionProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
@@ -28,7 +28,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [revealEditModal, setRevealEditModal] = useState<ImageTypeProp>('NIL');
 
   const [editing, setEditing] = useState<EditingProp>({editing: false, codeId: ''});
-  const [notintersecting, setNotIntersecting] = useState<ChatOption>('Open')
+  const [notintersecting, setNotIntersecting] = useState<IsIntersectingType>('NOT_INTERSECTING')
   const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
 
   const changeTheme = (mode: string) => {
