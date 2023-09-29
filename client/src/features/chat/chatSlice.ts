@@ -35,7 +35,6 @@ const chatSlice = createSlice({
       if(state?.chats?.length == 2){
         state.chats = [...state.chats, defaultMessages[1]]
       }
-      console.log(state.chats)
     },
     setChatMessages: (state, action: PayloadAction<ChatProps[]>) => {
       

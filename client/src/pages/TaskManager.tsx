@@ -14,6 +14,7 @@ import { setAllTasks } from "../features/story/taskManagerSlice";
 import { SkeletonTask } from "../components/skeletons/SkeletonTask";
 import { ViewSingleTask } from "../components/taskManager/ViewSingleTask";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { LeftSection } from "../components/LeftSection";
 
 type TogglerPosition = 'LEFT' | 'RIGHT'
 export default function TaskManager() {
@@ -85,45 +86,55 @@ export default function TaskManager() {
   )
 
   return (
-    <main className={`taskManager_page w-full flex flex-col pt-2`}>
-      <section className="relative flex-grow flex justify-between p-2">
-        <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-[75%] ${toggleButton === 'LEFT' ? 'flex mobile:flex' : 'flex mobile:hidden'} flex-col maxscreen:items-center gap-3 h-[28rem] box-border`}>
+    <main className={`w-full flex`}>
+      
+      <LeftSection />
 
-          <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
-          <section className={`hidebars relative shadow-md shadow-slate-800 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400`}>
-            <Form 
-              currentUserId={userId as string}
-            />
-            <div className={`taskbars overflow-y-scroll p-1 flex flex-col gap-2 h-full w-full`}>
-              {taskContent}
-            </div>
-            <ViewSingleTask 
-              theme={theme}
-              viewSingle={viewSingle}
-              setViewSingle={setViewSingle} 
-            />
-          </section>
-        </div>
+      <div className={`taskManager_page w-full flex flex-col pt-2`}>
+        <section className="relative flex-grow flex justify-between p-2">
 
-        <div className={`flex-none p-2 pt-6 mobile:pt-14 mobile:w-[95%] mobile:translate-x-2 mobile:items-center rounded-md w-[40%] h-[28rem] ${toggleButton === 'RIGHT' ? 'flex mobile:flex' : 'flex mobile:hidden'}`}>
-          <Taskbin 
-            userId={userId as string}
-          />
-        </div>
-      {/* Toggler Button */}
-      <div 
-        className={`absolute hidden mobile:flex w-14 h-7 p-0.5 rounded-full left-5 top-7 items-center ${toggleButton === 'LEFT' ? 'justify-start bg-slate-500' : 'justify-end bg-green-700'} transition-all`}>
-        <p 
-          title={toggleButton === 'LEFT' ? 'View Bin' : 'View Tasks'}
-          onClick={() => setToggleButton(prev => prev === 'LEFT' ? prev = 'RIGHT' : prev = 'LEFT')}  
-          className={`w-1/2 h-full ${toggleButton === 'LEFT' ? 'bg-white' : 'bg-gray-200'} shadow-2xl cursor-pointer transition-all hover:bg-opacity-80 active:bg-opacity-100 rounded-full`}
+          <div className={`flex-grow ${theme == 'light' ? 'bg-slate-50' : ''} p-2 rounded-md w-[75%] ${toggleButton === 'LEFT' ? 'flex mobile:flex' : 'flex mobile:hidden'} flex-col maxscreen:items-center gap-3 h-[28rem] box-border`}>
+
+            <h2 className="font-bold text-4xl text-center sm:text-left">Tasks Manager</h2>
+            <section className={`hidebars relative shadow-md shadow-slate-800 max-h-96 flex flex-col gap-2 w-[95%] sm:w-3/4 mobile:w-full pb-1.5 rounded-lg border border-dotted border-slate-400`}>
+              <Form 
+                currentUserId={userId as string}
+              />
+              <div className={`taskbars overflow-y-scroll p-1 flex flex-col gap-2 h-full w-full`}>
+                {taskContent}
+              </div>
+              <ViewSingleTask 
+                theme={theme}
+                viewSingle={viewSingle}
+                setViewSingle={setViewSingle} 
+              />
+            </section>
+          </div>
+
+          <div className={`flex-none p-2 pt-6 mobile:pt-14 mobile:w-[95%] mobile:translate-x-2 mobile:items-center rounded-md w-[40%] h-[28rem] ${toggleButton === 'RIGHT' ? 'flex mobile:flex' : 'flex mobile:hidden'}`}>
+            <Taskbin 
+              userId={userId as string}
+            />
+          </div>
+          {/* Toggler Button */}
+          <div 
+            className={`absolute hidden mobile:flex w-14 h-7 p-0.5 rounded-full left-5 top-7 items-center ${toggleButton === 'LEFT' ? 'justify-start bg-slate-500' : 'justify-end bg-green-700'} transition-all`}>
+            <p 
+              title={toggleButton === 'LEFT' ? 'View Bin' : 'View Tasks'}
+              onClick={() => setToggleButton(prev => prev === 'LEFT' ? prev = 'RIGHT' : prev = 'LEFT')}  
+              className={`w-1/2 h-full ${toggleButton === 'LEFT' ? 'bg-white' : 'bg-gray-200'} shadow-2xl cursor-pointer transition-all hover:bg-opacity-80 active:bg-opacity-100 rounded-full`}
+            />
+          </div>
+
+        </section>
+
+        <Footer 
+          tasks={tasks}
+          userId={userId as string}
         />
-      </div>
-      </section>
-      <Footer 
-        tasks={tasks}
-        userId={userId as string}
-      />
+
+    </div>
+
     </main>
   )
 }

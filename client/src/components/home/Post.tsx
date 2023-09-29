@@ -12,9 +12,10 @@ import { useAverageReadTimePerStory } from '../../hooks/useAverageReadTimePerSto
 type Props = {
   story: PostType,
   page?: PageType,
+  observerRef?: React.LegacyRef<HTMLElement>
 }
 
-export const Post = ({ story, page }: Props) => {
+export const Post = ({ story, page, observerRef }: Props) => {
   const [open, setOpen] = useState<boolean>(false)
   const averageReadingTime = useAverageReadTimePerStory(story?.body) as string;
   // const end = averageReadingTime.split(' ')[1]
@@ -34,6 +35,7 @@ export const Post = ({ story, page }: Props) => {
   
   return (
     <article 
+      ref={observerRef as React.LegacyRef<HTMLElement>}
       className={`${story?.fontFamily} ${page === 'PROFILE' ? '' : ''} flex flex-col gap-1 text-xs sm:w-full min-w-[58%]`}>
       <PostTop 
         open={open} setOpen={setOpen} openText={openText}

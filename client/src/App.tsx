@@ -28,6 +28,7 @@ import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { selectCurrentRoles } from "./features/auth/authSlice";
+import Notifications from "./pages/Notifications";
  
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
@@ -57,6 +58,7 @@ export const App = () => {
             <Route path="edit_story/:storyId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="follows/:userId" element={<Followers />} />
+            <Route path="notifications/:userId" element={<Notifications />} />
 
             <Route element={<ProtectedRoute roles={user_roles}/>}>
 

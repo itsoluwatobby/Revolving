@@ -9,7 +9,7 @@ import { useUpdateInfoMutation } from '../../app/api/usersApiSlice';
 import { useConfirmPasswordMutation } from '../../app/api/authApiSlice';
 import { ChangeEvent, useState, useEffect, useRef, useCallback } from 'react';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
-import { ErrorResponse, Gender, SocialMediaAccoutProp, UserProps } from '../../data';
+import { Entries, ErrorResponse, Gender, InitEntriesType, InitPrevEntriesType, SocialMediaAccoutProp, UserProps, ValueType } from '../../data';
 import { ChatOption, ImageTypeProp, NameType, TargetImageType, Theme } from '../../posts';
 
 type UserInputsProps = {
@@ -25,8 +25,12 @@ type UserInputsProps = {
 }
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
+
+const initPrevEntries = { prevHobby: '', prevStack: '', prevSocialName: '' }
+
 const initUserState = { username: '', firstName: '', lastName: '', country: '', description: '', hobbies: [] as string[], gender: 'Undecided' as Gender, stack: [] as string[], socialMediaAccounts: [] as SocialMediaAccoutProp[]}
-const initEntries = {hobbiesEntry: '', stackEntry: '' }
+
+const initEntries = { hobbiesEntry: '', stackEntry: '', socialMediaEntry: '', socialMediaName: '' }
 const initPasswordConfig = { match: false, validPassword: false, password: '', confirmPassword: '' }
 export default function EditUserInputs({ theme, userProfile, imageType, setImage, clearPhoto, isLoading, isLoadingDelete, isLoadingUpdate, setLoginPrompt }: UserInputsProps) {
   const [errorMsg, setErrorMsg] = useState<string>('')
@@ -36,12 +40,17 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
   const RequiredGenders = ['Male', 'Female', 'Others', 'Undecided']
   const [currentPassword, setCurrentPassword] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
-  const [arrayEntry, setArrayEntry] = useState<typeof initEntries>(initEntries)
+  const [arrayEntry, setArrayEntry] = useState<InitEntriesType>(initEntries)
   const [userDetails, setUserDetails] = useState<Partial<UserProps>>(initUserState)
-  const [inputRef1, inputRef2] = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
+  const [inputRef0, inputRef01, inputRef1, inputRef2] = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
   const [passwordConfig, setPasswordConfig] = useState<typeof initPasswordConfig>(initPasswordConfig)
   const [upDateUserInfo, { isLoading: isLoadingUserInfo, isError: isErrorUserInfo, error }] = useUpdateInfoMutation()
   const [confirmCurrentPassword, { isLoading: isLoadingConfirmation, isError, isSuccess, isUninitialized }] = useConfirmPasswordMutation()
+  const [prevEntries, setPrevEntries] = useState<InitPrevEntriesType>(initPrevEntries)
+  const NameValues = ['socialMediaName', 'socialMediaEntry', 'hobbiesEntry', 'stackEntry'] as const
+  const scrollRef0 = useCallback((node: Element) => {
+    node ? node?.scrollIntoView({ behavior: 'smooth'}) : null
+  }, [])
   const scrollRef1 = useCallback((node: Element) => {
     node ? node?.scrollIntoView({ behavior: 'smooth'}) : null
   }, [])
@@ -51,7 +60,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
 
   const stringVals = ['username', 'firstName', 'lastName', 'country']
 
-  const { stackEntry, hobbiesEntry } = arrayEntry
+  const { stackEntry, hobbiesEntry, socialMediaEntry, socialMediaName } = arrayEntry
 
   const { match, validPassword, password, confirmPassword } = passwordConfig
   const { username, firstName, lastName, country, description, hobbies, gender, stack, socialMediaAccounts } = userDetails
@@ -68,7 +77,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name
     const value = event.target.value
-    if(name === 'hobbiesEntry' || name === 'stackEntry'){
+    if(NameValues?.includes(name as (Entries | ValueType))){
       setArrayEntry(prev => ({...prev, [name]: value}))
     }
     else if(stringVals.includes(name)){
@@ -76,24 +85,37 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     }
   }
 
-  const addToArray = (type: string) => {
+  const addToArray = (type: Entries) => {
     if(type === 'hobbiesEntry'){
       if(!hobbiesEntry || (hobbies as string[])?.length >= 5) return
-      const filteredHobbies = hobbies?.filter(hobby => hobby?.toLowerCase() !== hobbiesEntry.toLowerCase()) as string[]
+      const filteredHobbies = hobbies?.filter(hobby => hobby?.toLowerCase() !== hobbiesEntry?.toLowerCase())?.filter(hobby => hobby?.toLowerCase() !== prevEntries?.prevHobby?.toLowerCase()) as string[]
+      console.log(filteredHobbies)
       setUserDetails(prev => ({...prev, hobbies: [...filteredHobbies, hobbiesEntry]}))
       setArrayEntry(prev => ({...prev, [type]: ''}))
       if(inputRef1?.current) inputRef1.current.focus()
     }
     else if(type === 'stackEntry'){
-      if(!stackEntry || (stack as string[])?.length > 10) return
-      const filteredStacks = stack?.filter(stk => stk?.toLowerCase() !== stackEntry.toLowerCase()) as string[]
+      if(!stackEntry || (stack as string[])?.length >= 10) return
+      const filteredStacks = stack?.filter(stk => stk?.toLowerCase() !== stackEntry.toLowerCase())?.filter(stack => stack?.toLowerCase() !== prevEntries?.prevStack?.toLowerCase()) as string[]
       setUserDetails(prev => ({...prev, stack: [...filteredStacks, stackEntry]}))
       setArrayEntry(prev => ({...prev, [type]: ''}))
       if(inputRef2?.current) inputRef2.current.focus()
     }
+    else if(type === 'socialMediaEntry'){
+      if((socialMediaAccounts as SocialMediaAccoutProp[])?.length >= 3) return
+      if(!socialMediaName) inputRef01.current ? inputRef01.current.focus() : null
+      else if(!socialMediaEntry) inputRef0.current ? inputRef0.current.focus() : null
+      else{
+        const newMedia: SocialMediaAccoutProp = { name: socialMediaName, link: socialMediaEntry }
+        const filteredAccounts = socialMediaAccounts?.filter(media => media?.name?.toLowerCase() !== socialMediaName.toLowerCase() || media?.link?.toLowerCase() !== socialMediaEntry.toLowerCase())?.filter(media => media?.name?.toLowerCase() !== prevEntries?.prevSocialName?.toLowerCase()) as SocialMediaAccoutProp[]
+        setUserDetails(prev => ({...prev, socialMediaAccounts: [...filteredAccounts, newMedia]}))
+        setArrayEntry(prev => ({...prev, socialMediaEntry: '', socialMediaName: ''}))
+        if(inputRef0?.current) inputRef0.current.focus()
+      }
+    }
   }
 
-  const removeFromArray = (name: string, type: string) => {
+  const removeFromArray = (name: string, type: Entries) => {
     if(type === 'hobbiesEntry'){
       const filteredHobbies = hobbies?.filter(hobby => hobby?.toLowerCase() !== name.toLowerCase()) as string[]
       setUserDetails(prev => ({...prev, hobbies: [...filteredHobbies]}))
@@ -103,6 +125,11 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
       const filteredStacks = stack?.filter(stk => stk?.toLowerCase() !== name.toLowerCase()) as string[]
       setUserDetails(prev => ({...prev, stack: [...filteredStacks]}))
       if(inputRef2?.current) inputRef2.current.focus()
+    }
+    else if(type === 'socialMediaEntry'){
+      const filteredAccounts = (socialMediaAccounts as SocialMediaAccoutProp[])?.filter(media => media?.name?.toLowerCase() !== name.toLowerCase())
+      setUserDetails(prev => ({...prev, socialMediaAccounts: [...filteredAccounts]}))
+      if(inputRef0?.current) inputRef0.current.focus()
     }
   }
 
@@ -305,33 +332,31 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
           </div>
 
         </div>
-
-        <div className='flex flex-col mobile:w-full w-7/12 md:w-4/6 p-2 gap-y-2 mt-1'> 
-          <h3 className='text-base font-medium capitalize'>Social medial links</h3>
-          <div className='flex flex-col md:flex-row gap-y-2 gap-x-2'> 
-            <InputField title='Name'
-              value={username as string || ''} handleChange={handleChange}
-              name='name' placeholder='media name' inputType='text' theme={theme}
-            />
-            <InputField title='Link'
-              value={country as string || ''} handleChange={handleChange}
-              name='link' placeholder='media link' inputType='text' theme={theme}
-            />
-          </div>
-        </div>
         
         <ArrayComponent 
-          addToArray={addToArray} inputRef={inputRef1} maxLetter={20} max={5}
-          theme={theme} handleChange={handleChange} hobbies={hobbies as string[]}
-          name='hobbiesEntry' placeholder='Hobbies' value={hobbiesEntry as string}
+          setPrevEntries={setPrevEntries}
+          name='socialMediaEntry' name1='socialMediaName' placeholder1='Social media name' 
+          addToArray={addToArray} inputRef={inputRef0} inputRef1={inputRef01} maxLetter={100}
+          setArrayEntry={setArrayEntry}  userDetails={userDetails} arrayEntry={arrayEntry} max={3}
+          removeFromArray={removeFromArray} scrollRef={scrollRef0 as React.LegacyRef<HTMLParagraphElement>}
+          theme={theme} handleChange={handleChange} attributeName={socialMediaAccounts as SocialMediaAccoutProp[]}
+          value={socialMediaEntry as Entries} value1={socialMediaName as ValueType} placeholder='Social media handle' 
+        />
+
+        <ArrayComponent 
+          setPrevEntries={setPrevEntries}
+          handleChange={handleChange} attributeName={hobbies as string[]} userDetails={userDetails}
           removeFromArray={removeFromArray} scrollRef={scrollRef1 as React.LegacyRef<HTMLParagraphElement>}
+          name='hobbiesEntry' placeholder='Hobbies' value={hobbiesEntry as Entries} setArrayEntry={setArrayEntry}
+          addToArray={addToArray} inputRef={inputRef1} maxLetter={20} max={5} theme={theme} arrayEntry={arrayEntry}
         />
         
         <ArrayComponent 
-          addToArray={addToArray} inputRef={inputRef2} maxLetter={20} 
-          theme={theme} handleChange={handleChange} hobbies={stack as string[]}
-          name='stackEntry' placeholder='Skills' value={stackEntry as string} max={10}
+          setPrevEntries={setPrevEntries}
+          addToArray={addToArray} inputRef={inputRef2} maxLetter={20} theme={theme} name='stackEntry' 
+          handleChange={handleChange} attributeName={stack as string[]} setArrayEntry={setArrayEntry}
           removeFromArray={removeFromArray} scrollRef={scrollRef2 as React.LegacyRef<HTMLParagraphElement>}
+          placeholder='Skills' value={stackEntry as Entries} max={10} userDetails={userDetails} arrayEntry={arrayEntry}
         />
         
         <div className='pt-2 pb-4 self-center w-full flex justify-center'>

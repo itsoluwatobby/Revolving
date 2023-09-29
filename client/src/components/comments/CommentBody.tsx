@@ -28,6 +28,7 @@ export default function CommentBody() {
   const dispatch = useDispatch();
   const [successModal, setSuccessModal] = useState<ChatOption>('Hide');
   const [prompt, setPrompt] = useState<Prompted>({type: 'nil', assert: false});
+  const [reloadLimit, setReloadLimit] = useState<number>(0)
 
   const handleComment = (event: ChangeEvent<HTMLInputElement>) => setComment(event.target.value)
 
@@ -83,13 +84,14 @@ export default function CommentBody() {
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length && (isError && errorMsg?.status != 404)){
+    if(!data?.length && openComment?.storyId && (isError && (errorMsg?.status != 404 || errorMsg?.originalStatus != 401)) && reloadLimit <= 2){
       timerId = setInterval(async() => {
         await refetch()
+        setReloadLimit(prev => prev + 1)
       }, REFRESH_RATE)
     }
     return () => clearInterval(timerId)
-  }, [data, isError, errorMsg?.status, refetch])
+  }, [data, isError, openComment?.storyId, errorMsg?.status, errorMsg?.originalStatus, refetch, reloadLimit])
 
   useEffect(() => {
     let isMounted = true

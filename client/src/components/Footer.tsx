@@ -1,4 +1,4 @@
-import { TaskProp, UserProps } from '../data';
+import { Followers, TaskProp, UserProps } from '../data';
 import { checkCount } from '../utils/navigator';
 import { useEffect, useState, useCallback } from 'react';
 import { useThemeContext } from '../hooks/useThemeContext';
@@ -60,9 +60,9 @@ export const Footer = ({ tasks, userId }: FooterProps) => {
           </p>
         </div>
         <p className='flex flex-col'>
-          <span className={countStyle(theme, 'MAIN')}>Followers: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(user?.followers as string[
-            
-          ])}</span></span>
+          <span className={countStyle(theme, 'MAIN')}>Followers: &nbsp;
+            <span className={countStyle(theme, 'NUM')}>{checkCount(user?.followers as Followers[])}</span>
+          </span>
           <span className={countStyle(theme, 'MAIN')}>Stories: &nbsp;<span className={countStyle(theme, 'NUM')}>{checkCount(userStories)}</span></span>
           <span className={countStyle(theme, 'MAIN')}>Total likes </span>
         </p>

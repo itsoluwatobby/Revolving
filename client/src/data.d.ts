@@ -11,6 +11,23 @@ type FunctionOption = {
   taskId?: string
 }
 
+type Entries = 'socialMediaEntry' | 'hobbiesEntry' | 'stackEntry'
+type ValueType = 'socialMediaName'
+
+
+type InitPrevEntriesType = {
+  prevHobby: string,
+  prevStack: string,
+  prevSocialName: string
+}
+
+type InitEntriesType = { 
+  hobbiesEntry: string, 
+  stackEntry: string, 
+  socialMediaEntry: string, 
+  socialMediaName: string 
+}
+
 type TextProp = {
   boldText: string
   italics: string
@@ -148,8 +165,10 @@ interface TaskProp{
   updatedAt?: string,
 }
 
+type Positions = 'navbar' | 'profile' | 'others'
+
 type HoverType = 'unfollow' | 'following'
-type PositionType = 'navbar' | 'others'
+type PositionType = Positions[]
 type OptionType = 'EMAIL' | 'DIRECT'
 
 type EnlargeCompo = {
@@ -179,6 +198,12 @@ type SocialMediaAccoutProp = {
   link: string
 }
 
+type Followers = { createdAt: string, followerId: string }
+type Follows = { createdAt: string, followRecipientId: string }
+
+type EachSubs = { createdAt: string, subscriberId: string }
+type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+
 interface UserProps{
   _id: string,
   username: string,
@@ -197,8 +222,8 @@ interface UserProps{
   isResetPassword: boolean,
   verificationToken: { type: string, token: string, createdAt: string },
   dateLocked: string,
-  followers?: string[],
-  followings?: string[],
+  followers?: Followers[],
+  followings?: Follows[],
   lastSeen: string,
   hobbies: string[],
   status: 'online' | 'offline',
@@ -210,11 +235,23 @@ interface UserProps{
   stack: string[],
   country: string,
   socialMediaAccounts: SocialMediaAccoutProp[],
-  notificationSubscribers: string[],
-  subscribed: string[],
+  notificationSubscribers: EachSubs[],
+  subscribed: SubscriptionTo[],
   createdAt: string,
   updatedAt: string
 }
+
+type SubUser = {
+  _id: string, 
+  subDate: string,
+  lastName: string, 
+  firstName: string, 
+  description: string, 
+  followers: Followers[], 
+  followings: Follows[], 
+  displayPicture: string,
+}
+
 
 type ChatProps = {
   _id?: string,
@@ -260,13 +297,13 @@ type AuthType={
 }
 
 type GetFollowsType = {
-  follows: Partial<UserProps[]>,
-  followers: Partial<UserProps[]>
+  follows: SubUser[],
+  followers: SubUser[]
 }
 
 type GetSubscriptionType = {
-  subscriptions: Partial<UserProps[]>,
-  subscribed: Partial<UserProps[]>
+  subscriptions: SubUser[],
+  subscribed: SubUser[]
 }
 
 type ApiSliceType = {

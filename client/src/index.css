@@ -27,6 +27,10 @@ textarea::-webkit-scrollbar{
   width: 2px;
 }
 
+.sidebar_height{
+  height: calc(100vh - 78px);
+}
+
 .single_page{
   height: calc(100vh - 64px);
 }

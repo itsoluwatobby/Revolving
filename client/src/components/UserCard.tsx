@@ -1,4 +1,4 @@
-import { UserProps } from "../data";
+import { Followers, Follows, UserProps } from "../data";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { ChatOption, ThemeContextType } from "../posts";
@@ -50,7 +50,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
     </>
   ) : content = (
     <>
-      <div className="flex flex-col gap-0.5 text-sm bg-inherit">
+      <div className="flex flex-col gap-y-2 text-sm bg-inherit">
         <div className="flex items-center justify-between w-full">
           <div className="flex-grow flex items-center gap-2">
             <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-10 h-10">
@@ -71,7 +71,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
               <span className="text-xs font-normal">{reduceLength(user?.description as string, 25, 'letter')}</span>
             </p>
           </div>
-          <FollowUnFollow position="others" userId={user?._id as string} />
+          <FollowUnFollow position={["others"]} userId={user?._id as string} />
         </div>
         
         <div>
@@ -83,12 +83,12 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         <div className='flex items-center gap-4'>
           <Link to={`/follows/${userId}`}>
             <p>
-              followers <span className="font-bold">{checkCount(user?.followers as string[])}</span>
+              followers <span className="font-bold">{checkCount(user?.followers as Followers[])}</span>
             </p>
           </Link>
           <Link to={`/follows/${userId}`}>
             <p>
-              following <span className="font-bold">{checkCount(user?.followings as string[])}</span>
+              following <span className="font-bold">{checkCount(user?.followings as Follows[])}</span>
             </p>
           </Link>
         </div>
@@ -105,7 +105,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         setOnCard(false)
         setRevealCard('Hide')
       }}
-      className={`absolute bg-slate-100 ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2 z-10 top-5 max-h-40 shadow-2xl w-fit ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
+      className={`absolute bg-slate-100 font-sans ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2.5 z-10 top-5 max-h-40 shadow-2xl w-fit ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
       {content}
     </article>
   )

@@ -13,6 +13,7 @@ import { getCachedResponse } from "../helpers/redis.js";
 import { deleteAccount, followOrUnFollow, getAllUsers, getUserById, updateUser } from "../services/userService.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { UserModel } from '../models/User.js';
+const dateTime = new Date().toString();
 /**
  * @description fetches all users
 */
@@ -54,7 +55,7 @@ export function getUser(req, res) {
 }
 /**
  * @description follow or unfollow a user
- * @param req - followerId, followingId
+ * @param req - followerId-sender, followingId- receiver
 */
 export function followUnFollowUser(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
@@ -66,7 +67,10 @@ export function followUnFollowUser(req, res) {
         if (!user)
             return responseType({ res, status: 404, message: 'user not found' });
         const result = yield followOrUnFollow(followerId, followingId);
-        result != 'duplicate' ?
+        const errorResponse = ['unable to follow', 'unable to unfollow'];
+        if (errorResponse === null || errorResponse === void 0 ? void 0 : errorResponse.includes(result))
+            return responseType({ res, status: 409, message: result });
+        return result !== 'duplicate' ?
             responseType({ res, status: 201, message: result })
             : responseType({ res, status: 409, message: 'You cannot follow yourself' });
     }));
@@ -164,26 +168,28 @@ export function lockAndUnlockUserAccount(req, res) {
 */
 export function subscribeToNotification(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         const { subscribeId, subscriberId } = req.params;
         if (!subscribeId || !subscriberId)
             return res.sendStatus(400);
         // subscribeId - recipient, subscriberId - subscriber
         const subscribee = yield getUserById(subscriberId);
-        const subscribe = yield getUserById(subscribeId);
-        if (!subscribe)
+        const subscribeRecipient = yield getUserById(subscribeId);
+        if (!subscribeRecipient)
             return responseType({ res, status: 404, message: 'User not found' });
-        if ((_a = subscribe === null || subscribe === void 0 ? void 0 : subscribe.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.includes(subscriberId)) {
-            subscribe.updateOne({ $pull: { notificationSubscribers: subscriberId } })
+        const duplicate = (_a = subscribeRecipient === null || subscribeRecipient === void 0 ? void 0 : subscribeRecipient.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.find(sub => (sub === null || sub === void 0 ? void 0 : sub.subscriberId) === subscriberId);
+        if (duplicate) {
+            const targetSubscriberRecipient = (_b = subscribee === null || subscribee === void 0 ? void 0 : subscribee.subscribed) === null || _b === void 0 ? void 0 : _b.find(sub => (sub === null || sub === void 0 ? void 0 : sub.subscribeRecipientId) === subscribeId);
+            subscribeRecipient.updateOne({ $pull: { notificationSubscribers: duplicate } })
                 .then(() => __awaiter(this, void 0, void 0, function* () {
-                yield subscribee.updateOne({ $pull: { subscribed: subscribeId } });
+                yield subscribee.updateOne({ $pull: { subscribed: targetSubscriberRecipient } });
                 return responseType({ res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED' });
-            })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
+            })).catch(() => responseType({ res, status: 400, message: 'unable to unsubscribe' }));
         }
         else {
-            subscribe.updateOne({ $push: { notificationSubscribers: subscriberId } })
+            subscribeRecipient.updateOne({ $push: { notificationSubscribers: { subscriberId, createdAt: dateTime } } })
                 .then(() => __awaiter(this, void 0, void 0, function* () {
-                yield subscribee.updateOne({ $push: { subscribed: subscribeId } });
+                yield subscribee.updateOne({ $push: { subscribed: { subscribeRecipientId: subscribeId, createdAt: dateTime } } });
                 return responseType({ res, status: 201, message: 'SUBSCRIPTION SUCCESSFUL' });
             })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
         }
@@ -204,13 +210,13 @@ export const getSubscriptions = (req, res) => {
         yield autoDeleteOnExpire(userId);
         getCachedResponse({ key: `userSubscriptions:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 var _a, _b;
-                const subscriptions = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.map((id) => __awaiter(void 0, void 0, void 0, function* () {
-                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
-                    return { _id, email, firstName, lastName, followers, followings };
+                const subscriptions = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.map((sub) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = yield getUserById(sub === null || sub === void 0 ? void 0 : sub.subscriberId);
+                    return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: sub === null || sub === void 0 ? void 0 : sub.createdAt };
                 })));
-                const subscribed = yield Promise.all((_b = user === null || user === void 0 ? void 0 : user.subscribed) === null || _b === void 0 ? void 0 : _b.map((id) => __awaiter(void 0, void 0, void 0, function* () {
-                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
-                    return { _id, email, firstName, lastName, followers, followings };
+                const subscribed = yield Promise.all((_b = user === null || user === void 0 ? void 0 : user.subscribed) === null || _b === void 0 ? void 0 : _b.map((sub) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = yield getUserById(sub === null || sub === void 0 ? void 0 : sub.subscribeRecipientId);
+                    return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: sub === null || sub === void 0 ? void 0 : sub.createdAt };
                 })));
                 return { subscriptions, subscribed };
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
@@ -237,13 +243,13 @@ export const getUserFollows = (req, res) => {
         yield autoDeleteOnExpire(userId);
         getCachedResponse({ key: `userFollows:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 var _a, _b;
-                const followings = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.map((id) => __awaiter(void 0, void 0, void 0, function* () {
-                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
-                    return { _id, email, firstName, lastName, followers, followings };
+                const followings = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.map((follow) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = yield getUserById(follow === null || follow === void 0 ? void 0 : follow.followRecipientId);
+                    return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow === null || follow === void 0 ? void 0 : follow.createdAt };
                 })));
-                const followers = yield Promise.all((_b = user === null || user === void 0 ? void 0 : user.followers) === null || _b === void 0 ? void 0 : _b.map((id) => __awaiter(void 0, void 0, void 0, function* () {
-                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
-                    return { _id, email, firstName, lastName, followers, followings };
+                const followers = yield Promise.all((_b = user === null || user === void 0 ? void 0 : user.followers) === null || _b === void 0 ? void 0 : _b.map((follow) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = yield getUserById(follow === null || follow === void 0 ? void 0 : follow.followerId);
+                    return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow === null || follow === void 0 ? void 0 : follow.createdAt };
                 })));
                 return { followings, followers };
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })

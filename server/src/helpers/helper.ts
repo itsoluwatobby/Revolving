@@ -145,7 +145,7 @@ export async function pagination({startIndex=1, endIndex=1, page=1, limit=1, cb}
           limit: +limit
         }
       }
-      const result = parsedObject as StoryProps[]  
+      const result = parsedObject as StoryProps[] 
       return {pages, result}
     }
     const result = parsedObject as string

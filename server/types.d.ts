@@ -123,6 +123,12 @@ type VerificationTokenType = {
   type: ConfirmationMethodType, 
 }
 
+type Followers = { createdAt: string, followerId: string }
+type Follows = { createdAt: string, followRecipientId: string }
+
+type EachSubs = { createdAt: string, subscriberId: string }
+type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+
 interface UserProps extends Document{
   email: string,
   gender: Gender,
@@ -140,9 +146,8 @@ interface UserProps extends Document{
   description: string,
   userSession: string,
   refreshToken: string,
-  subscribed: string[],
-  followers?: string[],
-  followings?: string[],
+  followers?: Followers[],
+  followings?: Follows[],
   displayPicture: {
     coverPhoto: string, 
     photo: string
@@ -151,12 +156,24 @@ interface UserProps extends Document{
   isAccountLocked: boolean,
   isResetPassword: boolean,
   isAccountActivated: boolean,
+  subscribed: SubscriptionTo[],
   status: 'online' | 'offline',
-  notificationSubscribers: string[],
+  notificationSubscribers: EachSubs[],
   verificationToken: VerificationTokenType,
   socialMediaAccounts: SocialMediaAccoutProp[],
   createdAt: string,
   updatedAt: string
+}
+
+type SubUser = {
+  _id: string, 
+  subDate: string,
+  lastName: string, 
+  firstName: string, 
+  description: string, 
+  followers: Followers[], 
+  followings: Follows[], 
+  displayPicture: string,
 }
 
 interface PageRequest extends Request{
@@ -190,11 +207,11 @@ type ObjectUnknown<K>={
 }
 
 type GetFollowsType = {
-  follows: Partial<UserProps[]>,
-  followers: Partial<UserProps[]>
+  follows: SubUser[],
+  followers: SubUser[]
 }
  
 type GetSubscriptionType = {
-  subscriptions: Partial<UserProps[]>,
-  subscribed: Partial<UserProps[]>
+  subscriptions: SubUser[],
+  subscribed: SubUser[]
 }

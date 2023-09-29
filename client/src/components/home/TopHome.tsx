@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { ThemeContextType } from '../../posts';
 import { GiHamburgerMenu} from 'react-icons/gi';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,14 +8,12 @@ import { getTabCategory, setNavigation } from '../../features/story/navigationSl
 
 const list_style = 'cursor-pointer touch-pan-x whitespace-nowrap text-gray-500 active:text-gray-500 duration-200 ease-in-out';
 
-const arrow_class= "text-2xl md:hidden text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out text-xl z-50";
-
 export const TopHome = () => {
   const {theme, setOpenComment, toggleLeft, setToggleLeft} = useThemeContext() as ThemeContextType;
   const getNavigation = useSelector(getTabCategory)
   const dispatch = useDispatch()
-  // const scrollNavBar = useCallback((node: any) => {
-  //   node && node.scrollIntoView({ smooth: true })
+  // const scrollNavBar = useCallback((node: HTMLElement) => {
+  //   node ? node.scrollIntoView({ behavior: 'smooth' }) : null
   // }, [])
 
   useEffect(() => {
@@ -26,17 +24,17 @@ export const TopHome = () => {
     <header
       onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
       className={`sticky top-0 z-10 max-w-full overflow-hidden flex-none flex items-center bg-inherit mt-2.5 mobile:mt-4 border $ border-l-0 border-r-0 border-t-1 duration-300 border-b-1 pl-2 pr-2 ${theme == 'dark' ? 'border-gray-700 dark:bg-slate-800' : 'border-gray-200 bg-white'}`}>
-      <div className={`${toggleLeft == 'Open' ? 'hidden' : 'sm:hidden'} h-14 w-10 grid place-content-center z-50`}>
+      <div className={`${toggleLeft == 'Open' ? 'hidden' : 'md:hidden'} h-14 w-10 grid place-content-center z-50`}>
         <GiHamburgerMenu 
           onClick={() => setToggleLeft('Open')}
-          className={arrow_class} />
+          className={`text-xl text-gray-500 cursor-pointer hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out z-50`} />
       </div>
       <ul className={`hidebars p-4 w-full text-gray-700 flex items-center sm:justify-between gap-3 overflow-x-scroll`}>
-        {//topHeader
+        {
           Object.entries(NAVIGATE).map(([key, value], i) => (
             <li 
               key={key}
-              // ref={scrollNavBar}
+              //ref={scrollNavBar}
               onClick={() => dispatch(setNavigation((Object.values(NAVIGATE)[i])))}
               className={`${list_style} ${theme == 'dark' ? 'hover:text-gray-200' : 'hover:text-gray-900'} ${value === getNavigation && 'font-bold'}`}>
               {value}
