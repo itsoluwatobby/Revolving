@@ -115,7 +115,7 @@ export default function ProfileTop({ userId, userProfile, imageType, handleImage
             </Link>
           :
             <MdNotificationsActive
-              title='Notification'
+              title={hasUserId ? 'unsubcribe' : 'subscribe'}
               onClick={subscribeToNotification}
               className={`text-2xl ${userProfile ? 'block' : 'hidden'} z-10 ${isLoadingSubscribe ? 'animate-bounce' : 'animate-none'} cursor-pointer ${hasUserId ? 'text-green-500' : 'text-gray-400'} hover:scale-[1.02] active:scale-[1] transition-all`}
             />

@@ -16,7 +16,7 @@ type Props = {
 export default function MidModal({ targetStory, theme, notintersecting, designatedPath, pathname }: Props) {
 
   return (
-    <div className={`${pathname === `/story/${targetStory?._id}` ? 'block' : 'hidden'} flex-auto grid transition-all place-content-center ${notintersecting === 'NOT_INTERSECTING' ? 'scale-100' : 'scale-0'}`}>
+    <div className={`${(pathname === `/story/${targetStory?._id}` || pathname === `/story/${targetStory?.sharedId}`) ? 'block' : 'hidden'} flex-auto grid transition-all place-content-center ${notintersecting === 'NOT_INTERSECTING' ? 'scale-100' : 'scale-0'}`}>
       <div className={`flex flex-col gap-1 minmobile:gap-0 minmobile:pl-1.5 ${pathname !== designatedPath ? 'hidden' : 'block'}`}>
         <div className='flex items-center gap-1.5'>
           <Link to={`/profile/${targetStory?.userId}`}>

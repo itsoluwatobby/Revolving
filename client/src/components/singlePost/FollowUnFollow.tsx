@@ -1,5 +1,5 @@
 import { toast } from 'react-hot-toast';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Theme, ThemeContextType } from '../../posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { ErrorResponse, HoverType, PositionType } from '../../data';
@@ -10,10 +10,13 @@ type FollowUnFollowProps = {
   position: PositionType
 }
 
+let isPrinted = false
 export default function FollowUnFollow({ userId, position }: FollowUnFollowProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const {data: user, refetch} = useGetUserByIdQuery(currentUserId)
+  const [isFollowing, setIsFollowing] = useState<boolean>(false)
+  
   const [followUnfollowUser, { isLoading: isMutating, 
     error: followError,  isError: isFollowError, 
     isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
@@ -23,13 +26,28 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
     ${position?.includes('profile') ? 'rounded-sm p-2 px-0 text-sm' : 'rounded-md p-1 px-1.5'} ${position?.includes('others') ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
     `
   }, [])
+  
+  if(!isPrinted){
+    console.log(user)
+    isPrinted = true
+  }
+  
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && currentUserId !== user?._id){
+      setIsFollowing(() => user?.followers?.find(sub => sub?.followerId === currentUserId) ? true : false)
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [user?._id, user?.followers, currentUserId])
 
   const followOrUnfollow = async() => {
     try{
       const requestIds = { followerId: currentUserId, followedId: userId }
     
       await followUnfollowUser(requestIds).unwrap()
-      await refetch()
+      // await refetch()
       isFollowSuccess && toast.success('Success!!', {
                       duration: 2000, icon: '👋', style: {
                         background: '#1E90FF'
@@ -51,7 +69,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
     <>
       {
         (currentUserId && currentUserId !== userId) ? (
-          !user?.followings?.includes(userId) ? (
+          !isFollowing ? (
             <button 
               onClick={followOrUnfollow}
               className={buttonClass(isMutating, theme, position)}>

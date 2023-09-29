@@ -1,4 +1,4 @@
-import { UserProps } from "../data";
+import { Followers, Follows, UserProps } from "../data";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { ChatOption, ThemeContextType } from "../posts";
@@ -83,12 +83,12 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         <div className='flex items-center gap-4'>
           <Link to={`/follows/${userId}`}>
             <p>
-              followers <span className="font-bold">{checkCount(user?.followers as string[])}</span>
+              followers <span className="font-bold">{checkCount(user?.followers as Followers[])}</span>
             </p>
           </Link>
           <Link to={`/follows/${userId}`}>
             <p>
-              following <span className="font-bold">{checkCount(user?.followings as string[])}</span>
+              following <span className="font-bold">{checkCount(user?.followings as Follows[])}</span>
             </p>
           </Link>
         </div>

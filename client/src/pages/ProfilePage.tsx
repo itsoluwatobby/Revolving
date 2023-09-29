@@ -11,6 +11,7 @@ import SkeletonProfile from "../components/skeletons/SkeletonProfile";
 import { useGetUserByIdQuery, useUpdateInfoMutation } from "../app/api/usersApiSlice";
 import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../posts";
 import { useDeleteImageMutation, useGetStoriesWithUserIdQuery, useUploadImageMutation } from "../app/api/storyApiSlice";
+import { LeftSection } from "../components/LeftSection";
 
 const initialState = {name: null, data: null}
 
@@ -161,34 +162,38 @@ export default function ProfilePage() {
     <main
       role="User profile"
       onClick={closeSetups}
-      className={`hidebars single_page md:pt-8 text-sm p-2 pt-0 flex-col gap-2 w-full overflow-y-scroll`}>
+      className={`w-full flex`}>
+      
+      <LeftSection />
 
-      <section className={`relative flex-auto text-sm flex md:flex-row flex-col gap-2 w-full`}>
-        {
-          isLoadingUserInfo ?
-            <SkeletonProfile theme={theme} page="EDIT" />
-          :
-          <>
-            <ProfileTop 
-              isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
-              clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
-              handleImage={handleImage} imageType={imageType} userId={userId as string}
-              userProfile={userProfile as UserProps} setLoginPrompt={setLoginPrompt}
-            />
-            <ProfileMid 
-              userProfile={userProfile as UserProps} theme={theme} 
-              setRevealEditModal={setRevealEditModal} userId={userId as string}
-            />
-          </>
-        }
-      </section>
+      <div className={`hidebars single_page flex-auto md:pt-8 text-sm p-2 pt-0 flex-col gap-2 w-full overflow-y-scroll`}>
+        <section className={`relative flex-auto text-sm flex md:flex-row flex-col gap-2 w-full`}>
+          {
+            isLoadingUserInfo ?
+              <SkeletonProfile theme={theme} page="EDIT" />
+            :
+            <>
+              <ProfileTop 
+                isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
+                clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
+                handleImage={handleImage} imageType={imageType} userId={userId as string}
+                userProfile={userProfile as UserProps} setLoginPrompt={setLoginPrompt}
+              />
+              <ProfileMid 
+                userProfile={userProfile as UserProps} theme={theme} 
+                setRevealEditModal={setRevealEditModal} userId={userId as string}
+              />
+            </>
+          }
+        </section>
 
-      <ProfileBase 
-        userStories={userStories as PostType[]} 
-        userProfile={userProfile as UserProps} theme={theme} 
-        isStoryLoading={isStoryLoading} isStoryError={isStoryError} 
-        storyError={storyError} setRevealEditModal={setRevealEditModal}
-      />
+        <ProfileBase 
+          userStories={userStories as PostType[]} 
+          userProfile={userProfile as UserProps} theme={theme} 
+          isStoryLoading={isStoryLoading} isStoryError={isStoryError} 
+          storyError={storyError} setRevealEditModal={setRevealEditModal}
+        />
+      </div>
 
     </main>
   )

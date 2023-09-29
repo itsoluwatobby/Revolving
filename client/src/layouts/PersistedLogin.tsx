@@ -36,7 +36,7 @@ export const PersistedLogin = () => {
   }, [])
 
   return (
-    <main className={`welcome w-full h-full`}>   
+    <main className={`welcome w-full h-full`}>
       {
         !token ? 
           <Outlet />

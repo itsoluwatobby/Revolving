@@ -63,27 +63,27 @@ export const LeftSection = () => {
   }
 // 'maxscreen:translate-x-0 maxscreen:w-[35%]' : 'maxscreen:-translate-x-96 maxscreen:w-0'
   return (
-    <section className={`sidebars h-full bg-red-300 mt-6 ${address.includes(pathname) ? 'hidden' : 'md:block'} flex-none lg:w-1/5 transition-all overflow-y-scroll ${toggleLeft === 'Open' ? 'fixed mt-20 midscreen:w-full' : 'md:hidden fixed midscreen:w-0'} ${theme == 'light' ? 'bg-gray-50 midscreen:bg-opacity-20' : 'bg-slate-700 midscreen:bg-opacity-20'} md:w-1/4 rounded-tr-lg z-50`}>
+    <section className={`sidebars md:h-[calc(100vh-78px)] sticky top-[72px] flex-non h-full mt-2 ${address.includes(pathname) ? 'hidden' : 'md:block'} lg:max-w-[20%] transition-all overflow-y-scroll ${toggleLeft === 'Open' ? 'midscreen:fixed midscreen:top-0 midscreen:mt-0 midscreen:h-full midscreen:w-full' : 'md:block hidden'} ${theme == 'light' ? 'bg-gray-50 midscreen:bg-opacity-20' : 'bg-slate-700 midscreen:bg-opacity-20'} md:w-[40%] rounded-tr-lg z-50`}>
 
-      <div className={`sidebars h-[89%] md:h-[97%] md:w-full overflow-y-scroll flex flex-col rounded-tr-md justify-between midscreen:w-[35%] maxmobile:w-1/2 ${theme == 'light' ? 'midscreen:bg-gray-50' : 'midscreen:bg-slate-700'} transition-all`}>
+      <div className={`sidebars h-full p-1 pb-2.5 md:w-ful overflow-y-scroll flex flex-col rounded-tr-md rounded-br-md justify-between midscreen:w-[35%] maxmobile:w-1/2 ${theme == 'light' ? 'midscreen:bg-gray-50' : 'midscreen:bg-slate-700'} transition-all`}>
         
         <div className='flex flex-col w-full gap-1'>
           
           <div className={`relative w-full h-8 flex items-center`}>
             <button
               onClick={() => setToggleLeft('Hide')}
-              className={`absolute p-2 text-sm md:hidden pt-1 pb-1 text-center rounded-md right-0.5 ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-500'}`}
+              className={`absolute p-2 text-sm md:hidden pt-1 pb-1 text-center rounded-md right-0 ${theme == 'light' ? 'bg-slate-300' : 'bg-slate-500'}`}
             >
               close
             </button>
           </div>
-          <div className={`h-full p-2 flex flex-col gap-1`}>
+          <div className={`h-full pt-2 flex flex-col gap-1`}>
             {
               routeLinkNames({ userId: currentUserId })?.map(values => (
                 <Link to={conditionalRouting(values) ? '' : values.link}
                   key={values.name}
                   onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
-                  className={`p-3 lg:py-4 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md transition-all rounded-md text-center border border-r-0 border-l-0 border-slate-300 border-t-0 border-b-1`}
+                  className={`p-3 lg:py-3 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1 transition-all`}
                 >
                   {values.name}
                 </Link>

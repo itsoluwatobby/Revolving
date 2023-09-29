@@ -48,7 +48,7 @@ import { UserModel } from '../models/User.js';
 
   /**
    * @description follow or unfollow a user
-   * @param req - followerId, followingId
+   * @param req - followerId-sender, followingId- receiver
   */
   export function followUnFollowUser(req: Request, res: Response){
     asyncFunc(res, async () => {
@@ -58,9 +58,11 @@ import { UserModel } from '../models/User.js';
       await autoDeleteOnExpire(followerId)
       if(!user) return responseType({res, status: 404, message: 'user not found'})
       const result = await followOrUnFollow(followerId, followingId);
-      result != 'duplicate' ? 
-          responseType({res, status: 201, message: result}) 
-              : responseType({res, status: 409, message: 'You cannot follow yourself'})
+      const errorResponse = ['unable to follow', 'unable to unfollow']
+      if (errorResponse?.includes(result)) return responseType({res, status: 409, message: result })
+      return result !== 'duplicate' ? 
+        responseType({res, status: 201, message: result}) 
+            : responseType({res, status: 409, message: 'You cannot follow yourself'})
     })
   }
 
@@ -167,7 +169,7 @@ import { UserModel } from '../models/User.js';
         .then(async() => {
           await subscribee.updateOne({$pull: { subscribed: targetSubscriberRecipient }})
           return responseType({res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED'})
-        }).catch(() => responseType({res, status: 400, message: 'unable to subscribe'}))
+        }).catch(() => responseType({res, status: 400, message: 'unable to unsubscribe'}))
       }
       else{
         subscribeRecipient.updateOne({$push: { notificationSubscribers: { subscriberId, createdAt: dateTime } }})
@@ -220,14 +222,14 @@ import { UserModel } from '../models/User.js';
       if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
       await autoDeleteOnExpire(userId)
       getCachedResponse({key: `userFollows:${userId}`, cb: async() => {
-        const followings = await Promise.all(user?.followings?.map(async(id) => {
-          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
-          return { _id, email, firstName, lastName, followers, followings }
-        })) as Partial<UserProps[]>
-        const followers = await Promise.all(user?.followers?.map(async(id) => {
-          const { _id, email, firstName, lastName, followers, followings } = await getUserById(id)
-          return { _id, email, firstName, lastName, followers, followings }
-        })) as Partial<UserProps[]>
+        const followings = await Promise.all(user?.followings?.map(async(follow) => {
+          const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = await getUserById(follow?.followRecipientId)
+          return {_id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow?.createdAt }
+        })) as SubUser[]
+        const followers = await Promise.all(user?.followers?.map(async(follow) => {
+          const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = await getUserById(follow?.followerId)
+          return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow?.createdAt }
+        })) as SubUser[]
         return { followings, followers }
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
       .then((allFollows: GetFollowsType) => {

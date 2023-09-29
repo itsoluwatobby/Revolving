@@ -4,7 +4,7 @@ export default function SkeletonSubscription() {
   return (
     <article className='hidebars flex flex-col h-full gap-2 w-full shadow-md'>
       {
-        [...Array(15).keys()].map(i => (
+        [...Array(5).keys()].map(i => (
           <div 
             key={i}
             className='p-1.5 bg-gray-200 rounded-md w-full flex gap-2'

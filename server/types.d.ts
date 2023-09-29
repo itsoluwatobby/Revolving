@@ -123,8 +123,11 @@ type VerificationTokenType = {
   type: ConfirmationMethodType, 
 }
 
-type EachSubs  =  { createdAt: string, subscriberId: string }
-type SubscriptionTo  =  { createdAt: string, subscribeRecipientId: string }
+type Followers = { createdAt: string, followerId: string }
+type Follows = { createdAt: string, followRecipientId: string }
+
+type EachSubs = { createdAt: string, subscriberId: string }
+type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
 
 interface UserProps extends Document{
   email: string,
@@ -143,8 +146,8 @@ interface UserProps extends Document{
   description: string,
   userSession: string,
   refreshToken: string,
-  followers?: string[],
-  followings?: string[],
+  followers?: Followers[],
+  followings?: Follows[],
   displayPicture: {
     coverPhoto: string, 
     photo: string
@@ -168,8 +171,8 @@ type SubUser = {
   lastName: string, 
   firstName: string, 
   description: string, 
-  followers: string[], 
-  followings: string[], 
+  followers: Followers[], 
+  followings: Follows[], 
   displayPicture: string,
 }
 
@@ -204,8 +207,8 @@ type ObjectUnknown<K>={
 }
 
 type GetFollowsType = {
-  follows: Partial<UserProps[]>,
-  followers: Partial<UserProps[]>
+  follows: SubUser[],
+  followers: SubUser[]
 }
  
 type GetSubscriptionType = {

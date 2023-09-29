@@ -3,7 +3,7 @@ import { UserProps } from "../../data";
 import { useSelector } from "react-redux";
 import useLogout from "../../hooks/useLogout"
 import { FaTimesCircle } from "react-icons/fa";
-import { Theme, ThemeContextType } from "../../posts";
+import { ChatOption, Theme, ThemeContextType } from "../../posts";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { selectCurrentRoles } from "../../features/auth/authSlice";
@@ -26,8 +26,8 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
   const address = ['/new_story', `/edit_story/${storyId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
-  const modalClass = useCallback((theme: Theme) => { 
-    return `hover:scale-[1.01] hover:border-b-2 whitespace-nowrap border-none transition-all hover:opacity-90 cursor-pointer midscreen:rounded-sm midscreen:p-4 capitalize flex items-center p-1 midscreen:drop-shadow-2xl midscreen:w-full midscreen:grid midscreen:place-content-center midscreen:border-b-[1px] midscreen:bg-opacity-80 midscreen:hover:opacity-90 ${theme == 'light' ? 'midscreen:hover:bg-slate-200' : 'midscreen:hover:bg-slate-600'}`
+  const modalClass = useCallback((theme: Theme, type?: ChatOption) => { 
+    return `${type === 'Hide' ? 'md:hidden' : ''} hover:scale-[1.01] hover:border-b-2 whitespace-nowrap border-none transition-all hover:opacity-90 cursor-pointer midscreen:rounded-sm midscreen:p-4 capitalize flex items-center p-1 midscreen:drop-shadow-2xl midscreen:w-full midscreen:grid midscreen:place-content-center midscreen:border-b-[1px] midscreen:bg-opacity-80 midscreen:hover:opacity-90 ${theme == 'light' ? 'midscreen:hover:bg-slate-200' : 'midscreen:hover:bg-slate-600'}`
   }, [])
 
   const arrow_class = useCallback(() => {
@@ -108,7 +108,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                 <Link 
                   onClick={() => setRollout(false)}
                   to={`/notifications/${userId}`}
-                  className={modalClass(theme)}
+                  className={modalClass(theme, 'Hide')}
                 >
                   Notifications
                 </Link>
@@ -146,7 +146,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                 <Link 
                   onClick={() => setRollout(false)}
                   to={`/about`}
-                  className={modalClass(theme)}
+                  className={modalClass(theme, 'Hide')}
                   >
                   About
                 </Link>

@@ -8,6 +8,12 @@ type StoryArgs = {
   userId: string, storyId?: string, story: PostType
 }
 
+type QueryArgs = {
+  category: Categories,
+  page?: number, 
+  limit?: number
+}
+
 type ResponseType = { data: PostType[] }
 
 export const storyApiSlice = apiSlice.injectEndpoints({
@@ -82,8 +88,10 @@ export const storyApiSlice = apiSlice.injectEndpoints({
       }
     }),
   
-    getStoriesByCategory: builder.query<PostType[], Categories>({
-      query: (category) => `story/category?category=${category}`,
+    getStoriesByCategory: builder.query<PostType[], QueryArgs>({
+      query: ({
+        category, page=1, limit=10
+      }) => `story/category?category=${category}&page=${page}&limit=${limit}`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
         const mapStories = baseQueryReturnValue?.data?.map(story => {
           return { ...story, mutualDate: story?.sharedDate ? story?.sharedDate : story?.createdAt }
@@ -95,7 +103,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
     }),
 
     getStories: builder.query<PostType[], void>({
-      query: () => 'story',
+      query: () => `story`,
       transformResponse: (baseQueryReturnValue: ResponseType) => {
         const response = baseQueryReturnValue.data?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
         return response

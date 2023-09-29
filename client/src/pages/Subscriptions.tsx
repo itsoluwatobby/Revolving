@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useThemeContext } from "../hooks/useThemeContext";
 import { useGetSubscriptionsQuery } from "../app/api/usersApiSlice";
 import SubscriptionComp from "../components/subscription/SubscriptionComp";
+import { LeftSection } from "../components/LeftSection";
 
 export default function Subscriptions() {
   const { userId } = useParams()
@@ -31,15 +32,20 @@ export default function Subscriptions() {
   }, [error])
 
   return (
-    <section className={`hidebars single_page text-sm flex flex-col w-full md:px-6 px-3 overflow-y-scroll`}>
-      <button 
-        onClick={() => navigate(-1)}
-        className={`self-start ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-700'} p-2 py-1 rounded-sm`}
-      >Return</button>
-      <SubscriptionComp 
-        yourSubscriptions={yourSubscriptions as GetSubscriptionType} 
-        theme={theme} isLoading={isLoading} errorMsg={errorMsg as ErrorResponse}
-      />
+    <section className={`w-full flex`}>
+
+      <LeftSection />
+
+      <div className={`hidebars single_page text-sm flex flex-col w-full md:px-6 px-3 overflow-y-scroll`}>
+        <button 
+          onClick={() => navigate(-1)}
+          className={`self-start ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-700'} p-2 py-1 rounded-sm`}
+          >Return</button>
+        <SubscriptionComp 
+          yourSubscriptions={yourSubscriptions as GetSubscriptionType} 
+          theme={theme} isLoading={isLoading} errorMsg={errorMsg as ErrorResponse}
+        />
+      </div>
 
     </section>
   )

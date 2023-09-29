@@ -57,7 +57,7 @@ let numberOfCores = cpus().length;
 if (cluster.isPrimary){
   console.log(`Primary with PID: ${process.pid} is running`)
 
-  while((numberOfCores - 5) != 0){
+  while((numberOfCores - 6) != 0){
     cluster.fork();
     numberOfCores--
   }

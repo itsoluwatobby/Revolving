@@ -138,7 +138,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
 
           <p className="font-sans flex items-center text-sm gap-2">{format(story?.createdAt)}</p>
         
-          {!story?.sharedAuthor  ?
+          {!story?.sharedAuthor ?
             <UserCard 
               closeUserCard={closeUserCard}
               userId={story.userId} cardRef={cardRef as React.LegacyRef<HTMLElement>}

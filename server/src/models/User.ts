@@ -10,6 +10,9 @@ const SocialMedia: Schema = new Schema(
 const EachSubscriptions  =  { createdAt: String, subscriberId: String }
 const SubscriptionsTo  =  { createdAt: String, subscribeRecipientId: String }
 
+const Followers = { createdAt: String, followerId: String }
+const Follows = { createdAt: String, followRecipientId: String }
+
 const USERSCHEMA: Schema = new Schema(
   {
     username: { type: String, required: [true, 'Username is required'], trim: true },
@@ -37,8 +40,8 @@ const USERSCHEMA: Schema = new Schema(
       token: { type: String, default: '' },
       createdAt: { type: String, default: '' }
     },
-    followers: { type: Array, default: [] },
-    followings: { type: Array, default: [] },
+    followers: [Followers],
+    followings: [Follows],
     lastSeen: { type: String, default: '' },
     hobbies: { type: Array, default: [] },
     status: { type: String, default: 'offline', enum: ['online', 'offline'] },

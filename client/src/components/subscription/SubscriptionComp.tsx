@@ -2,7 +2,7 @@ import { Theme } from '../../posts';
 import { format } from 'timeago.js';
 import { Link } from 'react-router-dom';
 import { ErrorContent } from '../ErrorContent';
-import { ErrorResponse, GetSubscriptionType } from '../../data';
+import { ErrorResponse, Followers, Follows, GetSubscriptionType } from '../../data';
 import { checkCount, reduceLength } from '../../utils/navigator';
 import SkeletonSubscription from '../skeletons/SkeletonSubscription';
 
@@ -14,7 +14,6 @@ type SubscriptionCompProps = {
  }
 
 export default function SubscriptionComp({ yourSubscriptions, isLoading, theme, errorMsg }: SubscriptionCompProps) {
-
   const sortedSubscriptions = yourSubscriptions?.subscriptions?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate))
   const sortedSubscribed = yourSubscriptions?.subscribed?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate))
 
@@ -52,8 +51,8 @@ export default function SubscriptionComp({ yourSubscriptions, isLoading, theme, 
                       </Link>
                       <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength(subscription?.description, 30, 'letter')}</p>
                       <div className='flex items-center gap-3'>
-                        <p className='text-[12px]'>followers: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscription?.followers as string[])}</span></p>
-                        <p className='text-[12px]'>followings: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscription?.followings as string[])}</span></p>
+                        <p className='text-[12px]'>followers: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscription?.followers as Followers[])}</span></p>
+                        <p className='text-[12px]'>followings: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscription?.followings as Follows[])}</span></p>
                       </div>
                     </div>
 
@@ -96,9 +95,9 @@ export default function SubscriptionComp({ yourSubscriptions, isLoading, theme, 
                         </p>
                       </Link>
                       <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength(subscriber?.description, 30, 'letter')}</p>
-                      <div className='flex items-center gap-3'>
-                        <p className='text-[12px]'>followers: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscriber?.followers as string[])}</span></p>
-                        <p className='text-[12px]'>followings: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscriber?.followings as string[])}</span></p>
+                      <div className='flex items-center gap-2 w-full'>
+                        <p className='text-[12px]'>followers: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscriber?.followers as Followers[])}</span></p>
+                        <p className='text-[12px]'>followings: &nbsp;<span className='opacity-100 font-medium'>{checkCount(subscriber?.followings as Follows[])}</span></p>
                       </div>
                     </div>
 
@@ -106,7 +105,7 @@ export default function SubscriptionComp({ yourSubscriptions, isLoading, theme, 
 
                   </div>
                 ))
-              : <ErrorContent message='No subscribers' errorMsg={errorMsg} contentLength={yourSubscriptions?.subscribed?.length } />
+              : <ErrorContent message='You subscribed to no one' errorMsg={errorMsg} contentLength={yourSubscriptions?.subscribed?.length } />
           }
         </article>
       </div>

@@ -11,6 +11,23 @@ type FunctionOption = {
   taskId?: string
 }
 
+type Entries = 'socialMediaEntry' | 'hobbiesEntry' | 'stackEntry'
+type ValueType = 'socialMediaName'
+
+
+type InitPrevEntriesType = {
+  prevHobby: string,
+  prevStack: string,
+  prevSocialName: string
+}
+
+type InitEntriesType = { 
+  hobbiesEntry: string, 
+  stackEntry: string, 
+  socialMediaEntry: string, 
+  socialMediaName: string 
+}
+
 type TextProp = {
   boldText: string
   italics: string
@@ -181,8 +198,11 @@ type SocialMediaAccoutProp = {
   link: string
 }
 
-type EachSubs  =  { createdAt: string, subscriberId: string }
-type SubscriptionTo  =  { createdAt: string, subscribeRecipientId: string }
+type Followers = { createdAt: string, followerId: string }
+type Follows = { createdAt: string, followRecipientId: string }
+
+type EachSubs = { createdAt: string, subscriberId: string }
+type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
 
 interface UserProps{
   _id: string,
@@ -202,8 +222,8 @@ interface UserProps{
   isResetPassword: boolean,
   verificationToken: { type: string, token: string, createdAt: string },
   dateLocked: string,
-  followers?: string[],
-  followings?: string[],
+  followers?: Followers[],
+  followings?: Follows[],
   lastSeen: string,
   hobbies: string[],
   status: 'online' | 'offline',
@@ -227,8 +247,8 @@ type SubUser = {
   lastName: string, 
   firstName: string, 
   description: string, 
-  followers: string[], 
-  followings: string[], 
+  followers: Followers[], 
+  followings: Follows[], 
   displayPicture: string,
 }
 
@@ -277,8 +297,8 @@ type AuthType={
 }
 
 type GetFollowsType = {
-  follows: Partial<UserProps[]>,
-  followers: Partial<UserProps[]>
+  follows: SubUser[],
+  followers: SubUser[]
 }
 
 type GetSubscriptionType = {

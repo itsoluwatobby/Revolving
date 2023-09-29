@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "tsc && node dist/revolving.js",
-    "dev": "tsc && node dist/revolving.js",
+    "dev": "tsc && nodemon dist/revolving.js",
     "test": "mocha dist/tests"
   },
   "repository": {
@@ -66,7 +66,6 @@
     "@types/redis": "^4.0.11",
     "@types/uuid": "^9.0.2",
     "mocha": "^10.2.0",
-    "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   }

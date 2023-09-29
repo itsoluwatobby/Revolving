@@ -22,7 +22,7 @@ export const Navbar = () => {
   const { typingEvent } = usePostContext() as PostContextType
   const {theme, rollout, notintersecting, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { storyId } = useParams()
-  const {data} = useGetStoriesByCategoryQuery(getNavigation)
+  const {data} = useGetStoriesByCategoryQuery({category: getNavigation})
   const [targetStory, setTargetStory] = useState<PostType>()
   const [delayedSaving, setDelayedSaving] = useState<TypingEvent>('notTyping')
   const designatedPath =  `/story/${storyId}`

@@ -55,7 +55,7 @@ export function getUser(req, res) {
 }
 /**
  * @description follow or unfollow a user
- * @param req - followerId, followingId
+ * @param req - followerId-sender, followingId- receiver
 */
 export function followUnFollowUser(req, res) {
     asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
@@ -67,7 +67,10 @@ export function followUnFollowUser(req, res) {
         if (!user)
             return responseType({ res, status: 404, message: 'user not found' });
         const result = yield followOrUnFollow(followerId, followingId);
-        result != 'duplicate' ?
+        const errorResponse = ['unable to follow', 'unable to unfollow'];
+        if (errorResponse === null || errorResponse === void 0 ? void 0 : errorResponse.includes(result))
+            return responseType({ res, status: 409, message: result });
+        return result !== 'duplicate' ?
             responseType({ res, status: 201, message: result })
             : responseType({ res, status: 409, message: 'You cannot follow yourself' });
     }));
@@ -181,7 +184,7 @@ export function subscribeToNotification(req, res) {
                 .then(() => __awaiter(this, void 0, void 0, function* () {
                 yield subscribee.updateOne({ $pull: { subscribed: targetSubscriberRecipient } });
                 return responseType({ res, status: 201, message: 'SUCCESSFULLY UNSUBSCRIBED' });
-            })).catch(() => responseType({ res, status: 400, message: 'unable to subscribe' }));
+            })).catch(() => responseType({ res, status: 400, message: 'unable to unsubscribe' }));
         }
         else {
             subscribeRecipient.updateOne({ $push: { notificationSubscribers: { subscriberId, createdAt: dateTime } } })
@@ -240,13 +243,13 @@ export const getUserFollows = (req, res) => {
         yield autoDeleteOnExpire(userId);
         getCachedResponse({ key: `userFollows:${userId}`, cb: () => __awaiter(void 0, void 0, void 0, function* () {
                 var _a, _b;
-                const followings = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.map((id) => __awaiter(void 0, void 0, void 0, function* () {
-                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
-                    return { _id, email, firstName, lastName, followers, followings };
+                const followings = yield Promise.all((_a = user === null || user === void 0 ? void 0 : user.followings) === null || _a === void 0 ? void 0 : _a.map((follow) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = yield getUserById(follow === null || follow === void 0 ? void 0 : follow.followRecipientId);
+                    return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow === null || follow === void 0 ? void 0 : follow.createdAt };
                 })));
-                const followers = yield Promise.all((_b = user === null || user === void 0 ? void 0 : user.followers) === null || _b === void 0 ? void 0 : _b.map((id) => __awaiter(void 0, void 0, void 0, function* () {
-                    const { _id, email, firstName, lastName, followers, followings } = yield getUserById(id);
-                    return { _id, email, firstName, lastName, followers, followings };
+                const followers = yield Promise.all((_b = user === null || user === void 0 ? void 0 : user.followers) === null || _b === void 0 ? void 0 : _b.map((follow) => __awaiter(void 0, void 0, void 0, function* () {
+                    const { _id, description, displayPicture: { photo }, firstName, lastName, followers, followings } = yield getUserById(follow === null || follow === void 0 ? void 0 : follow.followerId);
+                    return { _id, description, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow === null || follow === void 0 ? void 0 : follow.createdAt };
                 })));
                 return { followings, followers };
             }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })

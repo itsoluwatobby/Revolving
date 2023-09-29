@@ -1,8 +1,9 @@
-import { UserProps } from "../../types.js";
+import { Followers, Follows, UserProps } from "../../types.js";
 import { UserModel } from "../models/User.js";
 import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
 import { deleteAllUserStories } from "./StoryService.js";
 
+const dateTime = new Date().toString()
 
   export async function getAllUsers(){
     return await UserModel.find().lean();
@@ -33,19 +34,27 @@ import { deleteAllUserStories } from "./StoryService.js";
     return await UserModel.findByIdAndUpdate({ _id: userId }, updatedUser, {new: true})
   }
 
+  // receiver == followingId
   export async function followOrUnFollow(followerId: string, followingId: string): Promise<string>{
     const user = await UserModel.findById(followerId).exec();
     const following = await UserModel.findById(followingId).exec();
     if(user?._id.toString() == followingId) return 'duplicate'
-    if(!user?.followings?.includes(followingId)) {
-      await user?.updateOne({ $push: {followings: followingId} })
-      await following?.updateOne({ $push: {followers: followerId} })
-      return 'You followed this user'
+
+    const duplicate = following?.followers?.find(sub => sub?.followerId === followerId) as Followers
+    if(duplicate) {
+      const targetFollowerRecipient = user?.followings?.find(sub => sub?.followRecipientId === followingId) as Follows
+      following?.updateOne({ $pull: {followings: duplicate} })
+      .then(async() => {
+        await user?.updateOne({ $pull: { followers: targetFollowerRecipient }})
+        return 'You unfollowed this user'
+      }).catch(() => 'unable to unfollow')
     }
     else {
-      await user?.updateOne({ $pull: {followings: followingId} })
-      await following?.updateOne({ $pull: {followers: followerId} })
-      return 'You unfollowed this user'
+      following?.updateOne({ $push: {followers: { followerId, createdAt: dateTime }} })
+      .then(async() => {
+        await user?.updateOne({ $push: {followings: { followRecipientId: followingId, createdAt: dateTime } } })
+        return 'You followed this user'
+      }).catch(() => 'unable to follow')
     }
   }
 

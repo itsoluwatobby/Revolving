@@ -3,16 +3,22 @@ import { Posts } from "../components/home/Posts";
 // import RightSection from "../components/home/RightSection";
 import { TopHome } from "../components/home/TopHome";
 import { useThemeContext } from "../hooks/useThemeContext";
+import { LeftSection } from "../components/LeftSection";
 
 export const Home = () => {
   const { setRollout } = useThemeContext() as ThemeContextType
- 
+ // w-full flex flex-col gap-2 
   return (
     <main 
       onClick={() => setRollout(false)}
-      className="relative w-full flex flex-col gap-2 ">
-      <TopHome />
-      <Posts />
+      className="w-full flex h-ful">
+      
+      <LeftSection />
+
+      <section className="flex-auto w-full flex flex-col gap-2">
+        <TopHome />
+        <Posts />
+      </section>
     </main>
   )
 }
