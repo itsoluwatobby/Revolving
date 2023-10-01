@@ -49,7 +49,7 @@ export default function NotificationComp({ notifications, isLoading, theme, erro
                         <p className='hover:underline underline-offset-2 cursor-pointer'>{follower?.firstName} {follower?.lastName}
                         </p>
                       </Link>
-                      <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength(follower?.description, 30, 'letter')}</p>
+                      <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength('dd', 30, 'letter')}</p>
                     </div>
 
                     <div className='flex flex-col justify-between'>
