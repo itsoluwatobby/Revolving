@@ -22,8 +22,8 @@ type USERROLES = number
 type ALLOWEDROLES = Record<string, USERROLES>
 
 interface ClaimProps extends JwtPayload{
+  email: string,
   roles: USERROLES[],
-  email: string
 }
 
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
@@ -40,22 +40,22 @@ type CodeProps =  {
 }
 
 interface StoryProps extends Document{
-  userId: Types.ObjectId
-  title: string
-  picture: string[]
   body: string
-  fontFamily: string
-  category: Categories[]
-  commentIds?: string[]
-  isShared?: SharedInfo[]
-  code: CodeProps[]
-  likes: string[]
+  title: string
   edited: false
   author: string
-  sharedAuthor: string
-  sharedDate?: string
+  likes: string[]
+  picture: string[]
+  code: CodeProps[]
   createdAt: string
   updatedAt: string
+  fontFamily: string
+  sharedDate?: string
+  sharedAuthor: string
+  commentIds?: string[]
+  userId: Types.ObjectId
+  category: Categories[]
+  isShared?: SharedInfo[]
 }
 
 type TaskBin = {
@@ -68,27 +68,27 @@ type TaskBin = {
 
 interface TaskProp{
   _id: string,
-  userId: string,
   task: string,
-  completed: boolean,
-  subTasks?: SubTasks[],
-  dateRestored: string,
+  userId: string,
   edited: boolean,
   createdAt: string,
+  completed: boolean,
   updatedAt?: string,
+  dateRestored: string,
+  subTasks?: SubTasks[],
 }
 
 interface CommentProps{
   _id: string,
-  storyId: string,
   userId: string,
-  comment: string,
-  likes: string[],
   author: string,
+  likes: string[],
   edited: boolean,
+  storyId: string,
+  comment: string,
+  updatedAt: string,
+  createdAt: string,
   commentResponse: string[]
-  createdAt: string
-  updatedAt: string
 }
 
 type ConfirmationMethodType = 'LINK' | 'OTP'
@@ -96,20 +96,20 @@ type Gender = "Female" | "Male" | "Others" | "Undecided"
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 
 interface Emerge extends CommentProps{
-  responseTags: string[],
-  commentId: string,
   response: string,
-  responseId?: string
+  commentId: string,
+  responseId?: string,
+  responseTags: string[],
 }
 
 interface SharedProps extends Document{
-  sharerId: string,
   storyId: string,
-  sharedLikes: string[],
-  sharedAuthor: string,
-  sharedStory: StoryProps,
+  sharerId: string,
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  sharedAuthor: string,
+  sharedLikes: string[],
+  sharedStory: StoryProps,
 }
 
 type SocialMediaAccoutProp = {
@@ -139,6 +139,8 @@ interface UserProps extends Document{
   username: string,
   lastSeen: string,
   taskIds: string[],
+  createdAt: string,
+  updatedAt: string,
   hobbies: string[],
   firstName: string,
   roles: USERROLES[],
@@ -146,8 +148,9 @@ interface UserProps extends Document{
   description: string,
   userSession: string,
   refreshToken: string,
-  followers?: Followers[],
+  notificationId: string,
   followings?: Follows[],
+  followers?: Followers[],
   displayPicture: {
     coverPhoto: string, 
     photo: string
@@ -161,8 +164,6 @@ interface UserProps extends Document{
   notificationSubscribers: EachSubs[],
   verificationToken: VerificationTokenType,
   socialMediaAccounts: SocialMediaAccoutProp[],
-  createdAt: string,
-  updatedAt: string
 }
 
 type SubUser = {
@@ -171,8 +172,8 @@ type SubUser = {
   lastName: string, 
   firstName: string, 
   description: string, 
-  followers: Followers[], 
   followings: Follows[], 
+  followers: Followers[], 
   displayPicture: string,
 }
 
@@ -215,3 +216,82 @@ type GetSubscriptionType = {
   subscriptions: SubUser[],
   subscribed: SubUser[]
 }
+
+// NOTIFICATION OBJECT MODELS
+type NewStoryNotificationType = {
+  body: string, 
+  title: string, 
+  author: string,
+  userId: string,
+  likes: string[], 
+  picture: string,
+  commentIds: string[],
+  _id: string | ObjectId, 
+  category: Categories[], 
+}
+
+type FollowNotificationType = {
+  userId: string | ObjectId,
+  fullName: string,
+  displayPicture: string
+}
+
+type SubscribeNotificationType = FollowNotificationType
+
+type MessageNotificationType = FollowNotificationType
+
+type CommentNotificationType = FollowNotificationType & {storyId: string, title: string}
+
+type LikeNotificationType = CommentNotificationType
+
+// All notification model types
+type AllNotificationModelType = NewStoryNotificationType | FollowNotificationType | SubscribeNotificationType | MessageNotificationType | CommentNotificationType | LikeNotificationType
+
+// Notification
+type NotificationType = 'Subcribe' | 'NewStory' | 'Follow' | 'Likes' | 'Comment' | 'Message' | 'Tagged' | 'SharedStory'
+
+type NotificationBody = {
+  _id: ObjectId | string,
+  hasRead: boolean,
+  notificationType: NotificationType,
+  notify: { [key: string]: string | number | Categories[] | string[] },
+  createdAt: string,
+  updatedAt: string
+}
+
+interface NotificationModelType{
+  _id: ObjectId | string,
+  userId: ObjectId | string,
+  isNotificationOpen: boolean,
+  notification: NotificationBody[],
+  createdAt: string,
+  updatedAt: string
+}
+
+interface NewUserProp extends Request{
+  username: string,
+  email: string,
+  password: string,
+  userId: string,
+  type: ConfirmationMethodType
+}
+
+interface QueryProps extends Request{token: string}
+interface EmailProps extends Request{
+  email: string,
+  resetPass: string
+}
+
+interface RequestProp extends Request{
+  userId: string,
+  storyId: string,
+  commentId: string,
+  // newComment: CommentProps
+};
+
+interface RequestStoryProp extends Request{
+  userId: string,
+  storyId: string,
+  category: Categories
+};
+

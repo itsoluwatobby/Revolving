@@ -53,6 +53,7 @@ const USERSCHEMA: Schema = new Schema(
     subscribed: [SubscriptionsTo],
     stack: { type: Array, default: [] },
     socialMediaAccounts: [SocialMedia],
+    notificationId: { type: String, default: '' },
     country: { type: String, default: '' },
   },
   { 

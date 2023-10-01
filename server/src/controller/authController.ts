@@ -1,44 +1,43 @@
 import brcypt from 'bcrypt';
 import { Document, Types } from "mongoose";
 import { Request, Response } from "express";
-import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 import { UserModel } from "../models/User.js";
-import { transporter } from '../config/mailConfig.js';
-import { mailOptions } from '../templates/registration.js'; 
-import { redisClient } from "../helpers/redis.js";
 import { ROLES } from "../config/allowedRoles.js";
+import { transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
-import { ClaimProps, ConfirmationMethodType, UserProps } from "../../types.js";
-import { createUser, getUserByEmail, getUserById, getUserByVerificationToken } from "../services/userService.js";
+import { RedisClientService } from '../helpers/redis.js';
+import { UserService } from '../services/userService.js';
+import { mailOptions } from '../templates/registration.js'; 
+import { NotificationModel } from '../models/Notifications.js';
+import { ClaimProps, EmailProps, NewUserProp, QueryProps, UserProps } from "../../types.js";
+import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 
-interface NewUserProp extends Request{
-  username: string,
-  email: string,
-  password: string,
-  userId: string,
-  type: ConfirmationMethodType
-}
+/**
+ * @description Authentication controller
+ */
+class AuthenticationController {
 
-interface QueryProps extends Request{token: string}
-interface EmailProps extends Request{
-  email: string,
-  resetPass: string
-}
+  public dateTime: string
+  public emailRegex: RegExp
+  public passwordRegex: RegExp
+  private userService = new UserService()
+  private redisClientService = new RedisClientService()
 
-
-  const emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
-  const dateTime = new Date().toString()
+  constructor(){
+     this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
+     this.passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
+     this.dateTime = new Date().toString()
+  }
 
   /**
    * @description signs up a new user
    * @param body - username, email, password, type= 'LINK' | 'OTP'
   */
-  export function registerUser(req: NewUserProp, res: Response){
+  public registerUser(req: NewUserProp, res: Response){
     asyncFunc(res, async () => {
       const {username, email, password, type}: Omit<NewUserProp, 'userId'> = req.body
       if (!username || !email || !password) return res.sendStatus(400);
-      if(!emailRegex.test(email) || !passwordRegex.test(password)) return responseType({res, status: 400, message: 'Invalid email or Password format', data: {
+      if(!this.emailRegex.test(email) || !this.passwordRegex.test(password)) return responseType({res, status: 400, message: 'Invalid email or Password format', data: {
         requirement:  {
           password: {
             "a": 'Should atleast contain a symbol and number', 
@@ -67,15 +66,15 @@ interface EmailProps extends Request{
       const user = {
         username, email,
         password: hashedPassword, 
-        registrationDate: dateTime
+        registrationDate: this.dateTime
       } as Partial<UserProps>
-      const newUser = await createUser({...user})
+      const newUser = await this.userService.createUser({...user})
       if(type === 'LINK'){
         const roles = Object.values(newUser?.roles)
         const token = await signToken({roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
         const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
         const options = mailOptions(email, username, verificationLink)
-        await newUser.updateOne({$set: {verificationToken: { type: 'LINK', token: verificationLink, createdAt: dateTime }}});
+        await newUser.updateOne({$set: {verificationToken: { type: 'LINK', token: verificationLink, createdAt: this.dateTime }}});
     
         transporter.sendMail(options, (err) => {
           if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
@@ -83,7 +82,7 @@ interface EmailProps extends Request{
         return responseType({res, status: 201, message: 'Please check your email to activate your account'})
       }
       else if(type === 'OTP'){
-        OTPGenerator(res, newUser)
+        this.OTPGenerator(res, newUser)
       }
     })
   }
@@ -92,15 +91,15 @@ interface EmailProps extends Request{
    * @description account confirmation by link
    * @param query - token
   */
-  export function accountConfirmation(req: Request, res: Response){
+  public accountConfirmation(req: Request, res: Response){
     asyncFunc(res, async () => {
       const { token } = req.query
       if(!token) return res.sendStatus(400)
-      const user = await getUserByVerificationToken(token as string)
+      const user = await this.userService.getUserByVerificationToken(token as string)
       if(!user) {
         const verify = await verifyToken(token as string, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
         if (!verify?.email) return res.sendStatus(400)
-        const user = await getUserByEmail(verify?.email);
+        const user = await this.userService.getUserByEmail(verify?.email);
         if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
         await user.updateOne({ $set: { isAccountActivated: true, verificationToken: { type: 'LINK', token: '', createdAt: '' }}})
         return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
@@ -120,11 +119,11 @@ interface EmailProps extends Request{
    * @descriptionconfirms OTP sent by user
    * @body body - email, otp, purpose='ACCOUNT' | 'OTHERS
   */
-  export function confirmOTPToken(req: Request, res: Response){
+  public confirmOTPToken(req: Request, res: Response){
     asyncFunc(res, async () => {
       const { email, otp, purpose='ACCOUNT' }: {email: string, otp: string, purpose?: 'ACCOUNT' | 'OTHERS'} = req.body
       if(!email || !otp) return responseType({res, status: 400, message: 'OTP or Email required'});
-      const user = await getUserByEmail(email)
+      const user = await this.userService.getUserByEmail(email)
       if(!user) return responseType({res, status: 404, message: 'You do not have an account'});
       if(purpose === 'ACCOUNT'){
         if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
@@ -152,11 +151,11 @@ interface EmailProps extends Request{
    * @description generates OTP and sends it to user email
    * @param req - response object, user, length(default - 6)
   */
-  export function OTPGenerator(res: Response, user: Document<unknown, {}, UserProps> & UserProps & {_id: Types.ObjectId;}, length=6){
+  public OTPGenerator(res: Response, user: Document<unknown, {}, UserProps> & UserProps & {_id: Types.ObjectId;}, length=6){
     asyncFunc(res, async () => {
       const OTPToken = generateOTP(length)
       const options = mailOptions(user?.email, user?.username, OTPToken, 'account', 'OTP')
-      await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: dateTime } }});
+      await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } }});
       transporter.sendMail(options, (err) => {
         if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
         else return responseType({res, status: 201, message: 'Please check your email, OTP sent'})
@@ -168,17 +167,17 @@ interface EmailProps extends Request{
    * @description generates a new OTP
    * @param req - email, length(optional), option='EMAIL
   */  
-  export function ExtraOTPGenerator(req: Request, res: Response){
+  public ExtraOTPGenerator(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {email, length, option}: { email: string, length: number, option: 'EMAIL' | 'DIRECT' } = req.body
       if(!email) return responseType({res, status: 400, message: 'Email required'});
-      const user = await getUserByEmail(email)
+      const user = await this.userService.getUserByEmail(email)
       if(option === 'EMAIL'){
-        OTPGenerator(res, user, length)
+        this.OTPGenerator(res, user, length)
       }
       else{
         const OTPToken = generateOTP(length)
-        await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: dateTime } }});
+        await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } }});
         return responseType({res, status: 200, message: 'OTP generated', data: { otp: OTPToken, expiresIn: '30 minutes' }})
       }
     })
@@ -188,7 +187,7 @@ interface EmailProps extends Request{
    * @description signs in in a user
    * @param req - email and password
   */
-  export function loginHandler(req: NewUserProp, res: Response){
+  public loginHandler(req: NewUserProp, res: Response){
     asyncFunc(res, async () => {
       const {email, password} = req.body
       if (!email || !password) return res.sendStatus(400);
@@ -209,7 +208,7 @@ interface EmailProps extends Request{
             const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
     
             const options = mailOptions(email, user?.username, verificationLink)
-            await user.updateOne({$set: {verificationToken: { type: 'LINK', token, createdAt: dateTime }}});
+            await user.updateOne({$set: {verificationToken: { type: 'LINK', token, createdAt: this.dateTime }}});
     
             transporter.sendMail(options, (err) => {
               if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
@@ -220,7 +219,7 @@ interface EmailProps extends Request{
         }
         else{
           if(checksExpiration(user?.verificationToken?.createdAt)){
-            OTPGenerator(res, user)
+            this.OTPGenerator(res, user)
           }
           else{
             return responseType({res, status: 406, message: 'Please check your email.'})
@@ -235,6 +234,10 @@ interface EmailProps extends Request{
       // create taskBin for user
       if(!Boolean(await TaskBinModel.exists({userId: user?._id}))){
         await TaskBinModel.create({ userId: user?._id, taskBin: [] })
+      }
+      if(!Boolean(await NotificationModel.exists({userId: user?._id}))){
+        const newNotification = await NotificationModel.create({ userId: user?._id, notification: [] })
+        await user.updateOne({$set: { notificationId: newNotification?._id }})
       }
       await autoDeleteOnExpire(user?._id)
 
@@ -252,28 +255,28 @@ interface EmailProps extends Request{
    * @description logs out a user
    * @param req - userId
   */ 
-  export async function logoutHandler(req: NewUserProp, res: Response){
+  public async logoutHandler(req: NewUserProp, res: Response){
     try{
       const { userId } = req.params
       if(!userId) {
         res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
-        await redisFunc()
+        await this.redisFunc()
         return res.sendStatus(204);
       }
-      const user = await getUserById(userId)
+      const user = await this.userService.getUserById(userId)
       if (!user) {
         res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
-        await redisFunc()
+        await this.redisFunc()
         return res.sendStatus(204);
       }
-      await user.updateOne({$set: {status: 'offline', userSession: '', lastSeen: dateTime, refreshToken: '', verificationToken: { token: '' } }})
-      await redisFunc()
+      await user.updateOne({$set: {status: 'offline', userSession: '', lastSeen: this.dateTime, refreshToken: '', verificationToken: { token: '' } }})
+      await this.redisFunc()
       res.clearCookie('revolving', { httpOnly: true, sameSite: "none", secure: true })//secure: true
       return res.sendStatus(204)
     }
     catch(error){
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })//secure: true
-      await redisFunc()
+      await this.redisFunc()
       return res.sendStatus(500);
     }
   }
@@ -282,11 +285,11 @@ interface EmailProps extends Request{
    * @description receives a request to reset user password
    * @param query - email
   */ 
-  export function forgetPassword(req: Request, res: Response){
+  public forgetPassword(req: Request, res: Response){
     asyncFunc(res, async () => {
       const { email } = req.query
       if(!email) return res.sendStatus(400);
-      const user = await getUserByEmail(email as string);
+      const user = await this.userService.getUserByEmail(email as string);
       if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
       if (user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'})
 
@@ -296,7 +299,7 @@ interface EmailProps extends Request{
       transporter.sendMail(options, (err) => {
         if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
       })
-      user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: dateTime } }})
+      user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } }})
       .then(() => responseType({res, status:201, message:'Please check your email'}))
       .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     })
@@ -306,11 +309,11 @@ interface EmailProps extends Request{
    * @description confirms password request and sends back a password_reset link
    * @param query - token
   */ 
-  export function passwordResetRedirectLink(req: QueryProps, res: Response){
+  public passwordResetRedirectLink(req: QueryProps, res: Response){
     asyncFunc(res, async () => {
       const { token } = req.query
       if(!token) return res.sendStatus(400)
-      const user = await getUserByVerificationToken(token as string)
+      const user = await this.userService.getUserByVerificationToken(token as string)
       if(!user) return res.sendStatus(401)
       if(!user.isResetPassword) return res.sendStatus(401)
 
@@ -328,7 +331,7 @@ interface EmailProps extends Request{
    * @description resets user password
    * @param boby - email, resetPass
   */ 
-  export function passwordReset(req: EmailProps, res: Response){
+  public passwordReset(req: EmailProps, res: Response){
     asyncFunc(res, async () => {
       const {resetPass, email} = req.body
       if(!email || !resetPass) return res.sendStatus(400)
@@ -352,7 +355,7 @@ interface EmailProps extends Request{
    * @description confirms user password
    * @param req - email, password
   */ 
-  export function confirmUserByPassword(req: EmailProps, res: Response){
+  public confirmUserByPassword(req: EmailProps, res: Response){
     asyncFunc(res, async () => {
       const {password, email} = req.body
       if(!email || !password) return res.sendStatus(400)
@@ -368,25 +371,25 @@ interface EmailProps extends Request{
    * @description toggles assigning admin role by admin
    * @param req - adminId and userId
   */ 
-  export function toggleAdminRole(req: Request, res: Response){
+  public toggleAdminRole(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {adminId, userId} = req.params
       if(!adminId || !userId) return res.sendStatus(400)
-      const user = await getUserById(userId);
-      const admin = await getUserById(adminId);
+      const user = await this.userService.getUserById(userId);
+      const admin = await this.userService.getUserById(adminId);
       if(!user || !admin) return responseType({res, status: 401, message:'User not found'})
       if(admin?.roles.includes(ROLES.ADMIN)) {
         if(!user?.roles.includes(ROLES.ADMIN)) {
           user.roles = [...user.roles, ROLES.ADMIN]
           await user.save()
-          getUserById(userId)
+          this.userService.getUserById(userId)
           .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role assigned', data: userAd}))
           .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
         }
         else{
           user.roles = [ROLES.USER]
           await user.save()
-          getUserById(userId)
+          this.userService.getUserById(userId)
           .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role removed', data: userAd}))
           .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
         }
@@ -398,11 +401,13 @@ interface EmailProps extends Request{
   /**
    * @description disconnects redis connection
   */ 
-  async function redisFunc(){
+  public async redisFunc(){
     objInstance.reset();
-    if(redisClient.isOpen){
-      await redisClient.flushAll();
-      await redisClient.quit();
+    if(this.redisClientService.redisClient.isOpen){
+      await this.redisClientService.redisClient.flushAll();
+      await this.redisClientService.redisClient.quit();
     }
     return;
   }
+}
+export default new AuthenticationController()

@@ -8,14 +8,26 @@ import responseRouter from '../routes/responseRoutes.js';
 import passwordResetRouter from '../routes/resetPassword.js';
 import { logURLAndMethods } from '../middleware/urlLogger.js';
 import taskManagerRouter from '../routes/taskManagerRoutes.js';
+//  import { verifyAccessToken } from '../middleware/verifyTokens.js';
+// import { logoutHandler } from '../controller/authController.js';
+// import { getUser, getUsers } from '../controller/userController.js';
+// import { getComment, getStoryComments } from '../controller/commentController.js';
+// import { getResponse, getResponseByComment } from '../controller/responseController.js';
+// import { getTask, getTasksInBin, getUserTask } from '../controller/taskManagerController.js';
+// import { fetchSharedStories, getSingleShared } from '../controller/sharedStoryController.js';
+// import { getStories, getStoriesWithUserId, getStory, getStoryByCategory, getStoryLikes } from '../controller/storyController.js';
+// import TokenController from '../middleware/verifyTokens.js';
+import UserController from '../controller/userController.js';
+import StoryController from '../controller/storyController.js';
+import notificationRouter from '../routes/notificationRoutes.js';
+import CommentController from '../controller/commentController.js';
+import ResponseController from '../controller/responseController.js';
+import AuthenticationController from '../controller/authController.js';
+import TaskManagerController from '../controller/taskManagerController.js';
+import SharedStoryController from '../controller/sharedStoryController.js';
 import { verifyAccessToken } from '../middleware/verifyTokens.js';
-import { logoutHandler } from '../controller/authController.js';
-import { getUser, getUsers } from '../controller/userController.js';
-import { getComment, getStoryComments } from '../controller/commentController.js';
-import { getResponse, getResponseByComment } from '../controller/responseController.js';
-import { getStories, getStoriesWithUserId, getStory, getStoryByCategory, getStoryLikes } from '../controller/storyController.js';
-import { getTask, getTasksInBin, getUserTask } from '../controller/taskManagerController.js';
-import { fetchSharedStories, getSingleShared } from '../controller/sharedStoryController.js';
+import { EmailProps, NewUserProp, RequestProp, RequestStoryProp } from '../../types.js';
+
 
 export class RevolvingApplication{
 
@@ -36,37 +48,37 @@ export class RevolvingApplication{
 
   // ROUTES
     this.app.use('/revolving/auth', authRouter);
-    this.app.post('/revolving/auth/logout/:userId', logoutHandler);
+    this.app.post('/revolving/auth/logout/:userId', (req: NewUserProp, res: Response) => AuthenticationController.logoutHandler(req, res));
 
   // USERS
-    this.app.get('/revolving/users', getUsers);
-    this.app.get('/revolving/users/single/:userId', getUser);
+    this.app.get('/revolving/users', (req: NewUserProp, res: Response) => UserController.getUsers(req, res));
+    this.app.get('/revolving/users/single/:userId', (req: NewUserProp, res: Response) => UserController.getUser(req, res));
 
   //password reset
     this.app.use('/revolving/auth', passwordResetRouter);
   
-    this.app.get('/revolving/story/share_getAll', fetchSharedStories)
+    this.app.get('/revolving/story/share_getAll', (req: RequestStoryProp, res: Response) => SharedStoryController.fetchSharedStories(req, res));
 
   //public routes
-    this.app.get('/revolving/story', getStories);
-    this.app.get('/revolving/story/user/likesUsersInStory/:userId', getStoryLikes)
-    this.app.get('/revolving/story/user/storyWithUserId/:userId', getStoriesWithUserId)
+    this.app.get('/revolving/story', (req: RequestStoryProp, res: Response) => StoryController.getStories(req, res));
+    this.app.get('/revolving/story/user/likesUsersInStory/:userId', (req: RequestStoryProp, res: Response) => StoryController.getStoryLikes(req, res));
+    this.app.get('/revolving/story/user/storyWithUserId/:userId', (req: RequestStoryProp, res: Response) => StoryController.getStoriesWithUserId(req, res));
   
   // comments
-    this.app.get('/revolving/comment_in_story/:storyId', getStoryComments);
-    this.app.get('/revolving/comment/:commentId', getComment);
+    this.app.get('/revolving/comment_in_story/:storyId', (req: RequestProp, res: Response) => CommentController.getStoryComments(req, res));
+    this.app.get('/revolving/comment/:commentId', (req: RequestProp, res: Response) => CommentController.getComment(req, res));
   
-    this.app.get('/revolving/response_in_comment/:commentId', getResponseByComment);
-    this.app.get('/revolving/response/:responseId', getResponse);
+    this.app.get('/revolving/response_in_comment/:commentId', (req: RequestProp, res: Response) => ResponseController.getResponseByComment(req, res));
+    this.app.get('/revolving/response/:responseId', (req: RequestProp, res: Response) => ResponseController.getResponse(req, res));
 
-    this.app.get('/revolving/story/category', getStoryByCategory);
-    this.app.get('/revolving/story/:storyId', getStory);
-    this.app.get('/revolving/story/share/:sharedId', getSingleShared)
+    this.app.get('/revolving/story/category', (req: RequestStoryProp, res: Response) => StoryController.getStoryByCategory(req, res));
+    this.app.get('/revolving/story/:storyId', (req: RequestStoryProp, res: Response) => StoryController.getStory(req, res));
+    this.app.get('/revolving/story/share/:sharedId', (req: RequestStoryProp, res: Response) => SharedStoryController.getSingleShared(req, res));
 
   // Task manager
-    this.app.get('/revolving/task/user/:userId', getUserTask)
-    this.app.get('/revolving/task/:taskId', getTask)
-    this.app.get('/revolving/task/bin/:userId', getTasksInBin)
+    this.app.get('/revolving/task/user/:userId', (req: Request, res: Response) => TaskManagerController.getUserTask(req, res));
+    this.app.get('/revolving/task/:taskId', (req: Request, res: Response) => TaskManagerController.getTask(req, res));
+    this.app.get('/revolving/task/bin/:userId', (req: Request, res: Response) => TaskManagerController.getTasksInBin(req, res));
 
   // get image
   //  this.app.get('/revolving/images/:imageName', getImage)
@@ -91,6 +103,9 @@ export class RevolvingApplication{
 
   // task manager router
     this.app.use('/revolving/task', taskManagerRouter);
+  
+    // notification router
+    this.app.use('/revolving/notification', notificationRouter);
     
     // catch all error
      //app.use(errorLog);

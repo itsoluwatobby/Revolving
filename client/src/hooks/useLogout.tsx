@@ -1,16 +1,20 @@
 import { toast } from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ThemeContextType } from "../posts";
 import { useThemeContext } from "./useThemeContext";
 import { signUserOut } from "../features/auth/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSignOutMutation } from "../app/api/authApiSlice";
+import { getCurrentUser } from "../features/auth/userSlice";
+import { useOpenedNotificationMutation } from "../app/api/noficationSlice";
 
 type SignOutType = 'dont' | 'use'
 
 export default function useLogout() {
   const { setRollout } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
+  const currentUser = useSelector(getCurrentUser)
+  const [isNotificationOpened] = useOpenedNotificationMutation()
   const [signedOut] = useSignOutMutation()
   const { pathname } = useLocation()
   const dispatch = useDispatch()
@@ -18,6 +22,7 @@ export default function useLogout() {
 
   const signOut = async(option: SignOutType = 'use') => {
     try{
+      await isNotificationOpened({ isOpen: false, notificationId: currentUser?.notificationId as string }).unwrap()
       if(currentUserId) await signedOut(currentUserId as string)
       dispatch(signUserOut())
       toast.success('Success!! You logged out', {

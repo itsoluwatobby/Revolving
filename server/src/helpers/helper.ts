@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken'
 import { ClaimProps, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
 import { Response } from 'express';
 import { TaskBinModel } from '../models/TaskManager.js';
-import { timeConverterInMillis } from './redis.js';
 
 type ReqOpt = {
   mtd: string,
@@ -157,6 +156,14 @@ export async function pagination({startIndex=1, endIndex=1, page=1, limit=1, cb}
 }
 
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
+
+function timeConverterInMillis() {
+  const minute = 60 * 1000
+  const hour = minute * 60
+  const day = hour * 24
+
+  return {minute, hour, day}
+}
 
 /**
  * @description function to autodelete a taskbin when expired

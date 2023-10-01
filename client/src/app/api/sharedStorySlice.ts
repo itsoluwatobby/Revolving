@@ -18,7 +18,7 @@ export const sharedStoryApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: userId
       }),
-      invalidatesTags: [{ type: 'STORY' }, { type: 'STORY', id: 'LIST' }, { type: 'SHAREDSTORY' }],
+      invalidatesTags: [{ type: 'STORY' }, { type: 'NOTIFICATION' }, { type: 'STORY', id: 'LIST' }, { type: 'SHAREDSTORY' }],
     }),
 
     deleteSharedStory: builder.mutation<void, SharedStoryArgs>({

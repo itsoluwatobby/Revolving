@@ -14,6 +14,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts";
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice";
 import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice";
+import { BiMessageDots } from "react-icons/bi";
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -137,13 +138,26 @@ export default function TopRight({ currentUser }: TopRightProps) {
 
   return (
     <>
-      {
+        {
           theme == 'dark' ? 
             <FiSun 
               onClick={() => changeTheme('light')}
               className={mode_class} /> : <BsMoonStars 
               onClick={() => changeTheme('dark')}
-                className={mode_class+'text-gray-700'} />
+                className={mode_class+'text-gray-700 mr-2'} />
+        }
+
+        {
+          !exclude?.includes(pathname) ?
+            <div 
+            title='Notifications'
+              className="relative cursor-pointer">
+              <BiMessageDots 
+                className={`text-2xl text-gray-500 hover:text-gray-600 transition-all`}
+              />
+              <span className="text-sm rounded bg-slate-600 grid place-content-center absolute -right-1 -bottom-1 text-white p-2 w-4 h-3.5">5</span>
+            </div>
+          : null
         }
           {address?.includes(pathname) ? 
             (

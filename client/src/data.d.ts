@@ -165,7 +165,7 @@ interface TaskProp{
   updatedAt?: string,
 }
 
-type Positions = 'navbar' | 'profile' | 'others'
+type Positions = 'navbar' | 'profile' | 'followPage' | 'others'
 
 type HoverType = 'unfollow' | 'following'
 type PositionType = Positions[]
@@ -226,6 +226,7 @@ interface UserProps{
   followings?: Follows[],
   lastSeen: string,
   hobbies: string[],
+  notificationId: string,
   status: 'online' | 'offline',
   refreshToken: string,
   editDate: string,
@@ -366,4 +367,55 @@ interface RegistrationProps extends UserInfoProps{
   setValidEmail: React.Dispatch<React.SetStateAction<boolean>>,
   setValidPassword: React.Dispatch<React.SetStateAction<boolean>>
   setConfirmationBy: React.Dispatch<React.SetStateAction<ConfirmationMethodType>>
+}
+
+// NOTIFICATION OBJECT MODELS
+type NewStoryNotificationType = {
+  body: string, 
+  title: string, 
+  author: string,
+  userId: string,
+  likes: string[], 
+  picture: string,
+  commentIds: string[],
+  _id: string, 
+  category: Categories[], 
+}
+
+type FollowNotificationType = {
+  userId: string,
+  fullName: string,
+  displayPicture: string
+}
+
+type SubscribeNotificationType = FollowNotificationType
+
+type MessageNotificationType = FollowNotificationType
+
+type CommentNotificationType = FollowNotificationType & {storyId: string, title: string}
+
+type LikeNotificationType = CommentNotificationType
+
+// All notification model types
+type AllNotificationModelType = NewStoryNotificationType | FollowNotificationType | SubscribeNotificationType | MessageNotificationType | CommentNotificationType | LikeNotificationType
+
+// Notification
+type NotificationType = 'Subcribe' | 'NewStory' | 'Follow' | 'Likes' | 'Comment' | 'Message' | 'Tagged'
+
+type NotificationBody = {
+  _id: string,
+  hasRead: boolean,
+  notificationType: NotificationType,
+  notify: { [key: string]: string | number | Categories[] | string[] },
+  createdAt: string,
+  updatedAt: string
+}
+
+interface NotificationModelType{
+  _id: string,
+  userId: string,
+  isNotificationOpen: boolean,
+  notification: NotificationBody[],
+  createdAt: string,
+  updatedAt: string
 }

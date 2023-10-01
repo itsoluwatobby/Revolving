@@ -1,6 +1,6 @@
 import { toast } from 'react-hot-toast';
-import { useState, useCallback, useEffect } from 'react';
 import { Theme, ThemeContextType } from '../../posts';
+import { useState, useCallback, useEffect } from 'react';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { ErrorResponse, HoverType, PositionType } from '../../data';
 import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from '../../app/api/usersApiSlice';
@@ -10,11 +10,10 @@ type FollowUnFollowProps = {
   position: PositionType
 }
 
-let isPrinted = false
 export default function FollowUnFollow({ userId, position }: FollowUnFollowProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
-  const {data: user, refetch} = useGetUserByIdQuery(currentUserId)
+  const {data: user} = useGetUserByIdQuery(currentUserId)
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
   
   const [followUnfollowUser, { isLoading: isMutating, 
@@ -27,20 +26,15 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
     `
   }, [])
   
-  if(!isPrinted){
-    console.log(user)
-    isPrinted = true
-  }
-  
   useEffect(() => {
     let isMounted = true
-    if(isMounted && currentUserId !== user?._id){
-      setIsFollowing(() => user?.followers?.find(sub => sub?.followerId === currentUserId) ? true : false)
+    if(isMounted && userId !== user?._id){
+      setIsFollowing(() => user?.followings?.find(sub => sub?.followRecipientId === userId) ? true : false)
     }
     return () => {
       isMounted = false
     }
-  }, [user?._id, user?.followers, currentUserId])
+  }, [user?.followings, user?._id, currentUserId, userId])
 
   const followOrUnfollow = async() => {
     try{
@@ -56,7 +50,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
     }
     catch(err: unknown){
       const errors = followError as ErrorResponse
-     (!currentUserId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
+      (!currentUserId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
       isFollowError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
@@ -73,7 +67,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
             <button 
               onClick={followOrUnfollow}
               className={buttonClass(isMutating, theme, position)}>
-              follow
+              {position?.includes('followPage') ? 'follow back' : 'follow'}
             </button>
             ):(
             <button 

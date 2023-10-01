@@ -72,7 +72,7 @@ export const Navbar = () => {
         currentUser={currentUser as UserProps}
       />
       
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 z-30 ${pathname !== `/story/${storyId}` ? 'w-fit' : ''} ${pathname === `/edit_story/${storyId}` ? 'mobile:gap-x-2' : 'mobile:gap-x-1 gap-x-2'}`}>
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 mobile:p-0.5 z-30 ${pathname !== `/story/${storyId}` ? 'w-fit' : ''} ${pathname === `/edit_story/${storyId}` ? 'mobile:gap-x-2' : 'mobile:gap-x-1 gap-x-2'}`}>
         <TopRight currentUser={currentUser as UserProps} />
       </div>
      { 

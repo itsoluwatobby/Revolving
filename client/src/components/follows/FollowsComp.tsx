@@ -2,9 +2,10 @@ import { Theme } from '../../posts';
 import { format } from 'timeago.js';
 import { Link } from 'react-router-dom';
 import { ErrorContent } from '../ErrorContent';
-import { ErrorResponse, Followers, Follows, GetFollowsType } from '../../data';
+import FollowUnFollow from '../singlePost/FollowUnFollow';
 import { checkCount, reduceLength } from '../../utils/navigator';
 import SkeletonSubscription from '../skeletons/SkeletonSubscription';
+import { ErrorResponse, Followers, Follows, GetFollowsType } from '../../data';
 
 type FollowsCompProps = { 
   theme: Theme,
@@ -56,7 +57,10 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                       </div>
                     </div>
 
-                    <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follower?.subDate)}</p>
+                    <div className='flex flex-col justify-between'>
+                      <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follower?.subDate)}</p>
+                      <FollowUnFollow userId={follower?._id} position={['followPage']} />
+                    </div>
 
                   </div>
                 ))
@@ -101,7 +105,10 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                       </div>
                     </div>
 
-                    <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follow?.subDate)}</p>
+                      <div className='flex flex-col'>
+                        <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follow?.subDate)}</p>
+                        <button>not following</button>
+                      </div>
 {/* FOLLOW BACK BUTTON */}
                   </div>
                 ))

@@ -4,7 +4,11 @@ import { Request, Response } from "express";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 
 
-  export function uploadImages(req: Request, res: Response){
+class ImageController {
+
+  constructor(){}
+
+  public uploadImages(req: Request, res: Response){
     asyncFunc(res, async() => {
       const uploadedFile = req.file;
       const uniqueId = uuidV4()
@@ -21,7 +25,7 @@ import { asyncFunc, responseType } from "../helpers/helper.js";
   }
 
   // Using express-static middleware to serve my images
-  export function getImage(req: Request, res: Response){
+  public getImage(req: Request, res: Response){
     asyncFunc(res, async() => {
       const {imageName} = req.params
       const pathname = process.cwd()+`\\fileUpload\\${imageName}`
@@ -29,7 +33,7 @@ import { asyncFunc, responseType } from "../helpers/helper.js";
     })
   }
 
-  export function deleteImage(req: Request, res: Response){
+  public deleteImage(req: Request, res: Response){
     asyncFunc(res, async() => {
       const name = req.url
       const imageName = name.substring(1)
@@ -39,3 +43,5 @@ import { asyncFunc, responseType } from "../helpers/helper.js";
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
+}
+export default new ImageController()

@@ -1,95 +1,96 @@
 import { Request, Response } from "express";
 import { ROLES } from "../config/allowedRoles.js";
-import { CommentResponseProps } from "../../types.js";
-import { getCachedResponse } from "../helpers/redis.js";
-import { getUserById } from "../services/userService.js";
-import { createResponse, deleteAllUserResponseInComment, deleteAllUserResponses, deleteSingleResponse, editResponse, getAllCommentsResponse, getCommentById, getResponseById, getUserResponses, likeAndUnlikeResponse } from "../services/commentService.js";
+import { CommentResponseProps, RequestProp } from "../../types.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
-
-interface RequestProp extends Request{
-  userId: string,
-  responseId: string,
-  commentId: string,
-  // newComment: CommentProps
-};
+import { UserService } from "../services/userService.js";
+import { CommentService } from "../services/commentService.js";
+import { RedisClientService } from "../helpers/redis.js";
 
 
-  export function createNewResponse(req: RequestProp, res: Response){
+class ResponseController {
+
+  private userService = new UserService()
+  private responseService = new CommentService()
+  private redisClientService = new RedisClientService()
+
+  constructor(){}
+
+  public createNewResponse(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { userId, commentId } = req.params
       let newResponse: Partial<CommentResponseProps> = req.body
       if (!userId || !commentId || !newResponse?.response) return res.sendStatus(400)
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
       newResponse = {...newResponse, author: user?.username}
-      const comment = await getCommentById(commentId)
+      const comment = await this.responseService.getCommentById(commentId)
       if(!comment) return responseType({res, status: 404, message: 'Comment not found'})
       // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-      createResponse({...newResponse})
+      this.responseService.createResponse({...newResponse})
       .then((response) => responseType({res, status: 201, count:1, data: response}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function updateResponse(req: RequestProp, res: Response){
+  public updateResponse(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { userId, responseId } = req.params;
       const editedResponse = req.body
       if(!userId || !responseId) return res.sendStatus(400)
-      const user = await getUserById(userId)
+      const user = await this.userService.getUserById(userId)
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
       // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-      const responseExist = await getResponseById(responseId)
+      const responseExist = await this.responseService.getResponseById(responseId)
       if(!responseExist) return responseType({res, status: 404, message: 'Response not found'})
-      editResponse(userId, responseId, editedResponse)
+      this.responseService.editResponse(userId, responseId, editedResponse)
       .then((response) => responseType({res, status: 201, count:1, data: response}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function deleteResponse(req: RequestProp, res: Response){
+  public deleteResponse(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { userId, responseId } = req.params;
       if(!userId || !responseId) return res.sendStatus(400)
-      const user = await getUserById(userId)
+      const user = await this.userService.getUserById(userId)
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
       // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-      const response = await getResponseById(responseId) as CommentResponseProps
+      const response = await this.responseService.getResponseById(responseId) as CommentResponseProps
       if(user?.roles.includes(ROLES.ADMIN)) {
-        deleteSingleResponse(responseId)
+        this.responseService.deleteSingleResponse(responseId)
         .then(() => res.sendStatus(204))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
       if(response?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
-      deleteSingleResponse(responseId)
+      this.responseService.deleteSingleResponse(responseId)
       .then(() => res.sendStatus(204))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
   // ADMIN USER
-  export function deleteUserResponses(req: RequestProp, res: Response){
+  public deleteUserResponses(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { adminId, userId, responseId } = req.params;
       const option = req.query as { command: string, commentId: string }
       if(!userId || !responseId) return res.sendStatus(400)
-      const user = await getUserById(userId)
-      const adminUser = await getUserById(adminId)
+      const user = await this.userService.getUserById(userId)
+      const adminUser = await this.userService.getUserById(adminId)
       await autoDeleteOnExpire(userId)
       if(!user || !adminUser) return responseType({res, status: 404, message: 'You do not have an account'})
       if(adminUser?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
 
       if(adminUser?.roles.includes(ROLES.ADMIN)) {
         if(option?.command == 'onlyInComment'){
-          deleteAllUserResponseInComment(userId, option?.commentId)
+          this.responseService.deleteAllUserResponseInComment(userId, option?.commentId)
           .then(() => responseType({res, status: 201, message: 'All user responses in comment deleted'}))
           .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
         }
         else if(option?.command == 'allUserResponse'){
-          deleteAllUserResponses(userId)
+          this.responseService.deleteAllUserResponses(userId)
           .then(() => responseType({res, status: 201, message: 'All user responses deleted'}))
           .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
         }
@@ -98,12 +99,12 @@ interface RequestProp extends Request{
     })
   }
 
-  export function getResponse(req: RequestProp, res: Response){
+  public getResponse(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const {responseId} = req.params
       if(!responseId) return res.sendStatus(400);
-      getCachedResponse({key:`singleResponse:${responseId}`, timeTaken: 1800, cb: async() => {
-        const response = await getResponseById(responseId)
+      this.redisClientService.getCachedResponse({key:`singleResponse:${responseId}`, timeTaken: 1800, cb: async() => {
+        const response = await this.responseService.getResponseById(responseId)
         return response;
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((userResponse: CommentResponseProps) => {
@@ -114,18 +115,18 @@ interface RequestProp extends Request{
   }
 
   // FOR ADMIN PAGE
-  export function userResponses(req: Request, res: Response){
+  public userResponses(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {adminId, userId, responseId} = req.params
       if(!userId || !adminId || !responseId) return res.sendStatus(400);
-      const user = await getUserById(userId)
+      const user = await this.userService.getUserById(userId)
       if(!user) return res.sendStatus(404)
       await autoDeleteOnExpire(userId)
       // if(user?.isAccountLocked) return res.sendStatus(401)
-      const admin = await getUserById(adminId)
+      const admin = await this.userService.getUserById(adminId)
       if(!admin.roles.includes(ROLES.ADMIN)) return res.sendStatus(401)
-      getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
-        const userResponse = await getUserResponses(userId, responseId) 
+      this.redisClientService.getCachedResponse({key: `userResponses:${userId}/${responseId}`, cb: async() => {
+        const userResponse = await this.responseService.getUserResponses(userId, responseId) 
         return userResponse
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((userResponses: CommentResponseProps[] | string) => {
@@ -135,12 +136,12 @@ interface RequestProp extends Request{
     })
   }
 
-  export function getResponseByComment(req: RequestProp, res: Response){
+  public getResponseByComment(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
       const { commentId } = req.params;
       if(!commentId) return res.sendStatus(400);
-      getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
-        const responses = await getAllCommentsResponse(commentId);
+      this.redisClientService.getCachedResponse({key:`responseInComment:${commentId}`, cb: async() => {
+        const responses = await this.responseService.getAllCommentsResponse(commentId);
         return responses
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((responsesInStories: CommentResponseProps[] | string) => {
@@ -166,16 +167,18 @@ interface RequestProp extends Request{
   //   })
   // }
 
-  export function like_Unlike_Response(req: Request, res: Response){
+  public like_Unlike_Response(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId, responseId} = req.params
       if (!userId || !responseId) return res.sendStatus(400);
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
       // if(user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'});
-      likeAndUnlikeResponse(userId, responseId)
-      .then((result: Awaited<ReturnType<typeof likeAndUnlikeResponse>>) => responseType({res, status: 201, message: result}))
+      this.responseService.likeAndUnlikeResponse(userId, responseId)
+      .then((result: Awaited<ReturnType<typeof this.responseService.likeAndUnlikeResponse>>) => responseType({res, status: 201, message: result}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
+}
+export default new ResponseController()

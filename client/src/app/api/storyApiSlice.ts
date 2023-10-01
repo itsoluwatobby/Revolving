@@ -24,7 +24,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...story}
       }),
-      invalidatesTags: [{ type: 'STORY' }],
+      invalidatesTags: [{ type: 'STORY' }, { type: 'NOTIFICATION' }],
     }),
     
     uploadImage: builder.mutation<ImageRes, FormData>({
@@ -61,7 +61,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: userId
       }),
-      invalidatesTags: [{ type: 'STORY', id: 'LIST' }],
+      invalidatesTags: [{ type: 'NOTIFICATION' }, { type: 'STORY', id: 'LIST' }],
     }),
     
     deleteStory: builder.mutation<void, Omit<StoryArgs, 'story'>>({

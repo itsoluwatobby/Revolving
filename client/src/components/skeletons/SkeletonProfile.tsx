@@ -26,30 +26,30 @@ export default function SkeletonProfile({ theme, page }: SkeletonProfileType) {
       <div className={`relative flex py-2 pt-3 md:mt-0 mt-16 flex-col gap-2 w-full`}>
         <p className={`flex items-center gap-2`}>
           <span className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'}`}>Name:</span>
-          <span className="animate-pulse bg-gray-400 w-44 rounded-sm h-4" />
+          <span className="animate-pulse bg-gray-300 w-44 rounded-sm h-4" />
         </p>
 
         <p className="flex items-center gap-4 py-1">
-          <span className="animate-pulse bg-gray-400 w-32 rounded-sm h-4" />
-          <span className="animate-pulse bg-gray-400 w-32 rounded-sm h-4" />
+          <span className="animate-pulse bg-gray-300 w-32 rounded-sm h-4" />
+          <span className="animate-pulse bg-gray-300 w-32 rounded-sm h-4" />
         </p>
 
-        <span className="animate-pulse bg-gray-400 w-[40%] rounded-sm h-4" />
-        <span className="animate-pulse bg-gray-400 w-[40%] rounded-sm h-4" />
+        <span className="animate-pulse bg-gray-300 w-[40%] rounded-sm h-4" />
+        <span className="animate-pulse bg-gray-300 w-[40%] rounded-sm h-4" />
 
         <div className="flex flex-col">
           <p>Hobbies:</p>
           <div className="flex items-center gap-2">
-            <span className="animate-pulse bg-gray-400 w-16 rounded-sm h-4" />
-            <span className="animate-pulse bg-gray-400 w-16 rounded-sm h-4" />
-            <span className="animate-pulse bg-gray-400 w-16 rounded-sm h-4" />
+            <span className="animate-pulse bg-gray-300 w-16 rounded-sm h-4" />
+            <span className="animate-pulse bg-gray-300 w-16 rounded-sm h-4" />
+            <span className="animate-pulse bg-gray-300 w-16 rounded-sm h-4" />
           </div>
         </div>
 
         <p className="flex flex-col py-1 gap-2">
           <span>About:</span>
-          <span className="animate-pulse bg-gray-400 w-[70%] rounded-sm h-4" />
-          <span className="animate-pulse bg-gray-400 w-[85%] rounded-sm h-4" />
+          <span className="animate-pulse bg-gray-300 w-[70%] rounded-sm h-4" />
+          <span className="animate-pulse bg-gray-300 w-[85%] rounded-sm h-4" />
         </p>
       </div>
 
