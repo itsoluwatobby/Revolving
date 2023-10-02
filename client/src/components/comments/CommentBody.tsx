@@ -4,7 +4,6 @@ import { MdCancel } from 'react-icons/md';
 import CommentCompo from './CommentCompo';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChangeEvent, useState, useEffect } from 'react';
-import { ChatOption, ThemeContextType } from '../../posts';
 import { storyApiSlice } from '../../app/api/storyApiSlice';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { SkeletonComment } from '../skeletons/SkeletonComment';
@@ -12,12 +11,18 @@ import { ErrorStyle, REFRESH_RATE } from '../../utils/navigator';
 import { setAllComments } from '../../features/story/commentSlice';
 import { CommentProps, ErrorResponse, Prompted } from '../../data';
 import { getTabCategory } from '../../features/story/navigationSlice';
+import { ChatOption, CommentOptionProp, ThemeContextType } from '../../posts';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../app/api/commentApiSlice';
 
-export default function CommentBody() {
+type CommentBodyProps={
+  openComment: CommentOptionProp,
+  setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>
+} 
+
+export default function CommentBody({ openComment, setOpenComment }: CommentBodyProps) {
   const getNavigation = useSelector(getTabCategory)
-  const { theme, openComment, setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType;
+  const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const [deactivateInputBox, setDeactivateInputBox] = useState<boolean>(false);
   const currentUserId = localStorage.getItem('revolving_userId') as string;
   const { data, isLoading, isError, error, refetch } = useGetCommentsQuery(openComment?.storyId);
@@ -44,7 +49,7 @@ export default function CommentBody() {
         storyId: openComment?.storyId, 
         comment: newComment }).unwrap()
       setComment('')
-      await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
+      //await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err){
       const errors = (errorComment as ErrorResponse) ?? (err as ErrorResponse)
@@ -178,7 +183,7 @@ export default function CommentBody() {
         </button>
       </div>
 
-      <div className="hidebars relative w-full overflow-y-scroll mt-1 flex flex-col">
+      <div className="hidebars relative w-full overflow-y-scroll mt-1 flex flex-col gap-1">
         <>
           {commentContent}
           <p className={`absolute ${successModal === 'Open' ? 'scale-100' : 'scale-0'} z-30 transition-all ${(prompt.type == 'create' || prompt.type == 'edit') ? 'bg-green-600' : prompt.type == 'response' ? 'bg-blue-600' : (prompt.type == 'delete' && 'bg-red-600')} p-3.5 pt-1 pb-1 rounded-lg shadow-2xl tracking-wide text-sm font-mono shadow-slate-800 top-7 right-1/3 bg-opacity-90 border-2 border-gray-500`}>

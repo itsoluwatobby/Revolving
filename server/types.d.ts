@@ -40,6 +40,7 @@ type CodeProps =  {
 }
 
 interface StoryProps extends Document{
+  // _id: ObjectId | string
   body: string
   title: string
   edited: false
@@ -248,11 +249,12 @@ type LikeNotificationType = CommentNotificationType
 type AllNotificationModelType = NewStoryNotificationType | FollowNotificationType | SubscribeNotificationType | MessageNotificationType | CommentNotificationType | LikeNotificationType
 
 // Notification
-type NotificationType = 'Subcribe' | 'NewStory' | 'Follow' | 'Likes' | 'Comment' | 'Message' | 'Tagged' | 'SharedStory'
-
+type NotificationType = 'Subcribe' | 'NewStory' | 'Follow' | 'Likes' | 'Comment' | 'Message' | 'Tagged' | 'SharedStory' | 'CommentLikes'
+type NotificationStatus = 'unread' | 'read'
 type NotificationBody = {
   _id: ObjectId | string,
   hasRead: boolean,
+  status: NotificationStatus,
   notificationType: NotificationType,
   notify: { [key: string]: string | number | Categories[] | string[] },
   createdAt: string,

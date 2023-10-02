@@ -33,7 +33,7 @@ class StoryController {
       if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
       this.storyService.createUserStory({...newStory})
       .then(async(story) => {
-        const { _id, title, body, picture, category, commentIds, likes, author } = story
+        const { _id, title, body, picture, category, commentIds, likes, author } = story as StoryProps
         const notiStory = { 
           _id, title, body: body?.slice(0, 40), picture: picture[0], 
           category, commentIds, likes, author
@@ -87,7 +87,15 @@ class StoryController {
       }
       else if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
       this.storyService.deleteUserStory(storyId)
-      .then(() => res.sendStatus(204))
+      .then(async() => {
+        const { _id, title, body, picture, category, commentIds, likes, author } = story as StoryProps
+        const notiStory = { 
+          _id, title, body: body?.slice(0, 40), picture: picture[0], 
+          category, commentIds, likes, author
+        } as NewStoryNotificationType
+        await NotificationController.removeSingleNotification(userId, notiStory, 'NewStory')  
+        return res.sendStatus(204)
+      })
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }

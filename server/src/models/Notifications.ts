@@ -3,9 +3,10 @@ import { NotificationModelType } from '../../types.js'
 
 const NotificationBody = new Schema(
   {
-    notificationType: { type: String, enum: ['Subcribe', 'NewPost', 'Follow', 'Likes', 'Comment', 'Message'] },
+    notify: { type: Object, default: {} },
     hasRead: { type: Boolean, default: false },
-    notify: { type: Object, default: {} }
+    status: { type: String, default: 'unread' , enum: ['read', 'unread']},
+    notificationType: { type: String, enum: ['Subcribe', 'NewPost', 'Follow', 'Likes', 'Comment', 'Message', 'Tagged', 'SharedStory', 'CommentLikes'] },
   },
   {
     timestamps: true

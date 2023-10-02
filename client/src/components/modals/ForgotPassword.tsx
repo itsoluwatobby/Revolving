@@ -70,7 +70,7 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
             >Back to login?</p>
             <p className=''>Don't have an account?&nbsp; 
               <Link to={'/signUp'}>
-                <span className='hover:underline hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70'>Sign Up Here</span>
+                <span className='hover:underline hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70 w-fit'>Sign Up Here</span>
               </Link>
             </p>
           </div>

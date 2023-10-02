@@ -400,11 +400,12 @@ type LikeNotificationType = CommentNotificationType
 type AllNotificationModelType = NewStoryNotificationType | FollowNotificationType | SubscribeNotificationType | MessageNotificationType | CommentNotificationType | LikeNotificationType
 
 // Notification
-type NotificationType = 'Subcribe' | 'NewStory' | 'Follow' | 'Likes' | 'Comment' | 'Message' | 'Tagged'
-
+type NotificationType = 'Subcribe' | 'NewStory' | 'Follow' | 'Likes' | 'Comment' | 'Message' | 'Tagged' | 'SharedStory' | 'CommentLikes'
+type NotificationStatus = 'unread' | 'read'
 type NotificationBody = {
   _id: string,
   hasRead: boolean,
+  status: NotificationStatus,
   notificationType: NotificationType,
   notify: { [key: string]: string | number | Categories[] | string[] },
   createdAt: string,

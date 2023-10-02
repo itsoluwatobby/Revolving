@@ -20,7 +20,7 @@ export default function EditModal({ theme, cover, revealEditModal, hoverDp, user
   const [toggler, setToggler] = useState<ImageTypeProp>('DP')
 // "COVER" | "DP"
   const toggleModal = () => {
-    setToggler(prev => revealEditModal === 'COVER' ? prev = 'COVER' : revealEditModal === 'DP' ? prev = 'DP' : prev = 'NIL')
+    setToggler(prev => (revealEditModal === 'COVER' ? prev = 'COVER' : revealEditModal === 'DP' ? prev = 'DP' : prev = 'NIL'))
     if(toggler === 'NIL') {
       setRevealEditModal('NIL')
       setToggler('DP')

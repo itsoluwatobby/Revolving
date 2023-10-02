@@ -18,12 +18,12 @@ type CommentType = {
 
 export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox }: CommentType) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
+  const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
+  const { setLoginPrompt } = useThemeContext() as ThemeContextType
+  const [writeReply, setWriteReply] = useState<string>('');
   const [reveal, setReveal] = useState<boolean>(false)
   const getNavigation = useSelector(getTabCategory)
-  const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
-  const [writeReply, setWriteReply] = useState<string>('');
   const [expand, setExpand] = useState<boolean>(false)
-  const { setLoginPrompt } = useThemeContext() as ThemeContextType
   const responseRef = useRef<HTMLTextAreaElement>();
   const [deleteComment, { isLoading, isError, isSuccess: isSuccessDeleted, 
     error, isUninitialized }] = useDeleteCommentMutation()
@@ -35,7 +35,7 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
   const deleteSingleComment = async() => {
     try{
       await deleteComment({userId: currentUserId, commentId: comment?._id}).unwrap()
-      await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
+      //await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err: unknown){
       const errors = (error as ErrorResponse) ?? (err as ErrorResponse)

@@ -53,18 +53,16 @@ export class StoryService {
       return newStory;
     }
     catch(error){
-      console.log(error.messages)
+      return error.messages as string
     }
   }
 
-  public async updateUserStory(storyId: string, updateStory: StoryProps){
-    try{
-      const res = await StoryModel.findByIdAndUpdate({ _id: storyId }, {...updateStory, edited: true})
-      return res
-    }
-    catch(error){
-      console.log(error.messages)
-    }
+  public updateUserStory(storyId: string, updateStory: StoryProps){
+    return (
+      StoryModel.findByIdAndUpdate({ _id: storyId }, {...updateStory, edited: true}, {new: true})
+      .then((data) => data)
+      .catch(error => error.messages as string)
+    )
   }
 
   public async likeAndUnlikeStory(userId: string, storyId: string): Promise<string>{
@@ -87,7 +85,7 @@ export class StoryService {
       }
     }
     catch(error){
-      console.log(error.messages)
+      return error.messages as string
     }
   }
 
@@ -105,11 +103,11 @@ export class StoryService {
         const pathname = process.cwd()+`\\fileUpload\\${imageName}`
         fsPromises.unlink(pathname)
         .then(() => 'success')
-        .catch(error => console.log(error.message))
+        .catch(error => error.message as string)
       }))
     }
     catch(error){
-      console.log(error.messages)
+      return error.messages as string
     }
   }
 
@@ -131,7 +129,7 @@ export class StoryService {
       }))
     }
     catch(error){
-      console.log(error.messages)
+      return error.messages as string
     }
   }
 }

@@ -218,7 +218,6 @@ class AuthenticationController {
             if (!(user === null || user === void 0 ? void 0 : user.isAccountActivated)) {
                 if (((_a = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _a === void 0 ? void 0 : _a.type) === 'LINK') {
                     const verify = yield verifyToken((_b = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _b === void 0 ? void 0 : _b.token, process.env.ACCOUNT_VERIFICATION_SECRET);
-                    console.log(verify);
                     if (!(verify === null || verify === void 0 ? void 0 : verify.email)) {
                         const token = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
                         const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;

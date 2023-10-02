@@ -18,10 +18,6 @@ const routeLinkNames = ({ userId }:{ userId?: string }): RouteProps[] =>{
         link: `/`
       },
       {
-        name: 'Notifications',
-        link: `/notifications/${userId}`
-      },
-      {
         name: 'Profile Page',
         link: `/profile/${userId}`
       },

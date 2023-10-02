@@ -66,6 +66,7 @@ class CommentController{
       if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
 
       const comment = await this.commentService.getCommentById(commentId) as CommentProps
+      const story = await this.storyService.getStoryById(comment?.storyId)
       if(user?.roles.includes(ROLES.ADMIN)) {
         this.commentService.deleteSingleComment(commentId)
         .then(() => res.sendStatus(204))
@@ -73,7 +74,15 @@ class CommentController{
       }
       if(comment?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
       this.commentService.deleteSingleComment(commentId)
-      .then(() => res.sendStatus(204))
+      .then(async() => {
+        const { firstName, lastName, _id, displayPicture: { photo } } = user
+        const notiComment = { 
+          storyId: story?._id, title: story?.title, userId: _id,
+          fullName: `${firstName} ${lastName}`, displayPicture: photo
+        } as CommentNotificationType
+        await this.notification.removeSingleNotification(userId, notiComment, 'Comment')
+        return res.sendStatus(204)
+      })
       .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     })
   }

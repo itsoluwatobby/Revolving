@@ -53,7 +53,7 @@ export default function LikeStory({ story, position }: LikeStoryProps) {
           :
           <BsHandThumbsUp
             title='like' 
-            className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} `} />
+            className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer`} />
       }
         <span className={`font-mono text-base ${theme == 'dark' && 'text-white'}`}>
           {story?.sharedLikes ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}

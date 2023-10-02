@@ -85,12 +85,12 @@ export default function LoginComponent({
             </button>
 
             <div className='flex flex-col text-sm gap-2'>
-              <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2'
+              <p className='cursor-pointer w-fit duration-150 hover:opacity-70 hover:underline hover:underline-offset-2'
               onClick={() => setForgot(true)}
               >Forgot Password?</p>
               <p className=''>Don't have an account?&nbsp; 
                 <Link to={'/signUp'}>
-                  <span className='hover:underline hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70'>Sign Up Here</span>
+                  <span className='hover:underline w-fit hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70'>Sign Up Here</span>
                 </Link>
               </p>
             </div>

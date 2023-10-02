@@ -49,9 +49,15 @@ export class SharedStoryService {
     const sharedStory = await this.getSharedStoryById(sharedId)
     if(!sharedStory) return 'not found'
     const story = await storyService.getStoryById(sharedStory?.storyId)
+    const { title, body, picture, category, commentIds, likes, author } = story
     const verifyUser = story?.isShared?.map(targetShare => targetShare?.userId?.toString() === userId && targetShare?.sharedId === sharedId).find(res => res = true)
     if(!verifyUser) return 'unauthorized'
     await sharedStory.deleteOne()
+    const notiStory = { 
+      _id: sharedStory?._id, title, body: body?.slice(0, 40), picture: picture[0], 
+      category, commentIds, likes, author
+    } as NewStoryNotificationType
+    await NotificationController.removeSingleNotification(userId, notiStory, 'SharedStory')
     await story?.updateOne({ $pull: { isShared: { sharedId } } });
   }
 

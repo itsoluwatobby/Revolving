@@ -202,7 +202,6 @@ class AuthenticationController {
       if (!user?.isAccountActivated) {
         if(user?.verificationToken?.type === 'LINK'){
           const verify = await verifyToken(user?.verificationToken?.token, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
-          console.log(verify)
           if (!verify?.email) {
             const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
             const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`

@@ -29,7 +29,7 @@ type WriteProp={
 export default function WriteModal({ keepPrompt, setKeepPrompt, comment, response, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const getResponseEdit = useSelector(getEditResponse)
-  const [updateResponse, { error, isError, isLoading, isSuccess, isUninitialized }] = useUpdateResponseMutation()
+  const [updateResponse, { error, isError, isSuccess, isUninitialized }] = useUpdateResponseMutation()
   const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse, isUninitialized: isUninitializedResponse, isSuccess: isSuccessResponse }] = useCreateResponseMutation()
   const dispatch = useDispatch()
 
@@ -71,7 +71,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
       isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
-
+// console.log(writeReply.split(' ').length)
   const createNewResponse = async() => {
     if(!writeReply.length) return
     const newResponse = {
@@ -120,7 +120,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
   const content = (
     <article className={`absolute w-full -bottom-[80px] z-50 ${enlarge.assert && 'left-0'}`}>
       <div 
-        className={`w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingResponse) ? 'animate-pulse' : null}`}>
+        className={`w-full flex mt-1 items-center text-white rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'}`}>
         <textarea 
           ref={responseRef}
           name="comment"
@@ -131,7 +131,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
           autoComplete="off"
           placeholder="share your thought"
           onChange={handleChange}
-          className={`flex-auto font-serif p-2 h-full w-10/12 focus:outline-none rounded-md ${theme == 'light' ? 'text-black' : 'text-white'} bg-inherit`}
+          className={`flex-auto font-serif p-2 h-full w-10/12 focus:outline-none rounded-md ${(isLoadingResponse) ? 'animate-pulse' : null} bg-inherit`}
         ></textarea>
         <button 
           disabled={isLoadingResponse && !canSubmit}

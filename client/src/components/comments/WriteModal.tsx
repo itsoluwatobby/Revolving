@@ -27,7 +27,7 @@ type WriteProp={
 
 // TODO: When Prompt is up, disable textarea
 export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, comment, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
-  const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
+  const { theme, enlarge, setLoginPrompt, setEnlarge, setParseId } = useThemeContext() as ThemeContextType;
   const getCommentEdit = useSelector(getEditComments)
   const [updateComment, { error: errorComment, isError: isErrorComment, isLoading: isLoadingComment, isSuccess: isSuccessEdited, isUninitialized }] = useUpdateCommentMutation()
   const [createResponse, { error: errorResponse, isError: isErrorResponse, isLoading: isLoadingResponse }] = useCreateResponseMutation()
@@ -85,6 +85,8 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
         response: newResponse }).unwrap()
       setWriteReply('')
       setOpenReply({type: 'nil', assert: false})
+      setEnlarge({type: 'open', assert: true})
+      setParseId(comment?._id)
       dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err){
@@ -123,9 +125,9 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
   const canSubmit = Boolean(writeReply)
 
   const content = (
-    <article className={`absolute w-full ${openReply.pos == 'enlarge' ? '-bottom-20' : '-bottom-[80px]'} z-50 ${enlarge.assert && 'left-0'}`}>
+    <article className={`absolute w-full text-white ${openReply.pos == 'enlarge' ? '-bottom-20' : '-bottom-[80px]'} z-50 ${enlarge.assert && 'left-0'}`}>
       <div 
-        className={`relative w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'} ${(isLoadingComment || isLoadingResponse) ? 'animate-pulse' : null}`}>
+        className={`relative w-full flex mt-1 items-center rounded-md shadow-lg ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-600'}`}>
         <textarea 
           ref={responseRef}
           key={openReply.type}
@@ -136,7 +138,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
           autoComplete="off"
           placeholder="share your thought"
           onChange={handleChange}
-          className={`flex-auto font-serif p-2 h-full w-10/12 focus:outline-none rounded-md ${theme == 'light' ? 'text-black' : 'text-white'} bg-inherit`}
+          className={`flex-auto font-serif p-2 h-full w-10/12 focus:outline-none rounded-md bg-inherit ${(isLoadingComment || isLoadingResponse) ? 'animate-pulse' : null}`}
         ></textarea>
         <button 
           disabled={isLoadingComment && !canSubmit}

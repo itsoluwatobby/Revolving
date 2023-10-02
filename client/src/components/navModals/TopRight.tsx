@@ -4,17 +4,19 @@ import { toast } from "react-hot-toast";
 import { FiEdit } from 'react-icons/fi';
 import { nanoid } from "@reduxjs/toolkit";
 import { IoIosMore } from 'react-icons/io';
+import { useState, useEffect } from 'react';
 import { BsMoonStars } from "react-icons/bs";
-import { ErrorResponse, UserProps } from "../../data";
 import { useDispatch, useSelector } from "react-redux";
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { ErrorStyle, SuccessStyle } from "../../utils/navigator";
+import { ErrorResponse, NotificationBody, UserProps } from "../../data";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { ErrorStyle, SuccessStyle, checkCount } from "../../utils/navigator";
 import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts";
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice";
 import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice";
 import { BiMessageDots } from "react-icons/bi";
+import { useGetNotificationQuery } from "../../app/api/noficationSlice";
 
 const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
@@ -26,8 +28,10 @@ type TopRightProps = {
 export default function TopRight({ currentUser }: TopRightProps) {
   const [updateStory, {isLoading: isLoadingUpdate, error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, codeEditor, editing, setRollout, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, editing, setRollout, setOpenNotification, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
+  const { data } = useGetNotificationQuery(currentUser?._id as string)
+  const [unreadNotifications, setUnreadNotifications] = useState<NotificationBody[]>([])
   const { canPost, inputValue, setCodeStore, submitToSend, setImagesFiles } = usePostContext() as PostContextType
   const storyData = useSelector(getStoryData)
   const { pathname } = useLocation()
@@ -38,6 +42,18 @@ export default function TopRight({ currentUser }: TopRightProps) {
 
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
+
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && data) {
+      const unread = data?.notification?.filter(notification => notification?.status === 'unread')
+      setUnreadNotifications([...unread])
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [data])
+
 
   const createNewStory = async() => {
     if(!storyData.userId) return setLoginPrompt('Open')
@@ -150,12 +166,13 @@ export default function TopRight({ currentUser }: TopRightProps) {
         {
           !exclude?.includes(pathname) ?
             <div 
-            title='Notifications'
+              title='Notifications'
+              onClick={() => setOpenNotification(prev => (prev === 'Hide' ? prev = 'Open' : prev = 'Hide'))}
               className="relative cursor-pointer">
               <BiMessageDots 
                 className={`text-2xl text-gray-500 hover:text-gray-600 transition-all`}
               />
-              <span className="text-sm rounded bg-slate-600 grid place-content-center absolute -right-1 -bottom-1 text-white p-2 w-4 h-3.5">5</span>
+              <span className="text-sm rounded bg-slate-600 grid place-content-center absolute -right-1 -bottom-1 text-white p-2 w-4 h-3.5">{checkCount(unreadNotifications)}</span>
             </div>
           : null
         }

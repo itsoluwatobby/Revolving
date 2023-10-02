@@ -102,7 +102,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
               )
             : null
           }
-          {
+          {/* {
             (userRoles?.length && pathname !== `/notifications/${userId}`) ?
               (
                 <Link 
@@ -114,7 +114,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                 </Link>
               )
             : null
-          }
+          } */}
           {
             (userRoles?.length && pathname !== `/taskManager/${userId}`) ?
               (

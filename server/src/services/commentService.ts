@@ -1,8 +1,10 @@
 import { StoryModel } from "../models/Story.js";
 import { CommentModel } from "../models/CommentModel.js";
-import { CommentProps, CommentResponseProps } from "../../types.js";
+import { CommentProps, CommentResponseProps, LikeNotificationType } from "../../types.js";
 import { CommentResponseModel } from "../models/CommentResponse.js";
-
+import StoryService from "./StoryService.js";
+import UserService from "./userService.js";
+import NotificationController from "../controller/notificationController.js";
 
 export class CommentService {
 
@@ -35,12 +37,20 @@ export class CommentService {
 
   public async likeAndUnlikeComment(userId: string, commentId: string): Promise<string>{
     const comment = await CommentModel.findById(commentId).exec();
+    const story = await StoryService.getStoryById(comment?.storyId)
+    const { displayPicture: { photo }, firstName, lastName } = await UserService.getUserById(userId)
+    const notiLike = {
+      userId, fullName: `${firstName} ${lastName}`,
+      displayPicture: photo, storyId: story?._id, title: story?.title
+    } as LikeNotificationType
     if(!comment?.likes.includes(userId)) {
       await comment?.updateOne({ $push: {likes: userId} })
+      await NotificationController.addToNotification(comment?.userId as unknown as string, notiLike, 'CommentLikes')
       return 'You liked this comment'
     }
     else {
       await comment?.updateOne({ $pull: {likes: userId} })
+      await NotificationController.removeSingleNotification(comment?.userId as unknown as string, notiLike, 'CommentLikes')
       return 'You unliked this comment'
     }
   }

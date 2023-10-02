@@ -1,4 +1,4 @@
-import { NotificationBody, NotificationModelType } from "../../data";
+import { NotificationBody, NotificationModelType, NotificationStatus } from "../../data";
 import { providesTag } from "../../utils/helperFunc";
 import { apiSlice } from "./apiSlice";
 
@@ -6,13 +6,14 @@ type NotificationArgs = {
   isOpen?: boolean,
   notifyIds?: string[],
   notificationId: string,
+  status: NotificationStatus,
 }
 
 export const notificationSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     openedNotification: builder.mutation<string, NotificationArgs>({
-      query: ({notificationId, isOpen}) => ({
-        url: `/notification/open_notification?isOpen=${isOpen}&notificationId=${notificationId}`,
+      query: ({notificationId, isOpen, status}) => ({
+        url: `/notification/open_notification?isOpen=${isOpen}&notificationId=${notificationId}&stats=${status}`,
         method: 'PUT',
         body: notificationId
       }),

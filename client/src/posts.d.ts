@@ -144,7 +144,7 @@ type ThemeContextType = {
   isPresent: ConflictType,
   loginPrompt: ChatOption,
   openEditPage: ChatOption,
-  openComment: CommentOptionProp,
+  openNotification: ChatOption,
   revealEditModal: ImageTypeProp, 
   notintersecting: IsIntersectingType,
   changeTheme: (mode: string) => void,
@@ -161,7 +161,7 @@ type ThemeContextType = {
   setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
   setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
   setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
-  setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>,
+  setOpenNotification: React.Dispatch<React.SetStateAction<ChatOption>>,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
   setNotIntersecting: React.Dispatch<React.SetStateAction<IsIntersectingType>>
 }

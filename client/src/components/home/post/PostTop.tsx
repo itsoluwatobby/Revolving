@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useState, useRef } from 'react';
-import { ErrorResponse, PageType } from "../../../data";
+import { ErrorResponse } from "../../../data";
 import { useThemeContext } from "../../../hooks/useThemeContext";
 import { ChatOption, PostType, Theme, ThemeContextType } from "../../../posts";
 import { useDeleteSharedStoryMutation } from "../../../app/api/sharedStorySlice";
@@ -16,27 +16,24 @@ import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApi
 
 type PostTopProps = {
   story: PostType,
-  bodyContent: JSX.Element[] | "No content",
-  open: boolean,
-  page?: PageType,
-  openText: () => void,
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  bodyContent: JSX.Element[] | "No content"
 }
 
-export default function PostTop({ story, bodyContent, page, openText, open, setOpen }: PostTopProps) {
+export default function PostTop({ story, bodyContent }: PostTopProps) {
+  const [deleteSharedStory, { isLoading: isSharedDeleteLoading, isError: isSharedDeleteError }] = useDeleteSharedStoryMutation()
+  const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError }] = useDeleteStoryMutation()
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const [revealCard, setRevealCard] = useState<ChatOption>('Hide')
   const [hovering, setHovering] = useState<boolean>(false)
   const [onCard, setOnCard] = useState<boolean>(false)
-  const dispatch = useDispatch()
-  const cardRef = useRef<HTMLElement>(null)
-  const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError }] = useDeleteStoryMutation()
-  const [deleteSharedStory, { isLoading: isSharedDeleteLoading, isError: isSharedDeleteError }] = useDeleteSharedStoryMutation()
-  const buttonOptClass = useCallback((theme: Theme) => {
-    return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-50 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
-  }, [])
+  const [open, setOpen] = useState<boolean>(false)
   const observerRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLElement>(null)
+  const dispatch = useDispatch()
+  const buttonOptClass = useCallback((theme: Theme) => {
+    return `shadow-4xl shadow-slate-900 hover:scale-[1.04] z-10 active:scale-[1] transition-all text-center cursor-pointer p-2.5 pt-1 pb-1 rounded-sm font-mono w-full ${theme == 'light' ? 'bg-slate-700 hover:text-gray-500' : 'bg-slate-800 hover:text-gray-300'}`
+  }, [])
 
   const deleted = async(id: string) => {
     try{
@@ -82,6 +79,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
       className={`maxmobile:text-base ${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
       <div 
         className='relative flex items-center gap-3'>
+
         <p 
           onClick={() => setHovering(prev => !prev)}
           onMouseEnter={() => setHovering(true)}
@@ -89,7 +87,6 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
           className='capitalize font-sans maxmobile:text-base cursor-pointer hover:opacity-90 transition-all'>{
           reduceLength(story?.sharedId ? (story?.sharedAuthor as string) :  story?.author, 10, 'letter') || 'anonymous'
           }
-         
         </p>
         <span>.</span>
         <p className="font-sans flex items-center gap-2 text-sm">
@@ -152,7 +149,7 @@ export default function PostTop({ story, bodyContent, page, openText, open, setO
 
         <Link to={`/story/${story?._id}`} >
           <p 
-            onClick={openText}
+            onClick={() => setOpen(false)}
             className={`whitespace-pre-wrap text-justify text-sm first-letter:ml-3 px-1 first-letter:text-lg ${theme == 'light' ? 'text-black' : 'text-white'} first-letter:capitalize ${open ? 'opacity-40' : ''}`}>
               {bodyContent}
           </p>

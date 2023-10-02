@@ -61,7 +61,7 @@ export const storyApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: userId
       }),
-      invalidatesTags: [{ type: 'NOTIFICATION' }, { type: 'STORY', id: 'LIST' }],
+      invalidatesTags: [{ type: 'NOTIFICATION' }, { type: 'STORY' }],
     }),
     
     deleteStory: builder.mutation<void, Omit<StoryArgs, 'story'>>({

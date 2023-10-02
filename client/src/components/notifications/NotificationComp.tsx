@@ -1,69 +1,93 @@
-import { Theme } from '../../posts';
-import { format } from 'timeago.js';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ErrorContent } from '../ErrorContent';
-import FollowUnFollow from '../singlePost/FollowUnFollow';
-import { checkCount, reduceLength } from '../../utils/navigator';
-import { ErrorResponse, NotificationModelType } from '../../data';
-import SkeletonNotification from '../skeletons/SkeletonNotification';
+import { TDate, format } from 'timeago.js';
+import { NotificationBody } from '../../data';
+import { FaTrashRestore } from 'react-icons/fa';
+import { ChatOption, Theme } from '../../posts';
+import { reduceLength } from '../../utils/navigator';
 
 type FollowsCompProps = { 
   theme: Theme,
-  isLoading: boolean,
-  errorMsg: ErrorResponse,
-  notifications: NotificationModelType
- }
+  isDeleteLoading: boolean,
+  notificationIds: string[],
+  notification: NotificationBody,
+  deleteNotification: (notification: string) => void,
+  setNotificationIds: React.Dispatch<React.SetStateAction<string[]>>
+  setOpenNotification: React.Dispatch<React.SetStateAction<ChatOption>>
+}
 
-export default function NotificationComp({ notifications, isLoading, theme, errorMsg }: FollowsCompProps) {
-  
+export default function NotificationComp({ notification, theme, isDeleteLoading, notificationIds, deleteNotification, setOpenNotification, setNotificationIds }: FollowsCompProps) {
+  const [isMarked, setIsMarked] = useState<boolean>(false)
 
-  return (
-    <section className='flex justify-between maxscreen:flex-col p-1 h-full w-full transition-all'>
+  useEffect(() => {
+    if (isMarked) setNotificationIds(prev => ([...prev, notification?._id]))
+    else if (!isMarked) setNotificationIds(prev => (prev?.filter(id => id !== notification?._id)))
 
-      <div className={`hidebars flex flex-col gap-2 w-[49.5%] maxscreen:w-full maxscreen:h-full shadow-md box-border overflow-y-scroll`}>
-        <div className={`sticky top-0 rounded-sm ${theme === 'light' ? 'bg-white' : 'bg-slate-800'} z-10 w-full p-2 font-medium`}>Notifications</div>
-        <article className='flex flex-col h-full gap-2 w-full py-1.5 px-3'>
-          {
-            isLoading ?
-              <SkeletonNotification />
-            :
-              notifications?.notification?.length ?  
-              notifications?.notification?.map(follower => (
-                  <div 
-                    key={follower?._id}
-                    className={`p-1.5 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-700'} gap-x-2 rounded-md`}
-                  >
+  }, [isMarked, setNotificationIds, notification?._id])
 
-                    <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-10 h-10">
-                      {
-                        follower?.displayPicture ? 
-                        <img src={follower?.displayPicture} alt="" 
-                          className="w-full h-full rounded-full object-cover"
-                        /> 
-                        : null
-                      }
-                    </figure>
 
-                    <div className='flex-auto flex flex-col'>
-                      <Link to={`/profile/${follower?._id}`}>
-                        <p className='hover:underline underline-offset-2 cursor-pointer'>{follower?.firstName} {follower?.lastName}
-                        </p>
-                      </Link>
-                      <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength('dd', 30, 'letter')}</p>
-                    </div>
+  return (   
+    <>
+      {
+        <article 
+          className={`${isMarked ? 'bg-slate-300' : ''} ${(notificationIds?.includes(notification?._id) && isDeleteLoading) ? 'animate-pulse' : ''} ${notification?.status === 'read' ? 'opacity-70' : ''} p-1.5 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-700'} gap-x-2 rounded-md`}
+        >
 
-                    <div className='flex flex-col justify-between'>
-                      <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follower?.subDate)}</p>
-                      <FollowUnFollow userId={follower?._id} position={['followPage']} />
-                    </div>
+          <figure className="flex-none bg-slate-300 rounded-full border-2 border-slate-400 w-9 h-9">
+            {
+              notification?.notify?.displayPicture ? 
+              <img src={notification?.notify?.displayPicture as string} alt="" 
+                className="w-full h-full rounded-full object-cover"
+              /> 
+              : null
+            }
+          </figure>
 
-                  </div>
-                ))
-              : <ErrorContent message='You have no followers' errorMsg={errorMsg} contentLength={notifications?.notification?.length } />
-          }
+          <div 
+            onClick={() => setOpenNotification('Hide')}
+            className='flex-auto flex flex-col gap-1'>
+
+            <Link to={`/profile/${notification?.notify?.userId}`}>
+              <p className={`${theme === 'light' ? 'bg-white' : 'text-gray-300'} hover:underline underline-offset-2 cursor-pointer text-sm`}>@{(notification?.notify?.fullName as string)?.replace(' ', '_')?.toLowerCase()}
+              </p>
+            </Link>
+
+            {/* CONTENT */}
+            <Link to={`/story/${notification?.notify?.storyId as string}`}
+              title='view story'
+              className={`text-[11px] hover:underline ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>
+              {
+                notification?.notificationType === 'Comment' ? 'commented on your story' : notification?.notificationType === 'Likes' ? 'liked your story' : ''
+              }&nbsp;
+              <span 
+              className='font-bold'>
+                {reduceLength(notification?.notify?.title as string, 30, 'letter')}
+              </span>
+            </Link>
+
+          </div>
+
+          <div className='flex flex-col justify-between items-end'>
+            <button 
+              onClick={() => deleteNotification(notification?._id)}
+              className={`${notificationIds?.length ? 'hidden' : 'block'} rounded-sm hover:opacity-90 p-0.5 px-1 w-fit`}>
+              <FaTrashRestore 
+                className={`${theme === 'light' ? 'text-gray-800' : 'text-white'}`}
+              />
+            </button>
+            <input 
+              type='checkbox' title='mark' checked={isMarked}
+              onChange={event => setIsMarked(event?.target.checked)}  className='mr-1 cursor-pointer rounded-full border-none focus:outline-none' 
+            />
+            <p 
+              className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'} whitespace-nowrap`}
+              >
+              {format(notification?.createdAt as TDate)}
+            </p>
+          </div>
+
         </article>
-      </div>
-
-    </section>
+      }
+    </>
   )
 }

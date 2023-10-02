@@ -30,7 +30,7 @@ export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoa
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const responseRef = useRef<HTMLTextAreaElement>();
-  const [deleteResponse, {isError, error}] = useDeleteResponseMutation()
+  const [deleteResponse, {isError, isLoading, error}] = useDeleteResponseMutation()
   const dispatch = useDispatch();
 
   const buttonOptClass = useCallback((theme: Theme) => {
