@@ -3,18 +3,18 @@ import { format } from 'timeago.js';
 import PostImage from '../PostImages';
 import { Link } from 'react-router-dom';
 import Comments from '../comments/Comments';
-import FollowUnFollow from './FollowUnFollow';
 import { useState, useEffect } from 'react';
+import FollowUnFollow from './FollowUnFollow';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { MdOutlineInsertComment } from 'react-icons/md';
-import { PostType, ThemeContextType } from '../../posts';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { BsFillFileEarmarkPdfFill } from 'react-icons/bs';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import useRevolvingObserver from '../../hooks/useRevolvingObserver';
+import { CommentOptionProp, PostType, ThemeContextType } from '../../posts';
 
 type ArticleProps = {
   story: PostType,
@@ -29,9 +29,10 @@ type ArticleProps = {
 }
 
 export default function ArticleComp({ isError, story, storyRef, isBarOpen, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint }: ArticleProps) {
-  const { theme, setNotIntersecting, setOpenComment } = useThemeContext() as ThemeContextType
-  const [reveal, setReveal] = useState<boolean>(false)
+  const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' })
   const { isIntersecting, observerRef } = useRevolvingObserver({ screenPosition: '-180px' })
+  const { theme, setNotIntersecting } = useThemeContext() as ThemeContextType
+  const [reveal, setReveal] = useState<boolean>(false)
   
   useEffect(() => {
     let isMounted = true
@@ -141,7 +142,7 @@ export default function ArticleComp({ isError, story, storyRef, isBarOpen, bodyC
     <article 
       className={`app mt-2 flex-grow flex flex-col gap-3 ${isBarOpen ? '' : 'px-32 midscreen:px-6 mobile:px-4'} overflow-y-scroll ${story?.fontFamily} p-2 px-6 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
         {content}
-        <Comments />
+        <Comments openComment={openComment} setOpenComment={setOpenComment} />
       </article>
   )
 }

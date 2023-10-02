@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken';
 import { TaskBinModel } from '../models/TaskManager.js';
-import { timeConverterInMillis } from './redis.js';
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 /**
  * @description function to sign tokens
@@ -140,6 +139,12 @@ export function pagination({ startIndex = 1, endIndex = 1, page = 1, limit = 1, 
             console.log(error);
         }
     });
+}
+function timeConverterInMillis() {
+    const minute = 60 * 1000;
+    const hour = minute * 60;
+    const day = hour * 24;
+    return { minute, hour, day };
 }
 /**
  * @description function to autodelete a taskbin when expired

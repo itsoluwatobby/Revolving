@@ -25,7 +25,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: followerId
       }),
-      invalidatesTags: [{ type: 'USERS' }, { type: 'FOLLOWS' }, { type: 'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'NOTIFICATION' }, { type: 'FOLLOWS' }, { type: 'USERS', id: 'LIST'}],
     }),
     
     deleteUser: builder.mutation<void, string>({

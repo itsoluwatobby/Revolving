@@ -1,80 +1,87 @@
 import { TaskBin, TaskProp } from "../../types.js"
-import { Request, Response, response } from "express"
-import { getCachedResponse } from "../helpers/redis.js"
-import { getUserById } from "../services/userService.js";
-import { createNewTask, deletePermanentlyFromBin, deleteTask, emptyTaskBin, getTaskById, getTaskInBin, getUserTasks, restoreTaskFromBin, updateTask } from "../services/TaskManagerService.js";
+import { Request, Response } from "express"
+import { UserService } from "../services/userService.js"
+import { RedisClientService } from "../helpers/redis.js"
+import { TaskManagerService } from "../services/TaskManagerService.js"
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js"
 
+class TaskManagerController {
 
-  export function createTask(req: Request, res: Response){
+  private userService = new UserService()
+  private taskManagerService = new TaskManagerService()
+  private redisClientService = new RedisClientService()
+
+  constructor(){}
+
+  public createTask(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId } = req.params
       const task: Partial<TaskProp> = req.body
       await autoDeleteOnExpire(userId)
       if(!userId) return responseType({res, status: 400, message: 'userId required'})
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
       if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})
-      createNewTask(userId, task)
+      this.taskManagerService.createNewTask(userId, task)
       .then((newTask) => responseType({res, count: 1, data: newTask}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function updateTasks(req: Request, res: Response){
+  public updateTasks(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId } = req.params
       const task: TaskProp = req.body
       if(!task || !userId) return responseType({res, status: 404, message: 'task or userId required'})
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 401, message: 'unauthorized'})
       if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})
-      updateTask(task)
+      this.taskManagerService.updateTask(task)
       .then((updatedTask) => responseType({res, status: 201, count: 1, data: updatedTask}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function deleteUserTask(req: Request, res: Response){
+  public deleteUserTask(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId, taskId } = req.params
       if(!userId || !taskId) return responseType({res, status: 400, message: 'userId or taskId required'})
       await autoDeleteOnExpire(userId)
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-      const task = await getTaskById(taskId);
+      const task = await this.taskManagerService.getTaskById(taskId);
       if(!task) return responseType({res, status: 404, message: 'task not found'})
       if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})
-      deleteTask(userId, taskId)
+      this.taskManagerService.deleteTask(userId, taskId)
       .then(() => responseType({res, status: 204, message: 'task deleted'}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function emptyBin(req: Request, res: Response){
+  public emptyBin(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId } = req.params
       if(!userId) return responseType({res, status: 400, message: 'userId required'})
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-      const task = await getTaskInBin(userId);
+      const task = await this.taskManagerService.getTaskInBin(userId);
       if(!task) return responseType({res, status: 404, message: 'bin not found'})
-      emptyTaskBin(userId)
+      this.taskManagerService.emptyTaskBin(userId)
       .then(() => responseType({res, status: 201, message: 'task bin emptied'}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function getUserTask(req: Request, res: Response){
+  public getUserTask(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId } = req.params
       if(!userId) return responseType({res, status: 400, message: 'userId required'})
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-      getCachedResponse({key:`tasks:${userId}`, timeTaken: 1800, cb: async() => {
-        const tasks = await getUserTasks(userId)
+      this.redisClientService.getCachedResponse({key:`tasks:${userId}`, timeTaken: 1800, cb: async() => {
+        const tasks = await this.taskManagerService.getUserTasks(userId)
         return tasks;
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((userTasks: TaskProp[]) => {
@@ -84,12 +91,12 @@ import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.j
     })
   }
 
-  export function getTask(req: Request, res: Response){
+  public getTask(req: Request, res: Response){
     asyncFunc(res, () => {
       const { taskId } = req.params
       if(!taskId) return responseType({res, status: 400, message: 'taskId required'})
-      getCachedResponse({key:`singleTask:${taskId}`, timeTaken: 1800, cb: async() => {
-        const task = await getTaskById(taskId)
+      this.redisClientService.getCachedResponse({key:`singleTask:${taskId}`, timeTaken: 1800, cb: async() => {
+        const task = await this.taskManagerService.getTaskById(taskId)
         return task;
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((userTask: TaskProp) => {
@@ -99,12 +106,12 @@ import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.j
     })
   }
 
-  export function getTasksInBin(req: Request, res: Response){
+  public getTasksInBin(req: Request, res: Response){
     asyncFunc(res, () => {
       const { userId } = req.params
       if(!userId) return responseType({res, status: 400, message: 'userId required'})
-      getCachedResponse({key:`taskInBin:${userId}`, timeTaken: 1800, cb: async() => {
-        const task = await getTaskInBin(userId)
+      this.redisClientService.getCachedResponse({key:`taskInBin:${userId}`, timeTaken: 1800, cb: async() => {
+        const task = await this.taskManagerService.getTaskInBin(userId)
         return task;
       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
       .then((userTask: TaskBin) => {
@@ -115,30 +122,32 @@ import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.j
     })
   }
 
-  export function restoreTasks(req: Request, res: Response){
+  public restoreTasks(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId } = req.params
       const { taskIds }: {taskIds: string[]} = req.body
       if(!Array.isArray(taskIds) || !taskIds.length || !userId) return responseType({res, status: 400, message: 'all inputs are required in right format'})
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-      restoreTaskFromBin(taskIds, userId)
+      this.taskManagerService.restoreTaskFromBin(taskIds, userId)
       .then(() => responseType({res, status: 201, message: 'Tasks restored'}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
 
-  export function deletePermanently(req: Request, res: Response){
+  public deletePermanently(req: Request, res: Response){
     asyncFunc(res, async() => {
       const { userId } = req.params
       const { taskIds }: {taskIds: string[]} = req.body
       if(!Array.isArray(taskIds) || !taskIds.length || !userId) return responseType({res, status: 400, message: 'all inputs are required in right format'})
-      const user = await getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       await autoDeleteOnExpire(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
-      deletePermanentlyFromBin(taskIds, userId)
+      this.taskManagerService.deletePermanentlyFromBin(taskIds, userId)
       .then(() => responseType({res, status: 204, message: 'Tasks deleted permanently'}))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
+}
+export default new TaskManagerController()

@@ -27,7 +27,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...comment}
       }),
-      invalidatesTags: [{ type: 'COMMENT' }, { type: 'STORY', id: 'LIST' }],
+      invalidatesTags: [{ type: 'COMMENT' }, { type: 'NOTIFICATION' }, { type: 'NOTIFICATION', id: 'LIST' }, { type: 'STORY' }],
     }),
 
     updateComment: builder.mutation<CommentProps, Partial<CommentArgs>>({
@@ -45,7 +45,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: userId
       }),
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}],
+      invalidatesTags: [{ type: 'COMMENT'}, { type: 'NOTIFICATION' }, { type: 'NOTIFICATION', id: 'LIST' }],
     }),
     
     // Also works for admin deleting a user comment
@@ -55,7 +55,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }),
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }],
+      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY' }],
     }),
 
     deleteCommentsByAdmin: builder.mutation<void, Omit<CommentArgs, 'comment'>>({
@@ -64,7 +64,7 @@ export const commentApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }),
-      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }],
+      invalidatesTags: [{ type: 'COMMENT', id: 'LIST'}, { type: 'STORY', id: 'LIST' }, { type: 'STORY' }],
     }),
 
     getComment: builder.query<CommentProps, string>({

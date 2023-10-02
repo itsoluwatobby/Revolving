@@ -27,7 +27,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...response}
       }),
-      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST' }, { type: 'COMMENT', id: 'LIST' }],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST' }, { type: 'NOTIFICATION' }, { type: 'NOTIFICATION', id: 'LIST' }, { type: 'COMMENT', id: 'LIST' }],
     }),
 
     updateResponse: builder.mutation<CommentResponseProps, Partial<ResponseArgs>>({
@@ -45,7 +45,7 @@ export const responseApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: userId
       }),
-      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}],
+      invalidatesTags: [{ type: 'RESPONSE', id: 'LIST'}, { type: 'NOTIFICATION' }, { type: 'NOTIFICATION', id: 'LIST' }],
     }),
     
     // Also works for admin deleting a user comment

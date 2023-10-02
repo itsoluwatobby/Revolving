@@ -9,53 +9,53 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { createClient } from 'redis';
 import { objInstance } from './helper.js';
-export const redisClient = createClient();
-/**
- * @description caches all GET requests
- * @param object - containing {req, timeTaken, cb, reqMtd}
-*/
-export function getCachedResponse({ key, timeTaken = 7200, cb, reqMtd = [] }) {
-    return __awaiter(this, void 0, void 0, function* () {
-        redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage));
-        if (!redisClient.isOpen)
-            yield redisClient.connect();
-        try {
-            if (objInstance.isPresent(reqMtd)) {
-                redisClient.flushAll();
-                objInstance.pullIt(reqMtd);
+export class RedisClientService {
+    constructor() {
+        this.redisClient = createClient();
+    }
+    /**
+     * @description caches all GET requests
+     * @param object - containing {req, timeTaken, cb, reqMtd}
+    */
+    getCachedResponse({ key, timeTaken = 7200, cb, reqMtd = [] }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage));
+            if (!this.redisClient.isOpen)
+                yield this.redisClient.connect();
+            try {
+                if (objInstance.isPresent(reqMtd)) {
+                    this.redisClient.flushAll();
+                    objInstance.pullIt(reqMtd);
+                }
+                const data = yield this.redisClient.get(key);
+                if (data)
+                    return JSON.parse(data);
+                const freshData = yield cb();
+                this.redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
+                return freshData;
             }
-            const data = yield redisClient.get(key);
-            if (data)
-                return JSON.parse(data);
-            const freshData = yield cb();
-            redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
-            return freshData;
-        }
-        catch (error) {
-            console.error(error === null || error === void 0 ? void 0 : error.message);
-        }
-    });
-}
-export const getCachedValueResponse = ({ key, timeTaken = 3600, cb }) => __awaiter(void 0, void 0, void 0, function* () {
-    redisClient.on('error', err => console.error('Redis client error: ', err));
-    if (!redisClient.isOpen)
-        yield redisClient.connect();
-    try {
-        const data = yield redisClient.get(key);
-        if (data)
-            return JSON.parse(data);
-        const freshData = yield cb();
-        redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
-        return freshData;
+            catch (error) {
+                console.error(error === null || error === void 0 ? void 0 : error.message);
+            }
+        });
     }
-    catch (error) {
-        console.error(error === null || error === void 0 ? void 0 : error.message);
+    getCachedValueResponse({ key, timeTaken = 3600, cb }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.redisClient.on('error', err => console.error('Redis client error: ', err));
+            if (!this.redisClient.isOpen)
+                yield this.redisClient.connect();
+            try {
+                const data = yield this.redisClient.get(key);
+                if (data)
+                    return JSON.parse(data);
+                const freshData = yield cb();
+                this.redisClient.setEx(key, timeTaken, JSON.stringify(freshData));
+                return freshData;
+            }
+            catch (error) {
+                console.error(error === null || error === void 0 ? void 0 : error.message);
+            }
+        });
     }
-});
-export function timeConverterInMillis() {
-    const minute = 60 * 1000;
-    const hour = minute * 60;
-    const day = hour * 24;
-    return { minute, hour, day };
 }
 //# sourceMappingURL=redis.js.map

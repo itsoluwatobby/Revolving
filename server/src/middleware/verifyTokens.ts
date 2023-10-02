@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 import { ClaimProps, USERROLES, UserProps } from "../../types.js";
-import { getCachedResponse } from "../helpers/redis.js";
-import { getUserByEmail, getUserByToken } from "../services/userService.js";
+import { RedisClientService } from "../helpers/redis.js";
+import { UserService } from "../services/userService.js";
 
 interface TokenProp extends Request{
   email: string,
@@ -15,9 +15,12 @@ interface CookieProp extends Request{
   }
 }
 
+const redisClientSeerver = new RedisClientService();
+const userService = new UserService()
+
 async function activatedAccount(email: string): Promise<UserProps> {
-  const userData = await getCachedResponse({key: `user:${email}`, cb: async () => {
-    const user = await getUserByEmail(email)
+  const userData = await redisClientSeerver.getCachedResponse({key: `user:${email}`, cb: async () => {
+    const user = await userService.getUserByEmail(email)
     return user
   }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE']}) as UserProps
   return userData
@@ -50,7 +53,7 @@ export async function getNewTokens(req: CookieProp, res: Response) {
   const cookie = req.cookies;
   if(!cookie?.revolving) return responseType({res, status: 401, message: 'Bad Credentials'})
   const token = cookie?.revolving;
-  const user = await getUserByToken(token)
+  const user = await userService.getUserByToken(token)
   if(!user) return res.sendStatus(404)
 
   const verify = await verifyToken(user?.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET) as ClaimProps | string

@@ -15,16 +15,16 @@ type DrawdownProps = {
 }
 
 export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProps) {
-  const userId = localStorage.getItem('revolving_userId')
-  const userRoles = useSelector(selectCurrentRoles)
-  const signOut = useLogout()
-  const {pathname} = useLocation()
-  const home = '/'
   const { theme, setRollout } = useThemeContext() as ThemeContextType
-  const excludeRoute = ['/new_story', `/edit_story`, `/story/${storyId}`]
-
+  const userId = localStorage.getItem('revolving_userId') as string
+  const userRoles = useSelector(selectCurrentRoles)
+  const {pathname} = useLocation()
+  const signOut = useLogout()
+  const home = '/'
+  
   const address = ['/new_story', `/edit_story/${storyId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
+  const excludeRoute = ['/new_story', `/edit_story`, `/story/${storyId}`]
   
   const modalClass = useCallback((theme: Theme, type?: ChatOption) => { 
     return `${type === 'Hide' ? 'md:hidden' : ''} hover:scale-[1.01] hover:border-b-2 whitespace-nowrap border-none transition-all hover:opacity-90 cursor-pointer midscreen:rounded-sm midscreen:p-4 capitalize flex items-center p-1 midscreen:drop-shadow-2xl midscreen:w-full midscreen:grid midscreen:place-content-center midscreen:border-b-[1px] midscreen:bg-opacity-80 midscreen:hover:opacity-90 ${theme == 'light' ? 'midscreen:hover:bg-slate-200' : 'midscreen:hover:bg-slate-600'}`
@@ -102,7 +102,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
               )
             : null
           }
-          {
+          {/* {
             (userRoles?.length && pathname !== `/notifications/${userId}`) ?
               (
                 <Link 
@@ -114,7 +114,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                 </Link>
               )
             : null
-          }
+          } */}
           {
             (userRoles?.length && pathname !== `/taskManager/${userId}`) ?
               (

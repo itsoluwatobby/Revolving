@@ -8,12 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
-import { getCachedResponse } from "../helpers/redis.js";
-import { getUserByEmail, getUserByToken } from "../services/userService.js";
+import { RedisClientService } from "../helpers/redis.js";
+import { UserService } from "../services/userService.js";
+const redisClientSeerver = new RedisClientService();
+const userService = new UserService();
 function activatedAccount(email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userData = yield getCachedResponse({ key: `user:${email}`, cb: () => __awaiter(this, void 0, void 0, function* () {
-                const user = yield getUserByEmail(email);
+        const userData = yield redisClientSeerver.getCachedResponse({ key: `user:${email}`, cb: () => __awaiter(this, void 0, void 0, function* () {
+                const user = yield userService.getUserByEmail(email);
                 return user;
             }), reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] });
         return userData;
@@ -53,7 +55,7 @@ export function getNewTokens(req, res) {
         if (!(cookie === null || cookie === void 0 ? void 0 : cookie.revolving))
             return responseType({ res, status: 401, message: 'Bad Credentials' });
         const token = cookie === null || cookie === void 0 ? void 0 : cookie.revolving;
-        const user = yield getUserByToken(token);
+        const user = yield userService.getUserByToken(token);
         if (!user)
             return res.sendStatus(404);
         const verify = yield verifyToken(user === null || user === void 0 ? void 0 : user.refreshToken, process.env.REFRESHTOKEN_STORY_SECRET);

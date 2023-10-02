@@ -1,16 +1,18 @@
 import { toast } from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ThemeContextType } from "../posts";
 import { useThemeContext } from "./useThemeContext";
 import { signUserOut } from "../features/auth/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSignOutMutation } from "../app/api/authApiSlice";
+import { getCurrentUser } from "../features/auth/userSlice";
 
 type SignOutType = 'dont' | 'use'
 
 export default function useLogout() {
   const { setRollout } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
+  const currentUser = useSelector(getCurrentUser)
   const [signedOut] = useSignOutMutation()
   const { pathname } = useLocation()
   const dispatch = useDispatch()

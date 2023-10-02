@@ -16,6 +16,7 @@ import NewPassword from "./pages/NewPassword";
 import TaskManager from "./pages/TaskManager";
 import { BsChatTextFill } from 'react-icons/bs';
 import { Routes, Route } from 'react-router-dom';
+import Notifications from "./pages/Notifications";
 import RegisterModal from "./pages/RegisterModel";
 import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
@@ -28,14 +29,13 @@ import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { selectCurrentRoles } from "./features/auth/authSlice";
-import Notifications from "./pages/Notifications";
  
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
 
   return (
-    <main className={`app relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
+    <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
       <Routes>
 
         <Route path='/' element={<BlogLayout />}>
@@ -58,7 +58,7 @@ export const App = () => {
             <Route path="edit_story/:storyId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="follows/:userId" element={<Followers />} />
-            <Route path="notifications/:userId" element={<Notifications />} />
+            {/* <Route path="notifications/:userId" element={<Notifications />} /> */}
 
             <Route element={<ProtectedRoute roles={user_roles}/>}>
 
@@ -79,6 +79,8 @@ export const App = () => {
         <Route path="*" element={<NotFound />} />
       
       </Routes>
+
+      <Notifications />
 
       <Toaster />
       

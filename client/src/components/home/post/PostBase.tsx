@@ -1,27 +1,29 @@
-import { toast } from "react-hot-toast";
+import { useState } from 'react';
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { ErrorResponse } from "../../../data";
+import Comments from "../../comments/Comments";
 import { AiOutlineRetweet } from "react-icons/ai";
 import { MdOutlineInsertComment } from "react-icons/md";
-import { ErrorResponse, PageType } from "../../../data";
-import { MakeToButtom, ThemeContextType } from "../../../posts";
 import { useThemeContext } from "../../../hooks/useThemeContext";
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs";
 import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice";
 import { ErrorStyle, SuccessStyle, checkCount } from "../../../utils/navigator";
+import { CommentOptionProp, MakeToButtom, ThemeContextType } from "../../../posts";
 import { useLikeAndUnlikeSharedStoryMutation, useShareStoryMutation } from "../../../app/api/sharedStorySlice";
 
 type PostButtomProps = {
-  page?: PageType,
   story: MakeToButtom,
   averageReadingTime: string,
 }
 
-export default function PostBase({ story, averageReadingTime, page }: PostButtomProps) {
+export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
-  const { theme,  setOpenComment, setLoginPrompt } = useThemeContext() as ThemeContextType
-  const [likeAndUnlikeStory, { isLoading: isLikeLoading, isError: isLikeError, isUninitialized }] = useLikeAndUnlikeStoryMutation()
-  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, isError: isSharedLikeError, isUninitialized: isSharedUninitialzed }] = useLikeAndUnlikeSharedStoryMutation()
+  const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
+  const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' })
+  const [likeAndUnlikeStory, { isLoading: isLikeLoading, isError: isLikeError }] = useLikeAndUnlikeStoryMutation()
   const [shareStory, { isLoading: isSharedLoading, error: sharedError, isError: isSharedError }] = useShareStoryMutation();
+  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, isError: isSharedLikeError }] = useLikeAndUnlikeSharedStoryMutation()
 
   const likeUnlikeStory = async() => {
     try{
@@ -49,10 +51,10 @@ export default function PostBase({ story, averageReadingTime, page }: PostButtom
       isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
-
+// {(story?.likes?.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'}
   return (
-    <div className='mt-2 opacity-90 flex items-center gap-5 text-green-600 text-sm font-sans'>
-        <p>{story?.body ? averageReadingTime + ' read' : ''}</p>
+    <div className='relative mt-2 flex items-center gap-5 text-sm font-sans'>
+        <p className="text-green-600">{story?.body ? averageReadingTime + ' read' : ''}</p>
         <p 
           onClick={likeUnlikeStory}
           className={`flex items-center gap-1 ${(isLikeLoading || isSharedLikeLoading) && 'animate-bounce'}`}>
@@ -65,7 +67,7 @@ export default function PostBase({ story, averageReadingTime, page }: PostButtom
               :
               <BsHandThumbsUp 
                 title='like' 
-                className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${(story?.likes?.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'} ${theme == 'light' ? 'text-black' : 'text-white'}`} />
+                className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-black' : 'text-white'}`} />
           }
             <span className={`font-mono text-base ${theme == 'dark' ? 'text-white' : 'text-black'}`}>
               {story?.sharedId ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}
@@ -102,8 +104,7 @@ export default function PostBase({ story, averageReadingTime, page }: PostButtom
             </span>
           </p>
           
-          {/* )
-        } */}
+          <Comments openComment={openComment} setOpenComment={setOpenComment} />
       </div>
   )
 }

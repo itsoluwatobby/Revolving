@@ -1,20 +1,36 @@
 import CommentBody from "./CommentBody";
 import { useSelector } from "react-redux";
+import { useCallback } from 'react';
 import EnlargeComment from "./EnlargeComment";
-import { ThemeContextType } from "../../posts";
 import { checkCount } from "../../utils/navigator";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { getComments } from "../../features/story/commentSlice";
+import { CommentOptionProp, ThemeContextType } from "../../posts";
 
-export default function Comments() {
-  const {theme, enlarge, openComment } = useThemeContext() as ThemeContextType;
+type CommentProps={
+  openComment: CommentOptionProp,
+  setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>
+} 
+
+export default function Comments({ openComment, setOpenComment }: CommentProps) {
+  const {theme, enlarge } = useThemeContext() as ThemeContextType;
   const { pathname } = useLocation()
-  const {userId} = useParams()
   const comments = useSelector(getComments)
+  const scrollRef = useCallback((node: HTMLElement) => {
+    if(node && openComment?.option === 'Open') {
+      node.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [openComment?.option])
 
   return (
-    <section className={`comment_page text-sm absolute z-50 ${pathname === `/profile/${userId}` ? '-bottom-24' : 'top-20'} left-1 bg-opacity-90 w-full ${openComment?.option === 'Open' ? 'scale-100' : 'scale-0 hidden'} transition-all p-3`}>
+    <section 
+      className={`comment_page text-sm absolute z-10 ${pathname === `/story/${openComment?.storyId}` ? '-bottom-24' : '-top-32 mobile:-top-40'} left-1 w-full ${openComment?.option === 'Open' ? 'scale-100' : 'scale-0 hidden'} transition-all p-3`}>
+        <div 
+          ref={scrollRef as React.LegacyRef<HTMLDivElement>} 
+          onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
+          className="h-[20vh] w-full" 
+        />
       <article className={`relative ${theme == 'light' ? 'bg-slate-100' : 'bg-slate-700'} flex flex-col h-4/5 p-2 pt-1 md:w-4/5 shadow-lg rounded-lg`}>
         {!enlarge?.assert && (
           comments?.length ? (
@@ -32,7 +48,7 @@ export default function Comments() {
             )
           )
         }
-        {enlarge?.assert ? <EnlargeComment /> : <CommentBody />}
+        {enlarge?.assert ? <EnlargeComment /> : <CommentBody openComment={openComment} setOpenComment={setOpenComment} />}
       </article>
     </section>
   )

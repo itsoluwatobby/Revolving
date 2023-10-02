@@ -14,10 +14,9 @@ type Props = {
   userProfile: UserProps,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>
 }
-const InitElement = { name: '', elem: <></> }
+
 export default function ProfileMid({ userId, userProfile, setRevealEditModal, theme }: Props) {
   const [showAll, setShowAll] = useState<boolean>(false)
-  const [requiredIcon, setRequiredIcon] = useState<(typeof InitElement)[]>([])
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const ICONS = useCallback((classNames?: string): {[index: string]: JSX.Element} => {
     return (
@@ -113,9 +112,9 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
                 </button>
               </Link>
 
-              <div className='flex flex-col justify-between gap-4 h-full'>
+              <div className={`${userProfile?._id ? 'flex' : 'hidden'} flex-col justify-between gap-4 h-full`}>
 
-                <FollowUnFollow userId={userProfile?._id} position={['profile']} />  
+                <FollowUnFollow userId={userProfile?._id} position={['profile']} />
 
                 <div className={`${userProfile?.stack?.length ? 'flex' : 'hidden'} flex-col`}>
                   <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>

@@ -126,7 +126,7 @@ console.log({isIntersecting1})
           setLoginPrompt('Hide')
         }
       }
-      className={`relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 pb-5 px-3.5 md:px-6`}>
+      className={`scroll_behavior relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 pb-5 px-3.5 md:px-6`}>
          <p ref={observerRef1 as React.LegacyRef<HTMLParagraphElement>} />
 
         {content}

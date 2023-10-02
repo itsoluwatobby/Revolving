@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { ThemeContextType } from '../../posts';
 import { GiHamburgerMenu} from 'react-icons/gi';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,7 +9,7 @@ import { getTabCategory, setNavigation } from '../../features/story/navigationSl
 const list_style = 'cursor-pointer touch-pan-x whitespace-nowrap text-gray-500 active:text-gray-500 duration-200 ease-in-out';
 
 export const TopHome = () => {
-  const {theme, setOpenComment, toggleLeft, setToggleLeft} = useThemeContext() as ThemeContextType;
+  const {theme, toggleLeft, setToggleLeft} = useThemeContext() as ThemeContextType;
   const getNavigation = useSelector(getTabCategory)
   const dispatch = useDispatch()
   // const scrollNavBar = useCallback((node: HTMLElement) => {
@@ -22,7 +22,6 @@ export const TopHome = () => {
 
   const content = (
     <header
-      onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
       className={`sticky top-0 z-10 max-w-full overflow-hidden flex-none flex items-center bg-inherit mt-2.5 mobile:mt-4 border $ border-l-0 border-r-0 border-t-1 duration-300 border-b-1 pl-2 pr-2 ${theme == 'dark' ? 'border-gray-700 dark:bg-slate-800' : 'border-gray-200 bg-white'}`}>
       <div className={`${toggleLeft == 'Open' ? 'hidden' : 'md:hidden'} h-14 w-10 grid place-content-center z-50`}>
         <GiHamburgerMenu 

@@ -13,6 +13,9 @@
   scroll-behavior: smooth;
   /* scroll-snap-type: proximity;
 } */
+.scroll_behavior{
+ scroll-behavior: smooth;
+}
 
 @media print {
   .page-break {

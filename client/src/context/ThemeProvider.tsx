@@ -15,7 +15,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
 
   const [fontOption, setFontOption] = useState<boolean>(false);
   const [rollout, setRollout] = useState<boolean>(false);
-  const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' });
+  const [openNotification, setOpenNotification] = useState<ChatOption>('Hide');
 
   const [parseId, setParseId] = useState<string>('');
   const [codeEditor, setCodeEditor] = useState<boolean>(false);
@@ -39,7 +39,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   }
 
   const values = {
-    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openComment, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, revealEditModal, setRevealEditModal, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenComment,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
+    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openNotification, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, revealEditModal, setRevealEditModal, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenNotification,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
   }
   return (
     <ThemeContext.Provider value={ values }>

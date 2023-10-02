@@ -88,7 +88,7 @@ export default function RegistrationForm({
             <div className='flex flex-col text-sm gap-2 p-2 pt-0 pb-0'>
               <p className='p-1'>Have an account?&nbsp;
                 <Link to={'/signIn'}>
-                  <span className='hover:underline hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70'>Sign In</span>
+                  <span className='hover:underline hover:underline-offset-2 cursor-pointer duration-150 hover:opacity-70 w-fit'>Sign In</span>
                 </Link>
               </p>
             </div>

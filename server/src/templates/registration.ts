@@ -1,6 +1,5 @@
 import { ConfirmationMethodType } from "../../types.js"
 
-
 type OptionsType = 'account' | 'password'
 
 /**
