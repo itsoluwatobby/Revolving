@@ -54,7 +54,8 @@ export const PersistedLogin = () => {
       }
       catch(err: unknown){
         const errors = err as ErrorResponse
-        (!userId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
+        return
+        // (!userId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
       }
     }
     if(isMounted) notificationOpen()

@@ -129,10 +129,12 @@ type Follows = { createdAt: string, followRecipientId: string }
 
 type EachSubs = { createdAt: string, subscriberId: string }
 type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+type Status = 'online' | 'offline'
 
 interface UserProps extends Document{
   email: string,
   gender: Gender,
+  status: Status,
   country: string,
   stack: string[],
   lastName: string,
@@ -161,7 +163,6 @@ interface UserProps extends Document{
   isResetPassword: boolean,
   isAccountActivated: boolean,
   subscribed: SubscriptionTo[],
-  status: 'online' | 'offline',
   notificationSubscribers: EachSubs[],
   verificationToken: VerificationTokenType,
   socialMediaAccounts: SocialMediaAccoutProp[],
@@ -169,12 +170,23 @@ interface UserProps extends Document{
 
 type SubUser = {
   _id: string, 
+  status: Status,
   subDate: string,
-  lastName: string, 
+  lastName: string,
+  lastSeen: string,
   firstName: string, 
   description: string, 
   followings: Follows[], 
   followers: Followers[], 
+  displayPicture: string,
+}
+
+type UserFriends = {
+  _id: string, 
+  status: Status,
+  lastName: string,
+  lastSeen: string,
+  firstName: string, 
   displayPicture: string,
 }
 
@@ -297,3 +309,30 @@ interface RequestStoryProp extends Request{
   category: Categories
 };
 
+interface ConversationModelType{
+  _id: ObjectId | string,
+  adminId: string | ObjectId,
+  isOpened: boolean,
+  members: string[],
+  createdAt: string,
+  updatedAt: string
+}
+
+interface MessageModelType{
+  _id: ObjectId | string,
+  conversationId:  ObjectId | string, 
+  senderId:  ObjectId | string,
+  receiverId:  ObjectId | string, 
+  author: string,
+  message: string,
+  displayPicture: string,
+  referencedMessage: Omit<MessageModelType, 'referencedMessage'>,
+  isDelivered: boolean,
+  isMessageRead: NotificationStatus,
+  isMessageDeleted: string[],
+  pictures: string[],
+  createdAt: string,
+  updatedAt: string
+}
+
+type MessageStatus = 'DELIVERED' | 'READ'

@@ -105,7 +105,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         setOnCard(false)
         setRevealCard('Hide')
       }}
-      className={`absolute bg-slate-100 font-sans ${revealCard == 'Open' ? 'scale-100' : 'scale-0'} transition-all rounded p-2.5 z-10 top-5 max-h-40 shadow-2xl w-fit ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
+      className={`absolute bg-slate-100 font-sans ${revealCard == 'Open' ? 'scale-100' : 'scale-0 hidden'} transition-all rounded p-2.5 z-10 top-5 max-h-40 shadow-2xl w-fit ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
       {content}
     </article>
   )

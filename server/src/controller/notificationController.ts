@@ -6,6 +6,8 @@ import { NotificationModel } from "../models/Notifications.js";
 import { AllNotificationModelType, NotificationBody, NotificationModelType, NotificationStatus, NotificationType, UserProps } from "../../types.js";
 import { Document, Schema } from "mongoose";
 
+type NotificationDocument = Document<unknown, {}, NotificationModelType> & NotificationModelType & Required<{ _id: string | Schema.Types.ObjectId; }>
+
 export class NotificationController {
   
   private redisClientService: RedisClientService = new RedisClientService()
@@ -72,7 +74,7 @@ export class NotificationController {
   openOrCloseNotification(req: Request, res: Response){
     const { notificationId, isOpen, stats } = req.query
     if(!notificationId) return res.status(400)
-    const opened = isOpen as unknown as boolean
+    const opened = isOpen === 'true' ? true : false
     const status = stats as unknown as NotificationStatus
     NotificationModel.findByIdAndUpdate({_id: notificationId}, { $set: {isNotificationOpen: opened} }, { new: true })
     .then(async(userNotification) => {
@@ -89,9 +91,7 @@ export class NotificationController {
     }).catch(() => responseType({res, status: 400, message: 'Mongo error'}))
   }
 
-  public async isNotificationRead(userNotification: Document<unknown, {}, NotificationModelType> & NotificationModelType & Required<{
-    _id: string | Schema.Types.ObjectId;
-}>, status: NotificationStatus){
+  public async isNotificationRead(userNotification: NotificationDocument, status: NotificationStatus){
     let unRead_Notifications: NotificationBody[], read_Notifications: NotificationBody[], modified_Notifications: NotificationBody[];
     if(status === 'unread'){
       unRead_Notifications = userNotification?.notification?.filter(notification => !notification?.hasRead)
@@ -101,8 +101,9 @@ export class NotificationController {
     else if (status === 'read'){
       unRead_Notifications = userNotification?.notification?.filter(notification => notification?.status === 'unread')
       read_Notifications = userNotification?.notification?.filter(notification => notification?.status === 'read')
-      modified_Notifications = unRead_Notifications?.map(notification =>  ({ ...notification, status: 'read' }))
+      modified_Notifications = unRead_Notifications?.map(notification =>  ({ ...notification, status: 'read', hasRead: true }))
     }
+    if(!unRead_Notifications?.length) return 'Done'
     userNotification.notification = [...modified_Notifications, ...read_Notifications]
     await userNotification.save()
     return 'Done'

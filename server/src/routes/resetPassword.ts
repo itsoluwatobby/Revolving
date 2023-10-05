@@ -1,5 +1,4 @@
 import { Request, Response, Router } from "express";
-// import { forgetPassword, passwordReset, passwordResetRedirectLink } from "../controller/authController.js";
 import AuthenticationController from "../controller/authController.js";
 
 interface QueryProps extends Request{token: string}

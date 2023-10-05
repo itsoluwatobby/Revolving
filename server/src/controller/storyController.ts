@@ -53,8 +53,8 @@ class StoryController {
     asyncFunc(res, async () => {
       const { userId, storyId } = req.params;
       const editedStory = req.body
-      await autoDeleteOnExpire(userId)
       if(!userId || !storyId) return res.sendStatus(400)
+      await autoDeleteOnExpire(userId)
       const user = await this.userService.getUserById(userId)
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
       this.storyService.updateUserStory(storyId, editedStory)
@@ -152,8 +152,8 @@ class StoryController {
   public getUserStory(req: Request, res: Response){
     asyncFunc(res, async () => {
       const {userId} = req.params
-      await autoDeleteOnExpire(userId)
       if(!userId) return res.sendStatus(400);
+      await autoDeleteOnExpire(userId)
       const user = await this.userService.getUserById(userId)
       if(!user) return res.sendStatus(404)
       // if(user?.isAccountLocked) return res.sendStatus(401)

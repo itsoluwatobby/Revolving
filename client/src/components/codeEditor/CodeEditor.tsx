@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
-import { useThemeContext } from "../hooks/useThemeContext";
-import { PostContextType, ThemeContextType } from "../posts";
-import RevolvingEditor from 'react-monaco-editor';
 import { useDispatch } from "react-redux";
-import { setPresentLanguage } from "../features/story/codeSlice";
-import { usePostContext } from "../hooks/usePostContext";
+import { useEffect, useState } from "react"
+import RevolvingEditor from 'react-monaco-editor';
+import { usePostContext } from "../../hooks/usePostContext";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { PostContextType, ThemeContextType } from "../../posts";
+import { setPresentLanguage } from "../../features/story/codeSlice";
 
 type CodeType = {
   name: string,
@@ -104,12 +104,12 @@ export default function CodeBlock() {
   return (
     <section className="code_page w-full sm:w-3/5 sm:m-auto sm:mt-0 sm:mb-0 flex flex-col gap-2">
 
-      <div className="flex items-center text-sm w-full shadow-lg justify-evenly border p-0.5 gap-0.5 mb-0 rounded-lg">
+      <div className="flex items-center text-sm w-full shadow-lg justify-evenly border p-0.5 gap-0.5 mb-0 rounded-lg bg-red-700">
         {
           language.map(name => (
             <p 
               onClick={() => toggleLanguage(name)}
-              className={`cursor-pointer text-center w-full mobile:text-xs mobile:font-bold border border-t-0 border-b-0 px-6 border-l-0 last:border-r-0 capitalize rounded-lg shadow-2xl font-mono shadow-slate-900 ${theme == 'light' ? 'bg-slate-300' : '' } ${name == filename.name ? 'bg-slate-500' : ''}`}
+              className={`cursor-pointer text-center mobile:text-xs mobile:font-bold border border-t-0 border-b-0 px-6 border-l-0 last:border-r-0 capitalize rounded-lg     shadow-2xl font-mono shadow-slate-900 ${theme == 'light' ? 'bg-slate-300' : '' } ${name == filename.name ? 'bg-slate-500' : ''}`}
               key={name}>{name}
             </p>
           ))

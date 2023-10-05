@@ -49,7 +49,7 @@ class UserController {
         this.getUserFollows = (req, res) => {
             asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
                 const { userId } = req.params;
-                if (!userId)
+                if (!userId || !(userId === null || userId === void 0 ? void 0 : userId.length))
                     return res.sendStatus(400);
                 const user = yield this.userService.getUserById(userId);
                 if (!user)
@@ -63,6 +63,29 @@ class UserController {
                     if (!((_a = allFollows === null || allFollows === void 0 ? void 0 : allFollows.follows) === null || _a === void 0 ? void 0 : _a.length) && !((_b = allFollows === null || allFollows === void 0 ? void 0 : allFollows.followers) === null || _b === void 0 ? void 0 : _b.length))
                         return responseType({ res, status: 404, message: 'You have no follows or followings' });
                     return responseType({ res, status: 200, message: 'success', data: allFollows });
+                }).catch((error) => responseType({ res, status: 400, message: error === null || error === void 0 ? void 0 : error.message }));
+            }));
+        };
+        /**
+         * @description fetches user friends
+         * @param req - userid
+        */
+        this.getUserFriends = (req, res) => {
+            asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
+                const { userId } = req.params;
+                if (!userId || !(userId === null || userId === void 0 ? void 0 : userId.length))
+                    return res.sendStatus(400);
+                const user = yield this.userService.getUserById(userId);
+                if (!user)
+                    return responseType({ res, status: 404, message: 'You do not have an account' });
+                yield autoDeleteOnExpire(userId);
+                this.redisClientService.getCachedResponse({ key: `userFriends:${userId}`, cb: () => __awaiter(this, void 0, void 0, function* () {
+                        return yield this.userService.getFriends(user);
+                    }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+                    .then((allUsers) => {
+                    if (!(allUsers === null || allUsers === void 0 ? void 0 : allUsers.length))
+                        return responseType({ res, status: 404, message: 'You have no friends' });
+                    return responseType({ res, status: 200, message: 'success', count: allUsers === null || allUsers === void 0 ? void 0 : allUsers.length, data: allUsers });
                 }).catch((error) => responseType({ res, status: 400, message: error === null || error === void 0 ? void 0 : error.message }));
             }));
         };
@@ -92,7 +115,7 @@ class UserController {
     getUser(req, res) {
         asyncFunc(res, () => {
             const { userId } = req.params;
-            if (!userId || userId == null)
+            if (!userId || userId == null || userId == undefined)
                 return res.sendStatus(400);
             this.redisClientService.getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(this, void 0, void 0, function* () {
                     const current = yield this.userService.getUserById(userId);

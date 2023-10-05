@@ -1,5 +1,4 @@
 import { Router } from "express";
-// import { forgetPassword, passwordReset, passwordResetRedirectLink } from "../controller/authController.js";
 import AuthenticationController from "../controller/authController.js";
 const passwordResetRouter = Router();
 // RESET PASSWORD

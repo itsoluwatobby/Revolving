@@ -20,11 +20,16 @@ export default function NotificationComp({ notification, theme, isDeleteLoading,
   const [isMarked, setIsMarked] = useState<boolean>(false)
 
   useEffect(() => {
-    if (isMarked) setNotificationIds(prev => ([...prev, notification?._id]))
-    else if (!isMarked) setNotificationIds(prev => (prev?.filter(id => id !== notification?._id)))
-
+    let isMounted = true
+    if(isMounted){
+      if (isMarked) setNotificationIds(prev => ([...prev, notification?._id]))
+      else if (!isMarked) setNotificationIds(prev => (prev?.filter(id => id !== notification?._id)))
+    }  
+    return () => {
+      isMounted = false
+    }
   }, [isMarked, setNotificationIds, notification?._id])
-
+console.log(notification)
 
   return (   
     <>
@@ -36,10 +41,16 @@ export default function NotificationComp({ notification, theme, isDeleteLoading,
           <figure className="flex-none bg-slate-300 rounded-full border-2 border-slate-400 w-9 h-9">
             {
               notification?.notify?.displayPicture ? 
-              <img src={notification?.notify?.displayPicture as string} alt="" 
-                className="w-full h-full rounded-full object-cover"
-              /> 
-              : null
+                <img src={notification?.notify?.displayPicture as string} alt="" 
+                  className="w-full h-full rounded-full object-cover"
+                /> 
+              : 
+              notification?.notify?.picture ? 
+                <img src={notification?.notify?.picture as string} alt="" 
+                  className="w-full h-full rounded-full object-cover"
+                /> 
+              : 
+              null
             }
           </figure>
 
@@ -48,22 +59,26 @@ export default function NotificationComp({ notification, theme, isDeleteLoading,
             className='flex-auto flex flex-col gap-1'>
 
             <Link to={`/profile/${notification?.notify?.userId}`}>
-              <p className={`${theme === 'light' ? 'bg-white' : 'text-gray-300'} hover:underline underline-offset-2 cursor-pointer text-sm`}>@{(notification?.notify?.fullName as string)?.replace(' ', '_')?.toLowerCase()}
+              <p className={`w-fit ${theme === 'light' ? 'bg-white' : 'text-gray-300'} hover:underline underline-offset-2 cursor-pointer text-sm`}>@{(notification?.notify?.fullName as string)?.replace(' ', '_')?.toLowerCase()}
               </p>
             </Link>
 
             {/* CONTENT */}
-            <Link to={`/story/${notification?.notify?.storyId as string}`}
+            <Link to={notification?.notify?.title ? `/story/${notification?.notify?.storyId as string}` : `/profile/${notification?.notify?.userId as string}`}
               title='view story'
-              className={`text-[11px] hover:underline ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>
+              className={`w-fit text-[11px] hover:underline ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>
               {
-                notification?.notificationType === 'Comment' ? 'commented on your story' : notification?.notificationType === 'Likes' ? 'liked your story' : ''
+                notification?.notificationType === 'Comment' ? 'commented on your story' : notification?.notificationType === 'Likes' ? 'likes your story' : notification?.notificationType === 'Follow' ? 'followed you. Tap to view profile' : notification?.notificationType === 'Subcribe' ? 'subscribed to your stories' : notification?.notificationType === 'CommentLikes' ? 'likes your comment' : notification?.notificationType === 'NewStory' ? 'posted a new story' : notification?.notificationType === 'SharedStory' ? 'shared your story' : notification?.notificationType === 'Tagged' ? 'tagged you' : notification?.notificationType === 'Message' ? 'sent you a message' : ''
               }&nbsp;
               <span 
-              className='font-bold'>
+              className={`font-bold ${notification?.notify?.title ? 'block' : 'hidden'}`}>
                 {reduceLength(notification?.notify?.title as string, 30, 'letter')}
               </span>
             </Link>
+
+            {/* <div className='text-xs'>
+              {}
+            </div> */}
 
           </div>
 
@@ -72,6 +87,7 @@ export default function NotificationComp({ notification, theme, isDeleteLoading,
               onClick={() => deleteNotification(notification?._id)}
               className={`${notificationIds?.length ? 'hidden' : 'block'} rounded-sm hover:opacity-90 p-0.5 px-1 w-fit`}>
               <FaTrashRestore 
+                title='remove'
                 className={`${theme === 'light' ? 'text-gray-800' : 'text-white'}`}
               />
             </button>

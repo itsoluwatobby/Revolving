@@ -1,7 +1,6 @@
-import { Router } from "express";
 import { ROLES } from "../config/allowedRoles.js";
+import { Router } from "express";
 import { verifyRoles } from "../middleware/verifyRoles.js";
-// import { createNewComment, deleteComment, deleteUserComments, getUserCommentStory, like_Unlike_Comment, updateComment, userComments } from "../controller/commentController.js";
 import CommentController from "../controller/commentController.js";
 const commentRouter = Router();
 commentRouter.post('/:userId/:storyId', verifyRoles([ROLES.USER]), (req, res) => CommentController.createNewComment(req, res));

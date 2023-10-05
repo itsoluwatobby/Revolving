@@ -1,11 +1,9 @@
-import { Request, Response, Router } from "express";
+import { RequestStoryProp } from "../../types.js";
 import { ROLES } from "../config/allowedRoles.js";
+import { Request, Response, Router } from "express";
 import { verifyRoles } from "../middleware/verifyRoles.js";
-// import { createNewStory, deleteStory, deleteStoryByAdmin, getUserStory, like_Unlike_Story, updateStory } from "../controller/storyController.js";
-// import { getSharedStoriesByUser, like_Unlike_SharedStory, shareStory, unShareUserStory } from "../controller/sharedStoryController.js";
 import StoryController from "../controller/storyController.js";
 import SharedStoryController from "../controller/sharedStoryController.js";
-import { RequestStoryProp } from "../../types.js";
 
 const storyRouter: Router = Router();
 

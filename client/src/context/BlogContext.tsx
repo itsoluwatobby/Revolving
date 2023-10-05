@@ -4,11 +4,15 @@ import { createContext, useEffect, useState } from 'react';
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
 import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
+import { connect, Socket } from 'socket.io-client';
+import { BASEURL } from '../app/api/apiSlice';
 
+let socket: Socket
 export const PostContext = createContext<PostContextType | null>(null)
 
 const initState = { codeId: '', langType: '', code: '', date: '' }
 export const PostDataProvider = ({ children }: ChildrenProp) => {
+  //socket = new Socket()
   const [search, setSearch] = useState<string>('');
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<TypingEvent>('notTyping');
@@ -24,6 +28,16 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
   const [getLoggedInUser] = useGetCurrentUserMutation()
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && userId){
+      socket = connect('http://localhost:4000')
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [userId])
 
   useEffect(() => {
     let isMounted = true

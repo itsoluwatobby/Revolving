@@ -12,6 +12,8 @@ import { NotificationModel } from '../models/Notifications.js';
 import { ClaimProps, EmailProps, NewUserProp, QueryProps, UserProps } from "../../types.js";
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 
+type UserDocument = Document<unknown, {}, UserProps> & UserProps & {_id: Types.ObjectId;}
+
 /**
  * @description Authentication controller
  */
@@ -151,7 +153,7 @@ class AuthenticationController {
    * @description generates OTP and sends it to user email
    * @param req - response object, user, length(default - 6)
   */
-  public OTPGenerator(res: Response, user: Document<unknown, {}, UserProps> & UserProps & {_id: Types.ObjectId;}, length=6){
+  public OTPGenerator(res: Response, user: UserDocument, length=6){
     asyncFunc(res, async () => {
       const OTPToken = generateOTP(length)
       const options = mailOptions(user?.email, user?.username, OTPToken, 'account', 'OTP')

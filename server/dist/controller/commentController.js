@@ -74,6 +74,7 @@ class CommentController {
             if (!user)
                 return responseType({ res, status: 401, message: 'You do not have an account' });
             const comment = yield this.commentService.getCommentById(commentId);
+            const story = yield this.storyService.getStoryById(comment === null || comment === void 0 ? void 0 : comment.storyId);
             if (user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN)) {
                 this.commentService.deleteSingleComment(commentId)
                     .then(() => res.sendStatus(204))
@@ -82,7 +83,15 @@ class CommentController {
             if ((comment === null || comment === void 0 ? void 0 : comment.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
                 return res.sendStatus(401);
             this.commentService.deleteSingleComment(commentId)
-                .then(() => res.sendStatus(204))
+                .then(() => __awaiter(this, void 0, void 0, function* () {
+                const { firstName, lastName, _id, displayPicture: { photo } } = user;
+                const notiComment = {
+                    storyId: story === null || story === void 0 ? void 0 : story._id, title: story === null || story === void 0 ? void 0 : story.title, userId: _id,
+                    fullName: `${firstName} ${lastName}`, displayPicture: photo
+                };
+                yield this.notification.removeSingleNotification(userId, notiComment, 'Comment');
+                return res.sendStatus(204);
+            }))
                 .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
         }));
     }

@@ -6,7 +6,7 @@ type NotificationArgs = {
   isOpen?: boolean,
   notifyIds?: string[],
   notificationId: string,
-  status: NotificationStatus,
+  status?: NotificationStatus,
 }
 
 export const notificationSlice = apiSlice.injectEndpoints({

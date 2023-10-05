@@ -17,8 +17,8 @@ class TaskManagerController {
     asyncFunc(res, async() => {
       const { userId } = req.params
       const task: Partial<TaskProp> = req.body
-      await autoDeleteOnExpire(userId)
       if(!userId) return responseType({res, status: 400, message: 'userId required'})
+      await autoDeleteOnExpire(userId)
       const user = await this.userService.getUserById(userId);
       if(!user) return responseType({res, status: 403, message: 'You do not have an account'})
       if(userId !== task?.userId.toString()) return responseType({res, status: 403, message: 'Not you resource'})

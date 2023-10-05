@@ -86,9 +86,9 @@ class StoryController {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
             const { userId, storyId } = req.params;
             const editedStory = req.body;
-            yield autoDeleteOnExpire(userId);
             if (!userId || !storyId)
                 return res.sendStatus(400);
+            yield autoDeleteOnExpire(userId);
             const user = yield this.userService.getUserById(userId);
             if (!user)
                 return responseType({ res, status: 403, message: 'You do not have an account' });
@@ -124,7 +124,15 @@ class StoryController {
             else if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
                 return res.sendStatus(401);
             this.storyService.deleteUserStory(storyId)
-                .then(() => res.sendStatus(204))
+                .then(() => __awaiter(this, void 0, void 0, function* () {
+                const { _id, title, body, picture, category, commentIds, likes, author } = story;
+                const notiStory = {
+                    _id, title, body: body === null || body === void 0 ? void 0 : body.slice(0, 40), picture: picture[0],
+                    category, commentIds, likes, author
+                };
+                yield NotificationController.removeSingleNotification(userId, notiStory, 'NewStory');
+                return res.sendStatus(204);
+            }))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }));
     }
@@ -181,9 +189,9 @@ class StoryController {
     getUserStory(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
             const { userId } = req.params;
-            yield autoDeleteOnExpire(userId);
             if (!userId)
                 return res.sendStatus(400);
+            yield autoDeleteOnExpire(userId);
             const user = yield this.userService.getUserById(userId);
             if (!user)
                 return res.sendStatus(404);

@@ -21,9 +21,9 @@ class TaskManagerController {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
             const { userId } = req.params;
             const task = req.body;
-            yield autoDeleteOnExpire(userId);
             if (!userId)
                 return responseType({ res, status: 400, message: 'userId required' });
+            yield autoDeleteOnExpire(userId);
             const user = yield this.userService.getUserById(userId);
             if (!user)
                 return responseType({ res, status: 403, message: 'You do not have an account' });

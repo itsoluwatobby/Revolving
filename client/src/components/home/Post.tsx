@@ -2,20 +2,21 @@ import PostTop from './post/PostTop';
 import { PageType } from '../../data';
 import PostImage from '../PostImages';
 import PostBase from './post/PostBase';
-import { TextRules } from '../../fonts';
-import Comments from '../comments/Comments';
+import { TextRules } from '../../fonts';3
 import { reduceLength } from '../../utils/navigator';
 import { MakeToButtom, PostType } from '../../posts';
+// import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 import { useAverageReadTimePerStory } from '../../hooks/useAverageReadTimePerStory';
+
 
 type Props = {
   story: PostType,
   page?: PageType,
-  observerRef?: React.LegacyRef<HTMLElement>
 }
 
-export const Post = ({ story, page, observerRef }: Props) => {
+export const Post = ({ story, page }: Props) => {
   const averageReadingTime = useAverageReadTimePerStory(story?.body) as string;
+  // const { observerRef, isIntersecting } = useRevolvingObserver({screenPosition: '0px', threshold: 0})
   const adjustedStory = page === 'OTHERS' ? reduceLength(story?.body, 120, 'word') : reduceLength(story?.body, 150, 'word')
 
   const watchWords = TextRules.keywords as string[]
@@ -27,8 +28,8 @@ export const Post = ({ story, page, observerRef }: Props) => {
   
   return (
     <article 
-      ref={observerRef as React.LegacyRef<HTMLElement>}
-      className={`${story?.fontFamily} ${page === 'PROFILE' ? '' : ''} flex flex-col gap-1 text-xs sm:w-full min-w-[58%]`}>
+      // ref={observerRef}
+      className={`${story?.fontFamily} ${page === 'PROFILE' ? '' : ''} flex flex-col gap-1 text-xs sm:w-full min-w-[58%] transition-all`}>
       <PostTop bodyContent={bodyContent} story={story} />
 
       <PostImage story={story} position='main' page={page} />
