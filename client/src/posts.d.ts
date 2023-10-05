@@ -1,5 +1,6 @@
 // @types.posts.ts
 import React from 'react';
+import { UserFriends } from './data';
 
 type ChildrenProp = {
   children: React.ReactNode
@@ -143,11 +144,12 @@ type ThemeContextType = {
   success: UpdateSuccess,
   isPresent: ConflictType,
   loginPrompt: ChatOption,
+  currentChat: UserFriends,
   openEditPage: ChatOption,
   openNotification: ChatOption,
   revealEditModal: ImageTypeProp, 
   notintersecting: IsIntersectingType,
-  changeTheme: (mode: string) => void,
+  setTheme: React.Dispatch<React.SetStateAction<Theme>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>,
   setFontFamily: React.Dispatch<React.SetStateAction<string>>,
@@ -160,6 +162,7 @@ type ThemeContextType = {
   setSuccess: React.Dispatch<React.SetStateAction<UpdateSuccess>>,
   setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
   setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
+  setCurrentChat: React.Dispatch<React.SetStateAction<UserFriends>>,
   setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
   setOpenNotification: React.Dispatch<React.SetStateAction<ChatOption>>,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>,

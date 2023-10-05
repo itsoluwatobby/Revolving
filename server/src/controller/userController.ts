@@ -6,7 +6,7 @@ import { UserService } from '../services/userService.js';
 import { RedisClientService } from '../helpers/redis.js';
 import NotificationController from './notificationController.js';
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
-import { EachSubs, GetFollowsType, GetSubscriptionType, SubscribeNotificationType, SubscriptionTo, UserProps } from "../../types.js";
+import { EachSubs, GetFollowsType, GetSubscriptionType, SubscribeNotificationType, SubscriptionTo, UserFriends, UserProps } from "../../types.js";
 
 
 class UserController{
@@ -43,7 +43,7 @@ class UserController{
   public getUser(req: Request, res: Response){
     asyncFunc(res, () => { 
       const {userId} = req.params
-      if(!userId || userId == null) return res.sendStatus(400)
+      if(!userId || userId == null || userId == undefined) return res.sendStatus(400)
       this.redisClientService.getCachedResponse({key: `user:${userId}`, cb: async() => {
         const current = await this.userService.getUserById(userId)
         await autoDeleteOnExpire(userId)
@@ -228,7 +228,7 @@ class UserController{
   public getUserFollows = (req: Request, res: Response) => {
     asyncFunc(res, async() => {
       const {userId} = req.params
-      if(!userId) return res.sendStatus(400)
+      if(!userId || !userId?.length) return res.sendStatus(400)
       const user = await this.userService.getUserById(userId);
       if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
       await autoDeleteOnExpire(userId)
@@ -238,6 +238,26 @@ class UserController{
       .then((allFollows: GetFollowsType) => {
         if(!allFollows?.follows?.length && !allFollows?.followers?.length) return responseType({res, status: 404, message: 'You have no follows or followings'})
         return responseType({res, status: 200, message: 'success', data: allFollows})
+      }).catch((error) => responseType({res, status: 400, message: error?.message}))
+    })
+  }
+  /**
+   * @description fetches user friends
+   * @param req - userid 
+  */
+  public getUserFriends = (req: Request, res: Response) => {
+    asyncFunc(res, async() => {
+      const {userId} = req.params
+      if(!userId || !userId?.length) return res.sendStatus(400)
+      const user = await this.userService.getUserById(userId);
+      if(!user) return responseType({res, status: 404, message: 'You do not have an account'})
+      await autoDeleteOnExpire(userId)
+      this.redisClientService.getCachedResponse({key: `userFriends:${userId}`, cb: async() => {
+        return await this.userService.getFriends(user)
+      }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE']})
+      .then((allUsers: UserFriends[]) => {
+        if(!allUsers?.length) return responseType({res, status: 404, message: 'You have no friends'})
+        return responseType({res, status: 200, message: 'success', count: allUsers?.length, data: allUsers})
       }).catch((error) => responseType({res, status: 400, message: error?.message}))
     })
   }

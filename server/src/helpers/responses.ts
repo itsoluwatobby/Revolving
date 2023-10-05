@@ -1,5 +1,5 @@
 
-const statuses = {
+export const statuses = {
   "200": "SUCCESS",
   "201": "RESOURCE-CREATED",
   "204": "MODIFICATION-SUCCESS",
@@ -16,6 +16,8 @@ const statuses = {
   "429": "TOO-MANY-REQUESTS",
   "500": "INTERNAL-SERVER-ERROR"
 }
+
+export const SUCCESS_MESSAGE = { message: statuses[200] }
 
 // export const messageResponses = (param: string) => {
 

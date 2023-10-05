@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
-import { GetFollowsType, GetSubscriptionType, UserProps } from "../../data";
+import { GetFollowsType, GetSubscriptionType, UserFriends, UserProps } from "../../data";
 
 type SubscribeType = {
   meta: {
@@ -25,7 +25,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: followerId
       }),
-      invalidatesTags: [{ type: 'USERS' }, { type: 'NOTIFICATION' }, { type: 'FOLLOWS' }, { type: 'USERS', id: 'LIST'}],
+      invalidatesTags: [{ type: 'USERS' }, { type: 'NOTIFICATION' }, { type: 'FOLLOWS' }, { type: 'FRIENDS', id: 'LIST' }, { type: 'USERS', id: 'LIST'}],
     }),
     
     deleteUser: builder.mutation<void, string>({
@@ -86,6 +86,14 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       providesTags: ['FOLLOWS'],
     }),
 
+    getUserFriends: builder.query<UserFriends[], string>({
+      query: (userId) => `users/user_friends/${userId}`,
+       transformResponse: (baseQueryReturnValue: {data: UserFriends[]}) => {
+        return baseQueryReturnValue?.data
+      },
+      providesTags: (result) => providesTag(result as UserFriends[], 'FRIENDS'),
+    }),
+
   })
 })
 
@@ -94,6 +102,7 @@ export const {
   useGetCurrentUserMutation,
   useGetSubscriptionsQuery,
   useGetUserFollowsQuery,
+  useGetUserFriendsQuery,
   useUpdateInfoMutation,
   useDeleteUserMutation,
   useSubscribeMutation,

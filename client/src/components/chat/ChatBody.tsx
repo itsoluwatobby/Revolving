@@ -1,19 +1,22 @@
 import { format } from 'timeago.js';
-import { ChatProps } from '../../data';
-import { useSelector } from 'react-redux';
-import { Theme, ThemeContextType } from '../../posts';
+import { ChatProps, UserProps } from '../../data';
+import { ChatOption, Theme } from '../../posts';
 import { useState, useEffect, useCallback } from 'react';
 import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg';
-import { useThemeContext } from '../../hooks/useThemeContext';
-import { getChatMessages } from '../../features/chat/chatSlice';
+
+type ChatBodyProp={
+  theme: Theme,
+  openChat: ChatOption
+  currentUser: Partial<UserProps>,
+  setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
+}
 
 const DELAY = 250 as const
 
-export default function ChatBody() {
+export default function ChatBody({ theme, openChat, currentUser, setShowFriends }: ChatBodyProp) {
   const [typedInput, setTypedInput] = useState<string>('')
-  const {theme, openChat} = useThemeContext() as ThemeContextType;
   const [customMessage, setCustomMessage] = useState<ChatProps>()
-  const getChats = useSelector(getChatMessages)
+  // const getChats = useSelector(getChatMessages)
   const scrollIntoCurrent = useCallback((node: HTMLElement) => {
     node ? node?.scrollIntoView({ behavior: "smooth" }) : null
   }, [])
@@ -37,24 +40,8 @@ export default function ChatBody() {
     }
   }, [customMessage?.message])
 
-  useEffect(() => {
-    let isMounted = true
-    let customIndex = 0
-    if(getChats.length == 3) {customIndex+=2}
-    if(isMounted && openChat == 'Open'){
-      setCustomMessage(getChats[customIndex] as ChatProps)
-      setTypedInput('')
-    }
-    else{
-      customIndex = 0
-    }
-    return () => {
-      isMounted = false
-    }
-  }, [openChat, getChats])
-
   const chatContent = (
-    getChats?.length && getChats.map(chat => (
+      ([] as ChatProps[])?.map(chat => (
       <article 
         key={chat._id}
         ref={scrollIntoCurrent}
@@ -80,7 +67,9 @@ export default function ChatBody() {
 
 
   return (
-    <section className={`hidebars text-sm flex-auto flex flex-col gap-1.5 w-full box-border ${theme == 'light' ? '' : 'bg-slate-600'} overflow-y-scroll p-1.5 pl-1 pr-1`}>
+    <section 
+      onClick={() => setShowFriends('Hide')}
+      className={`hidebars text-sm flex-auto flex flex-col gap-1.5 w-full box-border ${theme == 'light' ? '' : 'bg-slate-600'} overflow-y-scroll p-1.5 pl-1 pr-1`}>
       {chatContent}
     </section>
   )

@@ -1,6 +1,5 @@
 import { ROLES } from "../config/allowedRoles.js";
 import { Request, Response, Router } from "express";
-// import { createTask, deletePermanently, deleteUserTask, emptyBin, restoreTasks, updateTasks } from "../controller/taskManagerController.js";
 import { verifyRoles } from "../middleware/verifyRoles.js";
 import TaskManagerController from "../controller/taskManagerController.js";
 

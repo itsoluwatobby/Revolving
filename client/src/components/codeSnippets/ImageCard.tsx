@@ -1,10 +1,10 @@
+import { toast } from "react-hot-toast"
 import { FaTimes } from "react-icons/fa"
+import { ErrorStyle } from "../../utils/navigator"
+import { useDispatch, useSelector } from "react-redux"
 import { Theme, ImageType, ImageUrlsType } from "../../posts"
 import { useDeleteImageMutation } from "../../app/api/storyApiSlice"
-import { useDispatch, useSelector } from "react-redux"
 import { getUrl, resetUrl, setUrl } from "../../features/story/storySlice"
-import { toast } from "react-hot-toast"
-import { ErrorStyle } from "../../utils/navigator"
 
 type ImageCardProps = {
   image: ImageType,

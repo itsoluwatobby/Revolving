@@ -203,6 +203,7 @@ type Follows = { createdAt: string, followRecipientId: string }
 
 type EachSubs = { createdAt: string, subscriberId: string }
 type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+type Status = 'online' | 'offline'
 
 interface UserProps{
   _id: string,
@@ -227,7 +228,7 @@ interface UserProps{
   lastSeen: string,
   hobbies: string[],
   notificationId: string,
-  status: 'online' | 'offline',
+  status: Status,
   refreshToken: string,
   editDate: string,
   gender: Gender,
@@ -242,16 +243,28 @@ interface UserProps{
   updatedAt: string
 }
 
-type SubUser = {
+type UserFriends = {
   _id: string, 
-  subDate: string,
-  lastName: string, 
+  status: Status,
+  lastName: string,
+  lastSeen: string,
   firstName: string, 
-  description: string, 
-  followers: Followers[], 
-  followings: Follows[], 
   displayPicture: string,
 }
+
+type SubUser = {
+  _id: string, 
+  status: Status,
+  subDate: string,
+  lastName: string,
+  lastSeen: string,
+  firstName: string, 
+  description: string, 
+  followings: Follows[], 
+  followers: Followers[], 
+  displayPicture: string,
+}
+
 
 
 type ChatProps = {
@@ -420,3 +433,34 @@ interface NotificationModelType{
   createdAt: string,
   updatedAt: string
 }
+
+type MembersType = { userId: string, partnerId: string }
+
+type ConversationModelType = {
+  _id: string,
+  adminId: string,
+  members: string[],
+  isOpend: boolean,
+  createdAt: string,
+  updatedAt: string
+}
+
+type MessageModelType = {
+  _id: string,
+  conversationId:  string, 
+  senderId:  string,
+  receiverId:  string, 
+  author: string,
+  message: string,
+  displayPicture: string,
+  referencedMessage: Omit<MessageModelType, 'referencedMessage'>,
+  isDelivered: boolean,
+  isMessageRead: NotificationStatus,
+  isMessageDeleted: string[],
+  pictures: string[],
+  createdAt: string,
+  updatedAt: string
+}
+
+type MessageStatus = 'DELIVERED' | 'READ'
+

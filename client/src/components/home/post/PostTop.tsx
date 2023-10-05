@@ -4,15 +4,17 @@ import UserCard from "../../UserCard";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { ErrorResponse } from "../../../data";
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useState, useRef } from 'react';
-import { ErrorResponse } from "../../../data";
 import { useThemeContext } from "../../../hooks/useThemeContext";
+import useRevolvingObserver from "../../../hooks/useRevolvingObserver";
 import { ChatOption, PostType, Theme, ThemeContextType } from "../../../posts";
 import { useDeleteSharedStoryMutation } from "../../../app/api/sharedStorySlice";
 import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApiSlice";
+
 
 type PostTopProps = {
   story: PostType,
@@ -22,13 +24,13 @@ type PostTopProps = {
 export default function PostTop({ story, bodyContent }: PostTopProps) {
   const [deleteSharedStory, { isLoading: isSharedDeleteLoading, isError: isSharedDeleteError }] = useDeleteSharedStoryMutation()
   const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError }] = useDeleteStoryMutation()
+  const { observerRef, isIntersecting } = useRevolvingObserver({screenPosition: '0px', threshold: 0.2})
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const [revealCard, setRevealCard] = useState<ChatOption>('Hide')
   const [hovering, setHovering] = useState<boolean>(false)
   const [onCard, setOnCard] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
-  const observerRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLElement>(null)
   const dispatch = useDispatch()
   const buttonOptClass = useCallback((theme: Theme) => {
@@ -76,20 +78,22 @@ export default function PostTop({ story, bodyContent }: PostTopProps) {
   return (
     <div 
       ref={observerRef as React.LegacyRef<HTMLDivElement>}
-      className={`maxmobile:text-base ${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''}`}>
+      className={`maxmobile:text-base ${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''} ${isIntersecting === 'NOT_INTERSECTING' ? 'scale-75' : 'scale-100'} duration-200 transition-all`}>
       <div 
-        className='relative flex items-center gap-3'>
+        className='relative flex items-center gap-3'
+      >
 
         <p 
+          // ref={observerRef as React.LegacyRef<HTMLParagraphElement>}
           onClick={() => setHovering(prev => !prev)}
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
-          className='capitalize font-sans maxmobile:text-base cursor-pointer hover:opacity-90 transition-all'>{
+          className={`capitalize font-sans text-sm maxmobile:text-base cursor-pointer hover:opacity-90 transition-all`}>{
           reduceLength(story?.sharedId ? (story?.sharedAuthor as string) :  story?.author, 10, 'letter') || 'anonymous'
           }
         </p>
         <span>.</span>
-        <p className="font-sans flex items-center gap-2 text-sm">
+        <p className="font-sans flex items-center gap-2 text-xs opacity-80">
           {story?.sharedId ? format(story?.sharedDate as string) : format(story?.createdAt)}
           {story?.sharedId ? <Link to={`/story/${story?._id}`} title="link to story" className="text-gray-400 cursor-pointer">shared</Link> : null}
         </p>
@@ -133,7 +137,7 @@ export default function PostTop({ story, bodyContent }: PostTopProps) {
 
           <span>.</span>
 
-          <p className="font-sans flex items-center text-sm gap-2">{format(story?.createdAt)}</p>
+          <p className="font-sans flex items-center text-xs opacity-80 gap-2">{format(story?.createdAt)}</p>
         
           {!story?.sharedAuthor ?
             <UserCard 

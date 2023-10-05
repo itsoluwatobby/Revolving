@@ -1,7 +1,7 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { BiCodeAlt } from 'react-icons/bi';
 import { FaRegImages } from 'react-icons/fa';
-import CodeBlock from '../codeEditor/CodeEditor';
+import CodeBlock from '../components/codeEditor/CodeEditor';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePostContext } from '../hooks/usePostContext';
 import { useLocation, useParams } from 'react-router-dom';

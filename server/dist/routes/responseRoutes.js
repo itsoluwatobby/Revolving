@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { ROLES } from "../config/allowedRoles.js";
 import { verifyRoles } from "../middleware/verifyRoles.js";
-// import { createNewResponse, deleteResponse, deleteUserResponses, like_Unlike_Response, updateResponse, userResponses } from "../controller/responseController.js";
 import ResponseController from "../controller/responseController.js";
 const responseRouter = Router();
 responseRouter.post('/:userId/:commentId', verifyRoles([ROLES.USER]), (req, res) => ResponseController.createNewResponse(req, res));

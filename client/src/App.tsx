@@ -16,7 +16,6 @@ import NewPassword from "./pages/NewPassword";
 import TaskManager from "./pages/TaskManager";
 import { BsChatTextFill } from 'react-icons/bs';
 import { Routes, Route } from 'react-router-dom';
-import Notifications from "./pages/Notifications";
 import RegisterModal from "./pages/RegisterModel";
 import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
@@ -24,10 +23,11 @@ import ExpensePlanner from "./pages/ExpensePlanner";
 import ChatModal from "./pages/chatAdmin/ChatModal";
 import SingleStoryPage from "./pages/SingleStoryPage";
 import EditProfilePage from "./pages/EditProfilePage";
+import Notifications from "./components/Notifications";
 import PrompLogin from "./components/modals/PrompLogin";
+import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
-import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { selectCurrentRoles } from "./features/auth/authSlice";
  
 export const App = () => {
@@ -35,7 +35,7 @@ export const App = () => {
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
 
   return (
-    <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all duration-300 font-sans overflow-x-hidden`}>
+    <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all font-sans overflow-x-hidden`}>
       <Routes>
 
         <Route path='/' element={<BlogLayout />}>
@@ -84,14 +84,15 @@ export const App = () => {
 
       <Toaster />
       
-      {openChat === 'Open' ?
-        <ChatModal />
+      {
+        openChat === 'Open' ?
+          <ChatModal />
         :  
-        <BsChatTextFill
-          title='Chat with Admin'
-          onClick={() => setOpenChat('Open')}
-          className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
-        />
+          <BsChatTextFill
+            title='Chat with Admin'
+            onClick={() => setOpenChat('Open')}
+            className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
+          />
       }
       {loginPrompt == 'Open' ? <PrompLogin /> : null}
     </main>

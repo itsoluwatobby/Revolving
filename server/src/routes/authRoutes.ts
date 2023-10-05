@@ -1,11 +1,9 @@
-import { Request, Response, Router } from "express";
 import { ROLES } from "../config/allowedRoles.js";
+import { Request, Response, Router } from "express";
+import { EmailProps, NewUserProp } from "../../types.js";
 import { verifyRoles } from "../middleware/verifyRoles.js";
-// import { ExtraOTPGenerator, accountConfirmation, confirmOTPToken, confirmUserByPassword, loginHandler, registerUser, toggleAdminRole } from "../controller/authController.js";
-// import { getNewTokens, verifyAccessToken } from "../middleware/verifyTokens.js";
 import AuthenticationController from '../controller/authController.js'
 import { getNewTokens, verifyAccessToken } from "../middleware/verifyTokens.js";
-import { EmailProps, NewUserProp } from "../../types.js";
 
 
 const authRouter: Router = Router()

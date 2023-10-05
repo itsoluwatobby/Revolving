@@ -1,5 +1,5 @@
-import { Request, Response, Router } from "express";
 import { ROLES } from "../config/allowedRoles.js";
+import { Request, Response, Router } from "express";
 import { verifyRoles } from "../middleware/verifyRoles.js";
 import NotificationController from "../controller/notificationController.js";
 

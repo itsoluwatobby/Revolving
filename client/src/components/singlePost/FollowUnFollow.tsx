@@ -10,31 +10,38 @@ type FollowUnFollowProps = {
   position: PositionType
 }
 
+const initFollowOption = { isFollowing: false, isFollowed: false }
+
 export default function FollowUnFollow({ userId, position }: FollowUnFollowProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const {data: user} = useGetUserByIdQuery(currentUserId)
-  const [isFollowing, setIsFollowing] = useState<boolean>(false)
+  const [isFollowOption, setIsFollowOption] = useState<typeof initFollowOption>(initFollowOption)
   
   const [followUnfollowUser, { isLoading: isMutating, 
     error: followError,  isError: isFollowError, 
     isSuccess: isFollowSuccess }] = useFollowUnfollowUserMutation()
+
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const buttonClass = useCallback((isMutating: boolean, theme?: Theme, position?: PositionType) => {
     return `
     ${position?.includes('profile') ? 'rounded-sm p-2 px-0 text-sm' : 'rounded-md p-1 px-1.5'} ${position?.includes('others') ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
     `
   }, [])
+
+  const { isFollowing, isFollowed } = isFollowOption
   
   useEffect(() => {
     let isMounted = true
     if(isMounted && userId !== user?._id){
-      setIsFollowing(() => user?.followings?.find(sub => sub?.followRecipientId === userId) ? true : false)
+      const following = user?.followings?.find(sub => sub?.followRecipientId === userId) ? true : false
+      const followed = user?.followers?.find(sub => sub?.followerId === userId) ? true : false
+      setIsFollowOption(prev => ({...prev, isFollowing: following, isFollowed: followed}))
     }
     return () => {
       isMounted = false
     }
-  }, [user?.followings, user?._id, currentUserId, userId])
+  }, [user?.followings, user?.followers, user?._id, currentUserId, userId])
 
   const followOrUnfollow = async() => {
     try{
@@ -67,7 +74,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
             <button 
               onClick={followOrUnfollow}
               className={buttonClass(isMutating, theme, position)}>
-              {position?.includes('followPage') ? 'follow back' : 'follow'}
+              {(isFollowed || position?.includes('followPage')) ? 'follow back' : 'follow'}
             </button>
             ):(
             <button 

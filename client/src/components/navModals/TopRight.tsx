@@ -4,23 +4,20 @@ import { toast } from "react-hot-toast";
 import { FiEdit } from 'react-icons/fi';
 import { nanoid } from "@reduxjs/toolkit";
 import { IoIosMore } from 'react-icons/io';
-import { useState, useEffect } from 'react';
 import { BsMoonStars } from "react-icons/bs";
+import { BiMessageDots } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect, useCallback } from 'react';
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
+import { useGetNotificationQuery } from "../../app/api/noficationSlice";
 import { ErrorResponse, NotificationBody, UserProps } from "../../data";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ErrorStyle, SuccessStyle, checkCount } from "../../utils/navigator";
 import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts";
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice";
 import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice";
-import { BiMessageDots } from "react-icons/bi";
-import { useGetNotificationQuery } from "../../app/api/noficationSlice";
 
-const arrow_class= "text-base text-gray-400 cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
-
-const mode_class= "text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out"
 
 type TopRightProps = {
   currentUser: UserProps
@@ -28,7 +25,7 @@ type TopRightProps = {
 export default function TopRight({ currentUser }: TopRightProps) {
   const [updateStory, {isLoading: isLoadingUpdate, error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, codeEditor, editing, setRollout, setOpenNotification, setSuccess, setEditing, changeTheme, setIsPresent, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, editing, openNotification, setRollout, setOpenNotification, setSuccess, setEditing, setTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
   const { data } = useGetNotificationQuery(currentUser?._id as string)
   const [unreadNotifications, setUnreadNotifications] = useState<NotificationBody[]>([])
@@ -39,10 +36,16 @@ export default function TopRight({ currentUser }: TopRightProps) {
   const url = useSelector(getUrl)
   const { storyId } = useParams()
   const dispatch = useDispatch()
-
+  
   const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
-
+  
+  const mode_class = useCallback((type: 'SUN' | 'MOON') => {
+    return (
+      `text-lg cursor-pointer shadow-lg hover:scale-[1.1] active:scale-[0.98] hover:text-gray-500 duration-200 ease-in-out mr-2 ${type === 'SUN' ? '' : 'text-gray-700'}`
+    )
+  }, []) 
+  
   useEffect(() => {
     let isMounted = true
     if(isMounted && data) {
@@ -152,15 +155,24 @@ export default function TopRight({ currentUser }: TopRightProps) {
     }
   }
 
+  const changeTheme = (mode: string) => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'))
+    localStorage.setItem('theme', mode);
+  }
+
   return (
     <>
         {
           theme == 'dark' ? 
             <FiSun 
               onClick={() => changeTheme('light')}
-              className={mode_class} /> : <BsMoonStars 
+              className={mode_class("SUN")} 
+            /> 
+          : 
+            <BsMoonStars 
               onClick={() => changeTheme('dark')}
-                className={mode_class+'text-gray-700 mr-2'} />
+              className={mode_class("MOON")} 
+            />
         }
 
         {
@@ -170,9 +182,9 @@ export default function TopRight({ currentUser }: TopRightProps) {
               onClick={() => setOpenNotification(prev => (prev === 'Hide' ? prev = 'Open' : prev = 'Hide'))}
               className="relative cursor-pointer">
               <BiMessageDots 
-                className={`text-2xl text-gray-500 hover:text-gray-600 transition-all`}
+                className={`${openNotification === 'Open' ? 'text-gray-400' : 'text-gray-500'} text-2xl hover:text-gray-600 transition-all`}
               />
-              <span className="text-sm rounded bg-slate-600 grid place-content-center absolute -right-1 -bottom-1 text-white p-2 w-4 h-3.5">{checkCount(unreadNotifications)}</span>
+              <span className={`text-sm rounded ${unreadNotifications?.length ? 'block' : 'scale-0 hidden'} bg-slate-600 transition-all grid place-content-center absolute -right-1 -bottom-1 text-white p-2 w-4 h-3.5`}>{checkCount(unreadNotifications)}</span>
             </div>
           : null
         }

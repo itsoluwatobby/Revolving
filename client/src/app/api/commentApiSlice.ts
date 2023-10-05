@@ -1,7 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
 import { CommentProps, DeleteCommentByAdmin } from "../../data";
-// import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type CommentArgs = {
   userId: string, 
@@ -13,11 +12,6 @@ type CommentArgs = {
 }
 
 type ResponseType = { data: CommentProps[] }
-// const storyAdapter: EntityAdapter<PostType> = createEntityAdapter<PostType>({
-//   sortComparer: (prev, next) => next.storyDate.localeCompare(prev.storyDate)
-// })
-
-// const initialState = storyAdapter.getInitialState({})
 
 export const commentApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -119,18 +113,3 @@ export const {
   useGetUserCommentsQuery
 } = commentApiSlice
 
-// //returns query result object 
-// export const selectStoriesResult = storyApiSlice.endpoints.getStories.select()
-
-// // creates momixed 
-// const selectStoriesData = createSelector(
-//   selectStoriesResult,
-//   storyResult => storyResult?.data // normalized data
-// )
-
-
-// export const {
-//   selectAll: selectAllStories,
-//   selectById: selectAllStoryBy,
-//   selectIds: selectStoryIds
-// } = storyAdapter.getSelectors((state: PostType) => state.story)

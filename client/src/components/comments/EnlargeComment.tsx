@@ -121,7 +121,7 @@ export default function EnlargeComment() {
 
   return (
     <section className='hidebars relative overflow-y-scroll p-2 pt-0'>
-      <nav className='bg-slate-100 sticky top-0 z-10 flex items-center justify-between p-1'>
+      <nav className={`${theme === 'light' ? 'bg-slate-100' : 'bg-slate-600'} rounded-md sticky top-0 z-10 flex items-center justify-between p-1`}>
         <RiArrowGoBackLine
           onClick={() => setEnlarge({type: 'enlarge', assert: false})}
           className={`flex-none bg-slate-500 p-0.5 rounded-full text-xl text-white cursor-pointer hover:text-gray-400`}

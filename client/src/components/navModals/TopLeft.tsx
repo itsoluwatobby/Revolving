@@ -15,18 +15,17 @@ type TopLeftProp={
 export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const postData = useSelector(getStoryData) 
   const { search, setSearch} = usePostContext() as PostContextType
-  const {theme, setFontOption, setOpenComment, setRollout} = useThemeContext() as ThemeContextType
+  const {theme, setFontOption, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
   const { storyId } = useParams()
   const { userId } = useParams()
 
-  // const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`, `/profile/${userId}`, '/signIn', '/signUp', '/new_password', '/otp']
   const searchBar = ['/', `/taskManager/${userId}`]
   const savedDraft = ['/new_story', `/edit_story/${storyId}`]
-  // const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
-
+  
+  console.log(pathname)
   return (
-    <div className="flex-none flex items-center">
+    <div className={`flex-none ${pathname === '/' ? 'md:sticky md:top-0' : ''} flex items-center`}>
       <Link to='/'>
           <img 
             src={WedgeLoad} 
@@ -40,7 +39,6 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
       {
         searchBar.includes(pathname) ?
           <div 
-            onClick={() => setOpenComment({option: 'Hide', storyId: ''})}
             className={`flex gap-0.5 justify-around items-center rounded-md md:w-48 lg:w-56 sm:w-48 mobile:w-32 h-8 ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-0`}
           >  
             <CiSearch className='text-gray-700 text-xl w-8'/>

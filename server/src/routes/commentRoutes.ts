@@ -1,10 +1,8 @@
-import { Request, Response, Router } from "express";
-import { ROLES } from "../config/allowedRoles.js";
-import { verifyRoles } from "../middleware/verifyRoles.js";
-// import { createNewComment, deleteComment, deleteUserComments, getUserCommentStory, like_Unlike_Comment, updateComment, userComments } from "../controller/commentController.js";
-import CommentController from "../controller/commentController.js";
 import { RequestProp } from "../../types.js";
-
+import { ROLES } from "../config/allowedRoles.js";
+import { Request, Response, Router } from "express";
+import { verifyRoles } from "../middleware/verifyRoles.js";
+import CommentController from "../controller/commentController.js";
 
 const commentRouter: Router = Router();
 

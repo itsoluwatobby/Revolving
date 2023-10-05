@@ -1,9 +1,14 @@
-import { EnlargeCompo } from '../data';
+import { EnlargeCompo, Status, UserFriends } from '../data';
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, CommentOptionProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp } from '../posts';
+import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
+const initCurrentChat = {
+  _id: '', status: 'online' as Status,
+  lastName: '', lastSeen: '',
+  firstName: '', displayPicture: ''
+}
 export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [theme, setTheme] = useState<Theme>(localStorage.getItem('theme') as Theme || 'light');
   const [fontFamily, setFontFamily] = useState<FontStyle>(
@@ -27,19 +32,14 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [openEditPage, setOpenEditPage] = useState<ChatOption>('Hide');
   const [revealEditModal, setRevealEditModal] = useState<ImageTypeProp>('NIL');
 
+  const [currentChat, setCurrentChat] = useState<UserFriends>(initCurrentChat);
+
   const [editing, setEditing] = useState<EditingProp>({editing: false, codeId: ''});
   const [notintersecting, setNotIntersecting] = useState<IsIntersectingType>('NOT_INTERSECTING')
   const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
 
-  const changeTheme = (mode: string) => {
-    setTheme(prev => {
-      return prev == 'light' ? 'dark' : 'light'
-    })
-    localStorage.setItem('theme', mode);
-  }
-
   const values = {
-    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openNotification, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, revealEditModal, setRevealEditModal, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenNotification,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily, changeTheme
+    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openNotification, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, revealEditModal, currentChat, setCurrentChat, setTheme, setRevealEditModal, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenNotification,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily
   }
   return (
     <ThemeContext.Provider value={ values }>

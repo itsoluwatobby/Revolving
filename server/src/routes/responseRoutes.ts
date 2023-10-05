@@ -1,9 +1,8 @@
 import { Response, Router } from "express";
+import { RequestProp } from "../../types.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { verifyRoles } from "../middleware/verifyRoles.js";
-// import { createNewResponse, deleteResponse, deleteUserResponses, like_Unlike_Response, updateResponse, userResponses } from "../controller/responseController.js";
 import ResponseController from "../controller/responseController.js";
-import { RequestProp } from "../../types.js";
 
 const responseRouter: Router = Router();
 

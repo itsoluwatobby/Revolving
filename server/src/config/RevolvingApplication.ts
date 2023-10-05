@@ -5,28 +5,20 @@ import storyRouter from '../routes/storyRoutes.js';
 import commentRouter from '../routes/commentRoutes.js';
 import { Application, Request, Response } from 'express';
 import responseRouter from '../routes/responseRoutes.js';
+import UserController from '../controller/userController.js';
 import passwordResetRouter from '../routes/resetPassword.js';
 import { logURLAndMethods } from '../middleware/urlLogger.js';
 import taskManagerRouter from '../routes/taskManagerRoutes.js';
-//  import { verifyAccessToken } from '../middleware/verifyTokens.js';
-// import { logoutHandler } from '../controller/authController.js';
-// import { getUser, getUsers } from '../controller/userController.js';
-// import { getComment, getStoryComments } from '../controller/commentController.js';
-// import { getResponse, getResponseByComment } from '../controller/responseController.js';
-// import { getTask, getTasksInBin, getUserTask } from '../controller/taskManagerController.js';
-// import { fetchSharedStories, getSingleShared } from '../controller/sharedStoryController.js';
-// import { getStories, getStoriesWithUserId, getStory, getStoryByCategory, getStoryLikes } from '../controller/storyController.js';
-// import TokenController from '../middleware/verifyTokens.js';
-import UserController from '../controller/userController.js';
 import StoryController from '../controller/storyController.js';
 import notificationRouter from '../routes/notificationRoutes.js';
+import { verifyAccessToken } from '../middleware/verifyTokens.js';
 import CommentController from '../controller/commentController.js';
 import ResponseController from '../controller/responseController.js';
 import AuthenticationController from '../controller/authController.js';
 import TaskManagerController from '../controller/taskManagerController.js';
 import SharedStoryController from '../controller/sharedStoryController.js';
-import { verifyAccessToken } from '../middleware/verifyTokens.js';
-import { EmailProps, NewUserProp, RequestProp, RequestStoryProp } from '../../types.js';
+import { NewUserProp, RequestProp, RequestStoryProp } from '../../types.js';
+import messageRouter from '../routes/messageRoute.js';
 
 
 export class RevolvingApplication{
@@ -106,6 +98,9 @@ export class RevolvingApplication{
   
     // notification router
     this.app.use('/revolving/notification', notificationRouter);
+
+    // message router
+    this.app.use('/revolving/messages', messageRouter);
     
     // catch all error
      //app.use(errorLog);
