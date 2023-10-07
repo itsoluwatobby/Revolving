@@ -18,7 +18,6 @@ export class UserService {
   public async getAllUsers(){
     return await UserModel.find().lean();
   }
-
   public async getUserById(id: string){
     return await UserModel.findById(id).exec();
   }

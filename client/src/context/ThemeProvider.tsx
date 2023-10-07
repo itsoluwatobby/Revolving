@@ -1,14 +1,25 @@
-import { EnlargeCompo, Status, UserFriends } from '../data';
+import { EnlargeCompo, ErrorResponse, Status } from '../data';
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp } from '../posts';
+import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp, GetConvoType, InitConversationType } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 const initCurrentChat = {
-  _id: '', status: 'online' as Status,
-  lastName: '', lastSeen: '',
-  firstName: '', displayPicture: ''
+  userId: '', adminId: '', isOpened: false, createdAt: '', updatedAt: '', members: [], 
+  _id: '', status: 'offline' as Status, lastName: '', lastSeen: '', firstName: '', displayPicture: '', lastMessage: { createdAt: '', _id: '', message: '' }
 }
+
+const initConversationState = {
+  isLoading: false, isError: false, msg: '', error: {
+    status: 0, message: '', data: {
+      meta: {
+        message: ''
+      }
+    },
+    originalStatus: 0
+  }
+}
+
 export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [theme, setTheme] = useState<Theme>(localStorage.getItem('theme') as Theme || 'light');
   const [fontFamily, setFontFamily] = useState<FontStyle>(
@@ -32,14 +43,16 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
   const [openEditPage, setOpenEditPage] = useState<ChatOption>('Hide');
   const [revealEditModal, setRevealEditModal] = useState<ImageTypeProp>('NIL');
 
-  const [currentChat, setCurrentChat] = useState<UserFriends>(initCurrentChat);
+  const [currentChat, setCurrentChat] = useState<GetConvoType>(initCurrentChat);
+  // const [convoErrorMsg, setConvoErrorMsg] = useState<ErrorResponse | string>('')
+  const [isConversationState, setIsConversationState] = useState<InitConversationType>(initConversationState)
 
   const [editing, setEditing] = useState<EditingProp>({editing: false, codeId: ''});
   const [notintersecting, setNotIntersecting] = useState<IsIntersectingType>('NOT_INTERSECTING')
   const [enlarge, setEnlarge] = useState<EnlargeCompo>({type: 'enlarge', assert: false});
 
   const values = {
-    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openNotification, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, revealEditModal, currentChat, setCurrentChat, setTheme, setRevealEditModal, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenNotification,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily
+    theme, fontFamily, openChat, enlarge, codeEditor, rollout, fontOption, openNotification, parseId, loginPrompt, toggleLeft, notintersecting, isPresent, editing, success, openEditPage, revealEditModal, currentChat, isConversationState, setIsConversationState, setCurrentChat, setTheme, setRevealEditModal, setOpenEditPage, setSuccess, setEditing, setIsPresent, setNotIntersecting, setToggleLeft, setRollout, setLoginPrompt, setFontOption, setParseId, setOpenNotification,  setCodeEditor, setEnlarge, setOpenChat, setFontFamily
   }
   return (
     <ThemeContext.Provider value={ values }>

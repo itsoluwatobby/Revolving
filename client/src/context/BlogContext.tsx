@@ -1,43 +1,50 @@
 import { useDispatch } from 'react-redux';
-import { CodeProps, TypingEvent } from '../data';
 import { createContext, useEffect, useState } from 'react';
+import { CodeProps, TypingEvent, TypingObjType, UserProps } from '../data';
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
 import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
-import { connect, Socket } from 'socket.io-client';
-import { BASEURL } from '../app/api/apiSlice';
 
-let socket: Socket
+
 export const PostContext = createContext<PostContextType | null>(null)
 
 const initState = { codeId: '', langType: '', code: '', date: '' }
+const initTypingObj = { firstName: '', userId: '', conversationId: '' }
 export const PostDataProvider = ({ children }: ChildrenProp) => {
-  //socket = new Socket()
   const [search, setSearch] = useState<string>('');
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<TypingEvent>('notTyping');
 
-  const [imagesFiles, setImagesFiles] = useState<ImageType[]>([]);
   const [canPost, setCanPost] = useState<boolean>(false);
   const [navPosts, setNavPosts] = useState<PostType[]>([])
+  const [imagesFiles, setImagesFiles] = useState<ImageType[]>([]);
 
   const userId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<CodeStoreType>(initState)
   const [submitToSend, setSubmitToSend] = useState<CodeProps[]>([])
-
+  
+  const [typingObj, setTypingObj] = useState<TypingObjType>(initTypingObj)
+  const [currentUser, setCurrentUser] = useState<UserProps>()
   const [codeStore, setCodeStore] = useState<CodeStoreType[]>(JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] || [])
+  
   const [getLoggedInUser] = useGetCurrentUserMutation()
   const dispatch = useDispatch()
 
   useEffect(() => {
     let isMounted = true
-    if(isMounted && userId){
-      socket = connect('http://localhost:4000')
+    const getCurrentUser = async() => {
+      getLoggedInUser(userId).unwrap()
+      .then((user: UserProps) => {
+        setCurrentUser(user)
+        console.log('rrr')
+      })
+      .catch((error) => console.log(error))
     }
+    if(isMounted && userId && !currentUser?._id) getCurrentUser()
     return () => {
       isMounted = false
     }
-  }, [userId])
+  }, [userId, currentUser?._id, getLoggedInUser])
 
   useEffect(() => {
     let isMounted = true
@@ -50,7 +57,6 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
       }
     }
     if(isMounted && userId) getLoggedIn()
-
     return () => {
       isMounted = false
     }
@@ -76,7 +82,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
   }, [search, navPosts])
 
   const value = {
-    filteredStories, search, typingEvent, navPosts, canPost, codeStore, inputValue, imagesFiles, submitToSend, setSubmitToSend, setImagesFiles, setInputValue, setCodeStore, setSearch, setTypingEvent, setCanPost, setNavPosts
+    filteredStories, search, typingEvent, navPosts, currentUser, canPost, codeStore, inputValue, imagesFiles, submitToSend, typingObj, setTypingObj, setSubmitToSend, setImagesFiles, setInputValue, setCodeStore, setSearch, setTypingEvent, setCanPost, setNavPosts
   }
 
   return (

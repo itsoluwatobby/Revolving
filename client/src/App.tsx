@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import About from "./pages/About";
 import { USERROLES } from "./data";
 import { Home } from "./pages/Home";
@@ -19,6 +20,7 @@ import { Routes, Route } from 'react-router-dom';
 import RegisterModal from "./pages/RegisterModel";
 import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
+import { connect, Socket } from 'socket.io-client';
 import ExpensePlanner from "./pages/ExpensePlanner";
 import ChatModal from "./pages/chatAdmin/ChatModal";
 import SingleStoryPage from "./pages/SingleStoryPage";
@@ -29,10 +31,36 @@ import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import { selectCurrentRoles } from "./features/auth/authSlice";
- 
+import TypewriterEffect from './components/TypewriterEffect';
+import { SOCKET_BASE_URL } from './app/api/apiSlice';
+
+let socket: Socket
 export const App = () => {
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
+  const userId = localStorage.getItem('revolving_userId') as string
+  const [startTypewriting, setStartTypewriting] = useState<'BEGIN' | 'END'>('END')
+  
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && userId){
+      socket = connect(SOCKET_BASE_URL)
+      socket.on('connect', () => {
+        socket.emit('revolving', 'REVOLVING_APP_ID')
+      })
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [userId])
+
+  const openChatModal = () => {
+    if(!userId) setStartTypewriting(prev => (prev === 'END' ? 'BEGIN' : 'END'))
+    else {
+      setOpenChat('Open')
+      setStartTypewriting('END')
+    }
+  }
 
   return (
     <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all font-sans overflow-x-hidden`}>
@@ -86,14 +114,20 @@ export const App = () => {
       
       {
         openChat === 'Open' ?
-          <ChatModal />
+          // userId ?
+          <ChatModal socket={socket} />
         :  
           <BsChatTextFill
-            title='Chat with Admin'
-            onClick={() => setOpenChat('Open')}
+            title='Chats'
+            onClick={openChatModal}
             className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
           />
       }
+      <div 
+        onClick={() => setStartTypewriting('END')}
+        className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
+          <TypewriterEffect text='Please login in' delay={0.4} start={startTypewriting} />
+      </div>
       {loginPrompt == 'Open' ? <PrompLogin /> : null}
     </main>
   )

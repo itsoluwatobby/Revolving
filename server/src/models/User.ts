@@ -16,6 +16,7 @@ const Follows = { createdAt: String, followRecipientId: String }
 const USERSCHEMA: Schema = new Schema(
   {
     username: { type: String, required: [true, 'Username is required'], trim: true },
+    lastConversationId: { type: Schema.Types.ObjectId, ref: 'conversation' },
     password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
     email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
     userSession: { type: String, default: '' },
@@ -39,6 +40,11 @@ const USERSCHEMA: Schema = new Schema(
       type: { type: String, default: 'LINK', enum: ['LINK', 'OTP'] },
       token: { type: String, default: '' },
       createdAt: { type: String, default: '' }
+    },
+    lastMessage: { 
+      _id: { type: String, default: '' }, 
+      message: { type: String, default: '' },
+      createdAt: { type: String, default: '' } 
     },
     followers: [Followers],
     followings: [Follows],

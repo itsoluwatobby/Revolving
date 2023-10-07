@@ -29,7 +29,6 @@ export default function NotificationComp({ notification, theme, isDeleteLoading,
       isMounted = false
     }
   }, [isMarked, setNotificationIds, notification?._id])
-console.log(notification)
 
   return (   
     <>

@@ -1,76 +1,75 @@
-import { format } from 'timeago.js';
-import { ChatProps, UserProps } from '../../data';
-import { ChatOption, Theme } from '../../posts';
-import { useState, useEffect, useCallback } from 'react';
-import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg';
+import { useState, useEffect } from 'react';
+import ChatBodyComp from './body/ChatBodyComp';
+import { ErrorContent } from '../ErrorContent';
+import { ChatOption, ThemeContextType } from '../../posts';
+import { useThemeContext } from '../../hooks/useThemeContext';
+import { useGetAllMessagesQuery } from '../../app/api/messageApiSlice';
+import { ErrorResponse, MessageModelType, UserProps } from '../../data';
+import { Socket } from 'socket.io-client';
 
 type ChatBodyProp={
-  theme: Theme,
-  openChat: ChatOption
+  socket: Socket,
   currentUser: Partial<UserProps>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
 const DELAY = 250 as const
 
-export default function ChatBody({ theme, openChat, currentUser, setShowFriends }: ChatBodyProp) {
-  const [typedInput, setTypedInput] = useState<string>('')
-  const [customMessage, setCustomMessage] = useState<ChatProps>()
-  // const getChats = useSelector(getChatMessages)
-  const scrollIntoCurrent = useCallback((node: HTMLElement) => {
-    node ? node?.scrollIntoView({ behavior: "smooth" }) : null
-  }, [])
+export default function ChatBody({ currentUser, socket, setShowFriends }: ChatBodyProp) {
+  const { theme, isConversationState, currentChat, openChat } = useThemeContext() as ThemeContextType
+  const [message, setMessage] = useState<MessageModelType>()
+  const [messages, setMessages] = useState<MessageModelType[]>()
+  const { data, isLoading, error, isError } = useGetAllMessagesQuery(currentChat?._id)
+
+  console.log(currentChat)
+  console.log(messages)
 
   useEffect(() => {
     let isMounted = true
-    let currentIndex = 0
-    
-    const inputValue = customMessage?.message?.split('') as string[]
-    const typedFunc = async() =>{
-      if(currentIndex < inputValue?.length - 1){
-        setTypedInput(prev => prev += inputValue[currentIndex-1])
-        setTimeout(typedFunc, DELAY)
-        currentIndex++
-      }
-    }
-    isMounted ? typedFunc() : null
-
+    if(isMounted && data?.length) setMessages([...data])
     return () => {
       isMounted = false
     }
-  }, [customMessage?.message])
+  }, [currentChat?._id, data])
 
+  useEffect(() => {
+    // let isMounted = true
+    // if(isMounted) {
+    socket.on('receive_message', (newMessage: {data: MessageModelType}) => {
+      console.log(newMessage?.data)
+      setMessages(prev => ([...prev as MessageModelType[], newMessage?.data]))
+    })
+    // }
+    // return () => {
+    //   isMounted = false
+    // }
+  }, [])
+ 
   const chatContent = (
-      ([] as ChatProps[])?.map(chat => (
-      <article 
-        key={chat._id}
-        ref={scrollIntoCurrent}
-        className={`flex ${chat.adminId ? 'self-start' : 'self-end flex-row-reverse'} text-white items-center shadow-slate-800 text-xs bg-slate-500 rounded-md rounded-br-none gap-2 p-1 shadow-md w-5/6`}>
-        <figure className={`flex-none rounded-full border border-white bg-slate-700 w-8 h-8 shadow-lg`}>
-          <img 
-            src={WedgeLoad} 
-            alt='Logo' 
-            className='h-full w-full object-cover rounded-full mr-2'
-          />
-        </figure>
-        <p className='flex-auto flex flex-col text-justify tracking-tight whitespace-pre-wrap'>
-            <span className={`w-full`}>
-              {chat.message}
-            </span>
-          <span className={`w-full text-right text-xs`} >
-            {format(chat.dateTime as string)}
-          </span>
-        </p>
-      </article>
+    messages?.length ?
+    messages?.map(msg => (
+      <ChatBodyComp key={msg?._id} 
+        currentUser={currentUser} message={msg} currentChat={currentChat}
+      />
     ))
+    :
+    <ErrorContent 
+      message={currentChat?._id ? 'Start a conversation' : (isConversationState?.msg ?? isConversationState?.error)} 
+      contentLength={(messages as MessageModelType[])?.length} 
+      position='MESSAGE' errorMsg={error as ErrorResponse} 
+    />
   )
-
 
   return (
     <section 
       onClick={() => setShowFriends('Hide')}
-      className={`hidebars text-sm flex-auto flex flex-col gap-1.5 w-full box-border ${theme == 'light' ? '' : 'bg-slate-600'} overflow-y-scroll p-1.5 pl-1 pr-1`}>
-      {chatContent}
+      className={`hidebars text-sm flex-auto flex flex-col gap-2.5 text-white w-full box-border ${theme == 'light' ? '' : 'bg-slate-600'} overflow-y-scroll py-2.5 pl-0.5 pr-0.5`}>
+      {
+        isLoading ?
+        <p className='animate-pulse m-auto'>Loading your messages...</p>
+        :
+        chatContent
+      }
     </section>
   )
 }

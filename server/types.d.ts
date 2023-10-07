@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { VerifyOptions } from "jsonwebtoken"
-import { Document, ObjectId, Types } from "mongoose"
+import { Document, FlattenMaps, ObjectId, Types } from "mongoose"
 
 // interface Environment_Env{
 //   REVOLVING_DB: string,
@@ -129,6 +129,7 @@ type Follows = { createdAt: string, followRecipientId: string }
 
 type EachSubs = { createdAt: string, subscriberId: string }
 type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+type LastMessageType = { _id: string, createdAt: string, message: string }
 type Status = 'online' | 'offline'
 
 interface UserProps extends Document{
@@ -161,7 +162,9 @@ interface UserProps extends Document{
   registrationDate: string,
   isAccountLocked: boolean,
   isResetPassword: boolean,
+  lastConversationId: string,
   isAccountActivated: boolean,
+  lastMessage: LastMessageType,
   subscribed: SubscriptionTo[],
   notificationSubscribers: EachSubs[],
   verificationToken: VerificationTokenType,
@@ -336,3 +339,19 @@ interface MessageModelType{
 }
 
 type MessageStatus = 'DELIVERED' | 'READ'
+
+type GetConvoType = {
+  _id: string | FlattenMaps<ObjectId>, 
+  status: Status,
+  lastName: string,
+  lastSeen: string,
+  firstName: string, 
+  displayPicture: string,
+  userId: ObjectId | string,
+  adminId: string | ObjectId,
+  lastMessage: LastMessageType,
+  isOpened: boolean,
+  members: string[],
+  createdAt: string,
+  updatedAt: string
+}

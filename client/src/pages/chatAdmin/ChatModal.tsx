@@ -1,27 +1,54 @@
-import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import ChatBody from "../../components/chat/ChatBody";
 import ChatBase from "../../components/chat/ChatBase";
-import { ErrorResponse, UserFriends } from "../../data";
+import ChatBody from "../../components/chat/ChatBody";
 import ChatHeader from "../../components/chat/ChatHeader";
-import { ChatOption, ThemeContextType } from "../../posts";
-import { useThemeContext } from "../../hooks/useThemeContext"
-import { getCurrentUser } from "../../features/auth/userSlice";
+import { usePostContext } from "../../hooks/usePostContext";
+import { useThemeContext } from "../../hooks/useThemeContext";
+import { ErrorResponse, UserFriends, UserProps } from "../../data";
 import { useGetUserFriendsQuery } from "../../app/api/usersApiSlice";
+import { useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
+import { ChatOption, GetConvoType, PostContextType, ThemeContextType } from "../../posts";
+import { Socket } from "socket.io-client";
 
-export default function ChatModal() {
-  const { theme, openChat, setOpenChat } = useThemeContext() as ThemeContextType;
-  const [input, setInput] = useState<string>('')
-  const currentUser = useSelector(getCurrentUser)
+type ChatModalProp = {
+  socket: Socket
+}
+
+export default function ChatModal({ socket }: ChatModalProp) {
+  const { theme, openChat, setOpenChat, currentChat, setCurrentChat, setIsConversationState } = useThemeContext() as ThemeContextType;
+  const { currentUser } = usePostContext() as PostContextType
+  const userId = localStorage.getItem('revolving_userId') as string
   const [friends, setFriends] = useState<UserFriends[]>()
   const [showFriends, setShowFriends] = useState<ChatOption>('Hide')
-  // let userData: GetFollowsType | undefined, loading: boolean, errors: any
-  // if(currentUser?._id){
-    const { data, isLoading, error } = useGetUserFriendsQuery(currentUser?._id as string)
-  //   userData = data, loading = isLoading, errors = error
-  // }  
+  const [getConversation, {isLoading: loadingCurrent, isError}] = useGetCurrentConversationMutation()
+  const { data, isLoading, error } = useGetUserFriendsQuery(userId)  
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>(null)
 
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && currentChat?._id) socket.emit('start_conversation', currentChat?._id)
+    return () => {
+      isMounted = false
+    }
+  }, [currentChat?._id, socket])
+
+  useEffect(() => {
+    let isMounted = true
+    const getCurrentUser = async() => {
+      if(!currentUser?.lastConversationId) return setIsConversationState(prev => ({...prev, isLoading: loadingCurrent, isError, msg: 'You have no recent conversation'}))
+      getConversation({userId, conversationId: currentUser?.lastConversationId as string}).unwrap()
+      .then((conversation) => {
+        console.log(conversation)  
+        setCurrentChat(conversation)
+      })
+      .catch((error) => setIsConversationState(prev => ({...prev, isLoading: loadingCurrent, isError, error})))
+    }
+    if(isMounted) getCurrentUser()
+    return () => {
+      isMounted = false
+    }
+  }, [userId, currentUser?.lastConversationId, loadingCurrent, isError, setIsConversationState, setCurrentChat, getConversation])
+  
   useEffect(() => {
     let isMounted = true
     if(isMounted && data) {
@@ -41,19 +68,21 @@ export default function ChatModal() {
   }, [error])
 
   return (
-    <section className={`fixed right-1 bottom-2 flex flex-col ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-700 shadow-slate-800'} rounded-md w-64 z-50 p-1 h-80 shadow-2xl`}>
+    <section className={`${openChat === 'Open' ? 'fixed flex h-[23rem] w-[19rem]' : 'scale-0 w-0'} transition-all right-1 bottom-2 flex-col ${theme == 'light' ? 'bg-slate-500' : 'bg-slate-700 shadow-slate-800'} rounded-md z-50 p-1 shadow-2xl`}>
       <main className="relative flex flex-col w-full h-full">
         <ChatHeader 
-          theme={theme} currentUser={currentUser} setOpenChat={setOpenChat} 
+          currentChat={currentChat}
           friends={friends as UserFriends[]} errorMsg={errorMsg as ErrorResponse}
           isLoading={isLoading} showFriends={showFriends} setShowFriends={setShowFriends}
+          theme={theme} currentUser={currentUser as Partial<UserProps>} setOpenChat={setOpenChat} socket={socket}
         />
         <ChatBody 
-          setShowFriends={setShowFriends}
-          theme={theme} openChat={openChat} currentUser={currentUser} 
+          setShowFriends={setShowFriends} socket={socket}
+          currentUser={currentUser as Partial<UserProps>} 
         />
         <ChatBase 
-          theme={theme} input={input} setInput={setInput} 
+          currentUser={currentUser as Partial<UserProps>}
+          theme={theme} currentChat={currentChat} socket={socket}
         />
       </main>
     </section>

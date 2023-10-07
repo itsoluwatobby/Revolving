@@ -65,8 +65,8 @@ export class ServerMiddlewares{
         })
       })
 
-      mongoose.connection.on('error', () => {
-        console.log('Error connecting to DB')
+      mongoose.connection.on('error', (error) => {
+        console.log('Error connecting to DB... ERROR: ', error?.message)
         process.exit(1)
       })
     // }
@@ -76,7 +76,7 @@ export class ServerMiddlewares{
     return (
       rateLimit({
         windowMs: 60 * 1000, //remembers req for a minute
-        max: 60, // maximum of 60 requests per minute
+        max: 200, // maximum of 60 requests per minute
         message: `<p style='font-size: 18px; font-family: mono;'>Too many requests from this IP, please try again after a minute</>`
       })
     )
@@ -86,7 +86,7 @@ export class ServerMiddlewares{
     return (
       SlowDown({
         windowMs: 60 * 1000, // 60 seconds
-        delayAfter: 30, //starts slowing down after 5 consecutive requests
+        delayAfter: 150, //starts slowing down after 5 consecutive requests
         delayMs: 500, // adds a 500ms delay per request after delay limit is reached
         maxDelayMs: 2000, // limits delay to a maximum of 2 seconds
       })

@@ -5,6 +5,7 @@ import { setCredentials, signUserOut } from '../../features/auth/authSlice';
 import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react';
 
 export const BASEURL = 'http://localhost:4000/revolving'
+export const SOCKET_BASE_URL = 'http://localhost:4000'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASEURL,

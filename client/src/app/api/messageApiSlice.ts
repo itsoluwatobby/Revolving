@@ -1,13 +1,13 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
-import { ConversationModelType, MembersType, MessageModelType, MessageStatus } from "../../data";
+import { MembersType, MessageModelType, MessageStatus, UserFriends } from "../../data";
+import { GetConvoType } from "../../posts";
 
 
 export const messageApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-
     // conversations
-    createConversation: builder.mutation<ConversationModelType, MembersType>({
+    createConversation: builder.mutation<{data: GetConvoType}, MembersType>({
       query: ({userId, partnerId}) => ({
         url: `messages/create_conversation/${userId}/${partnerId}`,
         method: 'POST',
@@ -18,21 +18,34 @@ export const messageApiSlice = apiSlice.injectEndpoints({
 
     deleteConversation: builder.mutation<string, string>({
       query: (conversationId) => ({
-        url: `messages/conversation/${conversationId}`,
+        url: `messages/delete_conversation/${conversationId}`,
         method: 'DELETE',
         body: conversationId
       }),
       invalidatesTags: [{ type: 'CONVERSATIONS', id: 'LIST'}],
     }),
     
-    getConversations: builder.query<ConversationModelType[], string>({
+    getConversations: builder.query<GetConvoType[], string>({
       query: (userId) => `messages/conversations/${userId}`,
-      providesTags: (result) => providesTag(result as ConversationModelType[], 'CONVERSATIONS'),
+      transformResponse: (baseQueryReturnValue: {data: GetConvoType[]}) => {
+        const result = baseQueryReturnValue?.data?.sort((a, b) => b?.updatedAt?.localeCompare(a?.updatedAt))
+        return result
+      },
+      providesTags: (result) => providesTag(result as GetConvoType[], 'CONVERSATIONS'),
     }),
     
-    getConversation: builder.query<ConversationModelType, string>({
-      query: (conversationId) => `messages/single_conversation/${conversationId}`,
+    getConversation: builder.query<GetConvoType, {userId: string, conversationId: string}>({
+      query: ({userId, conversationId}) => `messages/single_conversation/${userId}/${conversationId}`,
       providesTags: ['CONVERSATIONS'],
+      invalidatesTags: [{ type: 'USERS' }],
+    }),
+
+    getCurrentConversation: builder.mutation<GetConvoType, {userId: string, conversationId: string}>({
+      query: ({userId, conversationId}) => `messages/single_conversation/${userId}/${conversationId}`,
+      transformResponse: (baseQueryReturnValue: {data: GetConvoType}) => {
+        return baseQueryReturnValue?.data
+      },
+      invalidatesTags: [{ type: 'USERS' }],
     }),
     
     closeConversation: builder.mutation<string, string>({
@@ -51,7 +64,16 @@ export const messageApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...messageObj}
       }),
-      invalidatesTags: [{ type: 'MESSAGES' }],
+      // invalidatesTags: [{ type: 'MESSAGES' }],
+    }),
+    
+    editMessage: builder.mutation<MessageModelType, { userId: string, messageObj: Partial<MessageModelType> }>({
+      query: ({userId, messageObj}) => ({
+        url: `messages/edit_message/${userId}`,
+        method: 'PUT',
+        body: {...messageObj}
+      }),
+      // invalidatesTags: [{ type: 'MESSAGES' }],
     }),
 
     deleteMessage: builder.mutation<string, {userId: string, messageId: string}>({
@@ -60,11 +82,14 @@ export const messageApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: userId
       }),
-      invalidatesTags: [{ type: 'MESSAGES', id: 'LIST'}],
+      // invalidatesTags: [{ type: 'MESSAGES', id: 'LIST'}],
     }),
     
-    getMessages: builder.query<MessageModelType[], string>({
+    getAllMessages: builder.query<MessageModelType[], string>({
       query: (conversationId) => `messages/get_messages/${conversationId}`,
+      transformResponse: (baseQueryReturnValue: {data: MessageModelType[]}) => {
+        return baseQueryReturnValue?.data
+      },
       providesTags: (result) => providesTag(result as MessageModelType[], 'MESSAGES'),
     }),
     
@@ -79,13 +104,14 @@ export const messageApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: messageId
       }),
-      invalidatesTags: [{ type: 'MESSAGES', id: 'LIST'}],
+      // invalidatesTags: [{ type: 'MESSAGES', id: 'LIST'}],
     }),
 
   })
 })
 
 export const {
+  useGetCurrentConversationMutation,
   useCreateConversationMutation,
   useDeleteConversationMutation,
   useCloseConversationMutation,
@@ -93,7 +119,8 @@ export const {
   useGetConversationQuery,
   useCreateMessageMutation,
   useDeleteMessageMutation,
-  useGetMessagesQuery,
+  useEditMessageMutation,
+  useGetAllMessagesQuery,
   useGetMessageQuery,
   useUpdateMessageStatusMutation,
 } = messageApiSlice

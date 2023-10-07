@@ -1,14 +1,29 @@
 import { format } from 'timeago.js';
-import { Theme, ThemeContextType } from '../../../posts'
-import { UserFriends } from '../../../data'
+import { ChatOption, GetConvoType, Theme, ThemeContextType } from '../../../posts'
+import { UserFriends, UserProps } from '../../../data'
 import { useThemeContext } from '../../../hooks/useThemeContext';
+import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
+import { IsLoadingSpinner } from '../../IsLoadingSpinner';
 
-type FriendsRecentsProps = {
-  friends: UserFriends[]
+type FriendsProps = {
+  friends: UserFriends[],
+  currentUser: Partial<UserProps>,
+  setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export const FriendsRecents = ({ friends }: FriendsRecentsProps) => {
+export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) => {
   const { theme, currentChat, setCurrentChat } = useThemeContext() as ThemeContextType
+  const [createConversation, {isLoading, isError}] = useCreateConversationMutation()
+
+  const newConversation = (partnerId: string) => {
+    if(isLoading) return
+    createConversation({userId: currentUser?._id as string, partnerId}).unwrap()
+    .then((res) => {
+      setCurrentChat(res?.data)
+      setShowFriends('Hide')
+    })
+    .catch(error => console.log(error))
+  }
 
   return (
     <>
@@ -16,7 +31,7 @@ export const FriendsRecents = ({ friends }: FriendsRecentsProps) => {
         friends?.map(user => (
           <article 
             key={user?._id}
-            onClick={() => setCurrentChat(user)}
+            onClick={() => newConversation(user?._id)}
             className={`p-1 shadow-md flex w-full ${currentChat?._id === user?._id ? 'bg-slate-400' : ''} ${theme === 'light' ? 'bg-slate-100 text-black' : 'bg-slate-700'} gap-x-2 rounded-md cursor-pointer hover:bg-gray-200 transition-all`}
           >
 
@@ -43,6 +58,7 @@ export const FriendsRecents = ({ friends }: FriendsRecentsProps) => {
           </article>
         ))
       }
+      {isLoading ? <IsLoadingSpinner page='CHAT' customSize='LARGE' /> : null}
     </>
   )
 }

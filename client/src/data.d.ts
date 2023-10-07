@@ -203,6 +203,7 @@ type Follows = { createdAt: string, followRecipientId: string }
 
 type EachSubs = { createdAt: string, subscriberId: string }
 type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+type LastMessageType = { _id: string, createdAt: string, message: string }
 type Status = 'online' | 'offline'
 
 interface UserProps{
@@ -220,6 +221,7 @@ interface UserProps{
   },
   isAccountActivated: boolean,
   isAccountLocked: boolean,
+  lastConversationId: string,
   isResetPassword: boolean,
   verificationToken: { type: string, token: string, createdAt: string },
   dateLocked: string,
@@ -230,6 +232,7 @@ interface UserProps{
   notificationId: string,
   status: Status,
   refreshToken: string,
+  lastMessage: LastMessageType,
   editDate: string,
   gender: Gender,
   firstName: string,
@@ -264,8 +267,6 @@ type SubUser = {
   followers: Followers[], 
   displayPicture: string,
 }
-
-
 
 type ChatProps = {
   _id?: string,
@@ -440,7 +441,7 @@ type ConversationModelType = {
   _id: string,
   adminId: string,
   members: string[],
-  isOpend: boolean,
+  isOpened: boolean,
   createdAt: string,
   updatedAt: string
 }
@@ -461,6 +462,11 @@ type MessageModelType = {
   createdAt: string,
   updatedAt: string
 }
-
 type MessageStatus = 'DELIVERED' | 'READ'
 
+type TypingObjType = {
+  firstName: string,
+  userId: string,
+  status?: boolean,
+  conversationId: string
+}
