@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
-import { MembersType, MessageModelType, MessageStatus, UserFriends } from "../../data";
+import { DeleteChatOption, MembersType, MessageModelType, MessageStatus, UserFriends } from "../../data";
 import { GetConvoType } from "../../posts";
 
 
@@ -76,9 +76,9 @@ export const messageApiSlice = apiSlice.injectEndpoints({
       // invalidatesTags: [{ type: 'MESSAGES' }],
     }),
 
-    deleteMessage: builder.mutation<string, {userId: string, messageId: string}>({
-      query: ({userId, messageId}) => ({
-        url: `messages/delete_message/${userId}/${messageId}`,
+    deleteMessage: builder.mutation<string, {userId: string, messageId: string, option: DeleteChatOption}>({
+      query: ({userId, messageId, option}) => ({
+        url: `messages/delete_message/${userId}/${messageId}/${option}`,
         method: 'DELETE',
         body: userId
       }),

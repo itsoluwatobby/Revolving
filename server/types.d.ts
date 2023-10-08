@@ -337,7 +337,8 @@ interface MessageModelType{
   pictures: string[],
   createdAt: string,
   updatedAt: string,
-  edited: boolean
+  isDeleted: boolean,
+  edited: boolean,
 }
 
 type MessageStatus = 'DELIVERED' | 'READ'
@@ -357,3 +358,5 @@ type GetConvoType = {
   createdAt: string,
   updatedAt: string
 }
+
+type DeleteChatOption = 'forMe' | 'forAll'

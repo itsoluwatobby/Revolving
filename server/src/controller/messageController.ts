@@ -3,7 +3,7 @@ import { statuses } from "../helpers/responses.js";
 import { MessageService } from "../services/messageService.js"
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { ConversationService } from "../services/ConversationService.js"
-import { ConversationModelType, GetConvoType, MessageModelType, MessageStatus, UserFriends } from "../../types.js";
+import { ConversationModelType, DeleteChatOption, GetConvoType, MessageModelType, MessageStatus, UserFriends } from "../../types.js";
 import { RedisClientService } from "../helpers/redis.js";
 
 interface MessageRequest extends Request{
@@ -92,17 +92,20 @@ class MessageConversationController {
       const messageObj: MessageModelType = req.body
       if(!userId || !messageObj?.senderId || !messageObj?.receiverId || !messageObj?.message) return responseType({res, status: 406, message: statuses['406']})
       if(userId !== messageObj?.senderId) return responseType({res, status: 401, message: statuses['401']})
-      this.messageService.createNewMessage(messageObj)
+      this.messageService.updateMessage(messageObj)
       .then((data) => responseType({res, status: 201, message: `${statuses['201']}: message edited`, data}))
-      .catch(() => responseType({res, status: 400, message: 'mongo error: failed to edit message'}))
+      .catch((error) => {
+        console.log(error)
+        responseType({res, status: 400, message: 'mongo error: failed to edit message'})
+      })
     })
   }
 
   public deleteMessage(req: Request, res: Response){
     asyncFunc(res, () => {
-      const { userId, messageId } = req.params
+      const { userId, messageId, option } = req.params
       if(!userId || !messageId) return responseType({res, status: 406, message: statuses['406']})
-      this.messageService.deleteMessage(userId, messageId)
+      this.messageService.deleteMessage(userId, messageId, option as DeleteChatOption)
       .then((message) => responseType({res, status: 200, message}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to delete message'}))
     })
@@ -112,8 +115,7 @@ class MessageConversationController {
     asyncFunc(res, () => {
       const { messageId, status } = req.query
       if(!messageId || !status) return responseType({res, status: 406, message: statuses['406']})
-      const stats = status as MessageStatus
-      this.messageService.isRead_Or_Delivered_Message(messageId as string, stats)
+      this.messageService.isRead_Or_Delivered_Message(messageId as string, status as MessageStatus)
       .then((data) => {
         if(typeof data === 'string') return responseType({res, status: 400, message: statuses[400]})
         return responseType({res, status: 200, message: statuses[200], data})

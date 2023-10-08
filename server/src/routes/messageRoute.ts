@@ -15,7 +15,7 @@ messageRouter.get('/single_conversation/:userId/:conversationId', verifyRoles([R
 messageRouter.patch('/close_conversation/:conversationId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => messageController.close_current_conversation(req, res));
 
 // messages
-messageRouter.delete('/delete_message/:userId/:messageId', verifyRoles([ROLES.USER]), (req: RequestProp, res: Response) => messageController.deleteMessage(req, res));
+messageRouter.delete('/delete_message/:userId/:messageId/:option', verifyRoles([ROLES.USER]), (req: RequestProp, res: Response) => messageController.deleteMessage(req, res));
 messageRouter.get('/get_messages/:conversationId', verifyRoles([ROLES.USER]), (req: RequestProp, res: Response) => messageController.getMessages(req, res))
 messageRouter.put('/edit_message/:userId', verifyRoles([ROLES.USER]), (req: RequestProp, res: Response) => messageController.editMessage(req, res))
 

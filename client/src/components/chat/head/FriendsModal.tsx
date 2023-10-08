@@ -16,6 +16,7 @@ type FriendsModalType = {
   errorMsg: ErrorResponse,
   typingObj: TypingObjType,
   currentUser: Partial<UserProps>,
+  setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
@@ -26,7 +27,7 @@ type ChatStateType = {
 }
 
 const initChatState = { toggleView: 'Friends' as Option, openSearch: 'Hide' as ChatOption }
-export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg, currentUser, setShowFriends }: FriendsModalType) => {
+export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg, currentUser, setShowFriends, setPrevChatId }: FriendsModalType) => {
   const [chatState, setChatState] = useState<ChatStateType>(initChatState)
   const [filteredFriends, setFilteredFriends] = useState<(UserFriends | GetConvoType)[]>([])
   const { data: recentConversations, isLoading: loading, error } = useGetConversationsQuery(currentUser?._id as string)
@@ -96,15 +97,18 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg,
               toggleView === 'Friends' ?
                 <Friends 
                   friends={filteredFriends} currentUser={currentUser} 
-                  setShowFriends={setShowFriends} 
+                  setShowFriends={setShowFriends} setPrevChatId={setPrevChatId}
                 />
                 :    
                 <RecentConversations 
-                  friends={filteredFriends as GetConvoType[]} 
                   setShowFriends={setShowFriends} currentuser={currentUser}
+                  friends={filteredFriends as GetConvoType[]} setPrevChatId={setPrevChatId}
                 />    
             )
-        : <ErrorContent message='Empty list' position='CHAT' errorMsg={errorMsg} contentLength={friends?.length } />
+        : <ErrorContent 
+            message='Empty list' position='CHAT' 
+            errorMsg={errorMsg} contentLength={friends?.length } 
+          />
       }
       </div>
 

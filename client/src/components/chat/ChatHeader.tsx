@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { format } from 'timeago.js';
 import { Socket } from 'socket.io-client';
 import { FriendsModal } from './head/FriendsModal';
-import { reduceLength } from '../../utils/navigator';
 import { usePostContext } from '../../hooks/usePostContext';
-import { ErrorResponse, TypingObjType, UserFriends, UserProps } from '../../data';
+import { ErrorResponse, SearchStateType, TypingObjType, UserFriends, UserProps } from '../../data';
 import { ChatOption, GetConvoType, PostContextType, Theme, } from '../../posts';
+import { CiSearch } from 'react-icons/ci';
 
 type ChatHeaderProp={
   theme: Theme,
@@ -14,14 +14,19 @@ type ChatHeaderProp={
   friends: UserFriends[],
   errorMsg: ErrorResponse,
   showFriends: ChatOption,
-  currentChat: GetConvoType
+  currentChat: GetConvoType,
+  messageState: SearchStateType,
   currentUser: Partial<UserProps>,
+  setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
   setOpenChat: React.Dispatch<React.SetStateAction<ChatOption>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setMessageState: React.Dispatch<React.SetStateAction<SearchStateType>>,
 }
 
-export default function ChatHeader({ theme, friends, socket, currentChat, isLoading, errorMsg, currentUser, showFriends, setShowFriends, setOpenChat }: ChatHeaderProp) {
+export default function ChatHeader({ theme, friends, socket, setPrevChatId, currentChat, isLoading, errorMsg, currentUser, showFriends, messageState, setMessageState, setShowFriends, setOpenChat }: ChatHeaderProp) {
   const { typingObj, setTypingObj } = usePostContext() as PostContextType
+
+  const { openSearch, search } = messageState
 
   useEffect(() => {
     let isMounted = true
@@ -35,7 +40,7 @@ export default function ChatHeader({ theme, friends, socket, currentChat, isLoad
   return (
     <header className={`z-10 flex-none text-white rounded-md h- shadow-lg w-full sticky top-0 ${theme === 'light' ? '' : 'bg-slate-800'}`}>
     
-      <div className={`flex items-center justify-between relative w-full p-1.5 pb-1 pr-0.5 h-full`}>
+      <div className={`relative flex items-center justify-between relative w-full p-1.5 pb-1 pr-0.5 h-full`}>
 
         <div className='relative flex flex-col gap-0.5'>
 
@@ -69,11 +74,19 @@ export default function ChatHeader({ theme, friends, socket, currentChat, isLoad
         </div>
 
         <FriendsModal
-          isLoading={isLoading} errorMsg={errorMsg} currentUser={currentUser} typingObj={typingObj}
-          theme={theme} friends={friends} showFriends={showFriends} setShowFriends={setShowFriends}
+          showFriends={showFriends} setShowFriends={setShowFriends}
+          isLoading={isLoading} errorMsg={errorMsg} currentUser={currentUser} 
+          typingObj={typingObj} theme={theme} friends={friends} setPrevChatId={setPrevChatId}
         />
 
-        <div className='flex items-center gap-3'>  
+        <div className='flex items-center gap-3'> 
+
+          <button 
+            title='search'
+            onClick={() => setMessageState(prev => ({...prev, search: '', openSearch: !openSearch}))}
+            className={`flex-none w-5 h-5 p-0.5 ${showFriends === 'Open' ? 'scale-0' : 'scale-100'} ${theme === 'light' ? 'bg-slate-700 hover:bg-gray-600' : 'bg-slate-800 hover:bg-gray-700'} ${openSearch ? 'bg-slate-950' : ''} grid place-content-center rounded-sm transition-all`}>
+            <CiSearch className='text-white text-base font-bold'/>
+          </button>
 
           <button 
             onClick={() => setShowFriends(prev => (prev === 'Hide' ? prev = 'Open' : prev = 'Hide'))}
@@ -86,6 +99,18 @@ export default function ChatHeader({ theme, friends, socket, currentChat, isLoad
             close
           </button> 
 
+        </div>
+
+        <div className={`absolute rounded-sm left-0 w-full ${(openSearch && showFriends === 'Hide') ? 'slide_on' : ' opacity-30 slide_off '} h-5 transition-all rounded-b-sm ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'}`}>
+          <input 
+            type="text" 
+            value={search}
+            autoComplete="off"
+            autoFocus={true}
+            placeholder="search message"
+            onChange={event => setMessageState(prev => ({...prev, search: event.target.value}))}
+            className={`w-full h-full rounded-b-sm bg-inherit text-[13px] py-2 border-0 focus:outline-none ${theme === 'light' ? 'placeholder:text-gray-600' : 'placeholder:text-gray-400'} px-2`} 
+          />
         </div>
 
       </div>

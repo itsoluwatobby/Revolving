@@ -16,10 +16,11 @@ type ChatBaseProp={
   currentUser: Partial<UserProps>,
   messageResponse: MessageModelType,
   // setMessages: React.Dispatch<React.SetStateAction<MessageModelType[]>>
+  setEditMessage: React.Dispatch<React.SetStateAction<MessageModelType | null>>
   setMessageResponse: React.Dispatch<React.SetStateAction<MessageModelType | null>>
 }
 
-export default function ChatBase({ theme, socket, currentChat, messages, editMessage, currentUser, messageResponse, setMessageResponse }: ChatBaseProp) {
+export default function ChatBase({ theme, socket, currentChat, messages, editMessage, currentUser, messageResponse, setMessageResponse, setEditMessage }: ChatBaseProp) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [input, setInput] = useState<string>('')
   const currentUserId = localStorage.getItem('revolving_userId') as string
@@ -80,6 +81,7 @@ export default function ChatBase({ theme, socket, currentChat, messages, editMes
         } as Partial<MessageModelType>
         const res = await createMessage(newMessage).unwrap() as unknown as { data: MessageModelType}
         setInput('')
+        setMessageResponse(null)
         socket.emit('create_message', res?.data, async(acknowledgement: any) => {
           console.log(acknowledgement)
         })
@@ -91,6 +93,7 @@ export default function ChatBase({ theme, socket, currentChat, messages, editMes
         };
         setInput('')
         await editSingleMessage({userId: editMessage?.senderId, messageObj: edittedMessage}).unwrap()
+        setEditMessage(null)
         socket.emit('edit_message', {isEdited: true, conversationId: currentChat?._id})
       }
       // setMessages(prev => ([...prev, res?.data]))

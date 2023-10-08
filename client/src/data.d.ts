@@ -462,7 +462,8 @@ type MessageModelType = {
   pictures: string[],
   createdAt: string,
   updatedAt: string,
-  edited: boolean
+  isDeleted: boolean,
+  edited: boolean,
 }
 
 type MessageStatus = 'DELIVERED' | 'READ'
@@ -475,6 +476,8 @@ type TypingObjType = {
 }
 
 type DeleteStatusType = { loading: boolean, errorMsg: boolean }
+type SearchStateType = { openSearch: boolean, search: string }
+type DeleteChatOption = 'forMe' | 'forAll'
 
 type MessageStatusType = {
   isEdited?: boolean,

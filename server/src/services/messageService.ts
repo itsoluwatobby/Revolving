@@ -1,7 +1,7 @@
 import userService from "./userService.js";
 import { Document, Schema } from "mongoose";
 import { MessageModel } from "../models/Messages.js";
-import { MessageModelType, MessageStatus } from "../../types.js";
+import { DeleteChatOption, MessageModelType, MessageStatus } from "../../types.js";
 
 type NewMessageType = Document<unknown, {}, MessageModelType> & MessageModelType & Required<{
   _id: string | Schema.Types.ObjectId;
@@ -34,20 +34,19 @@ export class MessageService {
     )
   }
   
-  public deleteMessage(userId: string, messageId: string): Promise<string>{
-    return (
-      this.getSingleMessage(messageId)
-      .then(async(data) => {
-        if(data?.isMessageDeleted?.length && data?.isMessageDeleted[0] !== userId){
-          await data.deleteOne({_id: messageId})
-          return 'successfully deleted' 
-        }
-        else{
-          await data.updateOne({$push: { isMessageDeleted: userId }})
-          return 'deleted'
-        }
-      })
-    )
+  public deleteMessage(userId: string, messageId: string, option: DeleteChatOption): Promise<string>{
+    if(option === 'forAll'){
+      return (
+        MessageModel.findByIdAndUpdate({_id: messageId}, {$set: { isDeleted: true }})
+        .then(() => 'successfully deleted')
+      )
+    }
+    else if(option === 'forMe'){
+      return (
+        MessageModel.updateOne({$push: { isMessageDeleted: userId }})
+        .then(() => 'deleted')
+      )
+    }
   }
 
   public async isRead_Or_Delivered_Message(messageId: string, status: MessageStatus): Promise<NewMessageType | string>{

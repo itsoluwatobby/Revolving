@@ -5,7 +5,7 @@ import ChatBodyComp from './body/ChatBodyComp';
 import { ErrorContent } from '../ErrorContent';
 import { ChatOption, ThemeContextType } from '../../posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { ErrorResponse, MessageModelType, MessageStatusType, UserProps } from '../../data';
+import { ErrorResponse, MessageModelType, MessageStatusType, SearchStateType, UserProps } from '../../data';
 import { messageApiSlice, useGetAllMessagesQuery, useUpdateMessageStatusMutation } from '../../app/api/messageApiSlice';
 import { CiSearch } from 'react-icons/ci';
 
@@ -14,6 +14,7 @@ type ChatBodyProp={
   socket: Socket,
   messages: MessageModelType[],
   editMessage: MessageModelType,
+  messageState: SearchStateType,
   currentUser: Partial<UserProps>,
   setEditMessage: React.Dispatch<React.SetStateAction<MessageModelType | null>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
@@ -21,18 +22,16 @@ type ChatBodyProp={
   setMessageResponse: React.Dispatch<React.SetStateAction<MessageModelType | null>>,
 }
 
-const initMessageState = { openSearch: false, search: '' }
-export default function ChatBody({ currentUser, messages, editMessage, socket, setEditMessage, setMessages, setMessageResponse, setShowFriends }: ChatBodyProp) {
+export default function ChatBody({ currentUser, messages, messageState, editMessage, socket, setEditMessage, setMessages, setMessageResponse, setShowFriends }: ChatBodyProp) {
   const { theme, isConversationState, currentChat } = useThemeContext() as ThemeContextType
   const { data, isLoading, error } = useGetAllMessagesQuery(currentChat?._id)
   const [message, setMessage] = useState<MessageModelType>();
   const [updateMessageStatus] = useUpdateMessageStatusMutation();
-  const [messageState, setMessageState] = useState<typeof initMessageState>(initMessageState)
   const [filteredMessages, setFilteredMessages] = useState<MessageModelType[]>()
   const dispatch = useDispatch()
 
   const { openSearch, search } = messageState
-
+  
   useEffect(() => {
     let isMounted = true
     if(isMounted) setFilteredMessages(messages?.filter(msg => (msg?.message?.toLowerCase())?.includes(search?.toLowerCase())))
@@ -105,27 +104,7 @@ export default function ChatBody({ currentUser, messages, editMessage, socket, s
   return (
     <section 
       onClick={() => setShowFriends('Hide')}
-      className={`hidebars relative text-sm flex-auto flex flex-col gap-2.5 text-white w-full box-border ${theme == 'light' ? '' : 'bg-slate-600'} overflow-y-scroll pt-0.5 pb-2.5 px-1`}>
-      
-      <button 
-        title='search'
-        onClick={() => setMessageState(prev => ({...prev, search: '', openSearch: !openSearch}))}
-        className={`sticky top-0 self-end z-20 flex-none w-5 h-5 p-0.5 ${theme === 'light' ? 'bg-slate-700 hover:bg-gray-600' : 'bg-slate-800 hover:bg-gray-700'} ${openSearch ? 'bg-opacity-50' : ''} grid place-content-center rounded-sm transition-all`}>
-        <CiSearch className='text-white text-base font-bold'/>
-      </button>
-
-      <div className={`z-20 w-full ${openSearch ? 'sticky' : 'h-0'} transition-all rounded-b-sm bg-slate-900`}>
-        <input 
-          type="text" 
-          value={search}
-          autoComplete="off"
-          autoFocus={true}
-          placeholder="search message"
-          onChange={event => setMessageState(prev => ({...prev, search: event.target.value}))}
-          className="w-full h-full rounded-b-sm bg-inherit text-black px-1 border-0 focus:outline-none placeholder:text-gray-600 placeholder:pl-4" 
-        />
-      </div>
-
+      className={`hidebars text-sm flex-auto flex flex-col gap-2.5 text-white w-full box-border ${theme == 'light' ? '' : 'bg-slate-600'} overflow-y-scroll pt-0.5 pb-2.5 px-1`}>
       {
         isLoading ?
         <p className='animate-pulse m-auto'>Loading your messages...</p>

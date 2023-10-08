@@ -10,10 +10,11 @@ import { useCreateConversationMutation } from '../../../app/api/messageApiSlice'
 type FriendsProps = {
   friends: UserFriends[],
   currentUser: Partial<UserProps>,
+  setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) => {
+export const Friends = ({ friends, currentUser, setPrevChatId, setShowFriends }: FriendsProps) => {
   const { theme, currentChat, setCurrentChat } = useThemeContext() as ThemeContextType
   const [createConversation, {isLoading}] = useCreateConversationMutation()
   const [errorMsg, setErrorMsg] = useState<ErrorResponse>()
@@ -23,6 +24,7 @@ export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) 
     createConversation({userId: currentUser?._id as string, partnerId}).unwrap()
     .then((res) => {
       setCurrentChat(res?.data)
+      setPrevChatId(prev => prev?.includes(res?.data?._id) ? [...prev] : [...prev, res?.data?._id])
       setShowFriends('Hide')
     })
     .catch(error => setErrorMsg(error))

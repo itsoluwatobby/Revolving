@@ -9,10 +9,11 @@ import { UserProps } from '../../../data';
 type RecentConversationsProps = {
   friends: GetConvoType[],
   currentuser: Partial<UserProps>,
+  setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export const RecentConversations = ({ friends, currentuser, setShowFriends }: RecentConversationsProps) => {
+export const RecentConversations = ({ friends, currentuser, setPrevChatId, setShowFriends }: RecentConversationsProps) => {
   const { theme, currentChat, setCurrentChat, setIsConversationState } = useThemeContext() as ThemeContextType
   const [getConversation, {isLoading, isError}] = useGetCurrentConversationMutation()
 
@@ -21,6 +22,7 @@ export const RecentConversations = ({ friends, currentuser, setShowFriends }: Re
     getConversation({userId: currentuser?._id as string, conversationId: convoId as string}).unwrap()
     .then((conversation) => {
       setCurrentChat(conversation)
+      setPrevChatId(prev => prev?.includes(convoId) ? [...prev] : [...prev, convoId])
       setShowFriends('Hide')
     })
     .catch((error) => setIsConversationState(prev => ({...prev, error, isError})))
