@@ -15,19 +15,33 @@ export default function Notifications() {
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>(null)
   const [notificationIds, setNotificationIds] = useState<string[]>([])
   const [notifications, setNotifications] = useState<NotificationModelType>()
-  const [deleteNotifications, { isLoading: isDeleteLoading, error: deleteError }] = useDeleteNotificationMutation()
+  const [deleteErrorMsg, setDeleteErrorMsg] = useState<string>()
+  const [delete_all_notifications, { isLoading: isDeleteLoading, isError, error: deleteError }] = useDeleteNotificationMutation()
 
   const deleteNotification = async(notificationId?: string) => {
     const notifyIds = notificationIds?.length ? [...notificationIds] : [notificationId] as string[]
     try{
-      await deleteNotifications({ notificationId: notifications?._id as string, notifyIds }).unwrap()
-      console.log(notifyIds)
+      await delete_all_notifications({ notificationId: notifications?._id as string, notifyIds }).unwrap()
     }
     catch(err: unknown){
       const errors = (deleteError as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt('Open')
+      setDeleteErrorMsg(errors?.message ?? 'An error occurred')
     }
   }
+
+  useEffect(() => {
+    let isMounted = true, timeoutId: NodeJS.Timeout;
+    if(isMounted && isError){
+      timeoutId = setTimeout(() => {
+        setDeleteErrorMsg('')
+      }, 4000)
+    }
+    return () => {
+      isMounted = false
+      clearTimeout(timeoutId)
+    }
+  }, [isError])
 
   useEffect(() => {
     let isMounted = true
@@ -58,10 +72,13 @@ export default function Notifications() {
         <div className={`sticky top-0 rounded-sm ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'} flex items-center justify-between z-10 w-full p-2 font-medium`}>
           <span className={`${theme === 'light' ? 'text-black' : 'text-white'}`}>Notifications</span>
           <div className={`flex items-center gap-4 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+
             <FaTrashAlt 
               title='clear notifications'
-              onClick={deleteNotification}
-              className={`${notificationIds?.length ? 'scale-100' : 'scale-0 hidden'} cursor-pointer transition-all hover:opacity-90 active:opacity-100`} />
+              onClick={() => deleteNotification()}
+              className={`${notificationIds?.length ? 'scale-100' : 'scale-0 hidden'} cursor-pointer transition-all hover:opacity-90 active:opacity-100`} 
+            />
+            
             <button 
               onClick={closeModal}
               className='bg-slate-600 text-white rounded-sm text-sm p-0.5 px-1.5'>
@@ -70,7 +87,7 @@ export default function Notifications() {
           </div>
         </div>
 
-        <article className={`flex flex-col h-full gap-2 w-full py-1.5 px-3`}>
+        <article className={`relative flex flex-col h-full gap-2 w-full py-1.5 px-3`}>
           {
             isLoading ?
               <SkeletonNotification />
@@ -89,6 +106,9 @@ export default function Notifications() {
                 contentLength={(notifications?.notification as NotificationBody[])?.length } 
               />
           }
+          <div className={`absolute ${isError ? 'scale-100' : 'scale-0'} transition-all top-6 left-8 w-[80%] rounded-md p-2 shadow-md bg-slate-500 text-center whitespace-pre-wrap text-white py-4 capitalize`}>
+            {deleteErrorMsg}
+          </div>
         </article>
       </div>
     </div>

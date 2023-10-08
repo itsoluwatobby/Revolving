@@ -1,6 +1,6 @@
 // @types.posts.ts
 import React from 'react';
-import { UserFriends } from './data';
+import { ErrorResponse, LastMessageType, Status, TypingObjType, UserProps } from './data';
 
 type ChildrenProp = {
   children: React.ReactNode
@@ -75,8 +75,10 @@ type PostContextType = {
   search: string,
   canPost: boolean,
   navPosts: PostType[],
-  imagesFiles: ImageType[]
+  currentUser?: UserProps,
+  imagesFiles: ImageType[],
   typingEvent: TypingEvent,
+  typingObj: TypingObjType,
   submitToSend: CodeProps[],
   inputValue: CodeStoreType,
   codeStore: CodeStoreType[],
@@ -86,6 +88,7 @@ type PostContextType = {
   setNavPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
   setTypingEvent: React.Dispatch<React.SetStateAction<TypingEvent>>,
   setImagesFiles: React.Dispatch<React.SetStateAction<ImageType[]>>,
+  setTypingObj: React.Dispatch<React.SetStateAction<TypingObjType>>,
   setSubmitToSend: React.Dispatch<React.SetStateAction<CodeProps[]>>,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>,
@@ -130,6 +133,29 @@ type UpdateSuccess={
   res: boolean
 }
 
+type GetConvoType = {
+  _id: string, 
+  status: Status,
+  lastName: string,
+  lastSeen: string,
+  firstName: string, 
+  displayPicture: string,
+  userId: string,
+  adminId: string,
+  isOpened: boolean,
+  members: string[],
+  createdAt: string,
+  updatedAt: string,
+  lastMessage: LastMessageType,
+}
+
+type InitConversationType = { 
+  isLoading: boolean, 
+  isError: boolean, 
+  msg: string, 
+  error: ErrorResponse
+}
+
 type ThemeContextType = {
   theme: Theme,
   parseId: string,
@@ -144,11 +170,12 @@ type ThemeContextType = {
   success: UpdateSuccess,
   isPresent: ConflictType,
   loginPrompt: ChatOption,
-  currentChat: UserFriends,
+  currentChat: GetConvoType, 
   openEditPage: ChatOption,
   openNotification: ChatOption,
   revealEditModal: ImageTypeProp, 
   notintersecting: IsIntersectingType,
+  isConversationState: InitConversationType,
   setTheme: React.Dispatch<React.SetStateAction<Theme>>,
   setParseId: React.Dispatch<React.SetStateAction<string>>,
   setRollout: React.Dispatch<React.SetStateAction<boolean>>,
@@ -162,9 +189,10 @@ type ThemeContextType = {
   setSuccess: React.Dispatch<React.SetStateAction<UpdateSuccess>>,
   setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
   setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
-  setCurrentChat: React.Dispatch<React.SetStateAction<UserFriends>>,
   setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setCurrentChat: React.Dispatch<React.SetStateAction<GetConvoType>>,
   setOpenNotification: React.Dispatch<React.SetStateAction<ChatOption>>,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
-  setNotIntersecting: React.Dispatch<React.SetStateAction<IsIntersectingType>>
+  setNotIntersecting: React.Dispatch<React.SetStateAction<IsIntersectingType>>,
+  setIsConversationState: React.Dispatch<React.SetStateAction<InitConversationType>>
 }

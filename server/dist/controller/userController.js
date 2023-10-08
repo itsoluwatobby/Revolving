@@ -254,10 +254,10 @@ class UserController {
             const subscribeRecipient = yield this.userService.getUserById(subscribeId);
             if (!subscribeRecipient)
                 return responseType({ res, status: 404, message: 'User not found' });
-            const { firstName, lastName, displayPicture: { photo } } = subscribee;
+            const { firstName, lastName, displayPicture: { photo }, email } = subscribee;
             const notiSubscribe = {
                 userId: subscriberId, fullName: `${firstName} ${lastName}`,
-                displayPicture: photo
+                displayPicture: photo, email
             };
             const duplicate = (_a = subscribeRecipient === null || subscribeRecipient === void 0 ? void 0 : subscribeRecipient.notificationSubscribers) === null || _a === void 0 ? void 0 : _a.find(sub => (sub === null || sub === void 0 ? void 0 : sub.subscriberId) === subscriberId);
             if (duplicate) {

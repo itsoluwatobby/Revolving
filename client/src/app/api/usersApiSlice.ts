@@ -87,7 +87,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
 
     getUserFriends: builder.query<UserFriends[], string>({
-      query: (userId) => `users/user_friends/${userId}`,
+      query: (userId) => `users/user_friends/${userId}`,  
        transformResponse: (baseQueryReturnValue: {data: UserFriends[]}) => {
         return baseQueryReturnValue?.data
       },

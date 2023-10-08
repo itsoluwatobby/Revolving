@@ -19,6 +19,7 @@ type FollowsCompProps = {
 export default function NotificationComp({ notification, theme, isDeleteLoading, notificationIds, deleteNotification, setOpenNotification, setNotificationIds }: FollowsCompProps) {
   const [isMarked, setIsMarked] = useState<boolean>(false)
 
+  console.log(notification.notify)
   useEffect(() => {
     let isMounted = true
     if(isMounted){
@@ -29,7 +30,6 @@ export default function NotificationComp({ notification, theme, isDeleteLoading,
       isMounted = false
     }
   }, [isMarked, setNotificationIds, notification?._id])
-console.log(notification)
 
   return (   
     <>
@@ -59,7 +59,12 @@ console.log(notification)
             className='flex-auto flex flex-col gap-1'>
 
             <Link to={`/profile/${notification?.notify?.userId}`}>
-              <p className={`w-fit ${theme === 'light' ? 'bg-white' : 'text-gray-300'} hover:underline underline-offset-2 cursor-pointer text-sm`}>@{(notification?.notify?.fullName as string)?.replace(' ', '_')?.toLowerCase()}
+              <p className={`w-fit ${theme === 'light' ? 'bg-white' : 'text-gray-300'} hover:underline underline-offset-2 cursor-pointer text-sm`}>
+                @{
+                  (notification?.notify?.fullName as string)?.replace(' ', '_')?.toLowerCase() 
+                    ?? (notification?.notify?.email as string)?.split('@')[0] 
+                      ?? (notification?.notify?.author as string)?.split('@')[0]
+                }
               </p>
             </Link>
 

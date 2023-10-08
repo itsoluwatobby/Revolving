@@ -38,9 +38,9 @@ class CommentController {
                 return responseType({ res, status: 404, message: 'Story not found' });
             this.commentService.createComment(Object.assign({}, newComment))
                 .then((comment) => __awaiter(this, void 0, void 0, function* () {
-                const { firstName, lastName, _id, displayPicture: { photo } } = user;
+                const { firstName, lastName, _id, displayPicture: { photo }, email } = user;
                 const notiComment = {
-                    storyId: story === null || story === void 0 ? void 0 : story._id, title: story === null || story === void 0 ? void 0 : story.title, userId: _id,
+                    storyId: story === null || story === void 0 ? void 0 : story._id, title: story === null || story === void 0 ? void 0 : story.title, userId: _id, email,
                     fullName: `${firstName} ${lastName}`, displayPicture: photo
                 };
                 yield this.notification.addToNotification(userId, notiComment, 'Comment');
@@ -84,9 +84,9 @@ class CommentController {
                 return res.sendStatus(401);
             this.commentService.deleteSingleComment(commentId)
                 .then(() => __awaiter(this, void 0, void 0, function* () {
-                const { firstName, lastName, _id, displayPicture: { photo } } = user;
+                const { firstName, lastName, _id, displayPicture: { photo }, email } = user;
                 const notiComment = {
-                    storyId: story === null || story === void 0 ? void 0 : story._id, title: story === null || story === void 0 ? void 0 : story.title, userId: _id,
+                    storyId: story === null || story === void 0 ? void 0 : story._id, title: story === null || story === void 0 ? void 0 : story.title, userId: _id, email,
                     fullName: `${firstName} ${lastName}`, displayPicture: photo
                 };
                 yield this.notification.removeSingleNotification(userId, notiComment, 'Comment');

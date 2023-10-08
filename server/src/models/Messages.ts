@@ -12,8 +12,10 @@ const MessagesSchema = new Schema(
     displayPicture: { type: String, default: '' },
     referencedMessage: {type: Object, default: {}},
     isDelivered: {type: Boolean, default: false},
-    isMessageRead: {type: String, default: false, enum: ['read', 'unread']},
+    isMessageRead: {type: String, default: 'unread', enum: ['read', 'unread']},
     isMessageDeleted: {type: Array, default: []},
+    isDeleted: { type: Boolean, default: false },
+    edited: { type: Boolean, default: false },
     pictures: { type: Array, default: [] },
   },
   {

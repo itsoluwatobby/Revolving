@@ -5,6 +5,7 @@ import { RedisClientService } from "../helpers/redis.js";
 import { NotificationModel } from "../models/Notifications.js";
 import { AllNotificationModelType, NotificationBody, NotificationModelType, NotificationStatus, NotificationType, UserProps } from "../../types.js";
 import { Document, Schema } from "mongoose";
+import { statuses } from "../helpers/responses.js";
 
 type NotificationDocument = Document<unknown, {}, NotificationModelType> & NotificationModelType & Required<{ _id: string | Schema.Types.ObjectId; }>
 
@@ -73,7 +74,7 @@ export class NotificationController {
 
   openOrCloseNotification(req: Request, res: Response){
     const { notificationId, isOpen, stats } = req.query
-    if(!notificationId) return res.status(400)
+    if(!notificationId) return responseType({res, status: 406, message: statuses['406']})
     const opened = isOpen === 'true' ? true : false
     const status = stats as unknown as NotificationStatus
     NotificationModel.findByIdAndUpdate({_id: notificationId}, { $set: {isNotificationOpen: opened} }, { new: true })
@@ -111,11 +112,11 @@ export class NotificationController {
 
   public async removeNotification(req: Request, res: Response){
     const { notificationId } = req.params
-    const { notifyIds } = req.body
-    if(!notificationId || !Array.isArray(notifyIds) || !notifyIds?.length) return res.status(400)
+    const notifyIds = req.body
+    if(!notificationId || !Array.isArray(notifyIds) || !notifyIds?.length) return responseType({res, status: 406, message: statuses['406']})
     const userNotification = await NotificationModel.findById(notificationId).exec()
-    const retainAll = userNotification?.notification?.filter(noti => !notifyIds.includes(noti?._id))
-    await userNotification.updateOne({$push: { notification: [...retainAll] }})
+    const retainAll = userNotification?.notification?.filter(noti => !notifyIds.includes(noti?._id.toString()))
+    await userNotification.updateOne({$set: { notification: [...retainAll] }})
     .then(async() => {
       return responseType({res, status: 204, message: 'Removed notifications'})
     }).catch(() => responseType({res, status: 400, message: 'Mongo error'}))
@@ -123,7 +124,7 @@ export class NotificationController {
 
   public async getNotification(req: Request, res: Response){
     const { userId } = req.params
-    if(!userId || userId === undefined) return res.status(400)
+    if(!userId || userId === undefined) return responseType({res, status: 406, message: statuses['406']})
     this.redisClientService.getCachedResponse({key: `userNotification:${userId}`, timeTaken: 1800, cb: async() => {
       return await NotificationModel.findOne({userId}).exec()
     }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] })

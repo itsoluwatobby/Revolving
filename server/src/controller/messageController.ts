@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import { statuses } from "../helpers/responses.js";
 import { MessageService } from "../services/messageService.js"
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { ConversationService } from "../services/ConversationService.js"
-import { ConversationModelType, MessageModelType, MessageStatus } from "../../types.js";
+import { ConversationModelType, DeleteChatOption, GetConvoType, MessageModelType, MessageStatus, UserFriends } from "../../types.js";
+import { RedisClientService } from "../helpers/redis.js";
 
 interface MessageRequest extends Request{
   messageId: string,
@@ -13,6 +14,7 @@ interface MessageRequest extends Request{
 class MessageConversationController {
 
   private messageService: MessageService = new MessageService();
+  private redisClientService: RedisClientService = new RedisClientService()
   private conversationService: ConversationService = new ConversationService()
 
   constructor() {}
@@ -21,7 +23,7 @@ class MessageConversationController {
   public createConversation(req: Request, res: Response){
     asyncFunc(res, () => {
       const { userId, partnerId } = req.params
-      if(!userId || !partnerId) return res.status(400)
+      if(!userId || !partnerId) return responseType({res, status: 406, message: statuses['406']})
       this.conversationService.createNewConversation(userId, partnerId)
       .then((data) => {
         if(typeof data === 'string') return responseType({res, status: 400})
@@ -34,7 +36,7 @@ class MessageConversationController {
   public deleteConversation(req: Request, res: Response){
     asyncFunc(res, () => {
       const { conversationId } = req.params
-      if(!conversationId) return res.status(400)
+      if(!conversationId) return responseType({res, status: 406, message: statuses['406']})
       this.conversationService.deleteConversation(conversationId)
       .then((message) => responseType({res, status: 200, message}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to delete conversation'}))
@@ -44,19 +46,21 @@ class MessageConversationController {
   public getConversations(req: Request, res: Response){
     asyncFunc(res, () => {
       const { userId } = req.params
-      if(!userId) return res.status(400)
-      this.conversationService.getAllConversation(userId)
-      .then((data: ConversationModelType[]) => responseType({res, status: 200, message: statuses[200], data}))
+      if(!userId) return responseType({res, status: 406, message: statuses['406']})
+      this.redisClientService.getCachedResponse({key: `userConversations:${userId}`, timeTaken: 1800, cb: async() => {
+        return this.conversationService.getAllConversation(userId)
+      }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] })
+      .then((data: GetConvoType[]) => responseType({res, status: 200, message: statuses[200], data}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to get conversations'}))
     })
   }
   
   public getConversation(req: Request, res: Response){
     asyncFunc(res, () => {
-      const { conversationId } = req.params
-      if(!conversationId) return res.status(400)
-      this.conversationService.getSingleConversation(conversationId)
-      .then((data: ConversationModelType) => responseType({res, status: 200, message: statuses[200], data}))
+      const { userId, conversationId } = req.params
+      if(!conversationId || !userId) return responseType({res, status: 406, message: statuses['406']})
+      this.conversationService.getSingleConversation(userId, conversationId)
+      .then((data: GetConvoType) => responseType({res, status: 200, message: statuses[200], data}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to get conversation'}))
     })
   }
@@ -64,7 +68,7 @@ class MessageConversationController {
   public close_current_conversation(req: Request, res: Response){
     asyncFunc(res, () => {
       const { conversationId } = req.params
-      if(!conversationId) return res.status(400)
+      if(!conversationId) return responseType({res, status: 406, message: statuses['406']})
       this.conversationService.closeConversation (conversationId)
       .then(() => responseType({res, status: 200, message: 'conversation close'}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to get conversation'}))
@@ -74,19 +78,34 @@ class MessageConversationController {
   // message controller
   public createMessage(req: Request, res: Response){
     asyncFunc(res, () => {
-      const { messageObj }: { messageObj: MessageModelType } = req.body
-      if(!messageObj) return res.status(400)
+      const messageObj: MessageModelType = req.body
+      if(!messageObj?.senderId || !messageObj?.receiverId || !messageObj?.message) return responseType({res, status: 406, message: statuses['406']})
       this.messageService.createNewMessage(messageObj)
-      .then((data) => responseType({res, status: 200, message: 'message created', data}))
+      .then((data) => responseType({res, status: 201, message: 'message created', data}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to create message'}))
+    })
+  }
+
+  public editMessage(req: Request, res: Response){
+    asyncFunc(res, () => {
+      const { userId } = req.params
+      const messageObj: MessageModelType = req.body
+      if(!userId || !messageObj?.senderId || !messageObj?.receiverId || !messageObj?.message) return responseType({res, status: 406, message: statuses['406']})
+      if(userId !== messageObj?.senderId) return responseType({res, status: 401, message: statuses['401']})
+      this.messageService.updateMessage(messageObj)
+      .then((data) => responseType({res, status: 201, message: `${statuses['201']}: message edited`, data}))
+      .catch((error) => {
+        console.log(error)
+        responseType({res, status: 400, message: 'mongo error: failed to edit message'})
+      })
     })
   }
 
   public deleteMessage(req: Request, res: Response){
     asyncFunc(res, () => {
-      const { userId, messageId } = req.params
-      if(!userId || !messageId) return res.status(400)
-      this.messageService.deleteMessage(userId, messageId)
+      const { userId, messageId, option } = req.params
+      if(!userId || !messageId) return responseType({res, status: 406, message: statuses['406']})
+      this.messageService.deleteMessage(userId, messageId, option as DeleteChatOption)
       .then((message) => responseType({res, status: 200, message}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to delete message'}))
     })
@@ -95,9 +114,8 @@ class MessageConversationController {
   public message_read_or_deleted(req: Request, res: Response){
     asyncFunc(res, () => {
       const { messageId, status } = req.query
-      if(!messageId || !status) return res.status(400)
-      const stats = status as MessageStatus
-      this.messageService.isRead_Or_Delivered_Message(messageId as string, stats)
+      if(!messageId || !status) return responseType({res, status: 406, message: statuses['406']})
+      this.messageService.isRead_Or_Delivered_Message(messageId as string, status as MessageStatus)
       .then((data) => {
         if(typeof data === 'string') return responseType({res, status: 400, message: statuses[400]})
         return responseType({res, status: 200, message: statuses[200], data})
@@ -109,8 +127,10 @@ class MessageConversationController {
   public getMessages(req: Request, res: Response){
     asyncFunc(res, () => {
       const { conversationId } = req.params
-      if(!conversationId) return res.status(400)
-      this.messageService.get_All_Messages(conversationId)
+      if(!conversationId) return responseType({res, status: 406, message: statuses['406']})
+      this.redisClientService.getCachedResponse({key: `conversationMessages:${conversationId}`, timeTaken: 1800, cb: async() => {
+        return this.messageService.get_All_Messages(conversationId)
+      }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] })
       .then((data: MessageModelType[]) => responseType({res, status: 200, message: statuses[200], data}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to fetch messages'}))
     })
@@ -119,7 +139,7 @@ class MessageConversationController {
   public getMessage(req: Request, res: Response){
     asyncFunc(res, () => {
       const { messageId } = req.params
-      if(!messageId) return res.status(400)
+      if(!messageId) return responseType({res, status: 406, message: statuses['406']})
       this.messageService.getSingleMessage(messageId)
       .then((data: MessageModelType) => responseType({res, status: 200, message: statuses[200], data}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to fetch messages'}))

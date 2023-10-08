@@ -1,38 +1,52 @@
-import { Document, Types } from "mongoose";
+import userService from "./userService.js";
+import { Document, Schema } from "mongoose";
 import { MessageModel } from "../models/Messages.js";
-import { MessageModelType, MessageStatus } from "../../types.js";
+import { DeleteChatOption, MessageModelType, MessageStatus } from "../../types.js";
 
-type NewMessageType = Document<unknown, {}, MessageModelType> & MessageModelType & {
-  _id: Types.ObjectId;
-}
+type NewMessageType = Document<unknown, {}, MessageModelType> & MessageModelType & Required<{
+  _id: string | Schema.Types.ObjectId;
+}>
 
 export class MessageService {
 
   constructor(){}
 
-  public async createNewMessage(messageObj: MessageModelType): Promise<NewMessageType | string>{
+  public async createNewMessage(messageObj: MessageModelType): Promise<NewMessageType>{
+    const user = await userService.getUserById(messageObj?.senderId as string)
+    const newMsg = {
+      ...messageObj, displayPicture: user?.displayPicture?.photo, 
+      author: `${user?.firstName} ${user?.lastName}`
+    } as MessageModelType
     return (
-      MessageModel.create({ ...messageObj })
-      .then(newMessage => newMessage)
-      .catch(error => error.message)
+      MessageModel.create({ ...newMsg })
+      .then(async(newMessage) => {
+        const { _id, createdAt, message } = newMessage
+        await user.updateOne({$set: {lastMessage: { _id, message, createdAt }} })
+        return newMessage
+      })
     )
   }
 
-  public async deleteMessage(userId: string, messageId: string): Promise<string>{
+  public updateMessage(messageObj: MessageModelType): Promise<NewMessageType>{
     return (
-      this.getSingleMessage(messageId)
-      .then(async(data) => {
-        if(data?.isMessageDeleted?.length && data?.isMessageDeleted[0] !== userId){
-          await data.deleteOne({_id: messageId})
-          return 'successfully deleted' 
-        }
-        else{
-          await data.updateOne({$push: { isMessageDeleted: userId }})
-          return 'deleted'
-        }
-      })
-      .catch(error => error.message)
+      MessageModel.findByIdAndUpdate({_id: messageObj?._id}, messageObj, {new: true})
+      .then(data => data)
     )
+  }
+  
+  public deleteMessage(userId: string, messageId: string, option: DeleteChatOption): Promise<string>{
+    if(option === 'forAll'){
+      return (
+        MessageModel.findByIdAndUpdate({_id: messageId}, {$set: { isDeleted: true }})
+        .then(() => 'successfully deleted')
+      )
+    }
+    else if(option === 'forMe'){
+      return (
+        MessageModel.updateOne({$push: { isMessageDeleted: userId }})
+        .then(() => 'deleted')
+      )
+    }
   }
 
   public async isRead_Or_Delivered_Message(messageId: string, status: MessageStatus): Promise<NewMessageType | string>{
@@ -40,14 +54,12 @@ export class MessageService {
       return (
         MessageModel.findByIdAndUpdate({_id: messageId}, {$set: { isMessageRead: 'read' }}, {new: true})
         .then(data => data)
-        .catch(error => error.message)
       )
     } 
     else if(status === 'DELIVERED'){
       return (
         MessageModel.findByIdAndUpdate({_id: messageId}, {$set: { isDelivered: true }}, {new: true})
         .then(data => data)
-        .catch(error => error.message)
       )
     }
     else return 'argument error'
@@ -57,7 +69,6 @@ export class MessageService {
     return (
       MessageModel.find({ conversationId }).lean()
       .then(data => data)
-      .catch(error => error.message)
     )
   }
 
@@ -65,7 +76,6 @@ export class MessageService {
     return (
       MessageModel.findById(messageId).exec()
       .then(data => data)
-      .catch(error => error.message)
     )
   }
 }

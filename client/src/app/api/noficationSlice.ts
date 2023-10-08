@@ -24,7 +24,7 @@ export const notificationSlice = apiSlice.injectEndpoints({
       query: ({notificationId, notifyIds}) => ({
         url: `/notification/remove_notification/${notificationId}`,
         method: 'DELETE',
-        body: notifyIds
+        body: {notifyIds}
       }),
       invalidatesTags: [{type: 'NOTIFICATION'}, { type: 'NOTIFICATION', id: 'LIST' }]
     }),

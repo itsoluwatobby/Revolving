@@ -11,7 +11,7 @@ import { ThemeDataProvider } from './context/ThemeProvider.tsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 store.dispatch(usersApiSlice.endpoints.getUsers.initiate())
-store.dispatch(storyApiSlice.endpoints.getStoriesByCategory.initiate('General'))
+store.dispatch(storyApiSlice.endpoints.getStoriesByCategory.initiate({category: 'General'}))
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

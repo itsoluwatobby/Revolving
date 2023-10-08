@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { VerifyOptions } from "jsonwebtoken"
-import { Document, ObjectId, Types } from "mongoose"
+import { Document, FlattenMaps, ObjectId, Types } from "mongoose"
 
 // interface Environment_Env{
 //   REVOLVING_DB: string,
@@ -43,7 +43,7 @@ interface StoryProps extends Document{
   // _id: ObjectId | string
   body: string
   title: string
-  edited: false
+  edited: boolean
   author: string
   likes: string[]
   picture: string[]
@@ -129,6 +129,7 @@ type Follows = { createdAt: string, followRecipientId: string }
 
 type EachSubs = { createdAt: string, subscriberId: string }
 type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+type LastMessageType = { _id: string, createdAt: string, message: string }
 type Status = 'online' | 'offline'
 
 interface UserProps extends Document{
@@ -161,7 +162,9 @@ interface UserProps extends Document{
   registrationDate: string,
   isAccountLocked: boolean,
   isResetPassword: boolean,
+  lastConversationId: string,
   isAccountActivated: boolean,
+  lastMessage: LastMessageType,
   subscribed: SubscriptionTo[],
   notificationSubscribers: EachSubs[],
   verificationToken: VerificationTokenType,
@@ -184,6 +187,7 @@ type SubUser = {
 type UserFriends = {
   _id: string, 
   status: Status,
+  email?: string,
   lastName: string,
   lastSeen: string,
   firstName: string, 
@@ -332,7 +336,27 @@ interface MessageModelType{
   isMessageDeleted: string[],
   pictures: string[],
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  isDeleted: boolean,
+  edited: boolean,
 }
 
 type MessageStatus = 'DELIVERED' | 'READ'
+
+type GetConvoType = {
+  _id: string | FlattenMaps<ObjectId>, 
+  status: Status,
+  lastName: string,
+  lastSeen: string,
+  firstName: string, 
+  displayPicture: string,
+  userId: ObjectId | string,
+  adminId: string | ObjectId,
+  lastMessage: LastMessageType,
+  isOpened: boolean,
+  members: string[],
+  createdAt: string,
+  updatedAt: string
+}
+
+type DeleteChatOption = 'forMe' | 'forAll'

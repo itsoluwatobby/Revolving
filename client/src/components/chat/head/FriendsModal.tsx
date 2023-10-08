@@ -1,10 +1,12 @@
 import { CiSearch } from "react-icons/ci"
 import { useState, useEffect, useRef } from "react"
 import { ErrorContent } from "../../ErrorContent"
-import { FriendsRecents } from "./FriendsRecents"
-import { ChatOption, Theme } from "../../../posts"
+import { Friends } from "./Friends"
+import { ChatOption, GetConvoType, Theme } from "../../../posts"
 import SkeletonChats from "../../skeletons/SkeletonChats"
-import { ErrorResponse, UserFriends } from "../../../data"
+import { ErrorResponse, TypingObjType, UserFriends, UserProps } from "../../../data"
+import { useGetConversationsQuery } from "../../../app/api/messageApiSlice"
+import { RecentConversations } from "./RecentConversations"
 
 type FriendsModalType = {
   theme: Theme,
@@ -12,6 +14,10 @@ type FriendsModalType = {
   friends: UserFriends[],
   showFriends: ChatOption,
   errorMsg: ErrorResponse,
+  typingObj: TypingObjType,
+  currentUser: Partial<UserProps>,
+  setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
+  setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
 type Option = 'Friends' | 'Recents'
@@ -21,9 +27,10 @@ type ChatStateType = {
 }
 
 const initChatState = { toggleView: 'Friends' as Option, openSearch: 'Hide' as ChatOption }
-export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg }: FriendsModalType) => {
+export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg, currentUser, setShowFriends, setPrevChatId }: FriendsModalType) => {
   const [chatState, setChatState] = useState<ChatStateType>(initChatState)
-  const [filteredFriends, setFilteredFriends] = useState<UserFriends[]>([])
+  const [filteredFriends, setFilteredFriends] = useState<(UserFriends | GetConvoType)[]>([])
+  const { data: recentConversations, isLoading: loading, error } = useGetConversationsQuery(currentUser?._id as string)
   const [search, setSearch] = useState<string>('')
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -31,19 +38,25 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg 
 
   useEffect(() => {
     let isMounted = true
-    if(isMounted) setFilteredFriends(friends?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
-
+    if(isMounted) {
+      if(toggleView === 'Friends'){
+        setFilteredFriends(friends?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
+      }
+      else if(toggleView === 'Recents'){
+        setFilteredFriends((recentConversations as GetConvoType[])?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
+      }
+    }
     return () => {
       isMounted = false
     }
-  }, [search, friends])
+  }, [search, friends, recentConversations, toggleView])
 
   useEffect(() => {
     if(searchRef?.current) searchRef.current.focus()
   }, [openSearch])
   
   return (
-    <div className={`${showFriends === 'Open' ? 'flex' : 'hidden'} z-10 flex-col pb-1 text-xs absolute ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-800'} p-0.5 rounded-md top-9 right-4 border-4 border-slate-500 border-t-0 border-r-0 border-l-0 h-48 w-[80%]`}>
+    <div className={`${showFriends === 'Open' ? 'flex' : 'hidden'} flex-col pb-1 text-xs absolute ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-800'} p-0.5 rounded-md top-11 right-4 border-4 border-slate-500 border-t-0 border-r-0 border-l-0 h-48 w-[80%]`}>
 
       <div className='flex-none flex text-[13px] items-center justify-between border border-b-1 border-t-0 border-r-0 border-l-0 transition-all'>
         <p
@@ -74,7 +87,7 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg 
         />
       </div>
       
-      <div className={`hidebars flex-auto w-full h-full flex flex-col gap-1 p-1.5  overflow-y-scroll transition-all`}>
+      <div className={`hidebars relative flex-auto w-full h-full flex flex-col gap-1 p-1.5 overflow-y-scroll transition-all`}>
       {
         isLoading ?
           <SkeletonChats />
@@ -82,11 +95,20 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg 
           friends?.length ?
             (  
               toggleView === 'Friends' ?
-                <FriendsRecents friends={filteredFriends} />
+                <Friends 
+                  friends={filteredFriends} currentUser={currentUser} 
+                  setShowFriends={setShowFriends} setPrevChatId={setPrevChatId}
+                />
                 :    
-                <FriendsRecents friends={filteredFriends} />    
+                <RecentConversations 
+                  setShowFriends={setShowFriends} currentuser={currentUser}
+                  friends={filteredFriends as GetConvoType[]} setPrevChatId={setPrevChatId}
+                />    
             )
-        : <ErrorContent message='Empty list' position='CHAT' errorMsg={errorMsg} contentLength={friends?.length } />
+        : <ErrorContent 
+            message='Empty list' position='CHAT' 
+            errorMsg={errorMsg} contentLength={friends?.length } 
+          />
       }
       </div>
 

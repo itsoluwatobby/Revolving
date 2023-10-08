@@ -72,7 +72,7 @@ type StoryProps = {
   fontFamily?: string | 'sans',
   commentIds?: string[],
   code: CodeProps[],
-  edited: false,
+  edited: boolean,
   sharerId?: string,
   sharedId?: string,
   sharedAuthor?: string,
@@ -203,6 +203,7 @@ type Follows = { createdAt: string, followRecipientId: string }
 
 type EachSubs = { createdAt: string, subscriberId: string }
 type SubscriptionTo = { createdAt: string, subscribeRecipientId: string }
+type LastMessageType = { _id: string, createdAt: string, message: string }
 type Status = 'online' | 'offline'
 
 interface UserProps{
@@ -220,6 +221,7 @@ interface UserProps{
   },
   isAccountActivated: boolean,
   isAccountLocked: boolean,
+  lastConversationId: string,
   isResetPassword: boolean,
   verificationToken: { type: string, token: string, createdAt: string },
   dateLocked: string,
@@ -230,6 +232,7 @@ interface UserProps{
   notificationId: string,
   status: Status,
   refreshToken: string,
+  lastMessage: LastMessageType,
   editDate: string,
   gender: Gender,
   firstName: string,
@@ -246,6 +249,7 @@ interface UserProps{
 type UserFriends = {
   _id: string, 
   status: Status,
+  email?: string,
   lastName: string,
   lastSeen: string,
   firstName: string, 
@@ -264,8 +268,6 @@ type SubUser = {
   followers: Followers[], 
   displayPicture: string,
 }
-
-
 
 type ChatProps = {
   _id?: string,
@@ -440,7 +442,7 @@ type ConversationModelType = {
   _id: string,
   adminId: string,
   members: string[],
-  isOpend: boolean,
+  isOpened: boolean,
   createdAt: string,
   updatedAt: string
 }
@@ -459,8 +461,26 @@ type MessageModelType = {
   isMessageDeleted: string[],
   pictures: string[],
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  isDeleted: boolean,
+  edited: boolean,
 }
 
 type MessageStatus = 'DELIVERED' | 'READ'
 
+type TypingObjType = {
+  firstName: string,
+  userId: string,
+  status?: boolean,
+  conversationId: string
+}
+
+type DeleteStatusType = { loading: boolean, errorMsg: boolean }
+type SearchStateType = { openSearch: boolean, search: string }
+type DeleteChatOption = 'forMe' | 'forAll'
+
+type MessageStatusType = {
+  isEdited?: boolean,
+  isDeleted?: boolean
+  conversationId: string,
+}

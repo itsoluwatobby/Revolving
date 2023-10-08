@@ -24,6 +24,7 @@ export const Posts = () => {
   } = useGetStoriesByCategoryQuery({
     category: getNavigation
   })
+  const [reloadCount, setReloadCount] = useState<number>(0)
     //  page: pageQuery?.page, limit: pageQuery?.limit
   const { filteredStories, setNavPosts } = usePostContext() as PostContextType
   const { setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
@@ -71,15 +72,27 @@ console.log({isIntersecting1})
 
   useEffect(() => {
     let timerId: TimeoutId
-    if(!data?.length && (isError && errorMsg?.status != 404)){
+    if(!data?.length && (isError && errorMsg?.status != 404) && reloadCount <= 3){
       timerId = setInterval(async() => {
-        console.log('loading...')
         await refetch()
+        setReloadCount(prev => prev + 1)
       }, REFRESH_RATE)
     }
+    else if(data?.length) {
+      setReloadCount(0)
+    }
     return () => clearInterval(timerId)
-  }, [data, isError, errorMsg?.status, refetch])
-  
+  }, [data, isError, errorMsg?.status, refetch, reloadCount])
+
+  useEffect(() => {
+    if(data?.length) return
+    const reloadPageOnWindowFocus = () => setReloadCount(0)
+    window.addEventListener('focus', reloadPageOnWindowFocus)
+    return () => {
+      window.removeEventListener('focus', reloadPageOnWindowFocus)
+    }
+  }, [data])
+
   useEffect(() => {
     // mutate()
     setNavPosts(data as PostType[])

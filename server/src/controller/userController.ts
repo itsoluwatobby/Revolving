@@ -173,10 +173,10 @@ class UserController{
       const subscribeRecipient = await this.userService.getUserById(subscribeId);
       if(!subscribeRecipient) return responseType({res, status: 404, message: 'User not found'})
 
-      const { firstName, lastName, displayPicture: { photo } } = subscribee
+      const { firstName, lastName, displayPicture: { photo }, email } = subscribee
       const notiSubscribe = {
         userId: subscriberId, fullName: `${firstName} ${lastName}`,
-        displayPicture: photo
+        displayPicture: photo, email
       } as SubscribeNotificationType
 
       const duplicate = subscribeRecipient?.notificationSubscribers?.find(sub => sub?.subscriberId === subscriberId) as EachSubs
