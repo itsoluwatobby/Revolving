@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { format } from 'timeago.js';
-import { ChatOption, GetConvoType, Theme, ThemeContextType } from '../../../posts'
-import { UserFriends, UserProps } from '../../../data'
+import { ErrorContent } from '../../ErrorContent';
+import { ErrorResponse, UserFriends, UserProps } from '../../../data'
+import { IsLoadingSpinner } from '../../IsLoadingSpinner';
+import { ChatOption, ThemeContextType } from '../../../posts'
 import { useThemeContext } from '../../../hooks/useThemeContext';
 import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
-import { IsLoadingSpinner } from '../../IsLoadingSpinner';
 
 type FriendsProps = {
   friends: UserFriends[],
@@ -13,7 +15,8 @@ type FriendsProps = {
 
 export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) => {
   const { theme, currentChat, setCurrentChat } = useThemeContext() as ThemeContextType
-  const [createConversation, {isLoading, isError}] = useCreateConversationMutation()
+  const [createConversation, {isLoading}] = useCreateConversationMutation()
+  const [errorMsg, setErrorMsg] = useState<ErrorResponse>()
 
   const newConversation = (partnerId: string) => {
     if(isLoading) return
@@ -22,7 +25,7 @@ export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) 
       setCurrentChat(res?.data)
       setShowFriends('Hide')
     })
-    .catch(error => console.log(error))
+    .catch(error => setErrorMsg(error))
   }
 
   return (
@@ -32,7 +35,7 @@ export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) 
           <article 
             key={user?._id}
             onClick={() => newConversation(user?._id)}
-            className={`p-1 shadow-md flex w-full ${currentChat?._id === user?._id ? 'bg-slate-400' : ''} ${theme === 'light' ? 'bg-slate-100 text-black' : 'bg-slate-700'} gap-x-2 rounded-md cursor-pointer hover:bg-gray-200 transition-all`}
+            className={`p-1 shadow-md flex w-full ${currentChat?._id === user?._id ? 'bg-slate-400' : ''} ${theme === 'light' ? 'bg-slate-100 text-black hover:bg-gray-200' : 'bg-slate-700 hover:bg-gray-600'} gap-x-2 rounded-md cursor-pointer transition-all`}
           >
 
             <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-8 h-8">
@@ -46,7 +49,11 @@ export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) 
             </figure>
 
             <div className='flex-auto flex flex-col'>
-              <p className=''>{user?.firstName} {user?.lastName}
+              <p className=''>
+                {
+                  (user?.firstName || user?.lastName) 
+                  ? `${user?.firstName} ${user?.lastName}` : user?.email
+                }
               </p>
               <p 
                 className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>
@@ -58,6 +65,10 @@ export const Friends = ({ friends, currentUser, setShowFriends }: FriendsProps) 
           </article>
         ))
       }
+      <ErrorContent 
+        message={errorMsg?.message as string} position='CHAT' 
+        errorMsg={errorMsg as ErrorResponse} contentLength={friends?.length } 
+      />
       {isLoading ? <IsLoadingSpinner page='CHAT' customSize='LARGE' /> : null}
     </>
   )

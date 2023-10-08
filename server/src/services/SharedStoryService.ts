@@ -63,9 +63,9 @@ export class SharedStoryService {
 
   public async likeAndUnlikeSharedStory(userId: string, sharedId: string): Promise<string>{
     const sharedStory = await SharedStoryModel.findById(sharedId).exec();
-    const { displayPicture: { photo }, firstName, lastName } = await UserService.getUserById(userId)
+    const { displayPicture: { photo }, firstName, lastName, email } = await UserService.getUserById(userId)
     const notiLike = {
-      userId, fullName: `${firstName} ${lastName}`,
+      userId, fullName: `${firstName} ${lastName}`, email,
       displayPicture: photo, storyId: sharedStory?._id, title: sharedStory?.sharedStory?.title
     } as LikeNotificationType
     if(!sharedStory?.sharedLikes.includes(userId)) {

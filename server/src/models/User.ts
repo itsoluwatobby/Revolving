@@ -16,8 +16,8 @@ const Follows = { createdAt: String, followRecipientId: String }
 const USERSCHEMA: Schema = new Schema(
   {
     username: { type: String, required: [true, 'Username is required'], trim: true },
-    lastConversationId: { type: Schema.Types.ObjectId, ref: 'conversation' },
     password: { type: String, required: [true, 'Password is required'], select: false, trim: true },
+    lastConversationId: { type: Schema.Types.ObjectId, ref: 'conversations' },
     email: { type: String, required: [true, 'Email is required'], unique: true, min: 5, trim: true },
     userSession: { type: String, default: '' },
     firstName: { type: String, default: '', trim: true },

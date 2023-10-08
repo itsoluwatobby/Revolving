@@ -38,9 +38,9 @@ export class CommentService {
   public async likeAndUnlikeComment(userId: string, commentId: string): Promise<string>{
     const comment = await CommentModel.findById(commentId).exec();
     const story = await StoryService.getStoryById(comment?.storyId)
-    const { displayPicture: { photo }, firstName, lastName } = await UserService.getUserById(userId)
+    const { displayPicture: { photo }, firstName, lastName, email } = await UserService.getUserById(userId)
     const notiLike = {
-      userId, fullName: `${firstName} ${lastName}`,
+      userId, fullName: `${firstName} ${lastName}`, email,
       displayPicture: photo, storyId: story?._id, title: story?.title
     } as LikeNotificationType
     if(!comment?.likes.includes(userId)) {

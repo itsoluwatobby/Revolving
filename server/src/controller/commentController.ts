@@ -31,9 +31,9 @@ class CommentController{
       if(!story) return responseType({res, status: 404, message: 'Story not found'})
       this.commentService.createComment({...newComment})
       .then(async(comment) => {
-        const { firstName, lastName, _id, displayPicture: { photo } } = user
+        const { firstName, lastName, _id, displayPicture: { photo }, email } = user
         const notiComment = { 
-          storyId: story?._id, title: story?.title, userId: _id,
+          storyId: story?._id, title: story?.title, userId: _id, email,
           fullName: `${firstName} ${lastName}`, displayPicture: photo
         } as CommentNotificationType
         await this.notification.addToNotification(userId, notiComment, 'Comment')
@@ -75,9 +75,9 @@ class CommentController{
       if(comment?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
       this.commentService.deleteSingleComment(commentId)
       .then(async() => {
-        const { firstName, lastName, _id, displayPicture: { photo } } = user
+        const { firstName, lastName, _id, displayPicture: { photo }, email } = user
         const notiComment = { 
-          storyId: story?._id, title: story?.title, userId: _id,
+          storyId: story?._id, title: story?.title, userId: _id, email,
           fullName: `${firstName} ${lastName}`, displayPicture: photo
         } as CommentNotificationType
         await this.notification.removeSingleNotification(userId, notiComment, 'Comment')

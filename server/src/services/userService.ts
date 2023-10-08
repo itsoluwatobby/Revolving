@@ -48,10 +48,10 @@ export class UserService {
     const user = await UserModel.findById(followerId).exec();
     const following = await UserModel.findById(followingId).exec();
     if(user?._id.toString() == followingId) return 'duplicate'
-    const { firstName, lastName, displayPicture: { photo } } = user
+    const { firstName, lastName, displayPicture: { photo }, email } = user
     const notiFollow = {
       userId: followerId, fullName: `${firstName} ${lastName}`,
-      displayPicture: photo
+      displayPicture: photo, email
     } as FollowNotificationType
 
     const duplicate = following?.followers?.find(sub => sub?.followerId === followerId) as Followers
@@ -99,14 +99,13 @@ export class UserService {
   }
 
   public async getFriends(user: UserProps): Promise<UserFriends[]>{
-    const allIds = user?.followers?.map(us => us?.followerId)
+    const allIds = user?.followers?.map(us => us?.followerId.toString())
     // remove conflicting IDs
-    user?.followings?.map(us => {
-      allIds?.filter(id => id.toString() !== us?.followRecipientId.toString() ? allIds.push(us?.followRecipientId) : null)
-    })
+    user?.followings?.map(us => !allIds?.includes(us?.followRecipientId.toString()) ? allIds.push(us?.followRecipientId?.toString()) : null)
+      // allIds?.map(id => id.toString() !== us?.followRecipientId.toString() ? allIds.push(us?.followRecipientId) : null)
     const allUsers = await Promise.all(allIds?.map(async(eachId) => {
-      const { _id, status, lastSeen, displayPicture: { photo }, firstName, lastName } = await this.getUserById(eachId)
-      return {_id, status, lastSeen, displayPicture: photo, firstName, lastName }
+      const { _id, status, lastSeen, displayPicture: { photo }, firstName, lastName, email } = await this.getUserById(eachId)
+      return { _id, status, lastSeen, displayPicture: photo, firstName, lastName, email }
     })) as UserFriends[]
     return allUsers
   }

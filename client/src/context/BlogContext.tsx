@@ -3,7 +3,8 @@ import { createContext, useEffect, useState } from 'react';
 import { CodeProps, TypingEvent, TypingObjType, UserProps } from '../data';
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
-import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType } from '../posts';
+import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType, ThemeContextType } from '../posts';
+import { useThemeContext } from '../hooks/useThemeContext';
 
 
 export const PostContext = createContext<PostContextType | null>(null)
@@ -12,6 +13,7 @@ const initState = { codeId: '', langType: '', code: '', date: '' }
 const initTypingObj = { firstName: '', userId: '', conversationId: '' }
 export const PostDataProvider = ({ children }: ChildrenProp) => {
   const [search, setSearch] = useState<string>('');
+  const { openChat } = useThemeContext() as ThemeContextType
   const [filteredStories, setFilterStories] = useState<PostType[]>([])
   const [typingEvent, setTypingEvent] = useState<TypingEvent>('notTyping');
 
@@ -34,17 +36,14 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     let isMounted = true
     const getCurrentUser = async() => {
       getLoggedInUser(userId).unwrap()
-      .then((user: UserProps) => {
-        setCurrentUser(user)
-        console.log('rrr')
-      })
+      .then((user: UserProps) => setCurrentUser(user))
       .catch((error) => console.log(error))
     }
-    if(isMounted && userId && !currentUser?._id) getCurrentUser()
+    if(isMounted && userId && !currentUser?._id && openChat === 'Open') getCurrentUser()
     return () => {
       isMounted = false
     }
-  }, [userId, currentUser?._id, getLoggedInUser])
+  }, [userId, currentUser?._id, getLoggedInUser, openChat])
 
   useEffect(() => {
     let isMounted = true

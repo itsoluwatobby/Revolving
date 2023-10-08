@@ -72,7 +72,7 @@ type StoryProps = {
   fontFamily?: string | 'sans',
   commentIds?: string[],
   code: CodeProps[],
-  edited: false,
+  edited: boolean,
   sharerId?: string,
   sharedId?: string,
   sharedAuthor?: string,
@@ -249,6 +249,7 @@ interface UserProps{
 type UserFriends = {
   _id: string, 
   status: Status,
+  email?: string,
   lastName: string,
   lastSeen: string,
   firstName: string, 
@@ -460,8 +461,10 @@ type MessageModelType = {
   isMessageDeleted: string[],
   pictures: string[],
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  edited: boolean
 }
+
 type MessageStatus = 'DELIVERED' | 'READ'
 
 type TypingObjType = {
@@ -469,4 +472,12 @@ type TypingObjType = {
   userId: string,
   status?: boolean,
   conversationId: string
+}
+
+type DeleteStatusType = { loading: boolean, errorMsg: boolean }
+
+type MessageStatusType = {
+  isEdited?: boolean,
+  isDeleted?: boolean
+  conversationId: string,
 }

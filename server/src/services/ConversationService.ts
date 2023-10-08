@@ -1,8 +1,8 @@
-import { Document, Schema, Types } from "mongoose";
-import { conversationModel } from "../models/Coversations.js";
 import userService from "./userService.js";
-import { ConversationModelType, GetConvoType, UserFriends } from "../../types.js";
 import { UserModel } from "../models/User.js";
+import { Document, Schema, Types } from "mongoose";
+import { conversationModel } from "../models/Conversations.js";
+import { ConversationModelType, GetConvoType } from "../../types.js";
 
 type NewConvoType = Document<unknown, {}, ConversationModelType> & ConversationModelType & {
   _id: Types.ObjectId;
@@ -20,6 +20,7 @@ export class ConversationService {
     if(!user || !partnerUser) return 'not found'
     const duplicate = await conversationModel.findOne({"members": {$in: [userId, partnerId]}}).lean()
     if(duplicate) {
+      await UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: duplicate?._id }})
       const partnerId = duplicate?.members.filter(id => id.toString() !== userId.toString())
       return (
         userService.getUserById(partnerId[0])
@@ -83,7 +84,7 @@ export class ConversationService {
     return (
       conversationModel.findByIdAndUpdate({_id: conversationId}, {$set: { isOpened: true }}, { new: true }).lean()
       .then(async(data: ConversationModelType) => {
-        UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: data?._id }})
+        await UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: data?._id }})
         const partnerId = data?.members.filter(id => id.toString() !== userId.toString())
         return (
           userService.getUserById(partnerId[0])  

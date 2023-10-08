@@ -1,12 +1,17 @@
 import { Server } from 'socket.io';
 import { MessageModelType } from '../../types.js';
-import { disconnect } from 'process';
 
 type TypingObjType = {
   firstName: string,
   userId: string,
   conversationId: string,
   status: boolean
+}
+
+type MessageStatusType = {
+  isEdited?: boolean,
+  isDeleted?: boolean
+  conversationId: string,
 }
 
 export class SocketServer {
@@ -51,6 +56,14 @@ export class SocketServer {
       
       socket.on('typing_stopped', (typingObj: TypingObjType) => {
         this.customIO.to(typingObj.conversationId).emit('typing_event_ended', {...typingObj, status: false})
+      })
+
+      socket.on('edit_message', (isEdited: MessageStatusType) => {
+        this.customIO.to(isEdited.conversationId).emit('isEditted', isEdited)
+      })
+      
+      socket.on('delete_message', (isDeleted: MessageStatusType) => {
+        this.customIO.to(isDeleted.conversationId).emit('isDeleted', isDeleted)
       })
 
       socket.on('disconnect', () => {

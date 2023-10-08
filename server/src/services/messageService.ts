@@ -1,8 +1,7 @@
-import { Document, Schema, Types } from "mongoose";
+import userService from "./userService.js";
+import { Document, Schema } from "mongoose";
 import { MessageModel } from "../models/Messages.js";
 import { MessageModelType, MessageStatus } from "../../types.js";
-import { UserModel } from "../models/User.js";
-import userService from "./userService.js";
 
 type NewMessageType = Document<unknown, {}, MessageModelType> & MessageModelType & Required<{
   _id: string | Schema.Types.ObjectId;

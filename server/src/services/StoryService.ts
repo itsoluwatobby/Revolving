@@ -4,7 +4,7 @@ import { StoryModel } from "../models/Story.js";
 import { CommentService } from './commentService.js';
 import { CommentModel } from "../models/CommentModel.js";
 import { SharedStoryService } from './SharedStoryService.js';
-import { FollowNotificationType, LikeNotificationType, StoryProps } from "../../types.js";
+import { LikeNotificationType, StoryProps } from "../../types.js";
 import NotificationController from '../controller/notificationController.js';
 
 export class StoryService {
@@ -68,9 +68,9 @@ export class StoryService {
   public async likeAndUnlikeStory(userId: string, storyId: string): Promise<string>{
     try{
       const story = await StoryModel.findById(storyId).exec();
-      const { displayPicture: { photo }, firstName, lastName } = await UserService.getUserById(userId)
+      const { displayPicture: { photo }, firstName, lastName, email } = await UserService.getUserById(userId)
       const notiLike = {
-        userId, fullName: `${firstName} ${lastName}`,
+        userId, fullName: `${firstName} ${lastName}`, email,
         displayPicture: photo, storyId: story?._id, title: story?.title
       } as LikeNotificationType
       if(!story?.likes?.includes(userId)) {

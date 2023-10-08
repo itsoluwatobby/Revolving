@@ -14,6 +14,7 @@ const MessagesSchema = new Schema(
     isDelivered: {type: Boolean, default: false},
     isMessageRead: {type: String, default: 'unread', enum: ['read', 'unread']},
     isMessageDeleted: {type: Array, default: []},
+    edited: { type: Boolean, default: false },
     pictures: { type: Array, default: [] },
   },
   {

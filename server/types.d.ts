@@ -43,7 +43,7 @@ interface StoryProps extends Document{
   // _id: ObjectId | string
   body: string
   title: string
-  edited: false
+  edited: boolean
   author: string
   likes: string[]
   picture: string[]
@@ -187,6 +187,7 @@ type SubUser = {
 type UserFriends = {
   _id: string, 
   status: Status,
+  email?: string,
   lastName: string,
   lastSeen: string,
   firstName: string, 
@@ -335,7 +336,8 @@ interface MessageModelType{
   isMessageDeleted: string[],
   pictures: string[],
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  edited: boolean
 }
 
 type MessageStatus = 'DELIVERED' | 'READ'

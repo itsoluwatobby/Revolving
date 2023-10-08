@@ -26,7 +26,7 @@ type ChatStateType = {
 }
 
 const initChatState = { toggleView: 'Friends' as Option, openSearch: 'Hide' as ChatOption }
-export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg, typingObj, currentUser, setShowFriends }: FriendsModalType) => {
+export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg, currentUser, setShowFriends }: FriendsModalType) => {
   const [chatState, setChatState] = useState<ChatStateType>(initChatState)
   const [filteredFriends, setFilteredFriends] = useState<(UserFriends | GetConvoType)[]>([])
   const { data: recentConversations, isLoading: loading, error } = useGetConversationsQuery(currentUser?._id as string)
@@ -55,7 +55,7 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg,
   }, [openSearch])
   
   return (
-    <div className={`${showFriends === 'Open' ? 'flex' : 'hidden'} z-10 flex-col pb-1 text-xs absolute ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-800'} p-0.5 rounded-md top-11 right-4 border-4 border-slate-500 border-t-0 border-r-0 border-l-0 h-48 w-[80%]`}>
+    <div className={`${showFriends === 'Open' ? 'flex' : 'hidden'} flex-col pb-1 text-xs absolute ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-800'} p-0.5 rounded-md top-11 right-4 border-4 border-slate-500 border-t-0 border-r-0 border-l-0 h-48 w-[80%]`}>
 
       <div className='flex-none flex text-[13px] items-center justify-between border border-b-1 border-t-0 border-r-0 border-l-0 transition-all'>
         <p
@@ -101,7 +101,7 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg,
                 :    
                 <RecentConversations 
                   friends={filteredFriends as GetConvoType[]} 
-                  setShowFriends={setShowFriends} 
+                  setShowFriends={setShowFriends} currentuser={currentUser}
                 />    
             )
         : <ErrorContent message='Empty list' position='CHAT' errorMsg={errorMsg} contentLength={friends?.length } />

@@ -100,7 +100,7 @@ export const messageApiSlice = apiSlice.injectEndpoints({
 
     updateMessageStatus: builder.mutation<void, {messageId: string, status: MessageStatus}>({
       query: ({messageId, status}) => ({
-        url: `messages/message_status/messageId=${messageId}&status=${status}`,
+        url: `messages/message_status?messageId=${messageId}&status=${status}`,
         method: 'PATCH',
         body: messageId
       }),
