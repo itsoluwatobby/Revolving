@@ -102,7 +102,7 @@ export default function Notifications() {
               ))
             : 
               <ErrorContent message='You have no notifications' 
-                errorMsg={errorMsg as ErrorResponse} 
+                errorMsg={errorMsg as ErrorResponse} position="NOTIFICATION" 
                 contentLength={(notifications?.notification as NotificationBody[])?.length } 
               />
           }

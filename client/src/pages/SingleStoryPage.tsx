@@ -17,7 +17,7 @@ export default function SingleStoryPage() {
   const [sidebar, setSidebar] = useState<boolean>(false);
   const { loginPrompt, fontOption, setFontOption, theme } = useThemeContext() as ThemeContextType
   const { data: target, isLoading, isError } = useGetStoryQuery(storyId);
-  const { data, isLoading: loading } = useGetStoriesQuery()
+  const { data } = useGetStoriesQuery()
   const [stories, setStories] = useState<PostType[]>([])
   const [options, setOptions] = useState<string>('')
   const [isBarOpen, setIsBarOpen] = useState<boolean>(false)

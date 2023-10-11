@@ -78,7 +78,7 @@ export class ConversationService {
 
   public getSingleConversation(userId: string, conversationId: string): Promise<GetConvoType>{
     return (
-      conversationModel.findById(conversationId).exec()
+      this.getConversation(conversationId)
       .then( async(conversation) => {
         if(conversation.adminId.toString() === userId) conversation.membersOpen.adminOpened = true;
         else if(conversation.adminId.toString() !== userId) conversation.membersOpen.clientOpened = true;
@@ -90,9 +90,10 @@ export class ConversationService {
         return (
           userService.getUserById(partnerId[0])
           .then(partnerUser => {
+            const convo = conversation as unknown as { _doc: ConversationModelType }
             const { _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: { photo } } = partnerUser
             const user = { userId: _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: photo }
-            return {...conversation, ...user}
+            return {...convo?._doc, ...user}
           })
         )
       })

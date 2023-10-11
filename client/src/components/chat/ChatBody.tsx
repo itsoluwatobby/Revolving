@@ -25,7 +25,6 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
   const { theme, isConversationState, currentChat } = useThemeContext() as ThemeContextType
   const { data, isLoading, error } = useGetAllMessagesQuery(currentChat?._id)
   const [message, setMessage] = useState<MessageModelType>();
-  // const [updateMessageStatus] = useUpdateMessageStatusMutation();
   const [filteredMessages, setFilteredMessages] = useState<MessageModelType[]>()
   const dispatch = useDispatch()
   
@@ -66,6 +65,11 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
     }
   }, [message, currentChat?._id, setMessages])
 
+  console.log(messages)
+  console.log(currentChat)
+  console.log(isLoading)
+  console.log(data)
+
   useEffect(() => {
     let isMounted = true
     if(isMounted) socket.on('isEditted', (isEdited: MessageStatusType) => {
@@ -84,7 +88,7 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
   }, [socket, currentChat?._id, dispatch])
  
   const chatContent = (
-    messages?.length ?
+    messages?.length > 0 ?
     filteredMessages?.map(msg => (
       <ChatBodyComp key={msg?._id} socket={socket}
       currentUser={currentUser} message={msg} currentChat={currentChat}
@@ -94,7 +98,10 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
     :
     <ErrorContent 
       position='MESSAGE' errorMsg={error as ErrorResponse} contentLength={messages?.length} 
-      message={currentChat?._id ? 'Start a conversation' : (isConversationState?.msg ?? isConversationState?.error?.message)} 
+      message={
+        currentChat?._id 
+            ? 'Start a conversation' 
+              : isConversationState?.error?.originalStatus === 401 ? 'Please login in, session ended' : (isConversationState?.msg ?? isConversationState?.error?.message)} 
     />
   )
 

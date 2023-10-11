@@ -15,7 +15,7 @@ type DrawdownProps = {
 }
 
 export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProps) {
-  const { theme, setRollout } = useThemeContext() as ThemeContextType
+  const { theme, setRollout, setOpenChat } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const userRoles = useSelector(selectCurrentRoles)
   const {pathname} = useLocation()

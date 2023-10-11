@@ -14,6 +14,11 @@ type MessageStatusType = {
   conversationId: string,
 }
 
+type ConversationStatusType = {
+  isOpened: boolean,
+  conversationId: string,
+}
+
 export class SocketServer {
 
   private customIO: Server;
@@ -64,6 +69,10 @@ export class SocketServer {
       
       socket.on('delete_message', (isDeleted: MessageStatusType) => {
         this.customIO.to(isDeleted.conversationId).emit('isDeleted', isDeleted)
+      })
+      
+      socket.on('conversation_opened', (convoEvent: ConversationStatusType) => {
+        this.customIO.to(convoEvent.conversationId).emit('conversation_event', convoEvent)
       })
 
       socket.on('disconnect', () => {

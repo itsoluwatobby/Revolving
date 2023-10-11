@@ -74,6 +74,12 @@ export class MessageService {
         await msg.updateOne({$set: { isDelivered: isOpened, isMessageRead: read }})
       }))
     })
+    MessageModel.find({ conversationId, isMessageRead: 'unread' })
+    .then(async(messages) => {
+      await Promise.all(messages.map(async(msg) => {
+        await msg.updateOne({$set: { isMessageRead: read }})
+      }))
+    })
   }
 
   public get_All_Messages(conversationId: string){

@@ -488,3 +488,8 @@ type MessageStatusType = {
   isDeleted?: boolean
   conversationId: string,
 }
+
+type ConversationStatusType = {
+  isOpened: boolean,
+  conversationId: string,
+}

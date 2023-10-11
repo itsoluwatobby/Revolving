@@ -103,7 +103,7 @@ export default function ChatHeader({
 
         </div>
 
-        <div className={`absolute rounded-sm left-0 w-full ${(openSearch && showFriends === 'Hide') ? 'slide_on' : ' opacity-30 slide_off '} h-5 transition-all rounded-b-sm ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'}`}>
+        <div className={`absolute rounded-sm left-0 w-full ${(openSearch && showFriends === 'Hide') ? 'slide_on' : ' opacity-30 slide_off '} h-5 transition-all rounded-b-sm ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-500'}`}>
           <input 
             type="text" 
             value={search}
@@ -111,7 +111,7 @@ export default function ChatHeader({
             autoFocus={true}
             placeholder="search message"
             onChange={event => setMessageState(prev => ({...prev, search: event.target.value}))}
-            className={`w-full h-full rounded-b-sm bg-inherit text-[13px] py-2 border-0 focus:outline-none ${theme === 'light' ? 'placeholder:text-gray-600' : 'placeholder:text-gray-400'} px-2`} 
+            className={`w-full h-full text-black rounded-b-sm bg-inherit text-[13px] py-2 border-0 focus:outline-none ${theme === 'light' ? 'placeholder:text-gray-600' : 'placeholder:text-gray-400'} px-2`} 
           />
         </div>
 

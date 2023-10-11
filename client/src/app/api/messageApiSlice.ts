@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
-import { DeleteChatOption, MembersType, MessageModelType, MessageStatus, UserFriends } from "../../data";
+import { DeleteChatOption, MembersType, MessageModelType, MessageStatus } from "../../data";
 import { GetConvoType } from "../../posts";
 
 

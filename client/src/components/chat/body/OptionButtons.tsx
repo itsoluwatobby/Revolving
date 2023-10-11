@@ -16,7 +16,7 @@ type OptionButtonsType = {
 export const OptionButtons = ({ open, expandOption, message, currentUser, setMessageResponse, setExpandOption, setEditMessage, setOpen }: OptionButtonsType) => {
   
   return (
-    <div className={`absolute right-0 flex ${expandOption ? 'scale-100' : 'scale-0'} ${open === 'Open' ? 'z-0 scale-50' : 'z-10'} transition-all items-center ${message?.senderId === currentUser?._id ? 'bg-slate-500' : 'bg-slate-600'} gap-0.5 shadow-md rounded-sm`}>
+    <div className={`absolute right-0 flex ${expandOption ? 'scale-100' : 'scale-0'} ${open === 'Open' ? 'z-0 scale-50' : 'z-10'} text-black transition-all items-center font-bold ${message?.senderId === currentUser?._id ? 'bg-slate-200' : 'bg-slate-300'} gap-0.5 shadow-md rounded-sm`}>
 
       <button 
         onClick={() => {
