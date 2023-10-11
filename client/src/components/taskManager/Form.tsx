@@ -30,7 +30,7 @@ export default function Form({ currentUserId }: FormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [taskInput, setTaskInput] = useState<string>('');
   const dispatch = useDispatch()
-  const [createTask, {isLoading, isError, error}] = useCreateTaskMutation();
+  const [createTask, {isLoading}] = useCreateTaskMutation();
   const [updateTask, {isLoading: isLoadingUpdate}] = useUpdateTaskMutation();
   const [debouncedInput, setDebouncedInput] = useState<InputTaskProp>({
     value: '', isTyping: 'notTyping'

@@ -10,13 +10,13 @@ import { sharedStoryApiSlice, useLikeAndUnlikeSharedStoryMutation } from "../../
 
 type LikeStoryProps = {
   story: PostType,
-  position: PositionType
+  position?: PositionType
 }
 
-export default function LikeStory({ story, position }: LikeStoryProps) {
+export default function LikeStory({ story }: LikeStoryProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation();
-  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, error: sharedLikeError, isError: isSharedLikeError, isUninitialized: isSharedUninitialzed }] = useLikeAndUnlikeSharedStoryMutation()
+  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, error: sharedLikeError, isError: isSharedLikeError }] = useLikeAndUnlikeSharedStoryMutation()
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const dispatch = useDispatch()
 

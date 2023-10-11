@@ -10,7 +10,7 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 import { useSubscribeMutation } from '../../app/api/usersApiSlice';
 import DefaultCover from '../../assets/revolving/default_cover.webp';
 import { ErrorStyle, SuccessStyle, reduceLength } from '../../utils/navigator';
-import { ChatOption, ImageTypeProp, LoginPromptType, ThemeContextType } from '../../posts';
+import { ImageTypeProp, LoginPromptType, ThemeContextType } from '../../posts';
 
 type Props = {
   userId: string,

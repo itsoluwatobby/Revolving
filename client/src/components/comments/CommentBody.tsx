@@ -2,15 +2,13 @@ import { BsSend } from 'react-icons/bs';
 import { toast } from 'react-hot-toast';
 import { MdCancel } from 'react-icons/md';
 import CommentCompo from './CommentCompo';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { ChangeEvent, useState, useEffect } from 'react';
-import { storyApiSlice } from '../../app/api/storyApiSlice';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { SkeletonComment } from '../skeletons/SkeletonComment';
 import { ErrorStyle, REFRESH_RATE } from '../../utils/navigator';
 import { setAllComments } from '../../features/story/commentSlice';
 import { CommentProps, ErrorResponse, Prompted } from '../../data';
-import { getTabCategory } from '../../features/story/navigationSlice';
 import { ChatOption, CommentOptionProp, ThemeContextType } from '../../posts';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../app/api/commentApiSlice';
@@ -21,7 +19,6 @@ type CommentBodyProps={
 } 
 
 export default function CommentBody({ openComment, setOpenComment }: CommentBodyProps) {
-  const getNavigation = useSelector(getTabCategory)
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const [deactivateInputBox, setDeactivateInputBox] = useState<boolean>(false);
   const currentUserId = localStorage.getItem('revolving_userId') as string;

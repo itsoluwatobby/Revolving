@@ -44,8 +44,8 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
   const [userDetails, setUserDetails] = useState<Partial<UserProps>>(initUserState)
   const [inputRef0, inputRef01, inputRef1, inputRef2] = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
   const [passwordConfig, setPasswordConfig] = useState<typeof initPasswordConfig>(initPasswordConfig)
-  const [upDateUserInfo, { isLoading: isLoadingUserInfo, isError: isErrorUserInfo, error }] = useUpdateInfoMutation()
-  const [confirmCurrentPassword, { isLoading: isLoadingConfirmation, isError, isSuccess, isUninitialized }] = useConfirmPasswordMutation()
+  const [upDateUserInfo, { isLoading: isLoadingUserInfo, isError: isErrorUserInfo }] = useUpdateInfoMutation()
+  const [confirmCurrentPassword, { isLoading: isLoadingConfirmation, isError, isSuccess }] = useConfirmPasswordMutation()
   const [prevEntries, setPrevEntries] = useState<InitPrevEntriesType>(initPrevEntries)
   const NameValues = ['socialMediaName', 'socialMediaEntry', 'hobbiesEntry', 'stackEntry'] as const
   const scrollRef0 = useCallback((node: Element) => {

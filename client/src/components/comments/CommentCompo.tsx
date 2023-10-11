@@ -1,12 +1,9 @@
 import { toast } from "react-hot-toast";
-import { useSelector } from "react-redux";
 import BodyComponent from "./BodyComponent";
 import { ThemeContextType } from "../../posts";
 import { ErrorStyle } from "../../utils/navigator";
 import { useEffect, useRef, useState } from "react";
-import { storyApiSlice } from "../../app/api/storyApiSlice";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { getTabCategory } from "../../features/story/navigationSlice";
 import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
 import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../data";
 
@@ -22,7 +19,6 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
   const { setLoginPrompt } = useThemeContext() as ThemeContextType
   const [writeReply, setWriteReply] = useState<string>('');
   const [reveal, setReveal] = useState<boolean>(false)
-  const getNavigation = useSelector(getTabCategory)
   const [expand, setExpand] = useState<boolean>(false)
   const responseRef = useRef<HTMLTextAreaElement>();
   const [deleteComment, { isLoading, isError, isSuccess: isSuccessDeleted, 
