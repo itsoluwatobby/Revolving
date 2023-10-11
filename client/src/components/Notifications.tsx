@@ -25,7 +25,7 @@ export default function Notifications() {
     }
     catch(err: unknown){
       const errors = (deleteError as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       setDeleteErrorMsg(errors?.message ?? 'An error occurred')
     }
   }

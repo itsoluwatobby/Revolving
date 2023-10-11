@@ -67,7 +67,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
     }
     catch(err){
       const errors = (errorComment as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
@@ -91,7 +91,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, enlarged, commen
     }
     catch(err){
       const errors = errorResponse as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'

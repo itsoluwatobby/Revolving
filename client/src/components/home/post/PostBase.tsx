@@ -34,7 +34,7 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
-      (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
+      (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null;
       (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`,ErrorStyle)
     }
   }
@@ -47,7 +47,7 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
     }
     catch(err: unknown){
       const errors = sharedError as Partial<ErrorResponse>
-      (!currentUserId || !errors || errors?.originalStatus == 401) && setLoginPrompt('Open')
+      (!currentUserId || !errors || errors?.originalStatus == 401) && setLoginPrompt({opened: 'Open'})
       isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

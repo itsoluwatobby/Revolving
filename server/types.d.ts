@@ -319,7 +319,11 @@ interface ConversationModelType{
   isOpened: boolean,
   members: string[],
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  membersOpen: {
+    adminOpened: boolean,
+    clientOpened: boolean
+  }
 }
 
 interface MessageModelType{
@@ -355,6 +359,10 @@ type GetConvoType = {
   lastMessage: LastMessageType,
   isOpened: boolean,
   members: string[],
+  membersOpen: {
+    adminOpened: boolean,
+    clientOpened: boolean
+  }
   createdAt: string,
   updatedAt: string
 }

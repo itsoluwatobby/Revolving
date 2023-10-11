@@ -31,11 +31,13 @@ export const PersistedLogin = () => {
         dispatch(setCredentials({...res?.data}))
       }
       catch(err){
-        console.log(err)
+        const errors = err as ErrorResponse
+        errors?.originalStatus == 401 ? setLoginPrompt({opened: 'Open', source: 'BadToken'}) : null
       }
     }
-    if(persistLogin)
+    if(persistLogin){
      (isMounted && !token && persistLogin) ? getNewToken() : null
+    }
     else (isMounted && !token && notPersistedLogin === 'VALID') ? getNewToken() : null
 
     return () => {
@@ -58,7 +60,7 @@ export const PersistedLogin = () => {
         // (!userId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
       }
     }
-    if(isMounted) notificationOpen()
+    if(isMounted && userId) notificationOpen()
 
     return () => {
       isMounted = false

@@ -59,7 +59,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
 
 
   const createNewStory = async() => {
-    if(!storyData.userId) return setLoginPrompt('Open')
+    if(!storyData.userId) return setLoginPrompt({opened: 'Open'})
     if(storyData){
       const adjustCodes = submitToSend?.map(code => {
         const { codeId, ...rest } = code
@@ -86,7 +86,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
       }
       catch(err: unknown){
         const errors = (createError as ErrorResponse) ?? (err as ErrorResponse)
-        errors?.originalStatus == 401 && setLoginPrompt('Open')
+        errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
         isCreateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
       }
       finally{
@@ -118,7 +118,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
       }
       catch(err: unknown){
         const errors = (updateError as ErrorResponse) ?? (err as ErrorResponse)
-        errors?.originalStatus == 401 && setLoginPrompt('Open')
+        errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
         isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
       }
       finally {

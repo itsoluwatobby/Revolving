@@ -48,9 +48,9 @@ export const messageApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'USERS' }],
     }),
     
-    closeConversation: builder.mutation<string, string>({
-      query: (conversationId) => ({
-        url: `messages/close_conversation/${conversationId}`,
+    closeConversation: builder.mutation<string, {userId: string, conversationId: string}>({
+      query: ({userId, conversationId}) => ({
+        url: `messages/close_conversation/${userId}/${conversationId}`,
         method: 'PATCH',
         body: conversationId
       }),

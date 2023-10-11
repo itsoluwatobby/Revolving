@@ -7,7 +7,7 @@ import { useThemeContext } from "../../hooks/useThemeContext";
 import { ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
 import { useGetUserFriendsQuery } from "../../app/api/usersApiSlice";
 import { useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
-import { ChatOption, GetConvoType, PostContextType, ThemeContextType } from "../../posts";
+import { ChatOption, PostContextType, ThemeContextType } from "../../posts";
 import { Socket } from "socket.io-client";
 
 type ChatModalProp = {
@@ -35,7 +35,7 @@ export default function ChatModal({ socket }: ChatModalProp) {
   useEffect(() => {
     let isMounted = true
     if(isMounted && prevChatId?.length === 2){
-      close_Conversation(prevChatId[0])
+      close_Conversation({userId, conversationId: prevChatId[0]})
       .then(() => {
         console.log(`previous chat with id ${prevChatId[0]} closed`)
         setPrevChatId([prevChatId[1]])

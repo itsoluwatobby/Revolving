@@ -78,7 +78,7 @@ export const LeftSection = () => {
               routeLinkNames({ userId: currentUserId })?.map(values => (
                 <Link to={conditionalRouting(values) ? '' : values.link}
                   key={values.name}
-                  onClick={() => conditionalRouting(values) ? setLoginPrompt('Open') : null}  
+                  onClick={() => conditionalRouting(values) ? setLoginPrompt({opened: 'Open'}) : null}
                   className={`p-3 lg:py-3 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1 transition-all`}
                 >
                   {values.name}

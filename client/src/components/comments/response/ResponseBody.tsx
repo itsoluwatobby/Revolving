@@ -56,7 +56,7 @@ export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoa
     }
     catch(err: unknown){
       const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

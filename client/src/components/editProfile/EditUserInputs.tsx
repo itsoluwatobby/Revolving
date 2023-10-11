@@ -9,8 +9,8 @@ import { useUpdateInfoMutation } from '../../app/api/usersApiSlice';
 import { useConfirmPasswordMutation } from '../../app/api/authApiSlice';
 import { ChangeEvent, useState, useEffect, useRef, useCallback } from 'react';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import { ChatOption, ImageTypeProp, LoginPromptType, NameType, TargetImageType, Theme } from '../../posts';
 import { Entries, ErrorResponse, Gender, InitEntriesType, InitPrevEntriesType, SocialMediaAccoutProp, UserProps, ValueType } from '../../data';
-import { ChatOption, ImageTypeProp, NameType, TargetImageType, Theme } from '../../posts';
 
 type UserInputsProps = {
   theme: Theme,
@@ -21,7 +21,7 @@ type UserInputsProps = {
   imageType: ImageTypeProp,
   clearPhoto: (type: ImageTypeProp) => Promise<void>,
   setImage: React.Dispatch<React.SetStateAction<TargetImageType>>
-  setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>
+  setLoginPrompt: React.Dispatch<React.SetStateAction<LoginPromptType>>
 }
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
@@ -181,7 +181,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     }
     catch(error){
       const errors = error as ErrorResponse;
-      (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
+      (!errors || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null;
       setErrorMsg(errors?.data?.meta?.message)
       isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
@@ -197,7 +197,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     }
     catch(error){
       const errors = error as ErrorResponse;
-      (!errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
+      (!errors || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null;
       isErrorUserInfo && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

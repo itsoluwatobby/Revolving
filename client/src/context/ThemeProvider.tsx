@@ -1,6 +1,6 @@
 import { EnlargeCompo, ErrorResponse, Status } from '../data';
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp, GetConvoType, InitConversationType } from '../posts';
+import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp, GetConvoType, InitConversationType, LoginPromptType } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
@@ -26,7 +26,7 @@ export const ThemeDataProvider = ({ children }: ChildrenProp) => {
     localStorage.getItem('fontFamily') || 'font_style'
     );
   const [openChat, setOpenChat] = useState<ChatOption>('Hide');
-  const [loginPrompt, setLoginPrompt] = useState<ChatOption>('Hide');
+  const [loginPrompt, setLoginPrompt] = useState<LoginPromptType>({opened: 'Hide', source: 'Others'});
   const [toggleLeft, setToggleLeft] = useState<ChatOption>('Hide')
 
   const [fontOption, setFontOption] = useState<boolean>(false);

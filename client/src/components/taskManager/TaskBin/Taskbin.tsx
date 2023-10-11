@@ -75,7 +75,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
     }
     catch(err){
       const errors = (clearBinError as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isClearBinError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
@@ -90,7 +90,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
     }
     catch(err){
       const errors = (restoreError as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isRestoreError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
@@ -105,7 +105,7 @@ export default function Taskbin({ userId }: TaskBinProp) {
     }
     catch(err){
       const errors = (permanentlyDeleteError as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isPermanentlyDeleteError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

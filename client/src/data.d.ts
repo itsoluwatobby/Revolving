@@ -444,7 +444,11 @@ type ConversationModelType = {
   members: string[],
   isOpened: boolean,
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  membersOpen?: {
+    adminOpened: boolean,
+    clientOpened: boolean
+  }
 }
 
 type MessageModelType = {

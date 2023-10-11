@@ -22,9 +22,9 @@ type ArticleProps = {
   isError: boolean,
   isBarOpen: boolean,
   isLoading: boolean,
+  triggerPrint: () => void,
   bodyContent: JSX.Element[],
   averageReadingTime: string,
-  triggerPrint: () => void,
   storyRef: React.RefObject<HTMLDivElement>,
 }
 

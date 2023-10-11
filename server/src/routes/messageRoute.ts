@@ -12,7 +12,7 @@ messageRouter.post('/create_conversation/:userId/:partnerId', verifyRoles([ROLES
 messageRouter.delete('/delete_conversation/:conversationId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => messageController.deleteConversation(req, res));
 messageRouter.get('/conversations/:userId', verifyRoles([ROLES.USER]), (req: RequestProp, res: Response) => messageController.getConversations(req, res));
 messageRouter.get('/single_conversation/:userId/:conversationId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => messageController.getConversation(req, res));
-messageRouter.patch('/close_conversation/:conversationId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => messageController.close_current_conversation(req, res));
+messageRouter.patch('/close_conversation/:userId/:conversationId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => messageController.close_current_conversation(req, res));
 
 // messages
 messageRouter.delete('/delete_message/:userId/:messageId/:option', verifyRoles([ROLES.USER]), (req: RequestProp, res: Response) => messageController.deleteMessage(req, res));

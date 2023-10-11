@@ -57,7 +57,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
     }
     catch(err: unknown){
       const errors = followError as ErrorResponse
-      (!currentUserId || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null
+      (!currentUserId || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null
       isFollowError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'

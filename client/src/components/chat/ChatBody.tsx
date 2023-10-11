@@ -5,9 +5,8 @@ import ChatBodyComp from './body/ChatBodyComp';
 import { ErrorContent } from '../ErrorContent';
 import { ChatOption, ThemeContextType } from '../../posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import { messageApiSlice, useGetAllMessagesQuery } from '../../app/api/messageApiSlice';
 import { ErrorResponse, MessageModelType, MessageStatusType, SearchStateType, UserProps } from '../../data';
-import { messageApiSlice, useGetAllMessagesQuery, useUpdateMessageStatusMutation } from '../../app/api/messageApiSlice';
-import { CiSearch } from 'react-icons/ci';
 
 
 type ChatBodyProp={
@@ -26,19 +25,17 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
   const { theme, isConversationState, currentChat } = useThemeContext() as ThemeContextType
   const { data, isLoading, error } = useGetAllMessagesQuery(currentChat?._id)
   const [message, setMessage] = useState<MessageModelType>();
-  const [updateMessageStatus] = useUpdateMessageStatusMutation();
+  // const [updateMessageStatus] = useUpdateMessageStatusMutation();
   const [filteredMessages, setFilteredMessages] = useState<MessageModelType[]>()
   const dispatch = useDispatch()
-
-  const { openSearch, search } = messageState
   
   useEffect(() => {
     let isMounted = true
-    if(isMounted) setFilteredMessages(messages?.filter(msg => (msg?.message?.toLowerCase())?.includes(search?.toLowerCase())))
+    if(isMounted) setFilteredMessages(messages?.filter(msg => (msg?.message?.toLowerCase())?.includes(messageState?.search?.toLowerCase())))
     return () => {
       isMounted = false
     }
-  }, [search, messages])
+  }, [messageState?.search, messages])
   
   useEffect(() => {
     let isMounted = true
@@ -60,14 +57,14 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
     let isMounted = true
     if(isMounted && message?.conversationId === currentChat?._id ) {
       setMessages(prev => ([...prev, message as MessageModelType]));
-      (async() => {
-        await updateMessageStatus({messageId: message?._id, status: 'DELIVERED'})
-      })()
+      // (async() => {
+      //   await updateMessageStatus({messageId: message?._id, status: 'DELIVERED'})
+      // })()
     }
     return () => {
       isMounted = false
     }
-  }, [message, currentChat?._id, updateMessageStatus, setMessages])
+  }, [message, currentChat?._id, setMessages])
 
   useEffect(() => {
     let isMounted = true

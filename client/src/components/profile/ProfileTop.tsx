@@ -9,8 +9,8 @@ import { MdNotificationsActive } from 'react-icons/md';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { useSubscribeMutation } from '../../app/api/usersApiSlice';
 import DefaultCover from '../../assets/revolving/default_cover.webp';
-import { ChatOption, ImageTypeProp, ThemeContextType } from '../../posts';
 import { ErrorStyle, SuccessStyle, reduceLength } from '../../utils/navigator';
+import { ChatOption, ImageTypeProp, LoginPromptType, ThemeContextType } from '../../posts';
 
 type Props = {
   userId: string,
@@ -21,7 +21,7 @@ type Props = {
   isLoadingUpdate: boolean,
   clearPhoto: (type: ImageTypeProp) => Promise<void>,
   handleImage: (event: ChangeEvent<HTMLInputElement>) => void,
-  setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setLoginPrompt: React.Dispatch<React.SetStateAction<LoginPromptType>>,
 }
 
 export default function ProfileTop({ userId, userProfile, imageType, handleImage, clearPhoto, isLoadingDelete, isLoading, isLoadingUpdate, setLoginPrompt }: Props) {
@@ -49,7 +49,7 @@ export default function ProfileTop({ userId, userProfile, imageType, handleImage
     }
     catch(error){
       const errors = error as ErrorResponse
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       toast.error(errors?.message as string, ErrorStyle)
     }
   }

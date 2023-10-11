@@ -62,7 +62,7 @@ export default function SingleStoryPage() {
 
   return (
     <WindowScroll>
-      <main className={`single_page h-full ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl`}>
+      <main className={`single_page h-full ${loginPrompt?.opened == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl`}>
         <div className="flex h-full">
           {(Array.isArray(stories) && stories.length)
             ? <Aside 

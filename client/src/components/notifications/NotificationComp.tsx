@@ -19,7 +19,6 @@ type FollowsCompProps = {
 export default function NotificationComp({ notification, theme, isDeleteLoading, notificationIds, deleteNotification, setOpenNotification, setNotificationIds }: FollowsCompProps) {
   const [isMarked, setIsMarked] = useState<boolean>(false)
 
-  console.log(notification.notify)
   useEffect(() => {
     let isMounted = true
     if(isMounted){

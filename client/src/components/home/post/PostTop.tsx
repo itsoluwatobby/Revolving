@@ -48,7 +48,7 @@ export default function PostTop({ story, bodyContent }: PostTopProps) {
     }
     catch(err: unknown){
       const errors = (err as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 ? setLoginPrompt('Open') : null;
+      errors?.originalStatus == 401 ? setLoginPrompt({opened: 'Open'}) : null;
       (isDeleteError || isSharedDeleteError) && toast.error(`${errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

@@ -53,7 +53,7 @@ export default function CommentBody({ openComment, setOpenComment }: CommentBody
     }
     catch(err){
       const errors = (errorComment as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
