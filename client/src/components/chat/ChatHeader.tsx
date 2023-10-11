@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { format } from 'timeago.js';
 import { Socket } from 'socket.io-client';
+import { CiSearch } from 'react-icons/ci';
 import { FriendsModal } from './head/FriendsModal';
 import { usePostContext } from '../../hooks/usePostContext';
-import { ErrorResponse, SearchStateType, TypingObjType, UserFriends, UserProps } from '../../data';
 import { ChatOption, GetConvoType, PostContextType, Theme, } from '../../posts';
-import { CiSearch } from 'react-icons/ci';
+import { ErrorResponse, SearchStateType, TypingObjType, UserFriends, UserProps } from '../../data';
 
 type ChatHeaderProp={
   theme: Theme,
@@ -23,7 +23,9 @@ type ChatHeaderProp={
   setMessageState: React.Dispatch<React.SetStateAction<SearchStateType>>,
 }
 
-export default function ChatHeader({ theme, friends, socket, setPrevChatId, currentChat, isLoading, errorMsg, currentUser, showFriends, messageState, setMessageState, setShowFriends, setOpenChat }: ChatHeaderProp) {
+export default function ChatHeader({ 
+  theme, friends, socket, setPrevChatId, currentChat, isLoading, errorMsg, currentUser, showFriends, messageState, setMessageState, setShowFriends, setOpenChat 
+}: ChatHeaderProp) {
   const { typingObj, setTypingObj } = usePostContext() as PostContextType
 
   const { openSearch, search } = messageState
@@ -40,7 +42,7 @@ export default function ChatHeader({ theme, friends, socket, setPrevChatId, curr
   return (
     <header className={`z-10 flex-none text-white rounded-md h- shadow-lg w-full sticky top-0 ${theme === 'light' ? '' : 'bg-slate-800'}`}>
     
-      <div className={`relative flex items-center justify-between relative w-full p-1.5 pb-1 pr-0.5 h-full`}>
+      <div className={`relative flex items-center justify-between w-full p-1.5 pb-1 pr-0.5 h-full`}>
 
         <div className='relative flex flex-col gap-0.5'>
 
@@ -101,7 +103,7 @@ export default function ChatHeader({ theme, friends, socket, setPrevChatId, curr
 
         </div>
 
-        <div className={`absolute rounded-sm left-0 w-full ${(openSearch && showFriends === 'Hide') ? 'slide_on' : ' opacity-30 slide_off '} h-5 transition-all rounded-b-sm ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-700'}`}>
+        <div className={`absolute rounded-sm left-0 w-full ${(openSearch && showFriends === 'Hide') ? 'slide_on' : ' opacity-30 slide_off '} h-5 transition-all rounded-b-sm ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-500'}`}>
           <input 
             type="text" 
             value={search}
@@ -109,7 +111,7 @@ export default function ChatHeader({ theme, friends, socket, setPrevChatId, curr
             autoFocus={true}
             placeholder="search message"
             onChange={event => setMessageState(prev => ({...prev, search: event.target.value}))}
-            className={`w-full h-full rounded-b-sm bg-inherit text-[13px] py-2 border-0 focus:outline-none ${theme === 'light' ? 'placeholder:text-gray-600' : 'placeholder:text-gray-400'} px-2`} 
+            className={`w-full h-full text-black rounded-b-sm bg-inherit text-[13px] py-2 border-0 focus:outline-none ${theme === 'light' ? 'placeholder:text-gray-600' : 'placeholder:text-gray-400'} px-2`} 
           />
         </div>
 

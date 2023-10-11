@@ -36,7 +36,7 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
     }
     catch(err){
       const errors = (errorUpdate as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isErrorUpdate && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
@@ -58,7 +58,7 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
     }
     catch(err){
       const errors = (errorDelete as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isErrorDelete && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

@@ -67,7 +67,7 @@ export default function EditProfilePage() {
         .catch((error: unknown) => {
           const errors = error as ErrorResponse
           setImageType('NIL')
-          errors?.originalStatus == 401 && setLoginPrompt('Open')
+          errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
           toast.error(errors?.message as string, ErrorStyle)
         })
       }

@@ -25,7 +25,7 @@ export default function Notifications() {
     }
     catch(err: unknown){
       const errors = (deleteError as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       setDeleteErrorMsg(errors?.message ?? 'An error occurred')
     }
   }
@@ -102,7 +102,7 @@ export default function Notifications() {
               ))
             : 
               <ErrorContent message='You have no notifications' 
-                errorMsg={errorMsg as ErrorResponse} 
+                errorMsg={errorMsg as ErrorResponse} position="NOTIFICATION" 
                 contentLength={(notifications?.notification as NotificationBody[])?.length } 
               />
           }

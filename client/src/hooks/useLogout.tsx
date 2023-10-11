@@ -10,7 +10,7 @@ import { getCurrentUser } from "../features/auth/userSlice";
 type SignOutType = 'dont' | 'use'
 
 export default function useLogout() {
-  const { setRollout } = useThemeContext() as ThemeContextType
+  const { setRollout, setOpenChat } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const currentUser = useSelector(getCurrentUser)
   const [signedOut] = useSignOutMutation()
@@ -20,6 +20,7 @@ export default function useLogout() {
 
   const signOut = async(option: SignOutType = 'use') => {
     try{
+      setOpenChat('Hide')
       if(currentUserId) await signedOut(currentUserId as string)
       dispatch(signUserOut())
       toast.success('Success!! You logged out', {

@@ -4,7 +4,7 @@ type ErrorProp = {
   message: string,
   contentLength: number,
   errorMsg: ErrorResponse
-  position?: 'CHAT' | 'MESSAGE'
+  position?: 'CHAT' | 'MESSAGE' | 'NOTIFICATION'
 }
 
 export const ErrorContent = ({ message, contentLength, errorMsg, position }: ErrorProp) => {
@@ -16,7 +16,7 @@ export const ErrorContent = ({ message, contentLength, errorMsg, position }: Err
           (contentLength === 0 || errorMsg?.status == 404 || errorMsg?.status == 400) ? 
             <span className={`${position === 'MESSAGE' ? 'italic' : ''}`}>{message}</span>
             : 
-            <span>Network Error, Please check your connection</span>
+            <span>{(position === 'NOTIFICATION' && errorMsg?.originalStatus === 401) ? 'Please sign in' : 'Network Error, Please check your connection'}</span>
         }
       </p>
     :

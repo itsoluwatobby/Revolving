@@ -23,6 +23,7 @@ import { BlogLayout } from "./layouts/BlogLayout";
 import { connect, Socket } from 'socket.io-client';
 import ExpensePlanner from "./pages/ExpensePlanner";
 import ChatModal from "./pages/chatAdmin/ChatModal";
+import { SOCKET_BASE_URL } from './app/api/apiSlice';
 import SingleStoryPage from "./pages/SingleStoryPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import Notifications from "./components/Notifications";
@@ -30,9 +31,8 @@ import PrompLogin from "./components/modals/PrompLogin";
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
-import { selectCurrentRoles } from "./features/auth/authSlice";
 import TypewriterEffect from './components/TypewriterEffect';
-import { SOCKET_BASE_URL } from './app/api/apiSlice';
+import { selectCurrentRoles } from "./features/auth/authSlice";
 
 let socket: Socket
 export const App = () => {
@@ -128,7 +128,7 @@ export const App = () => {
         className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
           <TypewriterEffect text='Please login in' delay={0.4} start={startTypewriting} />
       </div>
-      {loginPrompt == 'Open' ? <PrompLogin /> : null}
+      {loginPrompt?.opened == 'Open' ? <PrompLogin /> : null}
     </main>
   )
 }

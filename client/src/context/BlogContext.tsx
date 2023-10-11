@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { createContext, useEffect, useState } from 'react';
-import { CodeProps, TypingEvent, TypingObjType, UserProps } from '../data';
+import { CodeProps, ErrorResponse, TypingEvent, TypingObjType, UserProps } from '../data';
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
 import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType, ThemeContextType } from '../posts';
@@ -37,7 +37,10 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     const getCurrentUser = async() => {
       getLoggedInUser(userId).unwrap()
       .then((user: UserProps) => setCurrentUser(user))
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        const errors = error as ErrorResponse
+        void(errors)
+      })
     }
     if(isMounted && userId && !currentUser?._id && openChat === 'Open') getCurrentUser()
     return () => {
@@ -51,6 +54,9 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
       const res = await getLoggedInUser(userId).unwrap()
       const { isAccountActivated, refreshToken, verificationToken, ...rest } = res
       dispatch(setLoggedInUser(rest))
+      void(isAccountActivated) 
+      void(refreshToken) 
+      void(verificationToken)
       if(!localStorage.getItem('revolving_login_time')){
         localStorage.setItem('revolving_login_time', rest?.updatedAt)
       }

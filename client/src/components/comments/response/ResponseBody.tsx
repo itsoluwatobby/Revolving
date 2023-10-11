@@ -25,12 +25,12 @@ type ResponseBodyProps = {
 export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
   const [reveal, setReveal] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(false);
-  const { theme, setLoginPrompt, parseId } = useThemeContext() as ThemeContextType
+  const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [writeReply, setWriteReply] = useState<string>('');
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const responseRef = useRef<HTMLTextAreaElement>();
-  const [deleteResponse, {isError, isLoading, error}] = useDeleteResponseMutation()
+  const [deleteResponse, {isError, error}] = useDeleteResponseMutation()
   const dispatch = useDispatch();
 
   const buttonOptClass = useCallback((theme: Theme) => {
@@ -56,7 +56,7 @@ export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoa
     }
     catch(err: unknown){
       const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

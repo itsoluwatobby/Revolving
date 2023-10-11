@@ -1,8 +1,10 @@
 import userService from "./userService.js";
 import { UserModel } from "../models/User.js";
+import messageService from "./messageService.js";
 import { Document, Schema, Types } from "mongoose";
 import { conversationModel } from "../models/Conversations.js";
 import { ConversationModelType, GetConvoType } from "../../types.js";
+
 
 type NewConvoType = Document<unknown, {}, ConversationModelType> & ConversationModelType & {
   _id: Types.ObjectId;
@@ -19,18 +21,7 @@ export class ConversationService {
     const partnerUser = await userService.getUserById(partnerId)
     if(!user || !partnerUser) return 'not found'
     const duplicate = await conversationModel.findOne({"members": {$in: [userId, partnerId]}}).lean()
-    if(duplicate) {
-      await UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: duplicate?._id }})
-      const partnerId = duplicate?.members.filter(id => id.toString() !== userId.toString())
-      return (
-        userService.getUserById(partnerId[0])
-        .then(partnerUser => {
-          const { _id, lastName, firstName, lastSeen, status, lastMessage, displayPicture: { photo } } = partnerUser
-          const user = { userId: _id, lastName, firstName, lastMessage, lastSeen, status, displayPicture: photo }
-          return { ...duplicate, ...user }
-        })
-      )
-    }
+    if(duplicate) this.getSingleConversation(userId, duplicate._id as string)
     else{
       return (
         conversationModel.create({
@@ -57,6 +48,12 @@ export class ConversationService {
       .then(() => 'deleted successfully')
     )
   }
+  public getConversation(conversationId: string){
+    return (
+      conversationModel.findById({_id: conversationId})
+      .then((data) => data)
+    )
+  }
 
   public getAllConversation(userId: string): Promise<GetConvoType[]>{
     return (
@@ -76,32 +73,43 @@ export class ConversationService {
           }))
         )
       })
-     
     )
   }
 
   public getSingleConversation(userId: string, conversationId: string): Promise<GetConvoType>{
     return (
-      conversationModel.findByIdAndUpdate({_id: conversationId}, {$set: { isOpened: true }}, { new: true }).lean()
-      .then(async(data: ConversationModelType) => {
-        await UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: data?._id }})
-        const partnerId = data?.members.filter(id => id.toString() !== userId.toString())
+      this.getConversation(conversationId)
+      .then( async(conversation) => {
+        if(conversation.adminId.toString() === userId) conversation.membersOpen.adminOpened = true;
+        else if(conversation.adminId.toString() !== userId) conversation.membersOpen.clientOpened = true;
+        conversation.isOpened = conversation.membersOpen.adminOpened && conversation.membersOpen.clientOpened;
+        await UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: conversation?._id }})
+        const partnerId = conversation?.members.filter(id => id.toString() !== userId.toString())
+        await conversation.save()
+        messageService.isRead_Messages(conversation._id as string, conversation.isOpened)
         return (
-          userService.getUserById(partnerId[0])  
+          userService.getUserById(partnerId[0])
           .then(partnerUser => {
+            const convo = conversation as unknown as { _doc: ConversationModelType }
             const { _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: { photo } } = partnerUser
-            const user = {userId: _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: photo }
-            return {...data, ...user}
+            const user = { userId: _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: photo }
+            return {...convo?._doc, ...user}
           })
         )
       })
-    )
+    ) 
   }
 
-  public closeConversation(conversationId: string){
+  public closeConversation(userId: string, conversationId: string){
     return (
-      conversationModel.findByIdAndUpdate({_id: conversationId}, {$set: { isOpened: false }}).exec()
-      .then(() => 'closed')
+      conversationModel.findById(conversationId).exec()
+      .then(async(conversation) => {
+        if(conversation.adminId.toString() === userId) conversation.membersOpen.adminOpened = true;
+        else if(conversation.adminId.toString() !== userId) conversation.membersOpen.clientOpened = true;
+        conversation.isOpened = conversation.membersOpen.adminOpened && conversation.membersOpen.clientOpened;
+        await conversation.save()
+        return 'closed'
+      })
     )
   }
 }

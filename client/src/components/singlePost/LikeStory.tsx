@@ -10,13 +10,13 @@ import { sharedStoryApiSlice, useLikeAndUnlikeSharedStoryMutation } from "../../
 
 type LikeStoryProps = {
   story: PostType,
-  position: PositionType
+  position?: PositionType
 }
 
-export default function LikeStory({ story, position }: LikeStoryProps) {
+export default function LikeStory({ story }: LikeStoryProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [likeAndUnlikeStory, { isLoading: isLikeLoading, error: likeError, isError: isLikeError }] = useLikeAndUnlikeStoryMutation();
-  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, error: sharedLikeError, isError: isSharedLikeError, isUninitialized: isSharedUninitialzed }] = useLikeAndUnlikeSharedStoryMutation()
+  const [likeAndUnlikeSharedStory, { isLoading: isSharedLikeLoading, error: sharedLikeError, isError: isSharedLikeError }] = useLikeAndUnlikeSharedStoryMutation()
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const dispatch = useDispatch()
 
@@ -31,7 +31,7 @@ export default function LikeStory({ story, position }: LikeStoryProps) {
     }
     catch(err: unknown){
       const errors = isLikeError ? likeError as Partial<ErrorResponse> : sharedLikeError as Partial<ErrorResponse>
-      (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt('Open') : null;
+      (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null;
       (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'

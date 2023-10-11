@@ -444,7 +444,11 @@ type ConversationModelType = {
   members: string[],
   isOpened: boolean,
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+  membersOpen?: {
+    adminOpened: boolean,
+    clientOpened: boolean
+  }
 }
 
 type MessageModelType = {
@@ -482,5 +486,10 @@ type DeleteChatOption = 'forMe' | 'forAll'
 type MessageStatusType = {
   isEdited?: boolean,
   isDeleted?: boolean
+  conversationId: string,
+}
+
+type ConversationStatusType = {
+  isOpened: boolean,
   conversationId: string,
 }

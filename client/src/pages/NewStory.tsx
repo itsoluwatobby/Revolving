@@ -113,7 +113,7 @@ export const NewStory = () => {
           uploadedImageIds.push(image.imageId)
         }).catch((error: unknown) => {
           const errors = error as ErrorResponse
-          errors?.originalStatus == 401 && setLoginPrompt('Open')
+          errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
         })
       }))
     }

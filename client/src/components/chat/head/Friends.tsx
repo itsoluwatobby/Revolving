@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { format } from 'timeago.js';
 import { ErrorContent } from '../../ErrorContent';
-import { ErrorResponse, UserFriends, UserProps } from '../../../data'
 import { IsLoadingSpinner } from '../../IsLoadingSpinner';
 import { ChatOption, ThemeContextType } from '../../../posts'
 import { useThemeContext } from '../../../hooks/useThemeContext';
+import { ErrorResponse, UserFriends, UserProps } from '../../../data'
 import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
 
 type FriendsProps = {

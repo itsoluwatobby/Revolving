@@ -65,7 +65,7 @@ export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, 
     }
     catch(err: unknown){
       const errors = (likeError as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

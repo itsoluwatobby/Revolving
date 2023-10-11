@@ -30,7 +30,7 @@ export default function Form({ currentUserId }: FormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [taskInput, setTaskInput] = useState<string>('');
   const dispatch = useDispatch()
-  const [createTask, {isLoading, isError, error}] = useCreateTaskMutation();
+  const [createTask, {isLoading}] = useCreateTaskMutation();
   const [updateTask, {isLoading: isLoadingUpdate}] = useUpdateTaskMutation();
   const [debouncedInput, setDebouncedInput] = useState<InputTaskProp>({
     value: '', isTyping: 'notTyping'
@@ -152,7 +152,7 @@ export default function Form({ currentUserId }: FormProps) {
     }
     catch(err){
       const errors = (err as ErrorResponse) ?? (err as ErrorResponse)
-      errors?.originalStatus == 401 && setLoginPrompt('Open')
+      errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
       err && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }

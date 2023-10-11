@@ -6,6 +6,10 @@ const ConversationSchema = new Schema(
     members: {type: Array, default: []},
     adminId: {type: Schema.Types.ObjectId, ref: 'users', unique: true},
     isOpened: {type: Boolean, default: false},
+    membersOpen: {
+      adminOpened: { type: Boolean, default: false },
+      clientOpened: { type: Boolean, default: false }
+    }
   },
   {
     minimize: false, 

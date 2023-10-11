@@ -20,7 +20,7 @@ export const Navbar = () => {
   const currentUser = useSelector(getCurrentUser)
   const getNavigation = useSelector(getTabCategory)
   const { typingEvent } = usePostContext() as PostContextType
-  const {theme, rollout, notintersecting, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
+  const {theme, rollout, notintersecting, setLoginPrompt, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
   const { storyId } = useParams()
   const {data} = useGetStoriesByCategoryQuery({category: getNavigation})
   const [targetStory, setTargetStory] = useState<PostType>()
@@ -56,6 +56,7 @@ export const Navbar = () => {
 
   return(
     <nav 
+      onClick={() => setLoginPrompt({opened: 'Hide'})}
       className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} z-30 p-4 w-full h-16 flex items-center justify-between mobile:justify-between minmobile:pr-0 minmobile:pl-2
      `}>
       

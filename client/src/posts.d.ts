@@ -144,6 +144,10 @@ type GetConvoType = {
   adminId: string,
   isOpened: boolean,
   members: string[],
+  membersOpen?: {
+    adminOpened: boolean,
+    clientOpened: boolean
+  }
   createdAt: string,
   updatedAt: string,
   lastMessage: LastMessageType,
@@ -155,6 +159,8 @@ type InitConversationType = {
   msg: string, 
   error: ErrorResponse
 }
+
+type LoginPromptType = { opened: ChatOption, source?: 'BadToken' | 'Others' }
 
 type ThemeContextType = {
   theme: Theme,
@@ -169,10 +175,10 @@ type ThemeContextType = {
   toggleLeft: ChatOption,
   success: UpdateSuccess,
   isPresent: ConflictType,
-  loginPrompt: ChatOption,
   currentChat: GetConvoType, 
   openEditPage: ChatOption,
   openNotification: ChatOption,
+  loginPrompt: LoginPromptType,
   revealEditModal: ImageTypeProp, 
   notintersecting: IsIntersectingType,
   isConversationState: InitConversationType,
@@ -187,11 +193,11 @@ type ThemeContextType = {
   setEnlarge: React.Dispatch<React.SetStateAction<EnlargeCompo>>,
   setToggleLeft: React.Dispatch<React.SetStateAction<ChatOption>>,
   setSuccess: React.Dispatch<React.SetStateAction<UpdateSuccess>>,
-  setLoginPrompt: React.Dispatch<React.SetStateAction<ChatOption>>,
   setIsPresent: React.Dispatch<React.SetStateAction<ConflictType>>,
   setOpenEditPage: React.Dispatch<React.SetStateAction<ChatOption>>,
   setCurrentChat: React.Dispatch<React.SetStateAction<GetConvoType>>,
   setOpenNotification: React.Dispatch<React.SetStateAction<ChatOption>>,
+  setLoginPrompt: React.Dispatch<React.SetStateAction<LoginPromptType>>,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>,
   setNotIntersecting: React.Dispatch<React.SetStateAction<IsIntersectingType>>,
   setIsConversationState: React.Dispatch<React.SetStateAction<InitConversationType>>

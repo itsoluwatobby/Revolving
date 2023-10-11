@@ -11,7 +11,7 @@ export default function LoginComponent({
  }: LoginProps) {
   const {theme} = useThemeContext() as ThemeContextType
   const persistLogin = useSelector(persisted)
-//translate-x-1/2
+
   const canSubmit = [email, password].every(Boolean)
   return (
     <article className={`absolute sm:w-[50%] md:w-[40%] lg:w-[30%] maxscreen:w-[65%] mobile:w-3/4 border shadow-2xl text-white ${theme == 'light' ? 'bg-gradient-to-r from-indigo-600 via-purple-900 to-pink-500 shadow-zinc-800' : 'dark:bg-gradient-to-r dark:from-slate-800 dark:via-slate-900 dark:to-slate-700 shadow-zinc-700'} translate-y-12 z-10 rounded-md`}>

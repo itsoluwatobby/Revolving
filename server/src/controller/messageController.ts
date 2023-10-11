@@ -67,9 +67,9 @@ class MessageConversationController {
   
   public close_current_conversation(req: Request, res: Response){
     asyncFunc(res, () => {
-      const { conversationId } = req.params
+      const { userId, conversationId } = req.params
       if(!conversationId) return responseType({res, status: 406, message: statuses['406']})
-      this.conversationService.closeConversation (conversationId)
+      this.conversationService.closeConversation (userId, conversationId)
       .then(() => responseType({res, status: 200, message: 'conversation close'}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to get conversation'}))
     })
@@ -116,10 +116,8 @@ class MessageConversationController {
       const { messageId, status } = req.query
       if(!messageId || !status) return responseType({res, status: 406, message: statuses['406']})
       this.messageService.isRead_Or_Delivered_Message(messageId as string, status as MessageStatus)
-      .then((data) => {
-        if(typeof data === 'string') return responseType({res, status: 400, message: statuses[400]})
-        return responseType({res, status: 200, message: statuses[200], data})
-      })
+    // if(typeof data === 'string') return responseType({res, status: 400, message: statuses[400]})
+      .then(data => responseType({res, status: 200, message: statuses[200], data}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to modify messages'}))
     })
   }

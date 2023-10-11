@@ -8,7 +8,7 @@ import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { SkeletonBlog } from '../skeletons/SkeletonBlog';
 import { usePostContext } from '../../hooks/usePostContext';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
+// import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { getTabCategory } from '../../features/story/navigationSlice';
 import { PostContextType, PostType, ThemeContextType } from '../../posts'
 import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
@@ -136,10 +136,10 @@ console.log({isIntersecting1})
       // ref={observerRef as React.LegacyRef<HTMLDivElement>}
       onClick={() => {
           setOpenChat('Hide')
-          setLoginPrompt('Hide')
+          setLoginPrompt({opened: 'Hide'})
         }
       }
-      className={`scroll_behavior relative ${loginPrompt == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 pb-5 px-3.5 md:px-6`}>
+      className={`scroll_behavior relative ${loginPrompt?.opened == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 pb-5 px-3.5 md:px-6`}>
          <p ref={observerRef1 as React.LegacyRef<HTMLParagraphElement>} />
 
         {content}

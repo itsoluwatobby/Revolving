@@ -4,11 +4,12 @@ import ChatBody from "../../components/chat/ChatBody";
 import ChatHeader from "../../components/chat/ChatHeader";
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
+import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
 import { useGetUserFriendsQuery } from "../../app/api/usersApiSlice";
-import { useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
-import { ChatOption, GetConvoType, PostContextType, ThemeContextType } from "../../posts";
+import { messageApiSlice, useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
+import { ChatOption, PostContextType, ThemeContextType } from "../../posts";
 import { Socket } from "socket.io-client";
+import { useDispatch } from "react-redux";
 
 type ChatModalProp = {
   socket: Socket
@@ -17,7 +18,7 @@ type ChatModalProp = {
 const initMessageState = { openSearch: false, search: '' }
 export default function ChatModal({ socket }: ChatModalProp) {
   const { theme, openChat, setOpenChat, currentChat, setCurrentChat, setIsConversationState } = useThemeContext() as ThemeContextType;
-  const [getConversation, {isLoading: loadingCurrent, isError}] = useGetCurrentConversationMutation()
+  const [getConversation] = useGetCurrentConversationMutation()
   const [messageResponse, setMessageResponse] = useState<MessageModelType>()
   const [editMessage, setEditMessage] = useState<MessageModelType>()
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>(null)
@@ -30,12 +31,14 @@ export default function ChatModal({ socket }: ChatModalProp) {
   const [messageState, setMessageState] = useState<SearchStateType>(initMessageState)
   const [close_Conversation] = useCloseConversationMutation()
   const [prevChatId, setPrevChatId] = useState<string[]>([])
+  const [errors, setErrors] = useState<ErrorResponse>()
+  const dispatch = useDispatch()
 
   // close previous chat
   useEffect(() => {
     let isMounted = true
     if(isMounted && prevChatId?.length === 2){
-      close_Conversation(prevChatId[0])
+      close_Conversation({userId, conversationId: prevChatId[0]})
       .then(() => {
         console.log(`previous chat with id ${prevChatId[0]} closed`)
         setPrevChatId([prevChatId[1]])
@@ -44,7 +47,7 @@ export default function ChatModal({ socket }: ChatModalProp) {
     return () => {
       isMounted = false
     }
-  }, [prevChatId, close_Conversation])
+  }, [prevChatId, userId, close_Conversation])
 
   useEffect(() => {
     let isMounted = true
@@ -57,29 +60,62 @@ export default function ChatModal({ socket }: ChatModalProp) {
   useEffect(() => {
     let isMounted = true
     const getCurrentUser = async() => {
-      if(!currentUser?.lastConversationId) return setIsConversationState(prev => ({...prev, isLoading: false, isError, msg: 'You have no recent conversation'}))
+      if(!currentUser?.lastConversationId) return setIsConversationState(prev => (
+        {...prev, isLoading: false, isError: true, 
+          msg: errors?.originalStatus === 401 
+              ? 'Session ended, Please sign in' : 'You have no recent conversation'
+        }))
       getConversation({userId: currentUser?._id, conversationId: currentUser?.lastConversationId}).unwrap()
       .then((conversation) => {
-        console.log(conversation)  
         setCurrentChat(conversation)
       })
-      .catch((error) => setIsConversationState(prev => ({...prev, isLoading: loadingCurrent, isError, error})))
+      .catch((err) => {
+        const error = err as ErrorResponse
+        setErrors(error)
+        setIsConversationState(prev => ({...prev, isLoading: false, isError: true, error}))
+      })
     }
-    if(isMounted && !currentChat?._id) getCurrentUser()
+    if(isMounted && !currentChat?._id && errors?.originalStatus !== 401) getCurrentUser()
     return () => {
       isMounted = false
     }
-  }, [currentUser?._id, currentUser?.lastConversationId, isError, loadingCurrent, setIsConversationState, currentChat?._id, setCurrentChat, getConversation])
+  }, [currentUser?._id, currentUser?.lastConversationId, errors?.originalStatus, setIsConversationState, currentChat?._id, setCurrentChat, getConversation])
   
   useEffect(() => {
     let isMounted = true
-    if(isMounted && data) {
-      setFriends([...data])
-    }
+    if(isMounted && data) setFriends([...data])
     return () => {
       isMounted = false
     }
   }, [data])
+  
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && currentChat?.isOpened) {
+      socket.emit('conversation_opened', {conversationId: currentChat?._id, isOpened: currentChat?.isOpened})
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [socket, currentChat?.isOpened, currentChat?._id])
+  
+  console.log(currentChat)
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted) {
+      socket.on('conversation_event', (convoEvent: ConversationStatusType) => {
+        console.log(convoEvent)
+        if(convoEvent?.conversationId === currentChat?._id && convoEvent?.isOpened){
+          console.log('innnn')
+          dispatch(messageApiSlice.util.invalidateTags(['CONVERSATIONS', 'MESSAGES']))
+        }
+        else return
+      })
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [socket, dispatch, currentChat?._id])
 
   useEffect(() => {
     let isMounted = true

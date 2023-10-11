@@ -25,7 +25,7 @@ type TopRightProps = {
 export default function TopRight({ currentUser }: TopRightProps) {
   const [updateStory, {isLoading: isLoadingUpdate, error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
   const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
-  const { theme, codeEditor, editing, openNotification, setRollout, setOpenNotification, setSuccess, setEditing, setTheme, setIsPresent, setFontOption, setLoginPrompt 
+  const { theme, codeEditor, editing, openNotification, setOpenChat, setRollout, setOpenNotification, setSuccess, setEditing, setTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
   const { data } = useGetNotificationQuery(currentUser?._id as string)
   const [unreadNotifications, setUnreadNotifications] = useState<NotificationBody[]>([])
@@ -57,12 +57,12 @@ export default function TopRight({ currentUser }: TopRightProps) {
     }
   }, [data])
 
-
   const createNewStory = async() => {
-    if(!storyData.userId) return setLoginPrompt('Open')
+    if(!storyData.userId) return setLoginPrompt({opened: 'Open'})
     if(storyData){
       const adjustCodes = submitToSend?.map(code => {
         const { codeId, ...rest } = code
+        void(codeId)
         return rest
       })
       dispatch(setLoading(true))
@@ -86,7 +86,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
       }
       catch(err: unknown){
         const errors = (createError as ErrorResponse) ?? (err as ErrorResponse)
-        errors?.originalStatus == 401 && setLoginPrompt('Open')
+        errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
         isCreateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
       }
       finally{
@@ -100,6 +100,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
     if(storyData){
       const adjustCodes = submitToSend?.map(code => {
         const { codeId, ...rest } = code
+        void(codeId)
         return rest
       })
       dispatch(setLoading(isLoadingUpdate))
@@ -118,7 +119,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
       }
       catch(err: unknown){
         const errors = (updateError as ErrorResponse) ?? (err as ErrorResponse)
-        errors?.originalStatus == 401 && setLoginPrompt('Open')
+        errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
         isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
       }
       finally {
@@ -240,7 +241,10 @@ export default function TopRight({ currentUser }: TopRightProps) {
             <div className='w-10 h-10 rounded-full p-1 flex'>
                  
                   <figure 
-                     onClick={() => setRollout(true)}
+                     onClick={() => { 
+                      setRollout(true)
+                      setOpenChat('Hide')
+                    }}
                     className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
                     {
                       currentUser?.displayPicture?.photo ?
