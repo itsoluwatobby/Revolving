@@ -16,7 +16,6 @@ import ProfilePage from "./pages/ProfilePage";
 import NewPassword from "./pages/NewPassword";
 import TaskManager from "./pages/TaskManager";
 import { BsChatTextFill } from 'react-icons/bs';
-import { Routes, Route } from 'react-router-dom';
 import RegisterModal from "./pages/RegisterModel";
 import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
@@ -32,14 +31,18 @@ import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import TypewriterEffect from './components/TypewriterEffect';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { selectCurrentRoles } from "./features/auth/authSlice";
 
 let socket: Socket
 export const App = () => {
+  const { pathname } = useLocation()
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
   const userId = localStorage.getItem('revolving_userId') as string
   const [startTypewriting, setStartTypewriting] = useState<'BEGIN' | 'END'>('END')
+
+  const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
   useEffect(() => {
     let isMounted = true
@@ -117,16 +120,20 @@ export const App = () => {
           // userId ?
           <ChatModal socket={socket} />
         :  
-          <BsChatTextFill
-            title='Chats'
-            onClick={openChatModal}
-            className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
-          />
+         (
+            !exclude.includes(pathname) ? 
+              <BsChatTextFill
+                title='Chats'
+                onClick={openChatModal}
+                className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
+              />
+            : null
+         )
       }
       <div 
         onClick={() => setStartTypewriting('END')}
         className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
-          <TypewriterEffect text='Please login in' delay={0.4} start={startTypewriting} />
+          <TypewriterEffect delay={0.4} start={startTypewriting} />
       </div>
       {loginPrompt?.opened == 'Open' ? <PrompLogin /> : null}
     </main>

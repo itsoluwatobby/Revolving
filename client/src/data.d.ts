@@ -177,7 +177,7 @@ type EnlargeCompo = {
 }
 
 type ObjectUnknown<K>={
-  [index: string]: K | string,
+  [index: string]: K | string | string[],
   createdAt: string,
   likes: string[]
 }
@@ -358,6 +358,7 @@ type AuthenticationContextType={
 interface UserInfoProps{
   email: string,
   password: string,
+  errorMsg: string,
   revealPassword: boolean,
   loading: boolean,
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void,
@@ -454,9 +455,9 @@ type ConversationModelType = {
 
 type MessageModelType = {
   _id: string,
-  conversationId:  string, 
-  senderId:  string,
-  receiverId:  string, 
+  conversationId: string, 
+  senderId: string,
+  receiverId: string, 
   author: string,
   message: string,
   displayPicture: string,

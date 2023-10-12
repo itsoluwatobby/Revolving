@@ -45,6 +45,7 @@ type PostType = {
 // interface WindowScrollType{
 //   Xscroll: number, Yscroll: number
 // }
+type PostFeedType = { filteredFeeds: PostType[], isLoading: boolean }
 
 type ImageType = {
   imageId: string,

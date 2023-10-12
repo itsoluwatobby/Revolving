@@ -7,7 +7,7 @@ import PasswordInput from './components/PasswordInput';
 import { useThemeContext } from '../../hooks/useThemeContext';
 
 export default function RegistrationForm({
-  handleSubmit, handleEmail, handlePassword, handleUsername, handleConfirmPassword, loading, validEmail, match, username, email, password, confirmPassword, revealPassword, setRevealPassword, confirmationBy, setConfirmationBy
+  handleSubmit, handleEmail, handlePassword, errorMsg, handleUsername, handleConfirmPassword, loading, validEmail, match, username, email, password, confirmPassword, revealPassword, setRevealPassword, confirmationBy, setConfirmationBy
 }: RegistrationProps) {
   const { theme } = useThemeContext() as ThemeContextType
 
@@ -81,9 +81,9 @@ export default function RegistrationForm({
             <button 
               type='submit'
               disabled={!canSubmit && !loading && !match && !validEmail}
-              className={`w-[95%] self-center mt-2 rounded-sm ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && !loading && validEmail && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center mt-2 rounded-sm ${errorMsg ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && !loading && validEmail && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
-              {!loading ? 'Sign Up' : 'Signing Up...'}
+              {errorMsg ? errorMsg : (!loading ? 'Sign Up' : 'Signing Up...')}
             </button>
             <div className='flex flex-col text-sm gap-2 p-2 pt-0 pb-0'>
               <p className='p-1'>Have an account?&nbsp;

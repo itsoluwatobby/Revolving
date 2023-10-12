@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { ThemeContextType } from '../posts';
 import { SuccessStyle } from '../utils/navigator';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { persistLogin } from '../features/auth/authSlice';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,6 +16,7 @@ export default function Login() {
   const dispatch = useDispatch()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [forgot, setForgot] = useState<boolean>(false)
   const [signIn, { isLoading, isError }] = useSignInMutation()
@@ -52,7 +53,9 @@ export default function Login() {
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
-      isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'Please Check Your Network' : errors?.data?.meta?.message}`, {
+      const message = errors?.status == 'FETCH_ERROR' ? 'Please Check Your Network' : errors?.data?.meta?.message
+      setErrorMsg(message)
+      isError && toast.error(`${message}`, {
         duration: 10000, icon: '💀', style: {
           background: errors?.status == 403 ? 'A6BCE2' : '#FF0000',
           color: '#FFFFFF'
@@ -66,6 +69,18 @@ export default function Login() {
     }
   }
 
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if(errorMsg){
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 8000)
+    }
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [errorMsg])
+
   return (
     <section className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-100' : ''}`}>
       {forgot ? 
@@ -75,7 +90,7 @@ export default function Login() {
             handleSubmit={handleSubmit} handleEmail={handleEmail} email={email} 
             setForgot={setForgot} handlePassword={handlePassword} handleChecked={handleChecked} 
             password={password} revealPassword={revealPassword} setRevealPassword={setRevealPassword} 
-            loading={isLoading}
+            loading={isLoading} errorMsg={errorMsg}
           />
           }
     </section>

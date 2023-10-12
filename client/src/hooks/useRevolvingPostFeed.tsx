@@ -1,48 +1,49 @@
-import { PostType } from "../posts";
-import { ObjectUnknown } from "../data";
+import { PostFeedType, PostType } from "../posts";
 import { useEffect, useState } from "react";
 
 
-export default function useRevolvingPostFeed<T>(entry: ObjectUnknown<T>[], post: PostType[], numLikes=70) {
-  const [filteredFeeds, setFilteredFeeds] = useState<ObjectUnknown<T>[]>()
+const initFeeds = { filteredFeeds: [] as PostType[], isLoading: false }
+export default function useRevolvingPostFeed(stories: PostType[], numLikes=70) {
+  const [filteredFeeds, setFilteredFeeds] = useState<PostFeedType>(initFeeds)
   
   useEffect(() => {
     let isMounted = true
     
-    function contentFeedAlgorithm(){
-      const mostLikedPosts = entry.filter(post => Number(post.likes) >= numLikes)
-      const otherLikedPosts = entry.filter(post => Number(post.likes) < numLikes)
+    const contentFeedAlgorithm = () => {
+      setFilteredFeeds(prev => ({...prev, isLoading: true}))
+      let mostLikedStories = [] as PostType[], lessLikedStories = [] as PostType[];
+      stories.map(story => (story.sharedLikes?.length || story.likes?.length) >= numLikes ? mostLikedStories.push(story) : lessLikedStories.push(story))
+      
+      // sort stories according to time posted
+      mostLikedStories = mostLikedStories.sort((a, b) => b?.createdAt.localeCompare(a?.createdAt))
+      lessLikedStories = lessLikedStories.sort((a, b) => b?.createdAt.localeCompare(a?.createdAt))
 
-      shufflePosts(mostLikedPosts)
-      shufflePosts(otherLikedPosts)  
-      sortByTime(mostLikedPosts)
-      sortByTime(otherLikedPosts)
-      const combinedPosts = [...mostLikedPosts, ...otherLikedPosts]
-      setFilteredFeeds(combinedPosts)
-    }
-    
-    function shufflePosts<K>(content: ObjectUnknown<K>[]){
-      for(let i = content.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1))
-        const temp = content[i]
-        content[i] = content[j]
-        content[j] = temp 
-      }
-    }
-    
-    function sortByTime<K>(content: ObjectUnknown<K>[]){
-      content.sort((a, b) => b?.createdAt.localeCompare(a?.createdAt))
-    }
+      // sort stories with a random index
+      mostLikedStories = mostLikedStories?.map((story, index) => {
+        const j = Math.floor(Math.random() * (index + 1))
+        const temp = mostLikedStories[index]
+        mostLikedStories[index] = mostLikedStories[j]
+        mostLikedStories[j] = temp
+        return mostLikedStories[j]
+      })
+      lessLikedStories = lessLikedStories?.map((story, index) => {
+        const j = Math.floor(Math.random() * (index + 1))
+        const temp = stories[index]
+        stories[index] = stories[j]
+        stories[j] = temp
+        return stories[j]
+      })
 
+      const combinedStories = [...mostLikedStories, ...lessLikedStories]
+      setFilteredFeeds(prev => ({...prev, filteredFeeds: combinedStories, isLoading: false}))
+    }
     console.log('running')
-    
-    isMounted ? contentFeedAlgorithm() : null
+    if(isMounted) contentFeedAlgorithm()
 
     return () => {
       isMounted = false
     }
-
-  }, [post.length, entry, numLikes])
+  }, [stories, numLikes])
   
   return filteredFeeds
 }
