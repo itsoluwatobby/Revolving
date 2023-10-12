@@ -56,7 +56,7 @@ export const RecentConversations = ({ friends, socket, currentuser, setPrevChatI
             <div className='flex-auto flex flex-col'>
                 {
                   (userConvo?.firstName || userConvo?.lastName) 
-                  ? `${userConvo?.firstName} ${userConvo?.lastName}` : userConvo?.email
+                  ? `${reduceLength(userConvo?.firstName, 12)} ${reduceLength(userConvo?.lastName, 10)}` : reduceLength(userConvo?.email, 15)
                 }
               <div className='flex items-center gap-1.5'>
                 <p>{reduceLength(userConvo?.lastMessage?.message, 10)}</p>

@@ -7,6 +7,7 @@ import { useThemeContext } from '../../../hooks/useThemeContext';
 import { ErrorResponse, UserFriends, UserProps } from '../../../data'
 import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
 import { Socket } from 'socket.io-client';
+import { reduceLength } from '../../../utils/navigator';
 
 type FriendsProps = {
   socket: Socket,
@@ -72,7 +73,8 @@ export const Friends = ({ socket, friends, currentUser, setPrevChatId, setShowFr
               <p className=''>
                 {
                   (user?.firstName || user?.lastName) 
-                  ? `${user?.firstName} ${user?.lastName}` : user?.email
+                      ? `${reduceLength(user?.firstName, 12)} ${reduceLength(user?.lastName, 10)}` 
+                          : reduceLength(user?.email as string, 15)
                 }
               </p>
               <p 

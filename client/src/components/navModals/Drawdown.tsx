@@ -3,9 +3,9 @@ import { UserProps } from "../../data";
 import { useSelector } from "react-redux";
 import useLogout from "../../hooks/useLogout"
 import { FaTimesCircle } from "react-icons/fa";
-import { ChatOption, Theme, ThemeContextType } from "../../posts";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../hooks/useThemeContext"
+import { ChatOption, Theme, ThemeContextType } from "../../posts";
 import { selectCurrentRoles } from "../../features/auth/authSlice";
 
 type DrawdownProps = {

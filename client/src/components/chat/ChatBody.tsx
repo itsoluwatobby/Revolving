@@ -79,7 +79,7 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
       isMounted = false
     }
   }, [socket, currentChat?._id, dispatch])
-console.log(isConversationState)
+
   const chatContent = (
     messages?.length > 0 ?
     filteredMessages?.map(msg => (
