@@ -1,7 +1,7 @@
 import userService from "./userService.js";
 import { UserModel } from "../models/User.js";
 import messageService from "./messageService.js";
-import { Document, Schema, Types } from "mongoose";
+import { Document, ObjectId, Schema, Types } from "mongoose";
 import { conversationModel } from "../models/Conversations.js";
 import { ConversationModelType, GetConvoType } from "../../types.js";
 
@@ -20,23 +20,19 @@ export class ConversationService {
     const user = await userService.getUserById(userId)
     const partnerUser = await userService.getUserById(partnerId)
     if(!user || !partnerUser) return 'not found'
-    const duplicate = await conversationModel.findOne({"members": {$in: [userId, partnerId]}}).lean()
-    if(duplicate) this.getSingleConversation(userId, duplicate._id as string)
+    const duplicate = await conversationModel.findOne({"members": {$all: [userId, partnerId]}}).lean()
+    if(duplicate) return this.getSingleConversation(userId, duplicate._id as string)
     else{
       return (
         conversationModel.create({
           members: [userId, partnerId], adminId: userId
         })
-        .then(newConversation => {
-          const partnerId = newConversation?.members.filter(id => id.toString() !== userId.toString())
-          return (
-            userService.getUserById(partnerId[0])
-            .then(partnerUser => {
-              const { _id, lastName, firstName, lastSeen, status, lastMessage, displayPicture: { photo } } = partnerUser
-              const user =  { userId: _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: photo }
-              return { ...newConversation, ...user }
-            })
-          )
+        .then(async(newConversation) => {
+          const convo = newConversation as unknown as { _doc: ConversationModelType }
+          await UserModel.findByIdAndUpdate({_id: userId}, {$set: { lastConversationId: convo._doc?._id }})
+          const { _id, lastName, firstName, lastSeen, email, status, lastMessage, displayPicture: { photo } } = partnerUser
+          const user =  { userId: _id, lastName, firstName, lastSeen, email, lastMessage, status, displayPicture: photo }
+          return { ...convo._doc, ...user }
         })
       )
     }
@@ -48,6 +44,7 @@ export class ConversationService {
       .then(() => 'deleted successfully')
     )
   }
+
   public getConversation(conversationId: string){
     return (
       conversationModel.findById({_id: conversationId})
@@ -67,8 +64,8 @@ export class ConversationService {
         return (
           await Promise.all(partnerIds?.map(async(partnerId, i) => {
             const partnerUser = await userService.getUserById(partnerId)
-            const { _id, lastName, firstName, lastSeen, status, lastMessage, displayPicture: { photo } } = partnerUser
-            const user = { userId: _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: photo }
+            const { _id, lastName, firstName, lastSeen, email, status, lastMessage, displayPicture: { photo } } = partnerUser
+            const user = { userId: _id, lastName, firstName, lastSeen, email, lastMessage, status, displayPicture: photo }
             return { ...data[i], ...user }
           }))
         )
@@ -91,8 +88,8 @@ export class ConversationService {
           userService.getUserById(partnerId[0])
           .then(partnerUser => {
             const convo = conversation as unknown as { _doc: ConversationModelType }
-            const { _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: { photo } } = partnerUser
-            const user = { userId: _id, lastName, firstName, lastSeen, lastMessage, status, displayPicture: photo }
+            const { _id, lastName, firstName, lastSeen, email, lastMessage, status, displayPicture: { photo } } = partnerUser
+            const user = { userId: _id, lastName, firstName, lastSeen, email, lastMessage, status, displayPicture: photo }
             return {...convo?._doc, ...user}
           })
         )
@@ -104,11 +101,11 @@ export class ConversationService {
     return (
       conversationModel.findById(conversationId).exec()
       .then(async(conversation) => {
-        if(conversation.adminId.toString() === userId) conversation.membersOpen.adminOpened = true;
-        else if(conversation.adminId.toString() !== userId) conversation.membersOpen.clientOpened = true;
+        if(conversation.adminId.toString() === userId) conversation.membersOpen.adminOpened = false;
+        else if(conversation.adminId.toString() !== userId) conversation.membersOpen.clientOpened = false;
         conversation.isOpened = conversation.membersOpen.adminOpened && conversation.membersOpen.clientOpened;
         await conversation.save()
-        return 'closed'
+        return conversation
       })
     )
   }

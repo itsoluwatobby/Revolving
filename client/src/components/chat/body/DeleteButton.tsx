@@ -13,7 +13,7 @@ type DeleteOptionProp = {
 export const DeleteOptionButton = ({ open, message, currentUser, setOpen, handleDelete }: DeleteOptionProp) => {
 
   return (
-    <div className={`absolute right-0 ${open === 'Open' ? 'scale-100' : 'scale-0'} flex transition-all items-center ${message?.senderId === currentUser?._id ? 'bg-slate-500' : 'bg-slate-600'} gap-0.5 shadow-md rounded-sm`}>
+    <div className={`absolute right-0 ${open === 'Open' ? 'scale-100' : 'scale-0'} flex transition-all items-center font-bold text-black ${message?.senderId === currentUser?._id ? 'bg-slate-200' : 'bg-slate-300'} gap-0.5 shadow-md rounded-sm`}>
       <button 
         onClick={() => handleDelete(message?.isMessageDeleted?.length === 1 ? 'forAll' : 'forMe')}
         className={`text-[10px] hover:opacity-90 hover:bg-gray-400 active:bg-gray-500 p-0.5 px-1 transition-all active:opacity-100 shadow-sm focus:outline-0 border-none rounded-sm`}>
@@ -26,7 +26,7 @@ export const DeleteOptionButton = ({ open, message, currentUser, setOpen, handle
       </button>
       <AiFillCloseSquare
         onClick={() => setOpen('Hide')} 
-        className='text-lg cursor-pointer hover:text-gray-200 active:text-gray-50 transition-all'
+        className='text-lg cursor-pointer hover:text-gray-700 active:text-gray-50 transition-all'
       />
     </div>
   )

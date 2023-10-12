@@ -11,7 +11,7 @@ export const ErrorContent = ({ message, contentLength, errorMsg, position }: Err
   
   return (
     errorMsg?.status ?
-      <p className={`transition-all text-center py-6 font-serif ${position === 'CHAT' ? 'text-[11px]' : position === 'MESSAGE' ? 'mt-8 text-gray-200' : 'text-sm'}`}>
+      <p className={`${position === 'MESSAGE' ? 'm-auto' : 'text-red-500 uppercase absolute bg-gray-50 font-extrabold top-2'} tracking-wide bg-opacity-80 w-56 rounded-sm font-mono transition-all text-center py-6 ${position === 'CHAT' ? 'text-[11px]' : position === 'MESSAGE' ? 'mt-8 text-gray-200' : 'text-sm'}`}>
         {
           (contentLength === 0 || errorMsg?.status == 404 || errorMsg?.status == 400) ? 
             <span className={`${position === 'MESSAGE' ? 'italic' : ''}`}>{message}</span>

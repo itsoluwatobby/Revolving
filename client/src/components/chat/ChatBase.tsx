@@ -72,6 +72,7 @@ export default function ChatBase({ theme, socket, currentChat, messages, editMes
       let messageReply = {} as Omit<MessageModelType, "referencedMessage">
       if(messageResponse){
         const { referencedMessage, ...rest } = messageResponse
+        void(referencedMessage)
         messageReply = rest
       }
       if(!editMessage?._id){
@@ -82,7 +83,7 @@ export default function ChatBase({ theme, socket, currentChat, messages, editMes
         const res = await createMessage(newMessage).unwrap() as unknown as { data: MessageModelType}
         setInput('')
         setMessageResponse(null)
-        socket.emit('create_message', res?.data, async(acknowledgement: any) => {
+        socket.emit('create_message', res?.data, async(acknowledgement: object) => {
           console.log(acknowledgement)
         })
       }

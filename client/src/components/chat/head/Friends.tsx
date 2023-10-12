@@ -1,34 +1,52 @@
-import { useState } from 'react';
 import { format } from 'timeago.js';
+import { useState, useEffect } from 'react';
 import { ErrorContent } from '../../ErrorContent';
 import { IsLoadingSpinner } from '../../IsLoadingSpinner';
 import { ChatOption, ThemeContextType } from '../../../posts'
 import { useThemeContext } from '../../../hooks/useThemeContext';
 import { ErrorResponse, UserFriends, UserProps } from '../../../data'
 import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
+import { Socket } from 'socket.io-client';
 
 type FriendsProps = {
+  socket: Socket,
   friends: UserFriends[],
   currentUser: Partial<UserProps>,
   setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export const Friends = ({ friends, currentUser, setPrevChatId, setShowFriends }: FriendsProps) => {
+export const Friends = ({ socket, friends, currentUser, setPrevChatId, setShowFriends }: FriendsProps) => {
   const { theme, currentChat, setCurrentChat } = useThemeContext() as ThemeContextType
-  const [createConversation, {isLoading}] = useCreateConversationMutation()
+  const [createConversation, {isLoading, isError}] = useCreateConversationMutation()
   const [errorMsg, setErrorMsg] = useState<ErrorResponse>()
 
   const newConversation = (partnerId: string) => {
     if(isLoading) return
     createConversation({userId: currentUser?._id as string, partnerId}).unwrap()
-    .then((res) => {
-      setCurrentChat(res?.data)
-      setPrevChatId(prev => prev?.includes(res?.data?._id) ? [...prev] : [...prev, res?.data?._id])
+    .then((conversation) => {
+      setCurrentChat(conversation?.data)
+      setPrevChatId(prev => (prev?.includes(conversation?.data?._id) ? [...prev] : [...prev, conversation?.data?._id]))
       setShowFriends('Hide')
+      if(conversation?.data?.isOpened) socket.emit('conversation_opened', {
+        conversationId: conversation?.data?._id, isOpened: conversation?.data?.isOpened
+      })
     })
     .catch(error => setErrorMsg(error))
   }
+
+  useEffect(() => {
+    let isMounted = true, timeoutId: NodeJS.Timeout;
+    if(isMounted && errorMsg?.status){
+      timeoutId = setTimeout(() => {
+        setErrorMsg(undefined)
+      }, 5000);
+    }
+    return () => {
+      isMounted = false
+      clearTimeout(timeoutId)
+    }
+  }, [isError, errorMsg?.status])
 
   return (
     <>
@@ -68,7 +86,8 @@ export const Friends = ({ friends, currentUser, setPrevChatId, setShowFriends }:
         ))
       }
       <ErrorContent 
-        message={errorMsg?.message as string} position='CHAT' 
+        // setErrorMsg={setErrorMsg}
+        message={(errorMsg?.message as string) ?? 'An Error occured'} position='CHAT' 
         errorMsg={errorMsg as ErrorResponse} contentLength={friends?.length } 
       />
       {isLoading ? <IsLoadingSpinner page='CHAT' customSize='LARGE' /> : null}

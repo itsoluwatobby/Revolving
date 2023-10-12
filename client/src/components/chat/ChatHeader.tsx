@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { format } from 'timeago.js';
 import { Socket } from 'socket.io-client';
 import { CiSearch } from 'react-icons/ci';
+import { useDispatch } from 'react-redux';
 import { FriendsModal } from './head/FriendsModal';
 import { usePostContext } from '../../hooks/usePostContext';
+import { messageApiSlice, useCloseConversationMutation } from '../../app/api/messageApiSlice';
 import { ChatOption, GetConvoType, PostContextType, Theme, } from '../../posts';
 import { ErrorResponse, SearchStateType, TypingObjType, UserFriends, UserProps } from '../../data';
 
@@ -27,6 +29,8 @@ export default function ChatHeader({
   theme, friends, socket, setPrevChatId, currentChat, isLoading, errorMsg, currentUser, showFriends, messageState, setMessageState, setShowFriends, setOpenChat 
 }: ChatHeaderProp) {
   const { typingObj, setTypingObj } = usePostContext() as PostContextType
+  const [close_Conversation] = useCloseConversationMutation()
+  const dispatch = useDispatch()
 
   const { openSearch, search } = messageState
 
@@ -39,6 +43,15 @@ export default function ChatHeader({
     }
   }, [socket, setTypingObj])
 
+  const closeChat = () => {
+    setOpenChat('Hide')
+    close_Conversation({userId: currentUser?._id as string, conversationId: currentChat?._id}).unwrap()
+    .then(() => {
+      setPrevChatId([])
+      dispatch(messageApiSlice.util.invalidateTags(['CONVERSATIONS', 'MESSAGES']))
+    })
+  }
+
   return (
     <header className={`z-10 flex-none text-white rounded-md h- shadow-lg w-full sticky top-0 ${theme === 'light' ? '' : 'bg-slate-800'}`}>
     
@@ -48,11 +61,15 @@ export default function ChatHeader({
 
           <div className='flex items-end gap-2'>
             <figure className={`rounded-full border border-white bg-slate-700 w-8 h-8 shadow-lg`}>
-              <img 
-                src={currentChat?.displayPicture} 
-                alt={`${currentChat?.firstName}_dp`} 
-                className='h-full w-full object-cover rounded-full mr-2'
-                />
+              {
+                currentChat?.displayPicture ?
+                  <img 
+                    src={currentChat?.displayPicture} 
+                    alt={`${currentChat?.firstName}_dp`} 
+                    className='h-full w-full object-cover rounded-full mr-2'
+                  /> 
+                  : null
+              }
             </figure>
 
             <p 
@@ -76,9 +93,10 @@ export default function ChatHeader({
         </div>
 
         <FriendsModal
+          typingObj={typingObj} theme={theme} friends={friends} 
           showFriends={showFriends} setShowFriends={setShowFriends}
           isLoading={isLoading} errorMsg={errorMsg} currentUser={currentUser} 
-          typingObj={typingObj} theme={theme} friends={friends} setPrevChatId={setPrevChatId}
+          setPrevChatId={setPrevChatId} socket={socket}
         />
 
         <div className='flex items-center gap-3'> 
@@ -96,7 +114,7 @@ export default function ChatHeader({
             Friends
           </button>
           <button 
-            onClick={() => setOpenChat('Hide')}
+            onClick={closeChat}
             className='shadow-lg text-white border border-slate-700 bg-opacity-40 bg-slate-900 cursor-pointer py-0.5 px-1 rounded-md text-sm hover:bg-slate-600 transition-all active:bg-slate-700'>
             close
           </button> 

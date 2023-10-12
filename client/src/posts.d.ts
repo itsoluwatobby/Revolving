@@ -135,6 +135,7 @@ type UpdateSuccess={
 
 type GetConvoType = {
   _id: string, 
+  email: string,
   status: Status,
   lastName: string,
   lastSeen: string,

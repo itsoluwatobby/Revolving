@@ -5,15 +5,17 @@ import { useThemeContext } from '../../../hooks/useThemeContext';
 import { ChatOption, GetConvoType, ThemeContextType } from '../../../posts'
 import { useGetCurrentConversationMutation } from '../../../app/api/messageApiSlice';
 import { UserProps } from '../../../data';
+import { Socket } from 'socket.io-client';
 
 type RecentConversationsProps = {
+  socket: Socket,
   friends: GetConvoType[],
   currentuser: Partial<UserProps>,
   setPrevChatId: React.Dispatch<React.SetStateAction<string[]>>,
   setShowFriends: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export const RecentConversations = ({ friends, currentuser, setPrevChatId, setShowFriends }: RecentConversationsProps) => {
+export const RecentConversations = ({ friends, socket, currentuser, setPrevChatId, setShowFriends }: RecentConversationsProps) => {
   const { theme, currentChat, setCurrentChat, setIsConversationState } = useThemeContext() as ThemeContextType
   const [getConversation, {isLoading, isError}] = useGetCurrentConversationMutation()
 
@@ -22,8 +24,11 @@ export const RecentConversations = ({ friends, currentuser, setPrevChatId, setSh
     getConversation({userId: currentuser?._id as string, conversationId: convoId as string}).unwrap()
     .then((conversation) => {
       setCurrentChat(conversation)
-      setPrevChatId(prev => prev?.includes(convoId) ? [...prev] : [...prev, convoId])
+      setPrevChatId(prev => (prev?.includes(convoId) ? [...prev] : [...prev, convoId]))
       setShowFriends('Hide')
+      if(conversation?.isOpened) socket.emit('conversation_opened', {
+        conversationId: convoId, isOpened: conversation?.isOpened
+      })
     })
     .catch((error) => setIsConversationState(prev => ({...prev, error, isError})))
   }
@@ -35,7 +40,7 @@ export const RecentConversations = ({ friends, currentuser, setPrevChatId, setSh
           <article 
             key={userConvo?._id}
             onClick={() => fetchConversation(userConvo?._id)}
-            className={`p-1 shadow-md flex w-full ${currentChat?._id === userConvo?._id ? 'bg-slate-400' : ''} ${theme === 'light' ? 'bg-slate-100 hover:bg-gray-200 text-black' : 'bg-slate-700 hover:bg-gray-600'} gap-x-2 rounded-md cursor-pointer transition-all`}
+            className={`p-1 shadow-md flex w-full ${currentChat?._id === userConvo?._id ? 'bg-slate-500' : ''} ${theme === 'light' ? 'bg-slate-100 hover:bg-gray-200 text-black' : 'bg-slate-700 hover:bg-gray-600'} gap-x-2 rounded-md cursor-pointer transition-all`}
           >
 
             <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-8 h-8">
@@ -49,8 +54,10 @@ export const RecentConversations = ({ friends, currentuser, setPrevChatId, setSh
             </figure>
 
             <div className='flex-auto flex flex-col'>
-              <p className=''>{userConvo?.firstName} {userConvo?.lastName}
-              </p>
+                {
+                  (userConvo?.firstName || userConvo?.lastName) 
+                  ? `${userConvo?.firstName} ${userConvo?.lastName}` : userConvo?.email
+                }
               <div className='flex items-center gap-1.5'>
                 <p>{reduceLength(userConvo?.lastMessage?.message, 10)}</p>
                 <p 

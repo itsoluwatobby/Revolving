@@ -173,6 +173,7 @@ interface UserProps extends Document{
 
 type SubUser = {
   _id: string, 
+  email: string,
   status: Status,
   subDate: string,
   lastName: string,
@@ -349,6 +350,7 @@ type MessageStatus = 'DELIVERED' | 'READ'
 
 type GetConvoType = {
   _id: string | FlattenMaps<ObjectId>, 
+  email: string,
   status: Status,
   lastName: string,
   lastSeen: string,

@@ -76,24 +76,24 @@ export class UserService {
 
   public async getUserSubscriptions(user: UserProps): Promise<GetSubscriptionType>{
     const subscriptions = await Promise.all(user?.notificationSubscribers?.map(async(sub) => {
-      const { _id, description, status, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(sub?.subscriberId)
-      return { _id, description, status, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: sub?.createdAt }
+      const { _id, description, status, email, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(sub?.subscriberId)
+      return { _id, description, status, email, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: sub?.createdAt }
     })) as SubUser[]
     const subscribed = await Promise.all(user?.subscribed?.map(async(sub) => {
-      const { _id, description, status, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(sub?.subscribeRecipientId)
-      return { _id, description, status, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: sub?.createdAt }
+      const { _id, description, status, email, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(sub?.subscribeRecipientId)
+      return { _id, description, status, email, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: sub?.createdAt }
     })) as SubUser[]
     return { subscriptions, subscribed }
   }
 
   public async getUserFollowers(user: UserProps): Promise<GetFollowsType>{
     const follows = await Promise.all(user?.followings?.map(async(follow) => {
-      const { _id, description, status, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(follow?.followRecipientId)
-      return {_id, description, status, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow?.createdAt }
+      const { _id, description, status, email, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(follow?.followRecipientId)
+      return {_id, description, status, email, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow?.createdAt }
     })) as SubUser[]
     const followers = await Promise.all(user?.followers?.map(async(follow) => {
-      const { _id, description, status, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(follow?.followerId)
-      return { _id, description, status, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow?.createdAt }
+      const { _id, description, status, email, lastSeen, displayPicture: { photo }, firstName, lastName, followers, followings } = await this.getUserById(follow?.followerId)
+      return { _id, description, status, email, lastSeen, displayPicture: photo, firstName, lastName, followers, followings, subDate: follow?.createdAt }
     })) as SubUser[]
     return { follows, followers }
   }

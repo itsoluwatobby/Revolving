@@ -23,7 +23,6 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const searchBar = ['/', `/taskManager/${userId}`]
   const savedDraft = ['/new_story', `/edit_story/${storyId}`]
   
-  console.log(pathname)
   return (
     <div className={`flex-none ${pathname === '/' ? 'md:sticky md:top-0' : ''} flex items-center`}>
       <Link to='/'>

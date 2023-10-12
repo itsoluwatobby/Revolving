@@ -4,7 +4,7 @@ import { ConversationModelType } from "../../types.js";
 const ConversationSchema = new Schema(
   {
     members: {type: Array, default: []},
-    adminId: {type: Schema.Types.ObjectId, ref: 'users', unique: true},
+    adminId: {type: Schema.Types.ObjectId, ref: 'users'},
     isOpened: {type: Boolean, default: false},
     membersOpen: {
       adminOpened: { type: Boolean, default: false },

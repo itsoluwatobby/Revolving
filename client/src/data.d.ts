@@ -258,6 +258,7 @@ type UserFriends = {
 
 type SubUser = {
   _id: string, 
+  email: string,
   status: Status,
   subDate: string,
   lastName: string,
