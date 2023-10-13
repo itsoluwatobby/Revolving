@@ -37,7 +37,7 @@ export const messageApiSlice = apiSlice.injectEndpoints({
     getConversation: builder.query<GetConvoType, {userId: string, conversationId: string}>({
       query: ({userId, conversationId}) => `messages/single_conversation/${userId}/${conversationId}`,
       providesTags: ['CONVERSATIONS'],
-      invalidatesTags: [{ type: 'CONVERSATIONS' }, { type: 'USERS' }],
+      // invalidatesTags: [{ type: 'CONVERSATIONS' }, { type: 'USERS' }],
     }),
 
     getCurrentConversation: builder.mutation<GetConvoType, {userId: string, conversationId: string}>({

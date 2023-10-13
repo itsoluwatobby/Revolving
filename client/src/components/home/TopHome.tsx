@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { ThemeContextType } from '../../posts';
 import { GiHamburgerMenu} from 'react-icons/gi';
-import { useSelector, useDispatch } from 'react-redux';
 import { NAVIGATE } from '../../utils/navigator';
+import { useSelector, useDispatch } from 'react-redux';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { getTabCategory, setNavigation } from '../../features/story/navigationSlice';
 

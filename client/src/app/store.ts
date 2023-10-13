@@ -1,6 +1,5 @@
 import { apiSlice } from './api/apiSlice';
 import { configureStore } from '@reduxjs/toolkit';
-import chatReducer from '../features/chat/chatSlice';
 import userReducer from '../features/auth/userSlice';
 import authReducer from '../features/auth/authSlice';
 import codeReducer from '../features/story/codeSlice';
@@ -17,7 +16,6 @@ export const store = configureStore({
     comment: commentReducer,
     navigate: navigationTabReducer,
     story: storyReducer,
-    chat: chatReducer,
     code: codeReducer,
     task: taskReducer,
     user: userReducer,

@@ -7,6 +7,9 @@ export const WindowScroll = ({ children }: ChildrenProp) => {
         Yscroll: 0
      })
 
+     void(windowSize)
+     void(setWindowSize)
+     
      //const { Xscroll, Yscroll } = windowSize; 
      useEffect(() => {
         const onWindowScroll = () => {

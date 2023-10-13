@@ -24,7 +24,7 @@ export default function EnlargeComment() {
   const [keepPrompt, setKeepPrompt] = useState<PromptLiterals>('Dommant');
   const responseRef = useRef<HTMLTextAreaElement>();
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>();
-
+  void(prompt)
   useEffect(() => {
     let isMounted = true
     isMounted && setTargetComment(data as CommentProps)

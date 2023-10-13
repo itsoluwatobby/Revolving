@@ -1,5 +1,4 @@
 import { Theme } from "../../posts";
-import SkeletonLoading from "./SkeletonLoading";
 
 type SkeletonProfileType = {
   page: 'EDIT'

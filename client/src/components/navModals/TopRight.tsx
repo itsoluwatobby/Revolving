@@ -23,8 +23,8 @@ type TopRightProps = {
   currentUser: UserProps
 }
 export default function TopRight({ currentUser }: TopRightProps) {
-  const [updateStory, {isLoading: isLoadingUpdate, error: updateError, isError: isUpdateError}] = useUpdateStoryMutation()
-  const [createStory, {isLoading: isLoadingCreate, error: createError, isError: isCreateError}] = useCreateStoryMutation()
+  const [updateStory, {isLoading: isLoadingUpdate, error: updateError}] = useUpdateStoryMutation()
+  const [createStory, {isLoading: isLoadingCreate, error: createError}] = useCreateStoryMutation()
   const { theme, codeEditor, editing, openNotification, setOpenChat, setRollout, setOpenNotification, setSuccess, setEditing, setTheme, setIsPresent, setFontOption, setLoginPrompt 
   } = useThemeContext() as ThemeContextType
   const { data } = useGetNotificationQuery(currentUser?._id as string)

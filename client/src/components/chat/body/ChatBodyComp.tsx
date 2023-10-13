@@ -9,7 +9,7 @@ import { ChatOption, GetConvoType } from '../../../posts'
 import { useDeleteMessageMutation } from '../../../app/api/messageApiSlice'
 import { DeleteChatOption, DeleteStatusType, MessageModelType, UserProps } from '../../../data'
 import { ReferencedMessage } from './ReferencedMessage'
-import { checkCount, reduceLength } from '../../../utils/navigator'
+import { reduceLength } from '../../../utils/navigator'
 
 
 type ChatBodyCompProps = {

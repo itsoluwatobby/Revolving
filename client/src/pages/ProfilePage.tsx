@@ -189,8 +189,7 @@ export default function ProfilePage() {
         </section>
 
         <ProfileBase 
-          userStories={userStories as PostType[]} 
-          userProfile={userProfile as UserProps} theme={theme} 
+          userStories={userStories as PostType[]} theme={theme} 
           isStoryLoading={isStoryLoading} isStoryError={isStoryError} 
           storyError={storyError} setRevealEditModal={setRevealEditModal}
         />

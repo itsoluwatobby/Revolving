@@ -1,6 +1,6 @@
 import { Theme } from '../../../posts';
 import { checkCount } from '../../../utils/navigator';
-import { Button, FunctionOption, Position, TaskBin } from '../../../data';
+import { FunctionOption, Position, TaskBin } from '../../../data';
 import { MdOutlineDeleteForever, MdOutlineRestore } from 'react-icons/md';
 
 type BinTopProps = {

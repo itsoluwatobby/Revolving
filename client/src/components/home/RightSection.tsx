@@ -8,7 +8,7 @@ import { useGetStoriesQuery } from "../../app/api/storyApiSlice";
 
 export default function RightSection() {
   const { theme } = useThemeContext() as ThemeContextType
-  const {data, isLoading, error} = useGetStoriesQuery()
+  const {data} = useGetStoriesQuery()
   const [stories, setStories] = useState<PostType[]>([])
 
   useEffect(() => {
