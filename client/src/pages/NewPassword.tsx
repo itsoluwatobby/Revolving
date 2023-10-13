@@ -9,6 +9,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import PasswordInput from "../components/modals/components/PasswordInput";
 
 export default function NewPassword() {
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [confirmPassword, setConfirmPassword] = useState<string>('')
@@ -38,7 +39,9 @@ export default function NewPassword() {
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
-      const msg = errors?.data ? errors?.data?.meta?.message : 'No Network'
+      const msg = errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : (errors?.data ? errors?.data?.meta?.message : 'No Network')
+      setErrorMsg(msg)
       isError && toast.error(`${msg}`, {
         duration: 10000, icon: '💀', style: {
           background: errors?.status == 403 ? 'A6BCE2' : '#FF0000'
@@ -47,7 +50,20 @@ export default function NewPassword() {
     }
   }
 
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if(errorMsg){
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 8000)
+    }
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [errorMsg])
+
   const canSubmit = [password].every(Boolean)
+
   return (
     <section className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-100' : ''}`}>
 
@@ -69,9 +85,16 @@ export default function NewPassword() {
           <button 
             type='submit'
             disabled={!canSubmit && !match && !isLoading}
-            className={`w-[95%] mx-auto mt-2 rounded-sm ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            className={`w-[95%] mx-auto mt-2 rounded-sm ${errorMsg ? 'bg-red-600' : ''}  ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
-            {isSuccess ? 'Reset Successful' : 'Submit'}
+            {
+              errorMsg ? errorMsg 
+                  : (
+                      isLoading ? 'Submitting...' 
+                        : isSuccess ? 'Reset Successful' 
+                            : 'Submit'
+                    )
+            }
           </button>
           <div className='flex flex-col text-sm gap-2'>
             <Link to={'/signIn'}>

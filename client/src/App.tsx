@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import About from "./pages/About";
 import { USERROLES } from "./data";
 import { Home } from "./pages/Home";
@@ -8,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/AdminPage";
 import Followers from "./pages/Followers";
-import { ThemeContextType } from "./posts";
+import { Theme, ThemeContextType } from "./posts";
 import { OTPEntry } from "./pages/OTPEntry";
 import { NewStory } from "./pages/NewStory";
 import LoginModal from "./pages/LoginModal";
@@ -16,7 +15,6 @@ import ProfilePage from "./pages/ProfilePage";
 import NewPassword from "./pages/NewPassword";
 import TaskManager from "./pages/TaskManager";
 import { BsChatTextFill } from 'react-icons/bs';
-import { Routes, Route } from 'react-router-dom';
 import RegisterModal from "./pages/RegisterModel";
 import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
@@ -28,18 +26,31 @@ import SingleStoryPage from "./pages/SingleStoryPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import Notifications from "./components/Notifications";
 import PrompLogin from "./components/modals/PrompLogin";
+import { useCallback, useState, useEffect } from 'react';
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import TypewriterEffect from './components/TypewriterEffect';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { selectCurrentRoles } from "./features/auth/authSlice";
+// import { GiStarShuriken, GiStarSwirl, GiStarsStack } from 'react-icons/gi';
 
 let socket: Socket
 export const App = () => {
+  const { pathname } = useLocation()
   const {theme, openChat, setOpenChat, loginPrompt} = useThemeContext() as ThemeContextType;
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
   const userId = localStorage.getItem('revolving_userId') as string
   const [startTypewriting, setStartTypewriting] = useState<'BEGIN' | 'END'>('END')
+
+  // const designClass = useCallback((theme: Theme, index: number) => {
+  //   const FIRST=[1,2,3,4], SECOND=[5,6,7,8,9], THIRD=[10,11,12,13]
+  //   return (`
+  //     absolute opacity-50 ${FIRST.includes(index) ? `top-${index*20} right-${index*16}` : THIRD.includes(index) ? `bottom-${index*4} left-${index*4}` : SECOND.includes(index) && ''} text-sm
+  //   `)
+  // }, [])
+
+  const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
   useEffect(() => {
     let isMounted = true
@@ -63,7 +74,7 @@ export const App = () => {
   }
 
   return (
-    <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-800 text-white'} h-screen w-full transition-all font-sans overflow-x-hidden`}>
+    <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-950 text-white'} h-screen w-full transition-all font-sans overflow-x-hidden`}>
       <Routes>
 
         <Route path='/' element={<BlogLayout />}>
@@ -111,22 +122,28 @@ export const App = () => {
       <Notifications />
 
       <Toaster />
-      
+      {/* {[...Array(4).keys()].map((index) => <GiStarsStack className={designClass(theme, index)} />)}
+      {[...Array(5).keys()].map((index) => <GiStarShuriken className={designClass(theme, index+4)} />)}
+      {[...Array(4).keys()].map((index) => <GiStarSwirl className={designClass(theme, index+9)} />)} */}
       {
         openChat === 'Open' ?
           // userId ?
           <ChatModal socket={socket} />
         :  
-          <BsChatTextFill
-            title='Chats'
-            onClick={openChatModal}
-            className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
-          />
+         (
+            !exclude.includes(pathname) ? 
+              <BsChatTextFill
+                title='Chats'
+                onClick={openChatModal}
+                className={`fixed bottom-4 right-3 text-4xl cursor-pointer text-gray-700 opacity-95 transition-all ease-in-out hover:text-gray-900  hover:scale-[1.03] active:scale-[1] ${theme == 'light' ? '' : ''}`}
+              />
+            : null
+         )
       }
       <div 
         onClick={() => setStartTypewriting('END')}
         className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
-          <TypewriterEffect text='Please login in' delay={0.4} start={startTypewriting} />
+          <TypewriterEffect delay={0.25} start={startTypewriting} />
       </div>
       {loginPrompt?.opened == 'Open' ? <PrompLogin /> : null}
     </main>

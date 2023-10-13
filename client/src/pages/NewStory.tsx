@@ -1,12 +1,12 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { BiCodeAlt } from 'react-icons/bi';
 import { FaRegImages } from 'react-icons/fa';
-import CodeBlock from '../components/codeEditor/CodeEditor';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePostContext } from '../hooks/usePostContext';
 import { useLocation, useParams } from 'react-router-dom';
 import { Components, NAVIGATE } from '../utils/navigator';
 import { useThemeContext } from '../hooks/useThemeContext';
+import CodeBlock from '../components/codeEditor/CodeEditor';
 import { Categories, ErrorResponse, OpenSnippet } from '../data';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
@@ -22,7 +22,7 @@ export const NewStory = () => {
   const { storyId } = useParams()
   const loading = useSelector(getLoading)
   const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, setCodeStore } = usePostContext() as PostContextType;
-  const [getStoryCond, { data: target, isLoading, isError }] = useGetStoryCondMutation()
+  const [getStoryCond, { data: target, isLoading }] = useGetStoryCondMutation()
   const { theme, isPresent, success, fontFamily, codeEditor, setCodeEditor, setIsPresent, setLoginPrompt, setSuccess } = useThemeContext() as ThemeContextType;
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [inputValue, setInputValue] = useState<string>('');
@@ -175,7 +175,6 @@ export const NewStory = () => {
         // localStorage.setItem('revolving-codeStore', JSON.stringify([...getStore]))
         setCodeStore([])
       }
-
       setInputValue(savedTitle || '')
       setTextareaValue(savedBody || '')
       setTypingEvent(debounceValue?.typing)

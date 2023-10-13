@@ -1,20 +1,15 @@
 import { toast } from 'react-hot-toast';
+import { useState, useEffect } from 'react';
 import { ErrorStyle } from '../utils/navigator';
 import { Link, useParams } from 'react-router-dom';
 import { ErrorResponse, UserProps } from '../data';
-import { ChangeEvent, useState, useEffect } from 'react';
 import { useThemeContext } from '../hooks/useThemeContext';
 import EditUserInputs from '../components/editProfile/EditUserInputs';
-import { ImageTypeProp, TargetImageType, Theme, ThemeContextType } from '../posts';
+import { ImageTypeProp, TargetImageType, ThemeContextType } from '../posts';
 import { useGetUserByIdQuery, useUpdateInfoMutation } from '../app/api/usersApiSlice';
 import { useDeleteImageMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
 
 const initialState = {name: null, data: null}
-type SocialMediaAccoutProp = {
-  name: string,
-  link: string
-}
-
 export default function EditProfilePage() {
   const { userId } = useParams()
   const MAX_SIZE = 1_000_000 as const // 1mb
@@ -60,7 +55,8 @@ export default function EditProfilePage() {
             })
             .catch(error => {
               const errors = error as ErrorResponse
-              toast.error(errors?.message as string, ErrorStyle)
+              toast.error(errors?.status === 'FETCH_ERROR' ?
+              'SERVER ERROR' : errors?.message as string, ErrorStyle)
             })
           }
         })
@@ -68,7 +64,8 @@ export default function EditProfilePage() {
           const errors = error as ErrorResponse
           setImageType('NIL')
           errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-          toast.error(errors?.message as string, ErrorStyle)
+          toast.error(errors?.status === 'FETCH_ERROR' ?
+          'SERVER ERROR' : errors?.message as string, ErrorStyle)
         })
       }
     }

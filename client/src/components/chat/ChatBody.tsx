@@ -39,6 +39,7 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
   useEffect(() => {
     let isMounted = true
     if(isMounted && currentChat?._id && data?.length) setMessages([...data])
+    else if(isMounted && currentChat?._id && !data?.length) setMessages([])
     return () => {
       isMounted = false
     }
@@ -56,19 +57,11 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
     let isMounted = true
     if(isMounted && message?.conversationId === currentChat?._id ) {
       setMessages(prev => ([...prev, message as MessageModelType]));
-      // (async() => {
-      //   await updateMessageStatus({messageId: message?._id, status: 'DELIVERED'})
-      // })()
     }
     return () => {
       isMounted = false
     }
   }, [message, currentChat?._id, setMessages])
-
-  console.log(messages)
-  console.log(currentChat)
-  console.log(isLoading)
-  console.log(data)
 
   useEffect(() => {
     let isMounted = true
@@ -86,7 +79,7 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
       isMounted = false
     }
   }, [socket, currentChat?._id, dispatch])
- 
+
   const chatContent = (
     messages?.length > 0 ?
     filteredMessages?.map(msg => (
@@ -97,7 +90,7 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
     ))
     :
     <ErrorContent 
-      position='MESSAGE' errorMsg={error as ErrorResponse} contentLength={messages?.length} 
+      position='MESSAGE' errorMsg={currentChat?._id ? {status: 400} as ErrorResponse : error as ErrorResponse} contentLength={messages?.length} 
       message={
         currentChat?._id 
             ? 'Start a conversation' 

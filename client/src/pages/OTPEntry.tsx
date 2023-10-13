@@ -36,7 +36,7 @@ export const OTPEntry = () => {
       catch(err){
         const errors = err as ErrorResponse
         setOtp(initialState)
-        isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'SERVER BUSY' : errors?.data?.meta?.message}`, {
+        isError && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'SERVER ERROR' : errors?.data?.meta?.message}`, {
           duration: 10000, icon: '💀', style: {
             background: errors?.status == 403 ? '#FF6600' : '#FF0000',
             color: '#FFFFFF'

@@ -70,9 +70,10 @@ export default function Notifications() {
       <div className={`hidebars flex flex-col gap-2 w-full maxscreen:w-full maxscreen:h-full shadow-md box-border overflow-y-scroll`}>
 
         <div className={`sticky top-0 rounded-sm ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'} flex items-center justify-between z-10 w-full p-2 font-medium`}>
+          
           <span className={`${theme === 'light' ? 'text-black' : 'text-white'}`}>Notifications</span>
-          <div className={`flex items-center gap-4 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
 
+          <div className={`flex items-center gap-4 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
             <FaTrashAlt 
               title='clear notifications'
               onClick={() => deleteNotification()}

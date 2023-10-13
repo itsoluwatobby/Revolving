@@ -17,11 +17,15 @@ const userSlice = createSlice({
     },
     setLoggedInUser: (state, action: PayloadAction<Partial<UserProps>>) => {
       state.user = action.payload
+    },
+    setLogout: (state) => {
+      state.user = {}
+      state.permission = 'AUTHENTICATING'
     }
   }
 })
 
-export const { setGrantedPermission, setLoggedInUser } = userSlice.actions
+export const { setGrantedPermission, setLoggedInUser, setLogout } = userSlice.actions
 export const grantedPermission = (state: RootState) => state.user.permission
 export const getCurrentUser = (state: RootState) => state.user.user
 

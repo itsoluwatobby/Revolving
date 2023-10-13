@@ -7,7 +7,7 @@ import { useThemeContext } from "../../hooks/useThemeContext";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 
 export default function LoginComponent({ 
-  handleSubmit, handleEmail, loading, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot
+  handleSubmit, handleEmail, loading, errorMsg, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot
  }: LoginProps) {
   const {theme} = useThemeContext() as ThemeContextType
   const persistLogin = useSelector(persisted)
@@ -79,9 +79,9 @@ export default function LoginComponent({
             <button 
               type='submit'
               disabled={!canSubmit && !loading}
-              className={`w-[95%] self-center ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center ${errorMsg ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
-              {!loading ? 'Sign In' : 'Signing In...'}
+              {errorMsg ? errorMsg : (!loading ? 'Sign In' : 'Signing In...')}
             </button>
 
             <div className='flex flex-col text-sm gap-2'>
@@ -96,6 +96,7 @@ export default function LoginComponent({
             </div>
 
           </form>
+
       </article>
   )
 }

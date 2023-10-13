@@ -26,7 +26,7 @@ export default function ProfilePage() {
   const [deleteImage, { isLoading: isLoadingDelete }] = useDeleteImageMutation()
   const [upDateUserInfo, { isLoading: isLoadingUpdate }] = useUpdateInfoMutation()
   const { theme, setOpenChat, setLoginPrompt, setRevealEditModal } = useThemeContext() as ThemeContextType
-  const { data: userData, isLoading: isLoadingUserInfo, isError: isErrorUserInfo } = useGetUserByIdQuery(userId as string)
+  const { data: userData, isLoading: isLoadingUserInfo } = useGetUserByIdQuery(userId as string)
   const { data, isLoading: isStoryLoading, isError: isStoryError, error: storyError } =  useGetStoriesWithUserIdQuery(userId as string)
 
   const handleImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -113,7 +113,8 @@ export default function ProfilePage() {
           const errors = error as ErrorResponse
           setImageType('NIL')
           errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-          toast.error(errors?.message as string, ErrorStyle)
+          toast.error(errors?.status === 'FETCH_ERROR' ?
+          'SERVER ERROR' : errors?.message as string, ErrorStyle)
         })
       }
     }

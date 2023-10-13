@@ -1,15 +1,15 @@
+import { useDispatch } from "react-redux";
+import { Socket } from "socket.io-client";
 import { useState, useEffect } from "react";
 import ChatBase from "../../components/chat/ChatBase";
 import ChatBody from "../../components/chat/ChatBody";
 import ChatHeader from "../../components/chat/ChatHeader";
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
 import { useGetUserFriendsQuery } from "../../app/api/usersApiSlice";
-import { messageApiSlice, useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
 import { ChatOption, PostContextType, ThemeContextType } from "../../posts";
-import { Socket } from "socket.io-client";
-import { useDispatch } from "react-redux";
+import { messageApiSlice, useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
+import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
 
 type ChatModalProp = {
   socket: Socket
@@ -62,13 +62,12 @@ export default function ChatModal({ socket }: ChatModalProp) {
     const getCurrentUser = async() => {
       if(!currentUser?.lastConversationId) return setIsConversationState(prev => (
         {...prev, isLoading: false, isError: true, 
-          msg: errors?.originalStatus === 401 
+          msg: errors?.status === 'FETCH_ERROR' ?
+          'SERVER ERROR' :  errors?.originalStatus === 401 
               ? 'Session ended, Please sign in' : 'You have no recent conversation'
         }))
       getConversation({userId: currentUser?._id, conversationId: currentUser?.lastConversationId}).unwrap()
-      .then((conversation) => {
-        setCurrentChat(conversation)
-      })
+      .then((conversation) => setCurrentChat(conversation))
       .catch((err) => {
         const error = err as ErrorResponse
         setErrors(error)
@@ -79,7 +78,7 @@ export default function ChatModal({ socket }: ChatModalProp) {
     return () => {
       isMounted = false
     }
-  }, [currentUser?._id, currentUser?.lastConversationId, errors?.originalStatus, setIsConversationState, currentChat?._id, setCurrentChat, getConversation])
+  }, [currentUser?._id, socket, currentUser?.lastConversationId, errors?.status, errors?.originalStatus, setIsConversationState, currentChat?._id, setCurrentChat, getConversation])
   
   useEffect(() => {
     let isMounted = true
@@ -91,22 +90,9 @@ export default function ChatModal({ socket }: ChatModalProp) {
   
   useEffect(() => {
     let isMounted = true
-    if(isMounted && currentChat?.isOpened) {
-      socket.emit('conversation_opened', {conversationId: currentChat?._id, isOpened: currentChat?.isOpened})
-    }
-    return () => {
-      isMounted = false
-    }
-  }, [socket, currentChat?.isOpened, currentChat?._id])
-  
-  console.log(currentChat)
-  useEffect(() => {
-    let isMounted = true
     if(isMounted) {
       socket.on('conversation_event', (convoEvent: ConversationStatusType) => {
-        console.log(convoEvent)
         if(convoEvent?.conversationId === currentChat?._id && convoEvent?.isOpened){
-          console.log('innnn')
           dispatch(messageApiSlice.util.invalidateTags(['CONVERSATIONS', 'MESSAGES']))
         }
         else return
@@ -116,6 +102,16 @@ export default function ChatModal({ socket }: ChatModalProp) {
       isMounted = false
     }
   }, [socket, dispatch, currentChat?._id])
+
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && currentChat?.isOpened) socket.emit('conversation_opened', {
+      conversationId: currentChat?._id, isOpened: currentChat?.isOpened
+    })
+    return () => {
+      isMounted = false
+    }
+  }, [socket, currentChat?.isOpened, currentChat?._id])
 
   useEffect(() => {
     let isMounted = true
@@ -130,10 +126,10 @@ export default function ChatModal({ socket }: ChatModalProp) {
       <main className="relative flex flex-col w-full h-full">
         <ChatHeader 
           currentChat={currentChat} setPrevChatId={setPrevChatId}
-          messageState={messageState} setMessageState={setMessageState}
           friends={friends as UserFriends[]} errorMsg={errorMsg as ErrorResponse}
+          messageState={messageState} setMessageState={setMessageState} socket={socket}
           isLoading={isLoading} showFriends={showFriends} setShowFriends={setShowFriends}
-          theme={theme} currentUser={currentUser as Partial<UserProps>} setOpenChat={setOpenChat} socket={socket}
+          theme={theme} currentUser={currentUser as Partial<UserProps>} setOpenChat={setOpenChat} 
         />
         <ChatBody 
           messageState={messageState}

@@ -5,14 +5,13 @@ import { useThemeContext } from "./useThemeContext";
 import { signUserOut } from "../features/auth/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSignOutMutation } from "../app/api/authApiSlice";
-import { getCurrentUser } from "../features/auth/userSlice";
+import { setLogout } from "../features/auth/userSlice";
 
 type SignOutType = 'dont' | 'use'
 
 export default function useLogout() {
   const { setRollout, setOpenChat } = useThemeContext() as ThemeContextType
   const currentUserId = localStorage.getItem('revolving_userId') as string
-  const currentUser = useSelector(getCurrentUser)
   const [signedOut] = useSignOutMutation()
   const { pathname } = useLocation()
   const dispatch = useDispatch()
@@ -23,6 +22,7 @@ export default function useLogout() {
       setOpenChat('Hide')
       if(currentUserId) await signedOut(currentUserId as string)
       dispatch(signUserOut())
+      dispatch(setLogout())
       toast.success('Success!! You logged out', {
         duration: 2000, icon: '👋', style: {
           background: '#8FBC8F'

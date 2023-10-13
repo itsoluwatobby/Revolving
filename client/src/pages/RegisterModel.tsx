@@ -12,6 +12,7 @@ export default function RegisterModal() {
   const [username, setUsername] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
   const [validPassword, setValidPassword] = useState<boolean>(false)
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
@@ -62,9 +63,24 @@ export default function RegisterModal() {
     }
     catch(err: unknown){
       const errors = error as ErrorResponse
-      isError && toast.error(`${errors?.data?.meta?.message}`, ErrorStyle)
+      const message = errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : errors?.data?.meta?.message
+      setErrorMsg(message)
+      isError && toast.error(`${message}`, ErrorStyle)
     }
   }
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if(errorMsg){
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 8000)
+    }
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [errorMsg])
 
   return (
     <div 
@@ -73,7 +89,7 @@ export default function RegisterModal() {
       <RegistrationForm 
         handleSubmit={handleSubmit} handleEmail={handleEmail} handleUsername={handleUsername} 
         username={username} email={email} password={password} match={match} 
-        confirmPassword={confirmPassword} handlePassword={handlePassword} 
+        confirmPassword={confirmPassword} handlePassword={handlePassword} errorMsg={errorMsg}
         handleConfirmPassword={handleConfirmPassword} revealPassword={revealPassword} 
         setRevealPassword={setRevealPassword} validEmail={validEmail} validPassword={validPassword} 
         loading={isLoading} setValidEmail={setValidEmail} setValidPassword={setValidPassword} 

@@ -38,7 +38,7 @@ export class ServerMiddlewares{
     this.io = new Server(this.server, {
       pingTimeout: 120000,
       cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.REDIRECTLINK,
         methods: ['POST', 'GET']
       }
     })

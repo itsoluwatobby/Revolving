@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../../data";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useForgotPasswordMutation } from "../../app/api/authApiSlice";
 
 type ForgotProps={
@@ -9,6 +9,7 @@ type ForgotProps={
 }
 
 export default function ForgotPassword({ setForgot }: ForgotProps) {
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const themeMode = localStorage.getItem('theme')
   const [forgotPassword, {isLoading, error, isError, isSuccess}] = useForgotPasswordMutation()
@@ -29,7 +30,9 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
     }
     catch(err: unknown){
       const errors = error as ErrorResponse;
-      isError && toast.error(`${errors?.data?.meta?.message}`, {
+      const message = errors?.data?.meta?.message
+      setErrorMsg(message)
+      isError && toast.error(`${message}`, {
         duration: 10000, icon: '💀', style: {
           background: errors?.status == 403 ? 'A6BCE2' : '#FF0000'
         }
@@ -37,6 +40,18 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
     }
   }
   
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if(errorMsg){
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 8000)
+    }
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [errorMsg])
+
   const canSubmit = Boolean(email)
 
   return (
@@ -60,9 +75,16 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
           <button 
             type='submit'
             disabled={!canSubmit && !isLoading}
-            className={`w-[95%] self-center ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}  rounded-sm p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            className={`w-[95%] self-center ${errorMsg ? 'bg-red-600' : ''} ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}  rounded-sm p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
-            {isLoading ? 'Requesting...' : isSuccess ? 'Link sent to mail' : 'Request'}
+            {
+              errorMsg ? errorMsg 
+                  : (
+                      isLoading ? 'Requesting...' 
+                          : isSuccess ? 'Link sent to mail' 
+                              : 'Request'
+                    )
+            }
           </button>
           <div className='flex flex-col p-2 pt-0 pb-0 text-sm gap-2'>
             <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2 w-fit'

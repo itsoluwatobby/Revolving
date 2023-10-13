@@ -1,15 +1,17 @@
-import { CiSearch } from "react-icons/ci"
-import { useState, useEffect, useRef } from "react"
-import { ErrorContent } from "../../ErrorContent"
 import { Friends } from "./Friends"
-import { ChatOption, GetConvoType, Theme } from "../../../posts"
+import { CiSearch } from "react-icons/ci"
+import { Socket } from "socket.io-client"
+import { ErrorContent } from "../../ErrorContent"
+import { useState, useEffect, useRef } from "react"
 import SkeletonChats from "../../skeletons/SkeletonChats"
-import { ErrorResponse, TypingObjType, UserFriends, UserProps } from "../../../data"
-import { useGetConversationsQuery } from "../../../app/api/messageApiSlice"
 import { RecentConversations } from "./RecentConversations"
+import { ChatOption, GetConvoType, Theme } from "../../../posts"
+import { useGetConversationsQuery } from "../../../app/api/messageApiSlice"
+import { ErrorResponse, TypingObjType, UserFriends, UserProps } from "../../../data"
 
 type FriendsModalType = {
   theme: Theme,
+  socket: Socket,
   isLoading: boolean,
   friends: UserFriends[],
   showFriends: ChatOption,
@@ -27,10 +29,10 @@ type ChatStateType = {
 }
 
 const initChatState = { toggleView: 'Friends' as Option, openSearch: 'Hide' as ChatOption }
-export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg, currentUser, setShowFriends, setPrevChatId }: FriendsModalType) => {
+export const FriendsModal = ({ theme, socket, showFriends, friends, isLoading, errorMsg, currentUser, setShowFriends, setPrevChatId }: FriendsModalType) => {
   const [chatState, setChatState] = useState<ChatStateType>(initChatState)
   const [filteredFriends, setFilteredFriends] = useState<(UserFriends | GetConvoType)[]>([])
-  const { data: recentConversations, isLoading: loading, error } = useGetConversationsQuery(currentUser?._id as string)
+  const { data: recentConversations } = useGetConversationsQuery(currentUser?._id as string)
   const [search, setSearch] = useState<string>('')
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -96,11 +98,13 @@ export const FriendsModal = ({ theme, showFriends, friends, isLoading, errorMsg,
             (  
               toggleView === 'Friends' ?
                 <Friends 
+                  socket={socket}
                   friends={filteredFriends} currentUser={currentUser} 
                   setShowFriends={setShowFriends} setPrevChatId={setPrevChatId}
                 />
                 :    
                 <RecentConversations 
+                  socket={socket}
                   setShowFriends={setShowFriends} currentuser={currentUser}
                   friends={filteredFriends as GetConvoType[]} setPrevChatId={setPrevChatId}
                 />    

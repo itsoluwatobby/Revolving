@@ -37,7 +37,7 @@ export const messageApiSlice = apiSlice.injectEndpoints({
     getConversation: builder.query<GetConvoType, {userId: string, conversationId: string}>({
       query: ({userId, conversationId}) => `messages/single_conversation/${userId}/${conversationId}`,
       providesTags: ['CONVERSATIONS'],
-      invalidatesTags: [{ type: 'USERS' }],
+      invalidatesTags: [{ type: 'CONVERSATIONS' }, { type: 'USERS' }],
     }),
 
     getCurrentConversation: builder.mutation<GetConvoType, {userId: string, conversationId: string}>({
@@ -45,16 +45,16 @@ export const messageApiSlice = apiSlice.injectEndpoints({
       transformResponse: (baseQueryReturnValue: {data: GetConvoType}) => {
         return baseQueryReturnValue?.data
       },
-      invalidatesTags: [{ type: 'USERS' }],
+      invalidatesTags: [{ type: 'CONVERSATIONS' }, { type: 'USERS' }],
     }),
     
-    closeConversation: builder.mutation<string, {userId: string, conversationId: string}>({
+    closeConversation: builder.mutation<GetConvoType, {userId: string, conversationId: string}>({
       query: ({userId, conversationId}) => ({
         url: `messages/close_conversation/${userId}/${conversationId}`,
         method: 'PATCH',
         body: conversationId
       }),
-      invalidatesTags: ['CONVERSATIONS'],
+      invalidatesTags: [{ type: 'CONVERSATIONS' }],
     }),
 
     // messages

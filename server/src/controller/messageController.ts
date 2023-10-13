@@ -29,7 +29,7 @@ class MessageConversationController {
         if(typeof data === 'string') return responseType({res, status: 400})
         return responseType({res, status: 200, message: 'conversation created', data})
       })
-      .catch(() => responseType({res, status: 400, message: 'mongo error: failed to create conversation'}))
+      .catch((error) => responseType({res, status: 400, message: error.message}))
     })
   }
 
@@ -70,7 +70,7 @@ class MessageConversationController {
       const { userId, conversationId } = req.params
       if(!conversationId) return responseType({res, status: 406, message: statuses['406']})
       this.conversationService.closeConversation (userId, conversationId)
-      .then(() => responseType({res, status: 200, message: 'conversation close'}))
+      .then((conversation) => responseType({res, status: 200, message: 'conversation close', data: conversation}))
       .catch(() => responseType({res, status: 400, message: 'mongo error: failed to get conversation'}))
     })
   }

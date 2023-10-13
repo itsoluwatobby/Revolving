@@ -15,9 +15,9 @@ type FollowsCompProps = {
  }
 
 export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg }: FollowsCompProps) {
-  const sortedFollowers = yourFollowers?.followers?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate))
-  const sortedFollows = yourFollowers?.follows?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate))
-
+  const sortedFollowers = yourFollowers?.followers ? [...yourFollowers.followers]?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate)) : []
+  const sortedFollows = yourFollowers?.follows ? [...yourFollowers.follows]?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate)) : []
+  
   return (
     <section className='flex justify-between maxscreen:flex-col p-1 h-full w-full transition-all'>
 
@@ -28,9 +28,9 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
             isLoading ?
               <SkeletonSubscription />
             :
-              yourFollowers?.followers.length ?  
+              yourFollowers?.followers?.length ?  
                 sortedFollowers?.map(follower => (
-                  <div 
+                 <div 
                     key={follower?._id}
                     className={`p-1.5 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-700'} gap-x-2 rounded-md`}
                   >
@@ -47,8 +47,15 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
 
                     <div className='flex-auto flex flex-col'>
                       <Link to={`/profile/${follower?._id}`}>
-                        <p className='hover:underline underline-offset-2 cursor-pointer'>{follower?.firstName} {follower?.lastName}
-                        </p>
+                        {
+                          (follower?.firstName || follower?.lastName) ?
+                            <p className='hover:underline underline-offset-2 cursor-pointer'>{follower?.firstName} {follower?.lastName}
+                            </p>
+                          :
+                            <p className='hover:underline underline-offset-2 cursor-pointer'>
+                              {follower?.email?.split('@')[0]}
+                            </p>
+                        }
                       </Link>
                       <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength(follower?.description, 30, 'letter')}</p>
                       <div className='flex items-center gap-3'>
@@ -58,7 +65,7 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                     </div>
 
                     <div className='flex flex-col justify-between'>
-                      <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follower?.subDate)}</p>
+                      <p className={`pb-1.5 text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follower?.subDate)}</p>
                       <FollowUnFollow userId={follower?._id} position={['followPage']} />
                     </div>
 
@@ -95,8 +102,15 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
 
                     <div className='flex-auto flex flex-col'>
                       <Link to={`/profile/${follow?._id}`}>
-                        <p className='hover:underline underline-offset-2 cursor-pointer'>{follow?.firstName} {follow?.lastName}
-                        </p>
+                        {
+                          (follow?.firstName || follow?.lastName) ?
+                            <p className='hover:underline underline-offset-2 cursor-pointer'>{follow?.firstName} {follow?.lastName}
+                            </p>
+                          :
+                            <p className='hover:underline underline-offset-2 cursor-pointer'>
+                              {follow?.email?.split('@')[0]}
+                            </p>
+                        }
                       </Link>
                       <p className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{reduceLength(follow?.description, 30, 'letter')}</p>
                       <div className='flex items-center gap-2 w-full'>
@@ -105,9 +119,9 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                       </div>
                     </div>
 
-                      <div className='flex flex-col'>
+                      <div className='flex flex-col justify-between'>
                         <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follow?.subDate)}</p>
-                        <button>not following</button>
+                        <FollowUnFollow userId={follow?._id} position={['followPage']} />
                       </div>
 {/* FOLLOW BACK BUTTON */}
                   </div>

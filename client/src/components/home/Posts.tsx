@@ -10,7 +10,7 @@ import { usePostContext } from '../../hooks/usePostContext';
 import { useThemeContext } from '../../hooks/useThemeContext';
 // import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { getTabCategory } from '../../features/story/navigationSlice';
-import { PostContextType, PostType, ThemeContextType } from '../../posts'
+import { PostContextType, PostFeedType, PostType, ThemeContextType } from '../../posts'
 import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import useRevolvingObserver from '../../hooks/useRevolvingObserver';
@@ -26,16 +26,13 @@ export const Posts = () => {
   })
   const [reloadCount, setReloadCount] = useState<number>(0)
     //  page: pageQuery?.page, limit: pageQuery?.limit
-  const { filteredStories, setNavPosts } = usePostContext() as PostContextType
+  const { filteredStories, setNavPosts, search } = usePostContext() as PostContextType
   const { setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
-  //const filteredFeeds = useRevolvingPostFeed(filteredStories, filteredStories) as PostType[]
+  // const filteredFeeds = useRevolvingPostFeed(filteredStories) as PostFeedType
   const { isIntersecting, observerRef } = useRevolvingObserver({screenPosition: '0px', threshold: 0.5})
   const { isIntersecting: isIntersecting1, observerRef: observerRef1 } = useRevolvingObserver({screenPosition: '0px', threshold: 0})
   const totalPages = 6 as const
-
-console.log({isIntersecting})
-console.log({isIntersecting1})
 
   useEffect(() => {
     let isMounted = true
@@ -43,14 +40,12 @@ console.log({isIntersecting1})
       setPageQuery(prev => ({
         ...prev, 
         page: prev?.page < totalPages ? prev?.page + 1 : prev?.page, 
-        // limit: prev?.page < totalPages ? prev?.limit + 10 : prev?.limit
       }))
     }
     else if(isMounted && isIntersecting1 === 'INTERSECTING'){
       setPageQuery(prev => ({
         ...prev, 
         page: (prev?.page >= 1 && prev?.page !== 1) ? prev?.page - 1 : prev?.page, 
-        // limit: (prev?.page >= 1 && prev?.page !== 1) ?  prev?.limit - 10 : prev?.limit
       }))
     }
 
@@ -94,8 +89,12 @@ console.log({isIntersecting1})
   }, [data])
 
   useEffect(() => {
-    // mutate()
-    setNavPosts(data as PostType[])
+    let isMounted = true
+    if(isMounted && data?.length) setNavPosts(data as PostType[])
+    if(isMounted && !data?.length) setNavPosts([])
+    return () => {
+      isMounted = false
+    }
   }, [getNavigation, data, setNavPosts])
 
   let content;
@@ -111,7 +110,9 @@ console.log({isIntersecting1})
         <span>
           {errorMsg?.status == 404 ? 
               'No Story Avaialable' 
-                  : 'Network Error, Please check your connection'
+                  : errorMsg?.status === 'FETCH_ERROR' ?
+                      'SERVER ERROR'
+                      : 'Network Error, Please check your connection'
           }
         </span>
         {errorMsg?.status == 404 ? 
@@ -119,7 +120,7 @@ console.log({isIntersecting1})
           :
           <RiSignalWifiErrorLine className='text-6xl text-gray-600' />
         }
-      </p> 
+      </p>
     ) : (
       filteredStories?.length ? content = (
         filteredStories?.map(post => (
@@ -128,7 +129,9 @@ console.log({isIntersecting1})
             />
           )
         )
-      ) : null
+      ) : content = (
+        <h3 className='m-auto text-2xl capitalize'>Story with name <span className='uppercase text-gray-600'>{search}</span> not found</h3>
+      )
     )
 
   return (

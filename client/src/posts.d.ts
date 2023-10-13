@@ -45,6 +45,7 @@ type PostType = {
 // interface WindowScrollType{
 //   Xscroll: number, Yscroll: number
 // }
+type PostFeedType = { filteredFeeds: PostType[], isLoading: boolean }
 
 type ImageType = {
   imageId: string,
@@ -135,6 +136,7 @@ type UpdateSuccess={
 
 type GetConvoType = {
   _id: string, 
+  email: string,
   status: Status,
   lastName: string,
   lastSeen: string,

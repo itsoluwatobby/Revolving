@@ -32,7 +32,7 @@ export default function LikeStory({ story }: LikeStoryProps) {
     catch(err: unknown){
       const errors = isLikeError ? likeError as Partial<ErrorResponse> : sharedLikeError as Partial<ErrorResponse>
       (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null;
-      (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, {
+      (isLikeError || isSharedLikeError) && toast.error(`${errors?.status == 'FETCH_ERROR' ? 'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)}`, {
         duration: 2000, icon: '💀', style: {
           background: '#FF0000'
         }

@@ -61,13 +61,18 @@ export default function TaskManager() {
   ) : isError ? taskContent = (
     <p className='text-center mt-5 text-sm whitespace-pre-wrap'>
     {
+      errorMsg?.status === 'FETCH_ERROR' ?
+        <span>SERVER ERROR</span> 
+        : 
       errorMsg?.status == 404 ? 
         <span className='flex flex-col gap-2 font-serif'>
           <small>No Tasks</small>
         </span> 
-        : errorMsg?.status == 401 ? 
+        : 
+      errorMsg?.status == 401 ? 
         <span>Please login, Session ended</span>
-        :  <span>Network Error, Please check your connection</span>
+        : 
+        <span>Network Error, Please check your connection</span>
       }
     </p>
   ) : taskContent = (

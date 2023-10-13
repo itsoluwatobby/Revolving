@@ -51,7 +51,8 @@ export default function CommentBody({ openComment, setOpenComment }: CommentBody
     catch(err){
       const errors = (errorComment as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-      isErrorComment && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+      isErrorComment && toast.error(`${errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)}`, ErrorStyle)
     }
   }
 
@@ -122,11 +123,13 @@ export default function CommentBody({ openComment, setOpenComment }: CommentBody
   : isError ? commentContent = (
     <p className='text-center mt-10 text-sm'>
       {
-        errorMsg?.status == 404 ? 
-          <span className='flex flex-col gap-2 font-serif'>
-            <small>No comments yet</small>
-            <small>Say something to start the converstion</small>
-          </span> 
+        errorMsg?.status === 'FETCH_ERROR' ?
+          <span>SERVER ERROR</span> 
+          : errorMsg?.status == 404 ? 
+            <span className='flex flex-col gap-2 font-serif'>
+              <small>No comments yet</small>
+              <small>Say something to start the converstion</small>
+            </span> 
           : 
           <span>Network Error, Please check your connection</span>
         }
