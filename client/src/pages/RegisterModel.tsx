@@ -7,6 +7,7 @@ import { ErrorStyle, SuccessStyle } from '../utils/navigator';
 import { ConfirmationMethodType, ErrorResponse } from '../data';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import RegistrationForm from '../components/modals/RegistrationForm';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 export default function RegisterModal() {
   const [username, setUsername] = useState<string>('')
@@ -71,7 +72,7 @@ export default function RegisterModal() {
   }
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: TimeoutId
     if(errorMsg){
       setTimeout(() => {
         setErrorMsg('')

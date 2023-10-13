@@ -1,12 +1,13 @@
 import { ThemeContextType } from "../posts";
 import { useEffect, useState } from 'react';
+import { FaTrashAlt } from "react-icons/fa";
 import { ErrorContent } from "./ErrorContent";
 import { useThemeContext } from "../hooks/useThemeContext";
-import { useDeleteNotificationMutation, useGetNotificationQuery } from "../app/api/noficationSlice";
 import NotificationComp from "./notifications/NotificationComp";
+import useRevolvingObserver from "../hooks/useRevolvingObserver";
 import SkeletonNotification from "./skeletons/SkeletonNotification";
 import { ErrorResponse, NotificationBody, NotificationModelType } from "../data";
-import { FaTrashAlt } from "react-icons/fa";
+import { useDeleteNotificationMutation, useGetNotificationQuery } from "../app/api/noficationSlice";
 
 export default function Notifications() {
   const userId =  localStorage.getItem('revolving_userId') as string
@@ -16,6 +17,7 @@ export default function Notifications() {
   const [notificationIds, setNotificationIds] = useState<string[]>([])
   const [notifications, setNotifications] = useState<NotificationModelType>()
   const [deleteErrorMsg, setDeleteErrorMsg] = useState<string>()
+  const {isIntersecting, observerRef} = useRevolvingObserver({screenPosition: '0px', threshold: 0.8})
   const [delete_all_notifications, { isLoading: isDeleteLoading, isError, error: deleteError }] = useDeleteNotificationMutation()
 
   const deleteNotification = async(notificationId?: string) => {
@@ -29,6 +31,16 @@ export default function Notifications() {
       setDeleteErrorMsg(errors?.message ?? 'An error occurred')
     }
   }
+
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && isIntersecting === 'NOT_INTERSECTING' && openNotification === 'Open'){
+      setOpenNotification('Hide')
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [isIntersecting, setOpenNotification, openNotification])
 
   useEffect(() => {
     let isMounted = true, timeoutId: NodeJS.Timeout;
@@ -66,10 +78,12 @@ export default function Notifications() {
 
   return (
     <div
-      className={`${openNotification === 'Open' ? 'flex max-h-96 w-80 maxmobile:w-[75%]' : 'scale-0 w-0 h'} ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'} justify-between maxscreen:flex-col p-1 rounded-md transition-all duration-300 absolute right-2 top-11 z-40 bg-slate-00 border-4 border-slate-400 border-t-0 border-l-0 border-r-0 border-b-4`}>
+      ref={observerRef as React.LegacyRef<HTMLDivElement>}
+      key={'Notification'}
+      className={`${openNotification === 'Open' ? 'flex max-h-96 w-80 maxmobile:w-[75%]' : 'scale-0 w-0 h'} ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'} transition-all justify-between maxscreen:flex-col p-1 rounded-md duration-300 absolute right-2 top-11 z-40 bg-slate-00 border-4 border-slate-400 border-t-0 border-l-0 border-r-0 border-b-4`}>
       <div className={`hidebars flex flex-col gap-2 w-full maxscreen:w-full maxscreen:h-full shadow-md box-border overflow-y-scroll`}>
 
-        <div className={`sticky top-0 rounded-sm ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'} flex items-center justify-between z-10 w-full p-2 font-medium`}>
+        <div className={`sticky top-0 rounded-sm flex items-center justify-between z-10 w-full p-2 ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'} transition-colors font-medium`}>
           
           <span className={`${theme === 'light' ? 'text-black' : 'text-white'}`}>Notifications</span>
 

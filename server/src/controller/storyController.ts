@@ -6,7 +6,7 @@ import { UserService } from "../services/userService.js";
 import { StoryService } from "../services/StoryService.js";
 import NotificationController from "./notificationController.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
-import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, pagination, responseType } from "../helpers/helper.js";
 import { NewStoryNotificationType, RequestStoryProp, StoryProps, UserProps } from "../../types.js";
 
 class StoryController {
@@ -41,7 +41,7 @@ class StoryController {
         await NotificationController.addToNotification(userId, notiStory, 'NewStory')
         return responseType({res, status: 201, count:1, data: story})
       })
-      .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+      .catch((error) => responseType({res, status: 404, message: `DB ERROR: ${error.message}`}))
     })
   }
 
@@ -174,7 +174,7 @@ class StoryController {
   */
   public getStoryByCategory(req: RequestStoryProp, res: Response){
     asyncFunc(res, () => {
-      const {category} = req.query
+      const {category, page, limit} = req.query
       if(!category) return res.sendStatus(400);
       this.redisClientService.getCachedResponse({key:`story:${category}`, cb: async() => {
         const categoryStory = await StoryModel.find({category: {$in: [category]}})
@@ -195,6 +195,33 @@ class StoryController {
       }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
     })
   }
+  
+  // public get_test_Story_By_Category(req: RequestStoryProp, res: Response){
+  //   asyncFunc(res, async() => {
+  //     const {category, page, limit} = req.query
+  //     if(!category) return res.sendStatus(400);
+  //     const pageNum = Number(page), limitNum = Number(limit)
+  //     pagination({ page: pageNum, limit: limitNum, Models: StoryModel, callback: async() => {
+  //       this.redisClientService.getCachedResponse({key:`story:${category}`, cb: async() => {
+  //         const categoryStory = await StoryModel.find({category: {$in: [category]}})
+  //         const sharedCategoryStory = await this.sharedStoryService.getAllSharedByCategories(category as string)
+  //         const reMouldedSharedStory = sharedCategoryStory.map(share => {
+  //           const storyObject = {
+  //             ...share.sharedStory, sharedId: share?._id, sharedLikes: share?.sharedLikes,
+  //             sharerId: share?.sharerId, sharedDate: share?.createdAt, sharedAuthor: share?.sharedAuthor
+  //           }
+  //           return storyObject
+  //         })
+  //         const refactoredModel = [...categoryStory, ...reMouldedSharedStory]
+  //         return refactoredModel
+  //       }, reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] })
+  //     }, query: 'hello' })
+  //     .then((result) => {
+  //       if(!result?.data?.length) return responseType({res, status: 404, message: 'You have no stories'});
+  //       return responseType({res, status: 200, pages: result?.pageable, data: result?.data})
+  //     }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+  //   })
+  // }
 
    /**
    * @description fetches all stories

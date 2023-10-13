@@ -1,5 +1,5 @@
 import { toast } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ThemeContextType } from "../posts";
 import { useThemeContext } from "./useThemeContext";
 import { signUserOut } from "../features/auth/authSlice";

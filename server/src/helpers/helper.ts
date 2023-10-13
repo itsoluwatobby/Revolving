@@ -1,8 +1,10 @@
 import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken'
-import { ClaimProps, ObjectUnknown, PageRequest, PagesType, ResponseType, StoryProps, USERROLES } from '../../types.js';
+import { ClaimProps, ObjectUnknown, PaginationType, ResponseType, StoryProps, USERROLES } from '../../types.js';
 import { Response } from 'express';
 import { TaskBinModel } from '../models/TaskManager.js';
+import { Model, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 type ReqOpt = {
   mtd: string,
@@ -124,35 +126,50 @@ export const asyncFunc = (res: Response, callback: () => void) => {
   }
 }
 
-export async function pagination({startIndex=1, endIndex=1, page=1, limit=1, cb}) {
+type ModelType<T> = Model<T, {}, {}, {}, Document<unknown, {}, T> & T & {
+  _id: Types.ObjectId;
+}, any>
 
-  const pages = {} as PagesType;
-  try{
-    const parsedObject = await cb() as StoryProps[] | string;
-    
-    if(parsedObject?.length){
-      if(endIndex < parsedObject?.length){
-        pages.next = {
-          page: +page + 1,
-          limit: +limit
-        }
-      }
+type FuncArgsType = { 
+  skip: number, 
+  limit: number, 
+  query?: string 
+}
 
-      if(startIndex > 0){
-        pages.previous = {
-          page: +page - 1,
-          limit: +limit
-        }
-      }
-      const result = parsedObject as StoryProps[] 
-      return {pages, result}
-    }
-    const result = parsedObject as string
-    return result
+type PageRequest<T, K> = {
+  itemsLength: number, 
+  Models: ModelType<T>, 
+  callback: () => Promise<T[]>, 
+  // callback: ({skip, limit, query}: FuncArgsType) => T[], 
+  query?: string
+  page: number,
+  limit: number,
+}
+
+export const pagination = async<T, K>({page, limit, Models, callback, query='nil'}: PageRequest<T, K>) => {
+  
+  const count = limit
+  const currentPage = page
+  const startIndex = (currentPage * count) - count 
+  const resultLength = await Models.find().count()
+  const data  = await callback()
+  // const data = await Models.find().skip(startIndex).limit(count)
+  // {skip: startIndex, limit: count, query}
+
+  const total = Math.ceil(resultLength / count)
+  const pageable = {
+    pages: {
+      previous: (currentPage === 1 || currentPage > total || currentPage < 1) ? 'Non' : currentPage - 1,
+      currentPage,
+      next: (currentPage === total || currentPage > total || currentPage < 1) ? 'Non' : currentPage + 1,
+    },
+    count: data?.length,
+    pagesLeft: (currentPage > total || currentPage < 1) ? 'Non' : total - currentPage,
+    numberOfPages: total,
   }
-  catch(error){
-    console.log(error)
-  }
+  // if(currentPage > total || currentPage < 1) 
+  // return { message: currentPage < 1 ? 'Pages starts from 1' : 'Pages exceeded', pageable }
+  return { pageable, data };
 }
 
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
@@ -161,7 +178,6 @@ function timeConverterInMillis() {
   const minute = 60 * 1000
   const hour = minute * 60
   const day = hour * 24
-
   return {minute, hour, day}
 }
 

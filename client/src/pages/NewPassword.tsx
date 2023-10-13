@@ -7,6 +7,7 @@ import { useThemeContext } from "../hooks/useThemeContext";
 import { useNewPasswordMutation } from "../app/api/authApiSlice";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import PasswordInput from "../components/modals/components/PasswordInput";
+import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 
 export default function NewPassword() {
   const [errorMsg, setErrorMsg] = useState<string>('')
@@ -51,7 +52,7 @@ export default function NewPassword() {
   }
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: TimeoutId
     if(errorMsg){
       setTimeout(() => {
         setErrorMsg('')

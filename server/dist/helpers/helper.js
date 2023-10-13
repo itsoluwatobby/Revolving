@@ -111,35 +111,29 @@ export const asyncFunc = (res, callback) => {
         res.sendStatus(500);
     }
 };
-export function pagination({ startIndex = 1, endIndex = 1, page = 1, limit = 1, cb }) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const pages = {};
-        try {
-            const parsedObject = yield cb();
-            if (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length) {
-                if (endIndex < (parsedObject === null || parsedObject === void 0 ? void 0 : parsedObject.length)) {
-                    pages.next = {
-                        page: +page + 1,
-                        limit: +limit
-                    };
-                }
-                if (startIndex > 0) {
-                    pages.previous = {
-                        page: +page - 1,
-                        limit: +limit
-                    };
-                }
-                const result = parsedObject;
-                return { pages, result };
-            }
-            const result = parsedObject;
-            return result;
-        }
-        catch (error) {
-            console.log(error);
-        }
-    });
-}
+export const pagination = ({ page, limit, Models, callback, query = 'nil' }) => __awaiter(void 0, void 0, void 0, function* () {
+    const count = limit;
+    const currentPage = page;
+    const startIndex = (currentPage * count) - count;
+    const resultLength = yield Models.find().count();
+    const data = yield callback();
+    // const data = await Models.find().skip(startIndex).limit(count)
+    // {skip: startIndex, limit: count, query}
+    const total = Math.ceil(resultLength / count);
+    const pageable = {
+        pages: {
+            previous: (currentPage === 1 || currentPage > total || currentPage < 1) ? 'Non' : currentPage - 1,
+            currentPage,
+            next: (currentPage === total || currentPage > total || currentPage < 1) ? 'Non' : currentPage + 1,
+        },
+        count: data === null || data === void 0 ? void 0 : data.length,
+        pagesLeft: (currentPage > total || currentPage < 1) ? 'Non' : total - currentPage,
+        numberOfPages: total,
+    };
+    // if(currentPage > total || currentPage < 1) 
+    // return { message: currentPage < 1 ? 'Pages starts from 1' : 'Pages exceeded', pageable }
+    return { pageable, data };
+});
 function timeConverterInMillis() {
     const minute = 60 * 1000;
     const hour = minute * 60;

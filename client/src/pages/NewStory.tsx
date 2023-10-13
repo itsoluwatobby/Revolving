@@ -156,13 +156,13 @@ export const NewStory = () => {
       const savedTitle = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
       const savedBody = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : (localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body)
       const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
-      if(targetStory?.code?.length){
+      if(targetStory?.code?.length || getStore?.length){ 
         const putInStore = targetStory?.code?.map(code => {
           return { 
             langType: code?.language, code: code?.body, 
             codeId: nanoid(8), date: code?.createdAt 
           }
-        })
+        }) ?? getStore
         const codeBodies = putInStore?.map(code => code?.code)
         const isPresent = getStore?.find(code => codeBodies?.includes(code?.code as string))
         if(!isPresent){
@@ -197,6 +197,14 @@ export const NewStory = () => {
     isMounted = false
   }
   }, [targetStory])
+  
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && !codeStore?.length) setSnippet('Nil')
+  return () => {
+    isMounted = false
+  }
+  }, [codeStore])
 
   useEffect(() => {
     if(debounceValue?.typing == 'notTyping'){
@@ -256,7 +264,7 @@ export const NewStory = () => {
                 name="story" key={currentUserId}
                 placeholder='Share your story...'
                 value={textareaValue}
-                cols={30} rows={8}
+                cols={30} rows={9}
                 onChange={handleBody}
                 className={`${(isLoading || loading) ? 'animate-pulse cursor-none' : ''} sm:w-4/5 md:w-3/4 lg:w-3/5 text-lg p-2 ${theme == 'light' ? 'focus:outline-slate-300' : ''} ${theme == 'dark' ? 'bg-slate-700 border-none focus:outline-none rounded-lg' : 'bg-slate-100 shadow-2xl'}`}
               />
@@ -331,6 +339,10 @@ export const NewStory = () => {
         success={success}
         setSuccess={setSuccess}
       />
+
+      <div 
+        className={`absolute bottom-8 text-base p-2 bg-slate-300 bg-opacity-50 rounded-md ${(snippet === 'Snippet' && !codeEditor && codeStore?.length) ? 'scale-100' : 'scale-0'} transition-all font-bold`}
+        >Please check before publishing your post</div>
     </section>
   )
 }

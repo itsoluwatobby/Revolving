@@ -14,7 +14,7 @@ import { UserService } from "../services/userService.js";
 import { StoryService } from "../services/StoryService.js";
 import NotificationController from "./notificationController.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
-import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
+import { asyncFunc, autoDeleteOnExpire, pagination, responseType } from "../helpers/helper.js";
 class StoryController {
     constructor() {
         this.userService = new UserService();
@@ -75,7 +75,7 @@ class StoryController {
                 yield NotificationController.addToNotification(userId, notiStory, 'NewStory');
                 return responseType({ res, status: 201, count: 1, data: story });
             }))
-                .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+                .catch((error) => responseType({ res, status: 404, message: `DB ERROR: ${error.message}` }));
         }));
     }
     /**
@@ -213,7 +213,7 @@ class StoryController {
    */
     getStoryByCategory(req, res) {
         asyncFunc(res, () => {
-            const { category } = req.query;
+            const { category, page, limit } = req.query;
             if (!category)
                 return res.sendStatus(400);
             this.redisClientService.getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(this, void 0, void 0, function* () {
@@ -232,6 +232,32 @@ class StoryController {
                 return responseType({ res, status: 200, count: storyCategory === null || storyCategory === void 0 ? void 0 : storyCategory.length, data: storyCategory });
             }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         });
+    }
+    get_test_Story_By_Category(req, res) {
+        asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
+            const { category, page, limit } = req.query;
+            if (!category)
+                return res.sendStatus(400);
+            const pageNum = Number(page), limitNum = Number(limit);
+            pagination({ page: pageNum, limit: limitNum, Models: StoryModel, callback: () => __awaiter(this, void 0, void 0, function* () {
+                    this.redisClientService.getCachedResponse({ key: `story:${category}`, cb: () => __awaiter(this, void 0, void 0, function* () {
+                            const categoryStory = yield StoryModel.find({ category: { $in: [category] } });
+                            const sharedCategoryStory = yield this.sharedStoryService.getAllSharedByCategories(category);
+                            const reMouldedSharedStory = sharedCategoryStory.map(share => {
+                                const storyObject = Object.assign(Object.assign({}, share.sharedStory), { sharedId: share === null || share === void 0 ? void 0 : share._id, sharedLikes: share === null || share === void 0 ? void 0 : share.sharedLikes, sharerId: share === null || share === void 0 ? void 0 : share.sharerId, sharedDate: share === null || share === void 0 ? void 0 : share.createdAt, sharedAuthor: share === null || share === void 0 ? void 0 : share.sharedAuthor });
+                                return storyObject;
+                            });
+                            const refactoredModel = [...categoryStory, ...reMouldedSharedStory];
+                            return refactoredModel;
+                        }), reqMtd: ['POST', 'PUT', 'PATCH', 'DELETE'] });
+                }), query: 'hello' })
+                .then((result) => {
+                var _a;
+                if (!((_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.length))
+                    return responseType({ res, status: 404, message: 'You have no stories' });
+                return responseType({ res, status: 200, pages: result === null || result === void 0 ? void 0 : result.pageable, data: result === null || result === void 0 ? void 0 : result.data });
+            }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+        }));
     }
     /**
     * @description fetches all stories

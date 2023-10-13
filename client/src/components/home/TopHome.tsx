@@ -22,7 +22,7 @@ export const TopHome = () => {
 
   const content = (
     <header
-      className={`sticky top-0 z-10 max-w-full overflow-hidden flex-none flex items-center bg-inherit mt-2.5 mobile:mt-4 border $ border-l-0 border-r-0 border-t-1 duration-300 border-b-1 pl-2 pr-2 ${theme == 'dark' ? 'border-gray-700 dark:bg-slate-900' : 'border-gray-200 bg-white'}`}>
+      className={`sticky top-0 z-10 max-w-full overflow-hidden flex-none flex items-center mt-2.5 mobile:mt-4 border $ border-l-0 border-r-0 border-t-1 border-b-1 pl-2 pr-2 ${theme == 'dark' ? 'border-gray-700 dark:bg-slate-900' : 'border-gray-200 bg-white'} transition-colors`}>
       <div className={`${toggleLeft == 'Open' ? 'hidden' : 'md:hidden'} h-14 w-10 grid place-content-center z-50`}>
         <GiHamburgerMenu 
           onClick={() => setToggleLeft('Open')}

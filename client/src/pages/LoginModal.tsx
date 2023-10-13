@@ -11,6 +11,7 @@ import { setCredentials } from '../features/auth/authSlice';
 import { useSignInMutation } from '../app/api/authApiSlice';
 import ForgotPassword from '../components/modals/ForgotPassword';
 import LoginComponent from '../components/modals/LoginComponent';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 export default function Login() {
   const dispatch = useDispatch()
@@ -70,7 +71,7 @@ export default function Login() {
   }
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: TimeoutId
     if(errorMsg){
       setTimeout(() => {
         setErrorMsg('')

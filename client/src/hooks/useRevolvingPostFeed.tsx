@@ -20,6 +20,7 @@ export default function useRevolvingPostFeed(stories: PostType[], numLikes=70) {
 
       // sort stories with a random index
       mostLikedStories = mostLikedStories?.map((story, index) => {
+        void(story)
         const j = Math.floor(Math.random() * (index + 1))
         const temp = mostLikedStories[index]
         mostLikedStories[index] = mostLikedStories[j]
@@ -27,6 +28,7 @@ export default function useRevolvingPostFeed(stories: PostType[], numLikes=70) {
         return mostLikedStories[j]
       })
       lessLikedStories = lessLikedStories?.map((story, index) => {
+        void(story)
         const j = Math.floor(Math.random() * (index + 1))
         const temp = stories[index]
         stories[index] = stories[j]
