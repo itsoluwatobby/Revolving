@@ -1,15 +1,15 @@
+import { useDispatch } from "react-redux";
+import { Socket } from "socket.io-client";
 import { useState, useEffect } from "react";
 import ChatBase from "../../components/chat/ChatBase";
 import ChatBody from "../../components/chat/ChatBody";
 import ChatHeader from "../../components/chat/ChatHeader";
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
 import { useGetUserFriendsQuery } from "../../app/api/usersApiSlice";
-import { messageApiSlice, useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
 import { ChatOption, PostContextType, ThemeContextType } from "../../posts";
-import { Socket } from "socket.io-client";
-import { useDispatch } from "react-redux";
+import { messageApiSlice, useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
+import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
 
 type ChatModalProp = {
   socket: Socket

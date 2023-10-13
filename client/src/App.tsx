@@ -33,7 +33,7 @@ import { PersistedLogin } from "./layouts/PersistedLogin";
 import TypewriterEffect from './components/TypewriterEffect';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { selectCurrentRoles } from "./features/auth/authSlice";
-import { GiStarShuriken, GiStarSwirl, GiStarsStack } from 'react-icons/gi';
+// import { GiStarShuriken, GiStarSwirl, GiStarsStack } from 'react-icons/gi';
 
 let socket: Socket
 export const App = () => {
@@ -43,12 +43,12 @@ export const App = () => {
   const userId = localStorage.getItem('revolving_userId') as string
   const [startTypewriting, setStartTypewriting] = useState<'BEGIN' | 'END'>('END')
 
-  const designClass = useCallback((theme: Theme, index: number) => {
-    const FIRST=[1,2,3,4], SECOND=[5,6,7,8,9], THIRD=[10,11,12,13]
-    return (`
-      absolute opacity-50 ${FIRST.includes(index) ? `top-${index*20} right-${index*16}` : THIRD.includes(index) ? `bottom-${index*4} left-${index*4}` : SECOND.includes(index) && ''} text-sm
-    `)
-  }, [])
+  // const designClass = useCallback((theme: Theme, index: number) => {
+  //   const FIRST=[1,2,3,4], SECOND=[5,6,7,8,9], THIRD=[10,11,12,13]
+  //   return (`
+  //     absolute opacity-50 ${FIRST.includes(index) ? `top-${index*20} right-${index*16}` : THIRD.includes(index) ? `bottom-${index*4} left-${index*4}` : SECOND.includes(index) && ''} text-sm
+  //   `)
+  // }, [])
 
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
