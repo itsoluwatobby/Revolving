@@ -1,11 +1,11 @@
-import { EnlargeCompo, ErrorResponse, Status } from '../data';
+import { EnlargeCompo, Status } from '../data';
 import { createContext, useState } from 'react';
 import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp, GetConvoType, InitConversationType, LoginPromptType } from '../posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 const initCurrentChat = {
-  userId: '', adminId: '', isOpened: false, createdAt: '', updatedAt: '', members: [], 
+  userId: '', adminId: '', isOpened: false, createdAt: '', updatedAt: '', members: [], email: '',
   _id: '', status: 'offline' as Status, lastName: '', lastSeen: '', firstName: '', displayPicture: '', lastMessage: { createdAt: '', _id: '', message: '' }
 }
 

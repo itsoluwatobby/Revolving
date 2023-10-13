@@ -11,14 +11,13 @@ import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 type Props = {
   theme: Theme
   isStoryError: boolean,
-  userProfile: UserProps,
   userStories: PostType[],
   isStoryLoading: boolean,
   storyError: FetchBaseQueryError | SerializedError | undefined,
   setRevealEditModal: React.Dispatch<React.SetStateAction<ImageTypeProp>>
 }
 
-export default function ProfileBase({ userProfile, setRevealEditModal, userStories, theme, isStoryError, storyError, isStoryLoading }: Props) {
+export default function ProfileBase({ setRevealEditModal, userStories, theme, isStoryError, storyError, isStoryLoading }: Props) {
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
  
   useEffect(() => {

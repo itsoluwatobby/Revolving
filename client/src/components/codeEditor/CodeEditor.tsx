@@ -49,6 +49,7 @@ export default function CodeBlock() {
   const handleChange = (newValue: string) => setInputValue(prev => ({...prev, code: newValue}))
   const editorDidMount = (editor: any, monaco: any) => {
     editor.focus()
+    void(monaco)
   }
 
   useEffect(() => {
