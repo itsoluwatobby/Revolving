@@ -22,6 +22,8 @@ import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDelet
  */
 class AuthenticationController {
     constructor() {
+        this.serverUrl = process.env.NODE_ENV === 'production'
+            ? '' : process.env.DEVELOPMENTLINK;
         this.userService = new UserService();
         this.redisClientService = new RedisClientService();
         this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
@@ -74,7 +76,7 @@ class AuthenticationController {
             if (type === 'LINK') {
                 const roles = Object.values(newUser === null || newUser === void 0 ? void 0 : newUser.roles);
                 const token = yield signToken({ roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
-                const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;
+                const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`;
                 const options = mailOptions(email, username, verificationLink);
                 yield newUser.updateOne({ $set: { verificationToken: { type: 'LINK', token: verificationLink, createdAt: this.dateTime } } });
                 transporter.sendMail(options, (err) => {
@@ -106,7 +108,7 @@ class AuthenticationController {
                 if (user.isAccountActivated)
                     return responseType({ res, status: 200, message: 'Your account has already been activated' });
                 yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: { type: 'LINK', token: '', createdAt: '' } } });
-                return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`);
+                return res.status(307).redirect(`${this.serverUrl}/revolving/auth/signIn`);
             }
             else {
                 const verify = yield verifyToken(token, process.env.ACCOUNT_VERIFICATION_SECRET);
@@ -220,7 +222,7 @@ class AuthenticationController {
                     const verify = yield verifyToken((_b = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _b === void 0 ? void 0 : _b.token, process.env.ACCOUNT_VERIFICATION_SECRET);
                     if (!(verify === null || verify === void 0 ? void 0 : verify.email)) {
                         const token = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email }, '30m', process.env.ACCOUNT_VERIFICATION_SECRET);
-                        const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`;
+                        const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`;
                         const options = mailOptions(email, user === null || user === void 0 ? void 0 : user.username, verificationLink);
                         yield user.updateOne({ $set: { verificationToken: { type: 'LINK', token, createdAt: this.dateTime } } });
                         transporter.sendMail(options, (err) => {
@@ -308,7 +310,7 @@ class AuthenticationController {
             if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
                 return responseType({ res, status: 423, message: 'Account locked' });
             const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
-            const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`;
+            const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`;
             const options = mailOptions(email, user.username, verificationLink, 'password');
             transporter.sendMail(options, (err) => {
                 if (err)

@@ -76,9 +76,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
           submitToSend.map(lang => {
             localStorage.removeItem(`revolving-${lang?.language}`)
           })
-          // localStorage.removeItem('revolving-codeStore')
-            
-          toast.success('Success!! Post added', SuccessStyle)
+          toast.success('Success!! Story added', SuccessStyle)
           dispatch(resetUrl())
           setImagesFiles([])
           dispatch(setLoading(false))
@@ -87,7 +85,8 @@ export default function TopRight({ currentUser }: TopRightProps) {
       catch(err: unknown){
         const errors = (createError as ErrorResponse) ?? (err as ErrorResponse)
         errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-        isCreateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+        const message = errors?.status === 'FETCH_ERROR' ? 'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)
+        toast.error(`${message}`, ErrorStyle)
       }
       finally{
         dispatch(setLoading(false))
@@ -120,7 +119,8 @@ export default function TopRight({ currentUser }: TopRightProps) {
       catch(err: unknown){
         const errors = (updateError as ErrorResponse) ?? (err as ErrorResponse)
         errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-        isUpdateError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+        const message = errors?.status === 'FETCH_ERROR' ? 'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)
+        toast.error(`${message}`, ErrorStyle)
       }
       finally {
         dispatch(setLoading(false))
@@ -204,7 +204,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
                   <button
                     className={`text-[13px] rounded-md p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingCreate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'} ${isLoadingCreate ? 'cursor-not-allowed' : ''}`}
                     onClick={createNewStory}
-                    disabled = {isCreateError ? isCreateError : isLoadingCreate ? isLoadingCreate : !canPost}
+                    disabled = {isLoadingCreate ? isLoadingCreate : !canPost}
                     >{isLoadingCreate ? 'Post...' : 'Publish'}
                   </button>
                 )
@@ -215,7 +215,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
                   <button
                     className={`text-[13px] rounded-lg p-0.5 shadow-lg duration-200 ease-in-out pl-1.5 pr-1.5 ${(canPost && !isLoadingUpdate) ? 'bg-green-400 hover:text-gray-500 active:scale-[0.98] hover:scale-[1.02]' : 'bg-gray-400'} ${isLoadingUpdate ? 'cursor-not-allowed' : ''}`}
                       onClick={updatedPost}
-                      disabled = {isUpdateError ? isUpdateError : isLoadingUpdate ? isLoadingUpdate : !canPost}
+                      disabled = {isLoadingUpdate ? isLoadingUpdate : !canPost}
                     >{isLoadingUpdate ? 'Wait...' : 'Republish'}
                   </button>
               )

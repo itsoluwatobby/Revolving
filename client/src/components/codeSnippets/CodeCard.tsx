@@ -60,8 +60,12 @@ export default function CodeCard({ code, count, codeStore, setCodeStore, submitT
   const deleteCode = (codeId: string) => {
     const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
     const others = getStore.filter(code => code?.codeId !== codeId)
+    const targetCodes = others.map(target => {
+      return ({ codeId: target?.codeId, language: target?.langType, body: target?.code })
+    }) as CodeProps[]
     setEditing({editing: false, codeId, code: '', type: 'DELETE'})
     setCodeStore([...others])
+    setSubmitToSend([...targetCodes])
     localStorage.setItem('revolving-codeStore', JSON.stringify(others))
   }
 

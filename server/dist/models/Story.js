@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 const CodeSchema = new Schema({
-    language: { type: String, required: [true, 'Language name required'], trim: true },
+    language: { type: String, trim: true },
     body: { type: String, default: '' }
 }, {
     timestamps: true

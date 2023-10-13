@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { VerifyOptions } from "jsonwebtoken"
 import { Document, FlattenMaps, ObjectId, Types } from "mongoose"
+import { type } from "os"
 
 // interface Environment_Env{
 //   REVOLVING_DB: string,
@@ -195,18 +196,17 @@ type UserFriends = {
   displayPicture: string,
 }
 
-interface PageRequest extends Request{
-  page: number,
-  limit: number
-}
-
 type PagesType = {
-  next?: { 
-    page: number, limit: number 
-  },
-  previous?: { 
-    page: number, limit: number 
-  }
+  previous: string | number;
+  currentPage: number;
+  next: string | number;
+};
+
+type PaginationType = {
+  pages: PagesType
+  count: any;
+  pagesLeft: string | number;
+  numberOfPages: number;
 }
 
 interface ResponseType extends Response{

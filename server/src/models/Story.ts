@@ -3,7 +3,7 @@ import { StoryProps } from '../../types.js';
 
 const CodeSchema = new Schema(
   {
-    language: { type: String, required: [true, 'Language name required'], trim: true },
+    language: { type: String, trim: true },
     body: { type: String, default: '' }
   },
   {

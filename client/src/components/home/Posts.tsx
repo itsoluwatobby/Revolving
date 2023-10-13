@@ -3,29 +3,28 @@ import { useSelector } from 'react-redux';
 import { BiErrorAlt } from 'react-icons/bi'
 import { ErrorResponse } from '../../data';
 import { useState, useEffect } from 'react';
-import { REFRESH_RATE } from '../../utils/navigator';
+import { Components, REFRESH_RATE } from '../../utils/navigator';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { SkeletonBlog } from '../skeletons/SkeletonBlog';
 import { usePostContext } from '../../hooks/usePostContext';
 import { useThemeContext } from '../../hooks/useThemeContext';
 // import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { getTabCategory } from '../../features/story/navigationSlice';
-import { PostContextType, PostFeedType, PostType, ThemeContextType } from '../../posts'
+import { PostContextType, PostType, ThemeContextType } from '../../posts'
 import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 
 const initQuery = { page: 1, limit: 10 }
 export const Posts = () => {
-  const getNavigation = useSelector(getTabCategory)
+  const getNavigation = useSelector(getTabCategory) as Components
   const [pageQuery, setPageQuery] = useState<typeof initQuery>(initQuery)
   const {
     data, isLoading, isError, error, refetch
   } = useGetStoriesByCategoryQuery({
-    category: getNavigation
+    category: getNavigation, ...pageQuery
   })
   const [reloadCount, setReloadCount] = useState<number>(0)
-    //  page: pageQuery?.page, limit: pageQuery?.limit
   const { filteredStories, setNavPosts, search } = usePostContext() as PostContextType
   const { setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [errorMsg, setErrorMsg] = useState<ErrorResponse | null>()
@@ -153,7 +152,7 @@ export const Posts = () => {
         >
           {
             isLoading ? content = (
-              [...Array(5).keys()].map(index => (
+              [...Array(3).keys()].map(index => (
                   <SkeletonBlog key={index} />
                   )
                 )

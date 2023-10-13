@@ -89,7 +89,7 @@ export const LeftSection = () => {
         
         </div>
         
-        <Link to={`/profile/${currentUser?._id}`} className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full flex items-center gap-2 rounded-md`}>
+        <Link to={`/profile/${currentUser?._id}`} className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full ${currentUser?._id ? 'flex' : 'scale-0'} transition-all items-center gap-2 rounded-md`}>
           <figure className="rounded-full border-2 shadow-2xl h-10 w-10">
             {
               currentUser?.displayPicture?.photo ?
