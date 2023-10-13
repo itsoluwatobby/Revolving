@@ -110,7 +110,9 @@ export const Posts = () => {
         <span>
           {errorMsg?.status == 404 ? 
               'No Story Avaialable' 
-                  : 'Network Error, Please check your connection'
+                  : errorMsg?.status === 'FETCH_ERROR' ?
+                      'SERVER ERROR'
+                      : 'Network Error, Please check your connection'
           }
         </span>
         {errorMsg?.status == 404 ? 

@@ -53,7 +53,7 @@ export default function Login() {
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
-      const message = errors?.status == 'FETCH_ERROR' ? 'Please Check Your Network' : errors?.data?.meta?.message
+      const message = errors?.status == 'FETCH_ERROR' ? 'SERVER ERROR' : errors?.data?.meta?.message
       setErrorMsg(message)
       isError && toast.error(`${message}`, {
         duration: 10000, icon: '💀', style: {

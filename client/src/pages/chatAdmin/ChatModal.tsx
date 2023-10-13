@@ -62,7 +62,8 @@ export default function ChatModal({ socket }: ChatModalProp) {
     const getCurrentUser = async() => {
       if(!currentUser?.lastConversationId) return setIsConversationState(prev => (
         {...prev, isLoading: false, isError: true, 
-          msg: errors?.originalStatus === 401 
+          msg: errors?.status === 'FETCH_ERROR' ?
+          'SERVER ERROR' :  errors?.originalStatus === 401 
               ? 'Session ended, Please sign in' : 'You have no recent conversation'
         }))
       getConversation({userId: currentUser?._id, conversationId: currentUser?.lastConversationId}).unwrap()
@@ -77,7 +78,7 @@ export default function ChatModal({ socket }: ChatModalProp) {
     return () => {
       isMounted = false
     }
-  }, [currentUser?._id, socket, currentUser?.lastConversationId, errors?.originalStatus, setIsConversationState, currentChat?._id, setCurrentChat, getConversation])
+  }, [currentUser?._id, socket, currentUser?.lastConversationId, errors?.status, errors?.originalStatus, setIsConversationState, currentChat?._id, setCurrentChat, getConversation])
   
   useEffect(() => {
     let isMounted = true

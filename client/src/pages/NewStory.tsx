@@ -175,7 +175,6 @@ export const NewStory = () => {
         // localStorage.setItem('revolving-codeStore', JSON.stringify([...getStore]))
         setCodeStore([])
       }
-
       setInputValue(savedTitle || '')
       setTextareaValue(savedBody || '')
       setTypingEvent(debounceValue?.typing)

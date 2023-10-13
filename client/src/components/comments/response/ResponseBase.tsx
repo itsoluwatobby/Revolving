@@ -66,7 +66,8 @@ export default function ResponseBase({ responseRef, comment, reveal, setPrompt, 
     catch(err: unknown){
       const errors = (likeError as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-      isLikeError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+      isLikeError && toast.error(`${errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)}`, ErrorStyle)
     }
   }
 

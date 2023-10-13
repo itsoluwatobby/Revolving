@@ -36,7 +36,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
 // lg:-translate-x-24 lg:w-[13%]
   return (
     <div 
-      className={`midscreen:fixed midscreen:h-full midscreen:z-50 midscreen:rounded-md tracking-widest ${rollout ? '' : 'midscreen:-translate-x-96 midscreen:hidden'} midscreen:right-0 midscreen:w-full midscreen:bg-opacity-80 midscreen:flex midscreen:flex-col midscreen:items-center midscreen:top-0 text-sm ${theme == 'light' ? 'midscreen:bg-slate-100' : 'midscreen:bg-slate-800'} transition-all last:border-0 p-2 midscreen:p-0 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] justify-between`}>
+      className={`midscreen:fixed midscreen:h-full midscreen:z-50 midscreen:rounded-md tracking-widest ${rollout ? '' : 'midscreen:translate-x-[100rem] midscreen:hidde'} midscreen:duration-300 midscreen:right-0 midscreen:w-full midscreen:bg-opacity-80 midscreen:flex midscreen:flex-col midscreen:items-center midscreen:top-0 text-sm ${theme == 'light' ? 'midscreen:bg-slate-100' : 'midscreen:bg-slate-800'} transition-all last:border-0 p-2 midscreen:p-0 ${!excludeRoute.includes(home) ? '' : '-translate-y-48'} ${excludeRoute?.includes(pathname) ? 'hidden' : 'flex'} flex-row w-[40%] justify-between`}>
       <div className={`md:flex-auto md:block sm:hidden midscreen:font-medium ${theme === 'light' ? 'midscreen:bg-gray-400' : 'midscreen:bg-slate-900'} midscreen:self-end midscreen:flex midscreen:flex-col midscreen:gap-3 midscreen:h-full midscreen:w-1/3`}>
 
         <div className="midscreen:flex flex-row-reverse items-center justify-between p-1 px-2 sm:hidden">

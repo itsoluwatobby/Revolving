@@ -4,8 +4,9 @@ import { BaseQueryFn } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import { setCredentials, signUserOut } from '../../features/auth/authSlice';
 import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react';
 
-export const BASEURL = 'http://localhost:4000/revolving'
-export const SOCKET_BASE_URL = 'http://localhost:4000'
+const BASEPATH = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:4000'
+export const BASEURL = `${BASEPATH}/revolving`
+export const SOCKET_BASE_URL = BASEPATH
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASEURL,

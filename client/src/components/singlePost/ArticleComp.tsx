@@ -28,7 +28,9 @@ type ArticleProps = {
   storyRef: React.RefObject<HTMLDivElement>,
 }
 
-export default function ArticleComp({ isError, story, storyRef, isBarOpen, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint }: ArticleProps) {
+export default function ArticleComp({ 
+  isError, story, storyRef, isBarOpen, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint 
+}: ArticleProps) {
   const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' })
   const { isIntersecting, observerRef } = useRevolvingObserver({ screenPosition: '-180px' })
   const { theme, setNotIntersecting } = useThemeContext() as ThemeContextType

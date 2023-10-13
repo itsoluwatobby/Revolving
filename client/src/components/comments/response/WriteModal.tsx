@@ -25,7 +25,7 @@ type WriteProp={
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>
 }
 
-// TODO: When Prompt is up, disable textarea
+
 export default function WriteModal({ keepPrompt, setKeepPrompt, comment, response, responseRef, openReply, currentUserId, writeReply, setWriteReply, setOpenReply, setPrompt }: WriteProp) {
   const { theme, enlarge, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const getResponseEdit = useSelector(getEditResponse)
@@ -68,7 +68,8 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     catch(err){
       const errors = (errorResponse as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-      isErrorResponse && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+      isErrorResponse && toast.error(`${errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)}`, ErrorStyle)
     }
   }
 // console.log(writeReply.split(' ').length)

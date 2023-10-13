@@ -15,8 +15,9 @@ export class MessageService {
   public async createNewMessage(messageObj: MessageModelType): Promise<NewMessageType>{
     const user = await userService.getUserById(messageObj?.senderId as string)
     const convo = await ConversationService.getConversation(messageObj?.conversationId as string)
+    const delivered = convo?.membersOpen?.adminOpened || convo.membersOpen?.clientOpened
     const newMsg = {
-      ...messageObj, displayPicture: user?.displayPicture?.photo, isDelivered: convo?.isOpened,
+      ...messageObj, displayPicture: user?.displayPicture?.photo, isDelivered: delivered,
       author: `${user?.firstName} ${user?.lastName}`, isMessageRead: convo?.isOpened ? 'read' : 'unread'
     } as MessageModelType
     return (

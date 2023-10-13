@@ -22,13 +22,15 @@ class AuthenticationController {
   public dateTime: string
   public emailRegex: RegExp
   public passwordRegex: RegExp
+  private serverUrl = process.env.NODE_ENV === 'production' 
+        ? '' : process.env.DEVELOPMENTLINK
   private userService = new UserService()
   private redisClientService = new RedisClientService()
 
   constructor(){
-     this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
-     this.passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
-     this.dateTime = new Date().toString()
+    this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
+    this.passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
+    this.dateTime = new Date().toString()
   }
 
   /**
@@ -74,7 +76,7 @@ class AuthenticationController {
       if(type === 'LINK'){
         const roles = Object.values(newUser?.roles)
         const token = await signToken({roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
-        const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
+        const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`
         const options = mailOptions(email, username, verificationLink)
         await newUser.updateOne({$set: {verificationToken: { type: 'LINK', token: verificationLink, createdAt: this.dateTime }}});
     
@@ -104,7 +106,7 @@ class AuthenticationController {
         const user = await this.userService.getUserByEmail(verify?.email);
         if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
         await user.updateOne({ $set: { isAccountActivated: true, verificationToken: { type: 'LINK', token: '', createdAt: '' }}})
-        return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
+        return res.status(307).redirect(`${this.serverUrl}/revolving/auth/signIn`)
       }
       else{
         const verify = await verifyToken(token as string, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
@@ -206,7 +208,7 @@ class AuthenticationController {
           const verify = await verifyToken(user?.verificationToken?.token, process.env.ACCOUNT_VERIFICATION_SECRET) as ClaimProps
           if (!verify?.email) {
             const token = await signToken({roles: user?.roles, email}, '30m', process.env.ACCOUNT_VERIFICATION_SECRET)
-            const verificationLink = `${process.env.ROUTELINK}/verify_account?token=${token}`
+            const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`
     
             const options = mailOptions(email, user?.username, verificationLink)
             await user.updateOne({$set: {verificationToken: { type: 'LINK', token, createdAt: this.dateTime }}});
@@ -295,7 +297,7 @@ class AuthenticationController {
       if (user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'})
 
       const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
-      const verificationLink = `${process.env.ROUTELINK}/password_reset?token=${passwordResetToken}`
+      const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`
       const options = mailOptions(email as string, user.username, verificationLink, 'password')
       transporter.sendMail(options, (err) => {
         if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})

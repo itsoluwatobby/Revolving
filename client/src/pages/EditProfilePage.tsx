@@ -60,7 +60,8 @@ export default function EditProfilePage() {
             })
             .catch(error => {
               const errors = error as ErrorResponse
-              toast.error(errors?.message as string, ErrorStyle)
+              toast.error(errors?.status === 'FETCH_ERROR' ?
+              'SERVER ERROR' : errors?.message as string, ErrorStyle)
             })
           }
         })
@@ -68,7 +69,8 @@ export default function EditProfilePage() {
           const errors = error as ErrorResponse
           setImageType('NIL')
           errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-          toast.error(errors?.message as string, ErrorStyle)
+          toast.error(errors?.status === 'FETCH_ERROR' ?
+          'SERVER ERROR' : errors?.message as string, ErrorStyle)
         })
       }
     }

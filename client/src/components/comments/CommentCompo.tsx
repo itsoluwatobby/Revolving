@@ -36,7 +36,8 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
     catch(err: unknown){
       const errors = (error as ErrorResponse) ?? (err as ErrorResponse)
       errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
-      isError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+      isError && toast.error(`${errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : (errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message)}`, ErrorStyle)
     }
   }
 

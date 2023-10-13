@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import About from "./pages/About";
 import { USERROLES } from "./data";
 import { Home } from "./pages/Home";
@@ -8,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/AdminPage";
 import Followers from "./pages/Followers";
-import { ThemeContextType } from "./posts";
+import { Theme, ThemeContextType } from "./posts";
 import { OTPEntry } from "./pages/OTPEntry";
 import { NewStory } from "./pages/NewStory";
 import LoginModal from "./pages/LoginModal";
@@ -27,12 +26,14 @@ import SingleStoryPage from "./pages/SingleStoryPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import Notifications from "./components/Notifications";
 import PrompLogin from "./components/modals/PrompLogin";
+import { useCallback, useState, useEffect } from 'react';
 import { ProtectedRoute } from "./layouts/ProtectedRoute";
 import { useThemeContext } from "./hooks/useThemeContext";
 import { PersistedLogin } from "./layouts/PersistedLogin";
 import TypewriterEffect from './components/TypewriterEffect';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { selectCurrentRoles } from "./features/auth/authSlice";
+import { GiStarShuriken, GiStarSwirl, GiStarsStack } from 'react-icons/gi';
 
 let socket: Socket
 export const App = () => {
@@ -41,6 +42,13 @@ export const App = () => {
   const user_roles = useSelector(selectCurrentRoles) as USERROLES[]
   const userId = localStorage.getItem('revolving_userId') as string
   const [startTypewriting, setStartTypewriting] = useState<'BEGIN' | 'END'>('END')
+
+  const designClass = useCallback((theme: Theme, index: number) => {
+    const FIRST=[1,2,3,4], SECOND=[5,6,7,8,9], THIRD=[10,11,12,13]
+    return (`
+      absolute opacity-50 ${FIRST.includes(index) ? `top-${index*20} right-${index*16}` : THIRD.includes(index) ? `bottom-${index*4} left-${index*4}` : SECOND.includes(index) && ''} text-sm
+    `)
+  }, [])
 
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
@@ -114,7 +122,9 @@ export const App = () => {
       <Notifications />
 
       <Toaster />
-      
+      {/* {[...Array(4).keys()].map((index) => <GiStarsStack className={designClass(theme, index)} />)}
+      {[...Array(5).keys()].map((index) => <GiStarShuriken className={designClass(theme, index+4)} />)}
+      {[...Array(4).keys()].map((index) => <GiStarSwirl className={designClass(theme, index+9)} />)} */}
       {
         openChat === 'Open' ?
           // userId ?
@@ -133,7 +143,7 @@ export const App = () => {
       <div 
         onClick={() => setStartTypewriting('END')}
         className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
-          <TypewriterEffect delay={0.4} start={startTypewriting} />
+          <TypewriterEffect delay={0.25} start={startTypewriting} />
       </div>
       {loginPrompt?.opened == 'Open' ? <PrompLogin /> : null}
     </main>

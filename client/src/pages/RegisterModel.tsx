@@ -63,7 +63,8 @@ export default function RegisterModal() {
     }
     catch(err: unknown){
       const errors = error as ErrorResponse
-      const message = errors?.data?.meta?.message
+      const message = errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : errors?.data?.meta?.message
       setErrorMsg(message)
       isError && toast.error(`${message}`, ErrorStyle)
     }

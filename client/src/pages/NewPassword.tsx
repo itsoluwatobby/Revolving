@@ -39,7 +39,8 @@ export default function NewPassword() {
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
-      const msg = errors?.data ? errors?.data?.meta?.message : 'No Network'
+      const msg = errors?.status === 'FETCH_ERROR' ?
+      'SERVER ERROR' : (errors?.data ? errors?.data?.meta?.message : 'No Network')
       setErrorMsg(msg)
       isError && toast.error(`${msg}`, {
         duration: 10000, icon: '💀', style: {
