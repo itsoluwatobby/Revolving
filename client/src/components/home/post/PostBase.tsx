@@ -70,7 +70,7 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
                 className={`text-lg hover:scale-[1.1] active:scale-[1] transition-all cursor-pointer ${theme == 'light' ? 'text-black' : 'text-white'}`} />
           }
             <span className={`font-mono text-base ${theme == 'dark' ? 'text-white' : 'text-black'}`}>
-              {story?.sharedId ? checkCount(story?.sharedLikes) : checkCount(story?.likes)}
+              {story?.sharedId ? checkCount(story?.sharedLikes) : checkCount(story?.likes)} 
             </span>
         </p>
         {/* {auth?._id && (     */}

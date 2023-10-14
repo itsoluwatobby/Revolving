@@ -123,11 +123,11 @@ export default function TaskManager() {
           </div>
           {/* Toggler Button */}
           <div 
-            className={`absolute hidden mobile:flex w-14 h-7 p-0.5 rounded-full left-5 top-7 items-center ${toggleButton === 'LEFT' ? 'justify-start bg-slate-500' : 'justify-end bg-green-700'} transition-all`}>
+            className={`absolute hidden mobile:block w-14 h-7 bg-slate-500 p-0.5 rounded-full left-5 top-7 items-center transition-all`}>
             <p 
               title={toggleButton === 'LEFT' ? 'View Bin' : 'View Tasks'}
               onClick={() => setToggleButton(prev => prev === 'LEFT' ? prev = 'RIGHT' : prev = 'LEFT')}  
-              className={`w-1/2 h-full ${toggleButton === 'LEFT' ? 'bg-white' : 'bg-gray-200'} shadow-2xl cursor-pointer transition-all hover:bg-opacity-80 active:bg-opacity-100 rounded-full`}
+              className={`w-1/2 h-full duration-300 ${toggleButton === 'LEFT' ? 'bg-gray-50' : 'translate-x-6 bg-green-500'} shadow-2xl cursor-pointer transition-all hover:bg-opacity-80 active:bg-opacity-100 rounded-full`}
             />
           </div>
 

@@ -24,6 +24,8 @@ class AuthenticationController {
     constructor() {
         this.serverUrl = process.env.NODE_ENV === 'production'
             ? '' : process.env.DEVELOPMENTLINK;
+        this.clientUrl = process.env.NODE_ENV === 'production'
+            ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK;
         this.userService = new UserService();
         this.redisClientService = new RedisClientService();
         this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
@@ -119,7 +121,7 @@ class AuthenticationController {
                 if (user.isAccountActivated)
                     return responseType({ res, status: 200, message: 'Your account has already been activated' });
                 yield user.updateOne({ $set: { isAccountActivated: true, verificationToken: { type: 'LINK', token: '', createdAt: '' } } });
-                return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`);
+                return res.status(307).redirect(`${this.clientUrl}/signIn`);
             }
         }));
     }
@@ -341,7 +343,7 @@ class AuthenticationController {
             if ((verify === null || verify === void 0 ? void 0 : verify.email) != (user === null || user === void 0 ? void 0 : user.email))
                 return res.sendStatus(400);
             user.updateOne({ $set: { verificationToken: { type: 'LINK', token: '', createdAt: '' } } })
-                .then(() => res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`))
+                .then(() => res.status(307).redirect(`${this.clientUrl}/new_password?email=${user.email}`))
                 .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
         }));
     }

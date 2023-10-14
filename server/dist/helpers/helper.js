@@ -61,7 +61,7 @@ export function verifyToken(token, secret) {
 export const responseType = ({ res, status = 200, count = 0, message = 'success', data = {}, pages = {} }) => {
     return (data ?
         res.status(status).json({ pages, meta: { status, count, message }, data })
-        : res.status(status).json({ meta: { status, message }, data }));
+        : res.status(status).json({ meta: { status, message } }));
 };
 /**
  * @class an object to keep track of the request methods to enable effect caching

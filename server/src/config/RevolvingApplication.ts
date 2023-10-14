@@ -2,6 +2,7 @@ import authRouter from '../routes/authRoutes.js';
 import imageRouter from '../routes/imageRoute.js';
 import userRouter from '../routes/usersRoutes.js';
 import storyRouter from '../routes/storyRoutes.js';
+import messageRouter from '../routes/messageRoute.js';
 import commentRouter from '../routes/commentRoutes.js';
 import { Application, Request, Response } from 'express';
 import responseRouter from '../routes/responseRoutes.js';
@@ -18,7 +19,6 @@ import AuthenticationController from '../controller/authController.js';
 import TaskManagerController from '../controller/taskManagerController.js';
 import SharedStoryController from '../controller/sharedStoryController.js';
 import { NewUserProp, RequestProp, RequestStoryProp } from '../../types.js';
-import messageRouter from '../routes/messageRoute.js';
 
 
 export class RevolvingApplication{

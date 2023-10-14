@@ -1,10 +1,10 @@
 import { useDispatch } from 'react-redux';
+import { useThemeContext } from '../hooks/useThemeContext';
 import { createContext, useEffect, useState } from 'react';
-import { CodeProps, ErrorResponse, TypingEvent, TypingObjType, UserProps } from '../data';
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
+import { CodeProps, ErrorResponse, TypingEvent, TypingObjType, UserProps } from '../data';
 import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType, ThemeContextType } from '../posts';
-import { useThemeContext } from '../hooks/useThemeContext';
 
 
 export const PostContext = createContext<PostContextType | null>(null)
@@ -37,7 +37,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     const getCurrentUser = async() => {
       getLoggedInUser(userId).unwrap()
       .then((user: UserProps) => setCurrentUser(user))
-      .catch((error) => {
+      .catch((error: unknown) => {
         const errors = error as ErrorResponse
         void(errors)
       })
@@ -46,7 +46,7 @@ export const PostDataProvider = ({ children }: ChildrenProp) => {
     return () => {
       isMounted = false
     }
-  }, [userId, currentUser?._id, getLoggedInUser, openChat])
+  }, [userId, currentUser, getLoggedInUser, openChat])
 
   useEffect(() => {
     let isMounted = true

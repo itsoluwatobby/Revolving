@@ -24,6 +24,8 @@ class AuthenticationController {
   public passwordRegex: RegExp
   private serverUrl = process.env.NODE_ENV === 'production' 
         ? '' : process.env.DEVELOPMENTLINK
+  private clientUrl = process.env.NODE_ENV === 'production' 
+        ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK
   private userService = new UserService()
   private redisClientService = new RedisClientService()
 
@@ -114,7 +116,7 @@ class AuthenticationController {
         if (verify?.email != user?.email) return res.sendStatus(400)
         if(user.isAccountActivated) return responseType({res, status: 200, message: 'Your account has already been activated'})
         await user.updateOne({ $set: { isAccountActivated: true, verificationToken: { type: 'LINK', token: '', createdAt: '' }}})
-        return res.status(307).redirect(`${process.env.REDIRECTLINK}/signIn`)
+        return res.status(307).redirect(`${this.clientUrl}/signIn`)
       }
     })
   }
@@ -325,7 +327,7 @@ class AuthenticationController {
       if (verify?.email != user?.email) return res.sendStatus(400)
 
       user.updateOne({$set: { verificationToken: { type: 'LINK', token: '', createdAt: '' } }})
-      .then(() => res.status(307).redirect(`${process.env.REDIRECTLINK}/new_password?email=${user.email}`))
+      .then(() => res.status(307).redirect(`${this.clientUrl}/new_password?email=${user.email}`))
       .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     })
   }

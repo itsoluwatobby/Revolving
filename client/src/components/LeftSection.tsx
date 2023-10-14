@@ -93,7 +93,7 @@ export const LeftSection = () => {
           <figure className="rounded-full border-2 shadow-2xl h-10 w-10">
             {
               currentUser?.displayPicture?.photo ?
-              <img src={currentUser?.displayPicture?.photo} alt="" className="w-full h-full object-cover rounded-full" /> : null
+              <img src={currentUser?.displayPicture?.photo} alt="" loading='eager' className="w-full h-full object-cover rounded-full" /> : null
             }
           </figure>
           <p className="text-white hover:underline">{reduceLength(currentUser?.email as string, 13, 'letter')}</p>

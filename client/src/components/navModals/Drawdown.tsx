@@ -50,7 +50,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                     :
                   <Link to={`/profile/${currentUser?._id}`}>
                     <figure className='w-10 h-10 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
-                      <img src={currentUser?.displayPicture?.photo} alt="dp" className='object-cover h-full w-full rounded-full'/>
+                      <img src={currentUser?.displayPicture?.photo} alt="dp" loading='eager' className='object-cover h-full w-full rounded-full'/>
                     </figure>
                   </Link>
                 }
@@ -102,19 +102,6 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
               )
             : null
           }
-          {/* {
-            (userRoles?.length && pathname !== `/notifications/${userId}`) ?
-              (
-                <Link 
-                  onClick={() => setRollout(false)}
-                  to={`/notifications/${userId}`}
-                  className={modalClass(theme, 'Hide')}
-                >
-                  Notifications
-                </Link>
-              )
-            : null
-          } */}
           {
             (userRoles?.length && pathname !== `/taskManager/${userId}`) ?
               (
@@ -161,9 +148,6 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
                 </button>
               : null
             }
-            {/* <button className={modalClass(theme)}>
-              Contact
-            </button>                                 */}
         </div>
 
       </div>
