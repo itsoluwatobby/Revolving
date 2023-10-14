@@ -1,4 +1,4 @@
-const allowedOrigins = ['http://localhost:5173', 'ws://127.0.0.1:64521/', 'https://revolving.onrender.com/'];
+const allowedOrigins = ['http://localhost:5173', 'ws://127.0.0.1:64521/', 'https://revolving.vercel.app'];
 export const corsOptions = {
     //"Allow-Control-Access-Origin": "*",
     origin: (origin, cb) => {

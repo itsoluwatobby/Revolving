@@ -11,7 +11,11 @@ import { createClient } from 'redis';
 import { objInstance } from './helper.js';
 export class RedisClientService {
     constructor() {
-        this.redisClient = createClient();
+        this.redisClient = createClient(process.env.NODE_ENV === 'production' ? { url: process.env.REDIS_URL } : {});
+        if (!this.redisClient.isOpen) {
+            this.redisClient.connect()
+                .then(() => console.log('REDIS CONNECTED SUCCESSFULLY'));
+        }
     }
     /**
      * @description caches all GET requests
@@ -19,9 +23,9 @@ export class RedisClientService {
     */
     getCachedResponse({ key, timeTaken = 7200, cb, reqMtd = [] }) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage));
-            if (!this.redisClient.isOpen)
-                yield this.redisClient.connect();
+            this.redisClient.on('error', (err) => {
+                console.error('Redis client error: ', err.logMessage);
+            });
             try {
                 if (objInstance.isPresent(reqMtd)) {
                     this.redisClient.flushAll();

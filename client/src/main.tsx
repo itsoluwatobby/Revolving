@@ -8,7 +8,10 @@ import { usersApiSlice } from './app/api/usersApiSlice.ts';
 import { storyApiSlice } from './app/api/storyApiSlice.ts';
 import { PostDataProvider } from './context/BlogContext.tsx';
 import { ThemeDataProvider } from './context/ThemeProvider.tsx';
+import { disableReactDevTools } from '@fvilers/disable-react-devtools'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+if(process.env.NODE_ENV === 'production') disableReactDevTools()
 
 store.dispatch(usersApiSlice.endpoints.getUsers.initiate())
 store.dispatch(storyApiSlice.endpoints.getStoriesByCategory.initiate({category: 'General'}))
