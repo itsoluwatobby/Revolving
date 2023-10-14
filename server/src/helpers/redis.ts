@@ -12,17 +12,25 @@ type RedisOptionProps<T>={
 
 export class RedisClientService {
 
-  public redisClient = createClient();
+  public redisClient = createClient(
+    process.env.NODE_ENV === 'production' ? { url: process.env.REDIS_URL } : {}
+  );
 
-  constructor(){}
+  constructor(){
+    if(!this.redisClient.isOpen) {
+      this.redisClient.connect()
+      .then(() => console.log('REDIS CONNECTED SUCCESSFULLY'))
+    }
+  }
 
   /**
    * @description caches all GET requests
    * @param object - containing {req, timeTaken, cb, reqMtd}
   */ 
   public async getCachedResponse<T>({key, timeTaken=7200, cb, reqMtd=[]}): Promise<T | T[]> {
-    this.redisClient.on('error', (err) => console.error('Redis client error: ', err.logMessage))
-    if(!this.redisClient.isOpen) await this.redisClient.connect();
+    this.redisClient.on('error', (err) => {
+      console.error('Redis client error: ', err.logMessage)
+    })
     try{
       if(objInstance.isPresent(reqMtd)){
         this.redisClient.flushAll()
