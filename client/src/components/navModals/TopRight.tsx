@@ -248,7 +248,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
                     className='w-8 h-8 bg-slate-800 rounded-full border-2 border-gray-300 cursor-pointer'>
                     {
                       currentUser?.displayPicture?.photo ?
-                        <img src={currentUser?.displayPicture?.photo} alt="dp" 
+                        <img src={currentUser?.displayPicture?.photo} alt="dp" loading='eager'
                           className='object-cover h-full w-full rounded-full' 
                         />
                       : null

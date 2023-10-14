@@ -1,4 +1,4 @@
-const allowedOrigins = ['http://localhost:5173', 'ws://127.0.0.1:64521/']
+const allowedOrigins = ['http://localhost:5173', 'ws://127.0.0.1:64521/', 'https://revolving.onrender.com/']
 
 export const corsOptions = {
   //"Allow-Control-Access-Origin": "*",

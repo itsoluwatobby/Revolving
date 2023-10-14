@@ -49,7 +49,7 @@ export const Footer = ({ tasks, userId }: FooterProps) => {
   }, [userData])
 
   return (
-    <footer className='flex-none h-20 w-full flex flex-col shadow-inner text-sm p-1'>
+    <footer className='flex-none h-20 w-full flex flex-col shadow-inner text-sm p-1 mobile:px-1.5'>
       <h2 className='text-center font-mono text-base font-bold'>ANALYTICS</h2>
       <div className={`flex items-end justify-evenly`}>
         <div className='flex flex-col'>
