@@ -23,7 +23,7 @@ class AuthenticationController {
   public emailRegex: RegExp
   public passwordRegex: RegExp
   private serverUrl = process.env.NODE_ENV === 'production' 
-        ? '' : process.env.DEVELOPMENTLINK
+        ? process.env.PRODUCTIONLINK : process.env.DEVELOPMENTLINK
   private clientUrl = process.env.NODE_ENV === 'production' 
         ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK
   private userService = new UserService()
