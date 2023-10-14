@@ -23,7 +23,7 @@ import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDelet
 class AuthenticationController {
     constructor() {
         this.serverUrl = process.env.NODE_ENV === 'production'
-            ? '' : process.env.DEVELOPMENTLINK;
+            ? process.env.PRODUCTIONLINK : process.env.DEVELOPMENTLINK;
         this.clientUrl = process.env.NODE_ENV === 'production'
             ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK;
         this.userService = new UserService();
