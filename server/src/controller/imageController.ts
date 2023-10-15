@@ -18,7 +18,7 @@ class ImageController {
       const newPath = `fileUpload/${newName}`
       fsPromises.rename(uploadedFile.path, newPath)
       .then(() => {
-        const imageLink = process.env.NODE_ENV === 'production' ? '' : process.env.DEVELOPMENTLINK
+        const imageLink = process.env.NODE_ENV === 'production' ? process.env.PRODUCTIONLINK : process.env.DEVELOPMENTLINK
         const imageUrl = `${imageLink}/${newName}`
         return responseType({res, status: 201, message: 'image uploaded', count: 1, data: { url: imageUrl}})
       }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))

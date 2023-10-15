@@ -14,6 +14,7 @@ import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
 import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
 import { CodeStoreType, ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 let uploadedImageIds = [] as string[]
 let imagesNames = [] as string[]
@@ -33,6 +34,8 @@ export const NewStory = () => {
   const [uploadToServer] = useUploadImageMutation()
   const [targetStory, setTargetStory] = useState<PostType>()
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
+  const [includesId, setIncludesId] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<boolean>(false);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
     1000) as DebounceProps;
@@ -67,20 +70,14 @@ export const NewStory = () => {
         else{
           const imageId = nanoid()
           const newImage = { imageId, image: file } as ImageType
-          if(imagesNames.includes(file?.name)) return
-          if(imagesFiles.length < 2){
-            setImagesFiles(prev => ([...prev, newImage]))
-            imagesNames.push(file?.name)
-            //setFiles([])
-          }
-          else{
-            setFiles([])
-          }
+          if(imagesNames.includes(file?.name) || imagesFiles?.length > 2) return setFiles([])
+          setImagesFiles(prev => ([...prev, newImage]))
+          imagesNames.push(file?.name)
         }
       })
+      setFiles([])
     }
-    isMounted ? checkSizeAndUpload() : null
-
+    if(isMounted) checkSizeAndUpload()
     return () => {
       isMounted = false
     }
@@ -107,6 +104,7 @@ export const NewStory = () => {
         imageData.append('image', image.image)
         await uploadToServer(imageData).unwrap()
         .then((data) => {
+          throw new Error('PRESENTLY GOING THROUGH TESTING')
           const res = data as unknown as { url: string }
           const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
           dispatch(setUrl(composed))
@@ -114,11 +112,11 @@ export const NewStory = () => {
         }).catch((error: unknown) => {
           const errors = error as ErrorResponse
           errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
+          setErrorMsg(true)
         })
       }))
     }
-    (isMounted && imagesFiles.length >= 1) ? uploadImages() : null
-
+    if(isMounted && imagesFiles.length >= 1) uploadImages()
     return () => {
       isMounted = false
     }
@@ -199,6 +197,19 @@ export const NewStory = () => {
   }, [targetStory])
   
   useEffect(() => {
+    let isMounted = true, timeoutId: TimeoutId;
+    if(isMounted && errorMsg){
+      timeoutId = setTimeout(() => {
+        setErrorMsg(false)
+      }, 8000);
+    }
+  return () => {
+    isMounted = false
+    clearTimeout(timeoutId)
+  }
+  }, [errorMsg])
+  
+  useEffect(() => {
     let isMounted = true
     if(isMounted && !codeStore?.length) setSnippet('Nil')
   return () => {
@@ -209,18 +220,11 @@ export const NewStory = () => {
   useEffect(() => {
     if(debounceValue?.typing == 'notTyping'){
       const storyData = targetStory ? {
-        ...targetStory,
-        title: inputValue,
-        body: textareaValue,
-        category: postCategory,
-        code: [],
-        fontFamily
+        ...targetStory, title: inputValue, code: [], fontFamily,
+        body: textareaValue, category: postCategory
       } : {
-        title: inputValue, 
-        body: textareaValue,
-        category: postCategory,
-        userId: currentUserId,
-        fontFamily
+        title: inputValue, body: textareaValue, fontFamily,
+        category: postCategory, userId: currentUserId
       }
     dispatch(setStoryData(storyData))
   }
@@ -249,7 +253,7 @@ export const NewStory = () => {
   }
   
   return (
-    <section className={`relative ${fontFamily} ${loading ? 'cursor-none' : ''} p-3 h-full text-sm flex flex-col gap-2 sm:items-center mt-2 ${theme == 'light' ? 'bg-gray-100' : ''}`}>
+    <section className={`hidebars relative ${fontFamily} ${loading ? 'cursor-none' : ''} p-3 h-full text-sm flex flex-col overflow-y-scroll gap-2 sm:items-center mt-2 ${theme == 'light' ? 'bg-gray-100' : ''}`}>
       {
         codeEditor ? <CodeBlock /> 
         : (
@@ -285,7 +289,7 @@ export const NewStory = () => {
             title={imagesFiles.length < 2 ? 'Add images' : 'MAX'}
             role='Add images'
             className={`absolute ${codeEditor ? 'scale-0' : 'scale-100'} right-3 md:right-20 top-4 ${theme === 'light' ? 'bg-opacity-50 hover:opacity-60' : 'hover:opacity-50'} transition-all active:opacity-30 ${imagesFiles.length < 2 ? 'bg-slate-400 bg-opacity-30' : 'bg-red-500'} grid place-content-center w-10 h-10`}>
-            <label htmlFor={imagesFiles.length < 2 ? 'image-upload' : ''} className='relative cursor-pointer h-full w-full' >
+            <label htmlFor={(imagesFiles.length < 2 && currentUserId) ? 'image-upload' : ''} className='relative cursor-pointer h-full w-full' >
               <FaRegImages 
                 className={`text-2xl`}
               />
@@ -330,16 +334,12 @@ export const NewStory = () => {
       </div>
 
       <CodeSnippets 
-        theme={theme} 
-        snippet={snippet}
-        isPresent={isPresent} 
-        codeEditor={codeEditor} 
-        setIsPresent={setIsPresent}
-        setSnippet={setSnippet}
-        success={success}
-        setSuccess={setSuccess}
+        errorMsg={errorMsg}
+        setIsPresent={setIsPresent} setSnippet={setSnippet} success={success}
+        theme={theme} snippet={snippet} isPresent={isPresent} codeEditor={codeEditor} 
+        setSuccess={setSuccess} includesId={includesId} setIncludesId={setIncludesId}
       />
-
+      
       <div 
         className={`absolute bottom-8 text-base p-2 bg-slate-300 bg-opacity-50 rounded-md ${(snippet === 'Snippet' && !codeEditor && codeStore?.length) ? 'scale-100' : 'scale-0'} transition-all font-bold`}
         >Please check before publishing your post</div>

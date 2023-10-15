@@ -5,7 +5,7 @@
   "main": "revolving.ts",
   "type": "module",
   "scripts": {
-    "start": "node dist/revolving.js",
+    "start": "tsc && node dist/revolving.js",
     "dev": "tsc && nodemon dist/revolving.js",
     "test": "mocha dist/tests"
   },

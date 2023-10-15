@@ -142,7 +142,7 @@ export const App = () => {
       }
       <div 
         onClick={() => setStartTypewriting('END')}
-        className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
+        className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] mobile:w-[18rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
           <TypewriterEffect delay={0.25} start={startTypewriting} />
       </div>
       {loginPrompt?.opened == 'Open' ? <PrompLogin /> : null}

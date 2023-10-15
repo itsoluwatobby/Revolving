@@ -9,16 +9,18 @@ import { CodeStoreType, Theme, ThemeContextType } from '../../posts';
 type CodeCardProps = {
   count: number,
   code: CodeStoreType,
+  includesId: string[],
   submitToSend: CodeProps[],
   codeStore: CodeStoreType[],
+  setIncludesId: React.Dispatch<React.SetStateAction<string[]>>
   setSubmitToSend: React.Dispatch<React.SetStateAction<CodeProps[]>>,
   setInputValue: React.Dispatch<React.SetStateAction<CodeStoreType>>,
   setCodeStore: React.Dispatch<React.SetStateAction<CodeStoreType[]>>
 }
 
-export default function CodeCard({ code, count, codeStore, setCodeStore, submitToSend, setSubmitToSend, setInputValue }: CodeCardProps) {
+export default function CodeCard({ code, count, codeStore, includesId, setIncludesId, setCodeStore, submitToSend, setSubmitToSend, setInputValue }: CodeCardProps) {
   const { editing, isPresent, codeEditor, theme, success, setEditing } = useThemeContext() as ThemeContextType
-  const [includesId, setIncludesId] = useState<string[]>([])
+  // const [includesId, setIncludesId] = useState<string[]>([])
   const nodeRef = useCallback((node: HTMLElement) => {
     node ? node.scrollIntoView({behavior: 'smooth'}) : null
   }, []);
