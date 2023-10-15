@@ -68,6 +68,7 @@ export const Posts = () => {
     let timerId: TimeoutId
     if(!data?.length && (isError && errorMsg?.status != 404) && reloadCount <= 3){
       timerId = setInterval(async() => {
+        setErrorMsg(null)
         await refetch()
         setReloadCount(prev => prev + 1)
       }, REFRESH_RATE)

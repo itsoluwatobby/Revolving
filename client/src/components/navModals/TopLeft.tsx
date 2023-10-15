@@ -38,7 +38,7 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
       {
         searchBar.includes(pathname) ?
           <div 
-            className={`flex gap-0.5 justify-around items-center rounded-md md:w-48 lg:w-56 sm:w-48 mobile:w-32 h-8 ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-0`}
+            className={`flex gap-0.5 justify-around items-center rounded-md md:w-48 lg:w-56 sm:w-48 midmobile:hidden mobile:w-32 h-8 ${theme == 'dark' ? 'bg-gray-500' : ''} mobile:translate-y-0`}
           >  
             <CiSearch className='text-gray-700 text-xl w-8'/>
             <input 
