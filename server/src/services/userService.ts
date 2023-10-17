@@ -1,9 +1,9 @@
 import { UserModel } from "../models/User.js";
 import { StoryService } from "./StoryService.js";
-import { FollowNotificationType, Followers, Follows, GetFollowsType, GetSubscriptionType, SubUser, UserFriends, UserProps } from "../../types.js";
 import { NotificationModel } from "../models/Notifications.js";
 import { TaskBinModel, TaskManagerModel } from "../models/TaskManager.js";
 import NotificationController from "../controller/notificationController.js";
+import { FollowNotificationType, Followers, Follows, GetFollowsType, GetSubscriptionType, SubUser, UserFriends, UserProps } from "../../types.js";
 
 
 export class UserService {

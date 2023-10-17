@@ -1,7 +1,7 @@
 import { TaskBin, TaskProp } from "../../types.js"
 import { Request, Response } from "express"
 import { UserService } from "../services/userService.js"
-import { RedisClientService } from "../helpers/redis.js"
+import { KV_Redis_ClientService } from "../helpers/redis.js"
 import { TaskManagerService } from "../services/TaskManagerService.js"
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js"
 
@@ -9,7 +9,7 @@ class TaskManagerController {
 
   private userService = new UserService()
   private taskManagerService = new TaskManagerService()
-  private redisClientService = new RedisClientService()
+  private redisClientService = new KV_Redis_ClientService()
 
   constructor(){}
 

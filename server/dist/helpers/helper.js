@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { sub } from 'date-fns';
 import jwt from 'jsonwebtoken';
+import { sub } from 'date-fns';
 import { TaskBinModel } from '../models/TaskManager.js';
 export const dateTime = sub(new Date, { minutes: 0 }).toISOString();
 /**

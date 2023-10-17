@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { responseType } from "../helpers/helper.js";
 import UserService from "../services/userService.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { NotificationModel } from "../models/Notifications.js";
 import { AllNotificationModelType, NotificationBody, NotificationModelType, NotificationStatus, NotificationType, UserProps } from "../../types.js";
 import { Document, Schema } from "mongoose";
@@ -11,8 +11,8 @@ type NotificationDocument = Document<unknown, {}, NotificationModelType> & Notif
 
 export class NotificationController {
   
-  private redisClientService: RedisClientService = new RedisClientService()
   private Notification_To_Others = ["NewStory"] as Partial<NotificationType>[]
+  private redisClientService: KV_Redis_ClientService = new KV_Redis_ClientService()
   private Notification_To_Tagged_And_Others = ["Tagged"] as Partial<NotificationType>[]
   private Notification_To_Self = ["Subcribe", "Follow", "Comment", "Likes", "Message", "SharedStory", "CommentLikes"] as Partial<NotificationType>[]
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StoryModel } from "../models/Story.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { UserService } from "../services/userService.js";
 import { StoryService } from "../services/StoryService.js";
 import NotificationController from "./notificationController.js";
@@ -14,7 +14,7 @@ class StoryController {
   private userService = new UserService()
   private storyService = new StoryService()
   private sharedStoryService = new SharedStoryService()
-  private redisClientService = new RedisClientService()
+  private redisClientService = new KV_Redis_ClientService()
 
   constructor(){}
 

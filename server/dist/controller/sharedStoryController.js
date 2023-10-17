@@ -8,14 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { UserService } from "../services/userService.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 class SharedStoryController {
     constructor() {
         this.userService = new UserService();
         this.sharedStoryService = new SharedStoryService();
-        this.redisClientService = new RedisClientService();
+        this.redisClientService = new KV_Redis_ClientService();
     }
     // Only for admin page
     /**
@@ -81,7 +81,7 @@ class SharedStoryController {
                 return res.sendStatus(400);
             yield autoDeleteOnExpire(userId);
             const result = yield this.sharedStoryService.unShareStory(userId, sharedId);
-            this.redisClientService.redisClient.DEL(`sharedStory:${sharedId}`);
+            this.redisClientService.redisClient.del(`sharedStory:${sharedId}`);
             return result == 'not found'
                 ? responseType({ res, status: 404, count: 0, message: result }) : result == 'unauthorized'
                 ? responseType({ res, status: 401, count: 0, message: result })
