@@ -1,8 +1,9 @@
 import { ConnectOptions, connect } from "mongoose";
-import asyncHandler from 'express-async-handler';
 
-export const dbConfig = asyncHandler( async(): Promise<void> => {
-  await connect(process.env.REVOLVING_DB, {
-    useNewUrlParser: true, useUnifiedTopology: true
-  } as ConnectOptions)
-})
+export const dbConfig = () => {
+  connect(process.env.REVOLVING_DB, {
+      useNewUrlParser: true, useUnifiedTopology: true
+    } as ConnectOptions)
+  .then(() => {return})
+  .catch(error => console.log({"MONGO_CONNECTION_ERROR": error.message}))
+}

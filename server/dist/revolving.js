@@ -5,7 +5,7 @@ dotenv.config();
 import { dbConfig } from './config/mongoConfig.js';
 import { ServerMiddlewares } from './config/server_middlewares.js';
 // import { errorLog, logEvents } from './middleware/logger.js';
-dbConfig(null, null, null);
+dbConfig();
 const app = express();
 const PORT = process.env.PORT || 4000;
 new ServerMiddlewares(app, PORT);
