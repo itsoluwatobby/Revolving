@@ -6,28 +6,27 @@ import mongoose from 'mongoose';
 import { Server } from 'socket.io';
 import cookieParser from "cookie-parser";
 import SlowDown from 'express-slow-down';
-import cluster, { Cluster } from 'cluster';
+import { dbConfig } from './mongoConfig.js';
 import { corsOptions } from "./corsOption.js";
 import express, { Application } from "express";
+import { SocketServer } from './socketsServer.js';
 import { RevolvingApplication } from './RevolvingApplication.js';
 import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
-import { SocketServer } from './socketsServer.js';
 
 type HTTPServerType = http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
 export class ServerMiddlewares{
 
   private io: Server
-  private clusters: Cluster = cluster
   private server: HTTPServerType
+  public staticPath = process.cwd() + '\\fileUpload'
 
   constructor(app: Application, PORT: string | 4000){
-
-    const staticPath = process.cwd() + '\\fileUpload'
+    dbConfig()
     app.use(this.Limiter(), this.speedLimiter())
     app.use(cors(corsOptions))
     app.use(express.json());
-    app.use(express.static(staticPath))
+    app.use(express.static(this.staticPath))
     app.use(express.urlencoded({ extended: false }));
     app.use(morgan('common'))
     // app.use(eventLogger)
