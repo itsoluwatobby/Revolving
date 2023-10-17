@@ -1,0 +1,5 @@
+{
+  "version": 2,
+  "builds": [{ "src": "./dist/revolving.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "/" }] 
+}
