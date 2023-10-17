@@ -1,21 +1,21 @@
 {
-  "version": 2, // Use Vercel Configuration Version 2
+  "version": 2,
   "builds": [
     {
-      "src": "/src/**/*", // Compile TypeScript files from /src directory
+      "src": "/src/**/*",
       "use": "@now/node"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)", // Route requests starting with /api/ to the backend
-      "dest": "/src/routes/$1" // Point to your backend routes in /src/routes/
+      "src": "/(.*)",
+      "dest": "/src/routes/$1"
     },
     {
-      "handle": "filesystem" // Serve static files from /public directory
+      "handle": "filesystem"
     },
     {
-      "src": "/(.*)", // Route all other requests to the main entry point
+      "src": "/(.*)",
       "dest": "/src/revolving.ts"
     }
   ]
