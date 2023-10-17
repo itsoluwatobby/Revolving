@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ROLES } from "../config/allowedRoles.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { UserService } from "../services/userService.js";
 import { StoryService } from "../services/StoryService.js";
 import { CommentNotificationType, CommentProps, RequestProp } from "../../types.js";
@@ -13,7 +13,7 @@ class CommentController{
   private userService = new UserService()
   private storyService = new StoryService()
   private commentService = new CommentService()
-  private redisClientService = new RedisClientService()
+  private redisClientService = new KV_Redis_ClientService()
   private notification: NotificationController = new NotificationController()
 
   constructor(){}

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/userService.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
 import { RequestStoryProp, SharedProps } from "../../types.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
@@ -10,7 +10,7 @@ class SharedStoryController {
 
   private userService = new UserService()
   private sharedStoryService = new SharedStoryService()
-  private redisClientService = new RedisClientService()
+  private redisClientService = new KV_Redis_ClientService()
 
   constructor(){}
 
@@ -76,7 +76,7 @@ class SharedStoryController {
       if (!userId || !sharedId) return res.sendStatus(400);
       await autoDeleteOnExpire(userId)
       const result = await this.sharedStoryService.unShareStory(userId, sharedId)
-      this.redisClientService.redisClient.DEL(`sharedStory:${sharedId}`)
+      this.redisClientService.redisClient.del(`sharedStory:${sharedId}`)
       return result == 'not found' 
           ? responseType({res, status: 404, count:0, message: result }) : result == 'unauthorized' 
               ? responseType({res, status: 401, count:0, message: result }) 
