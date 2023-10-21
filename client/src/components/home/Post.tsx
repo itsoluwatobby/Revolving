@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import PostTop from './post/PostTop';
-import { PageType } from '../../data';
 import PostImage from '../PostImages';
 import PostBase from './post/PostBase';
-import { TextRules } from '../../fonts';3
+import { TextRules } from '../../fonts';
+import { PageType } from '../../types/data';
 import { reduceLength } from '../../utils/navigator';
-import { MakeToButtom, PostType } from '../../posts';
+import { ChatOption, MakeToButtom, PostType } from '../../types/posts';
 // import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 import { useAverageReadTimePerStory } from '../../hooks/useAverageReadTimePerStory';
 
@@ -16,7 +17,7 @@ type Props = {
 
 export const Post = ({ story, page }: Props) => {
   const averageReadingTime = useAverageReadTimePerStory(story?.body) as string;
-  // const { observerRef, isIntersecting } = useRevolvingObserver({screenPosition: '0px', threshold: 0})
+  const [viewUsers, setViewUsers] = useState<ChatOption>('Hide')
   const adjustedStory = page === 'OTHERS' ? reduceLength(story?.body, 120, 'word') : reduceLength(story?.body, 150, 'word')
 
   const watchWords = TextRules.keywords as string[]
@@ -30,11 +31,12 @@ export const Post = ({ story, page }: Props) => {
     <article 
       // ref={observerRef}
       className={`${story?.fontFamily} ${page === 'PROFILE' ? '' : ''} flex flex-col gap-1 text-xs sm:w-full min-w-[58%] transition-all`}>
-      <PostTop bodyContent={bodyContent} story={story} />
+      <PostTop bodyContent={bodyContent} story={story} setViewUsers={setViewUsers} />
 
       <PostImage story={story} position='main' page={page} />
       
       <PostBase 
+        viewUsers={viewUsers} setViewUsers={setViewUsers}
         story={story as MakeToButtom} averageReadingTime={averageReadingTime}
       />
       {/* <Comments /> */}

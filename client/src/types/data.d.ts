@@ -285,8 +285,15 @@ type ConfirmationMethodType = 'LINK' | 'OTP'
 type PageType = 'PROFILE' | 'OTHERS'
 type DeleteCommentByAdmin = 'onlyInStory' | 'allUserComment'
 type DeleteResponseByAdmin = 'onlyInComment' | 'allUserResponse'
-type DataType = { otp: string, expiresIn: string }
-type UserDataType = { _id: string, email: string, roles: USERROLES[] }
+type DataType = { 
+  otp: string, 
+  expiresIn: string 
+}
+type UserDataType = { 
+  _id: string, 
+  email: string, 
+  roles: USERROLES[],
+}
 
 interface ErrorResponse{
   status: number | string,
@@ -332,6 +339,8 @@ type ApiSliceType = {
   data: object, 
   meta: object
 }
+
+type OTPPURPOSE = 'ACCOUNT' | 'PASSWORD' | 'OTHERS'
 
 type RefreshTokenType = {
   data: {

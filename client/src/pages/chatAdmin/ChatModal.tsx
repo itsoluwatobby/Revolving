@@ -7,9 +7,9 @@ import ChatHeader from "../../components/chat/ChatHeader";
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { useGetUserFriendsQuery } from "../../app/api/usersApiSlice";
-import { ChatOption, PostContextType, ThemeContextType } from "../../posts";
+import { ChatOption, PostContextType, ThemeContextType } from "../../types/posts";
 import { messageApiSlice, useCloseConversationMutation, useGetCurrentConversationMutation } from "../../app/api/messageApiSlice";
-import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../data";
+import { ConversationStatusType, ErrorResponse, MessageModelType, SearchStateType, UserFriends, UserProps } from "../../types/data";
 
 type ChatModalProp = {
   socket: Socket

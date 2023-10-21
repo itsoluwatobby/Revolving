@@ -1,15 +1,15 @@
 import CommentBase from './CommentBase';
-import { checkCount, reduceLength } from '../../utils/navigator';
+import { TDate, format } from 'timeago.js';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import { useEffect, useRef, useState } from 'react';
 import { ResponseBody } from './response/ResponseBody';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { PromptLiterals, ThemeContextType } from '../../posts';
 import { SkeletonComment } from '../skeletons/SkeletonComment';
+import { checkCount, reduceLength } from '../../utils/navigator';
 import { useGetCommentQuery } from '../../app/api/commentApiSlice';
+import { PromptLiterals, ThemeContextType } from '../../types/posts';
 import { useGetResponsesQuery } from '../../app/api/responseApiSlice';
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
-import { TDate, format } from 'timeago.js';
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../types/data';
 
 export default function EnlargeComment() {
   const { theme, parseId, enlarge, setEnlarge } = useThemeContext() as ThemeContextType

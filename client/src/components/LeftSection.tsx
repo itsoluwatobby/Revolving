@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { ThemeContextType } from "../posts";
+import { ThemeContextType } from "../types/posts";
 import { reduceLength } from "../utils/navigator";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../hooks/useThemeContext";

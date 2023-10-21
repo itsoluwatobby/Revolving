@@ -11,12 +11,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { useGetNotificationQuery } from "../../app/api/noficationSlice";
-import { ErrorResponse, NotificationBody, UserProps } from "../../data";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ErrorStyle, SuccessStyle, checkCount } from "../../utils/navigator";
-import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../posts";
+import { ErrorResponse, NotificationBody, UserProps } from "../../types/data";
 import { useCreateStoryMutation, useUpdateStoryMutation } from "../../app/api/storyApiSlice";
 import { getStoryData, getUrl, resetUrl, setLoading } from "../../features/story/storySlice";
+import { CodeStoreType, PostContextType, PostType, ThemeContextType } from "../../types/posts";
 
 
 type TopRightProps = {
@@ -34,10 +34,10 @@ export default function TopRight({ currentUser }: TopRightProps) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const url = useSelector(getUrl)
-  const { storyId } = useParams()
+  const { storyId, storyUserId } = useParams()
   const dispatch = useDispatch()
   
-  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
+  const address = ['/new_story', `/edit_story/${storyId}/${storyUserId}`, `/story/${storyId}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   
   const mode_class = useCallback((type: 'SUN' | 'MOON') => {

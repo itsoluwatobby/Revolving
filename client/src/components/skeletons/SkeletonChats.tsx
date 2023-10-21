@@ -1,5 +1,4 @@
 
-
 export default function SkeletonChats() {
   return (
     <article className='hidebars flex flex-col h-full gap-2 w-full shadow-md'>

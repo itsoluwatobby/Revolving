@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TDate, format } from 'timeago.js';
-import { NotificationBody } from '../../data';
+import { useEffect, useState } from 'react';
 import { FaTrashRestore } from 'react-icons/fa';
-import { ChatOption, Theme } from '../../posts';
+import { NotificationBody } from '../../types/data';
 import { reduceLength } from '../../utils/navigator';
+import { ChatOption, Theme } from '../../types/posts';
 
 type FollowsCompProps = { 
   theme: Theme,

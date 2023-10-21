@@ -1,21 +1,23 @@
 import { Link } from "react-router-dom"
+import { PostType } from "../../types/posts"
 
 type SinglePageSidebarProps = {
   theme: string,
   options: string,
   storyId: string,
+  story: PostType,
   fontOption: boolean,
   triggerPrint: () => void,
   setOptions: React.Dispatch<React.SetStateAction<string>>,
   setFontOption: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const SinglePageSidebar = ({ setOptions, triggerPrint, setFontOption, theme, fontOption, options, storyId } : SinglePageSidebarProps) => {
+export const SinglePageSidebar = ({ setOptions, story, triggerPrint, setFontOption, theme, fontOption, options, storyId } : SinglePageSidebarProps) => {
   const postOptions = ['home', 'edit', 'print']
-  const postLinks = ['/', `/edit_story/${storyId}`, '']
+  const postLinks = ['/', `/edit_story/${storyId}/${story?.userId}`, '']
+  const currentUserId = localStorage.getItem('revolving_userId') as string
 
   const printPDF = (option: string) => {
-    console.log(option)
     option === 'print' ? triggerPrint() : null
     setOptions(option)
     setFontOption(false)
@@ -25,11 +27,11 @@ export const SinglePageSidebar = ({ setOptions, triggerPrint, setFontOption, the
       <div className='w-[30%] md:w-1/5 h-full bg-slate-600 flex flex-col gap-1 p-1'>
         {
           postOptions?.map((option, index) => (
-            <Link to={`${postLinks[index]}`}
+            <Link to={(option === 'edit' && story?.userId !== currentUserId) ? '' : `${postLinks[index]}`}
               key={option}
               title={`${option == 'print' ? 'print as pdf' : option}`}
               onClick={() => printPDF(option)}
-              className={`bg-slate-400 cursor-pointer hover:scale-[1.01] uppercase text-center text-xs hover:bg-slate-400 hover:opacity-80 duration-200 ease-in-out rounded-sm ${option === options ? 'bg-slate-500 text-white' : ''} p-4`} 
+              className={`bg-slate-400 ${(option === 'edit' && story?.userId !== currentUserId)? 'hidden' : 'block'} cursor-pointer hover:scale-[1.01] uppercase text-center text-xs hover:bg-slate-400 hover:opacity-80 duration-200 ease-in-out rounded-sm ${option === options ? 'bg-slate-500 text-white' : ''} p-4`} 
             >
               {option}
             </Link>

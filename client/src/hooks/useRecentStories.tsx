@@ -1,4 +1,4 @@
-import { PostType } from "../posts";
+import { PostType } from "../types/posts";
 
 /**
 * @description gets posts within the last 3 days

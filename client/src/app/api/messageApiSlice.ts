@@ -1,8 +1,7 @@
 import { apiSlice } from "./apiSlice";
+import { GetConvoType } from "../../types/posts";
 import { providesTag } from "../../utils/helperFunc";
-import { DeleteChatOption, MembersType, MessageModelType, MessageStatus } from "../../data";
-import { GetConvoType } from "../../posts";
-
+import { DeleteChatOption, MembersType, MessageModelType, MessageStatus } from "../../types/data";
 
 export const messageApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({

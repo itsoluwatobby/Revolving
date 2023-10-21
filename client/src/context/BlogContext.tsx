@@ -3,8 +3,8 @@ import { useThemeContext } from '../hooks/useThemeContext';
 import { createContext, useEffect, useState } from 'react';
 import { setLoggedInUser } from "../features/auth/userSlice";
 import { useGetCurrentUserMutation } from "../app/api/usersApiSlice";
-import { CodeProps, ErrorResponse, TypingEvent, TypingObjType, UserProps } from '../data';
-import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType, ThemeContextType } from '../posts';
+import { CodeProps, ErrorResponse, TypingEvent, TypingObjType, UserProps } from '../types/data';
+import { PostType, ChildrenProp, PostContextType, CodeStoreType, ImageType, ThemeContextType } from '../types/posts';
 
 
 export const PostContext = createContext<PostContextType | null>(null)

@@ -2,8 +2,8 @@ import PostImage from "../PostImages";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { reduceLength } from "../../utils/navigator";
-import { PostType, ThemeContextType } from "../../posts";
 import { useThemeContext } from "../../hooks/useThemeContext";
+import { PostType, ThemeContextType } from "../../types/posts";
 import { useGetStoriesQuery } from "../../app/api/storyApiSlice";
 
 export default function RightSection() {

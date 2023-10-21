@@ -1,20 +1,21 @@
 import { useCallback } from 'react';
-import { UserProps } from "../../data";
 import { useSelector } from "react-redux";
+import { UserProps } from "../../types/data";
 import useLogout from "../../hooks/useLogout"
 import { FaTimesCircle } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../hooks/useThemeContext"
-import { ChatOption, Theme, ThemeContextType } from "../../posts";
 import { selectCurrentRoles } from "../../features/auth/authSlice";
+import { ChatOption, Theme, ThemeContextType } from "../../types/posts";
 
 type DrawdownProps = {
   rollout: boolean,
+  id: string,
   storyId: string,
   currentUser: UserProps,
 }
 
-export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProps) {
+export default function Drawdown({ rollout, id, storyId, currentUser }: DrawdownProps) {
   const { theme, setRollout } = useThemeContext() as ThemeContextType
   const userId = localStorage.getItem('revolving_userId') as string
   const userRoles = useSelector(selectCurrentRoles)
@@ -22,7 +23,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
   const signOut = useLogout()
   const home = '/'
   
-  const address = ['/new_story', `/edit_story/${storyId}`]
+  const address = ['/new_story', `/edit_story/${storyId}/${id}`]
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
   const excludeRoute = ['/new_story', `/edit_story`, `/story/${storyId}`]
   
@@ -64,7 +65,7 @@ export default function Drawdown({ rollout, storyId, currentUser }: DrawdownProp
           }
         </div>
 
-        <div className='md:flex md:items-center md:justify-between'>
+        <div className='md:flex md:items-center md:justify-between transition-all p-1'>
           {
             pathname !== '/' ?
               <Link to={`/`}

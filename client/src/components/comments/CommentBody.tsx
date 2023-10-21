@@ -8,9 +8,9 @@ import { useThemeContext } from '../../hooks/useThemeContext';
 import { SkeletonComment } from '../skeletons/SkeletonComment';
 import { ErrorStyle, REFRESH_RATE } from '../../utils/navigator';
 import { setAllComments } from '../../features/story/commentSlice';
-import { CommentProps, ErrorResponse, Prompted } from '../../data';
-import { ChatOption, CommentOptionProp, ThemeContextType } from '../../posts';
+import { CommentProps, ErrorResponse, Prompted } from '../../types/data';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import { ChatOption, CommentOptionProp, ThemeContextType } from '../../types/posts';
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../app/api/commentApiSlice';
 
 type CommentBodyProps={

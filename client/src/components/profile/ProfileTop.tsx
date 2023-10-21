@@ -2,15 +2,15 @@ import EditModal from './EditModal';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import DPComponent from './DPComponent';
-import { ChangeEvent, useState, useEffect } from 'react';
-import { ErrorResponse, UserProps } from '../../data';
 import { IsLoadingSpinner } from '../IsLoadingSpinner';
 import { MdNotificationsActive } from 'react-icons/md';
+import { ChangeEvent, useState, useEffect } from 'react';
+import { ErrorResponse, UserProps } from '../../types/data';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { useSubscribeMutation } from '../../app/api/usersApiSlice';
 import DefaultCover from '../../assets/revolving/default_cover.webp';
 import { ErrorStyle, SuccessStyle, reduceLength } from '../../utils/navigator';
-import { ImageTypeProp, LoginPromptType, ThemeContextType } from '../../posts';
+import { ImageTypeProp, LoginPromptType, ThemeContextType } from '../../types/posts';
 
 type Props = {
   userId: string,

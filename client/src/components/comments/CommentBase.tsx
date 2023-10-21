@@ -6,9 +6,9 @@ import { MdOutlineInsertComment } from 'react-icons/md';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { ErrorStyle, checkCount } from '../../utils/navigator';
 import { setEditComment } from '../../features/story/commentSlice';
-import { PromptLiterals, Theme, ThemeContextType } from '../../posts';
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs';
-import { CommentProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../data';
+import { PromptLiterals, Theme, ThemeContextType } from '../../types/posts';
+import { CommentProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../types/data';
 import { commentApiSlice, useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
 
 type BaseProps = {

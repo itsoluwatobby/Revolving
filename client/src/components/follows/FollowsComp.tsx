@@ -1,11 +1,11 @@
-import { Theme } from '../../posts';
 import { format } from 'timeago.js';
 import { Link } from 'react-router-dom';
+import { Theme } from '../../types/posts';
 import { ErrorContent } from '../ErrorContent';
 import FollowUnFollow from '../singlePost/FollowUnFollow';
 import { checkCount, reduceLength } from '../../utils/navigator';
 import SkeletonSubscription from '../skeletons/SkeletonSubscription';
-import { ErrorResponse, Followers, Follows, GetFollowsType } from '../../data';
+import { ErrorResponse, Followers, Follows, GetFollowsType } from '../../types/data';
 
 type FollowsCompProps = { 
   theme: Theme,

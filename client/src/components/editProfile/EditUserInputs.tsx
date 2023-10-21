@@ -9,8 +9,8 @@ import { useUpdateInfoMutation } from '../../app/api/usersApiSlice';
 import { useConfirmPasswordMutation } from '../../app/api/authApiSlice';
 import { ChangeEvent, useState, useEffect, useRef, useCallback } from 'react';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
-import { ChatOption, ImageTypeProp, LoginPromptType, NameType, TargetImageType, Theme } from '../../posts';
-import { Entries, ErrorResponse, Gender, InitEntriesType, InitPrevEntriesType, SocialMediaAccoutProp, UserProps, ValueType } from '../../data';
+import { ChatOption, ImageTypeProp, LoginPromptType, NameType, TargetImageType, Theme } from '../../types/posts';
+import { Entries, ErrorResponse, Gender, InitEntriesType, InitPrevEntriesType, SocialMediaAccoutProp, UserProps, ValueType } from '../../types/data';
 
 type UserInputsProps = {
   theme: Theme,

@@ -1,4 +1,4 @@
-import { ErrorResponse } from "../data"
+import { ErrorResponse } from "../types/data"
 
 type ErrorProp = {
   message: string,

@@ -4,9 +4,8 @@ import { useReactToPrint } from "react-to-print";
 import { BsArrowBarRight } from 'react-icons/bs';
 import Aside from "../components/singlePost/Aside";
 import { useEffect, useRef, useState } from "react";
-import { PostType, ThemeContextType } from "../posts";
-import { WindowScroll } from "../components/WindowScroll";
 import { useThemeContext } from "../hooks/useThemeContext";
+import { PostType, ThemeContextType } from "../types/posts";
 import ArticleComp from "../components/singlePost/ArticleComp";
 import { SinglePageSidebar } from "../components/singlePost/SinglePageSidebar";
 import { useGetStoriesQuery, useGetStoryQuery } from "../app/api/storyApiSlice";
@@ -61,34 +60,32 @@ export default function SingleStoryPage() {
   }) : 'No content'
 
   return (
-    <WindowScroll>
-      <main className={`single_page h-full ${loginPrompt?.opened == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl`}>
-        <div className="flex h-full">
-          {(Array.isArray(stories) && stories.length)
-            ? <Aside 
-                sidebar={sidebar} setIsBarOpen={setIsBarOpen}
-                setSidebar={setSidebar} stories={stories as PostType[]} 
-              /> 
-            : null
-          }
-          <ArticleComp 
-            story={targetStory as PostType} bodyContent={bodyContent as JSX.Element[]}
-            averageReadingTime={averageReadingTime} sidebar={sidebar} isLoading={isLoading} 
-            isError={isError} storyRef={storyRef} triggerPrint={triggerPrint} isBarOpen={isBarOpen}
-          />
-        </div>
-        <BsArrowBarRight 
-          title='Recent stories'
-          onClick={() => setSidebar(true)}
-          className={`${isBarOpen ? '' : 'hidden'} fixed md:hidden left-0 top-[40%] opacity-30 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:opacity-80 p-1 text-[30px]`} />
-
-        {
-          <SinglePageSidebar
-          fontOption={fontOption} options={options} triggerPrint={triggerPrint}
-          setOptions={setOptions} storyId={storyId} theme={theme} setFontOption={setFontOption}
-          />  
+    <main className={`single_page h-full ${loginPrompt?.opened == 'Open' ? 'opacity-40 transition-all' : null} box-border max-w-full flex-auto flex flex-col gap-4 drop-shadow-2xl`}>
+      <div className="flex h-full">
+        {(Array.isArray(stories) && stories.length)
+          ? <Aside 
+              sidebar={sidebar} setIsBarOpen={setIsBarOpen}
+              setSidebar={setSidebar} stories={stories as PostType[]} 
+            /> 
+          : null
         }
-      </main>
-    </WindowScroll>
+        <ArticleComp 
+          story={targetStory as PostType} bodyContent={bodyContent as JSX.Element[]}
+          averageReadingTime={averageReadingTime} sidebar={sidebar} isLoading={isLoading} 
+          isError={isError} storyRef={storyRef} triggerPrint={triggerPrint} isBarOpen={isBarOpen}
+        />
+      </div>
+      <BsArrowBarRight 
+        title='Recent stories'
+        onClick={() => setSidebar(true)}
+        className={`${isBarOpen ? '' : 'hidden'} fixed md:hidden left-0 top-[40%] opacity-30 animate-bounce bg-slate-400 cursor-pointer rounded-tr-md rounded-br-md hover:opacity-80 p-1 text-[30px]`} />
+
+      {
+        <SinglePageSidebar
+        setOptions={setOptions} storyId={storyId} theme={theme} setFontOption={setFontOption}
+        fontOption={fontOption} options={options} triggerPrint={triggerPrint} story={targetStory as PostType}
+        />  
+      }
+    </main>
   )
 }

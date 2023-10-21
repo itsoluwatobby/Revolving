@@ -2,19 +2,19 @@ import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Footer } from "../components/Footer";
-import { ErrorResponse, TaskProp } from "../data";
 import { REFRESH_RATE } from "../utils/navigator";
 import Form from "../components/taskManager/Form";
 import Tasks from "../components/taskManager/Tasks";
-import { ChatOption, ThemeContextType } from "../posts";
+import { LeftSection } from "../components/LeftSection";
+import { ErrorResponse, TaskProp } from "../types/data";
 import { useThemeContext } from "../hooks/useThemeContext";
+import { ChatOption, ThemeContextType } from "../types/posts";
 import { useGetUserTasksQuery } from "../app/api/taskApiSlice";
 import Taskbin from "../components/taskManager/TaskBin/Taskbin";
 import { setAllTasks } from "../features/story/taskManagerSlice";
 import { SkeletonTask } from "../components/skeletons/SkeletonTask";
 import { ViewSingleTask } from "../components/taskManager/ViewSingleTask";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
-import { LeftSection } from "../components/LeftSection";
 
 type TogglerPosition = 'LEFT' | 'RIGHT'
 export default function TaskManager() {

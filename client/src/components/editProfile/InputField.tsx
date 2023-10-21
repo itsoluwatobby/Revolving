@@ -1,5 +1,5 @@
-import { Theme } from "../../posts";
 import { ChangeEvent } from 'react';
+import { Theme } from "../../types/posts";
 
 type InputFieldName = {
   theme: Theme,

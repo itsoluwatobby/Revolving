@@ -1,15 +1,6 @@
 import { RootState } from "../../app/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CommentProps, CommentResponseProps } from "../../data";
-// import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
-
-// const storyAdapter: EntityAdapter<CommentProps> = createEntityAdapter<CommentProps>({
-//   sortComparer: (prev, next) => next.commentDate.localeCompare(prev.commentDate)
-// })
-
-// const initialState = storyAdapter.getInitialState({
-//   commentLength: 0,
-// })
+import { CommentProps, CommentResponseProps } from "../../types/data";
 
 const initialState = {
   comments: [] as CommentProps[],

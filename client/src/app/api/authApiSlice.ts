@@ -1,5 +1,8 @@
 import { apiSlice } from "./apiSlice";
-import { AuthType, ConfirmType, ConfirmationMethodType, DataType, OptionType, RefreshType, UserDataType, UserProps } from "../../data";
+import { 
+  AuthType, ConfirmType, ConfirmationMethodType, DataType, OTPPURPOSE, OptionType, 
+  RefreshType, UserDataType, UserProps 
+} from "../../types/data";
 
 type NewUser = {
   username: string,
@@ -43,9 +46,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
       })
     }),
 
-    forgotPassword: builder.mutation<Omit<AuthType, 'updatedAt'>, string>({
-      query: email => ({
-        url: `auth/forgot_password?email=${email}`,
+    forgotPassword: builder.mutation<Omit<AuthType, 'updatedAt'>, {email: string, type?: ConfirmationMethodType}>({
+      query: ({email, type='LINK'}) => ({
+        url: `auth/forgot_password?email=${email}&type=${type}`,
         method: 'POST',
         body: JSON.stringify({email})
       })
@@ -83,7 +86,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
       })
     }),
 
-    confirmOTP: builder.mutation<OTPConfirmType, {email: string, otp: string, purpose?: 'ACCOUNT' | 'OTHERS'}>({
+    confirmOTP: builder.mutation<OTPConfirmType, {email: string, otp: string, purpose?: OTPPURPOSE}>({
       query: ({email, otp, purpose='ACCOUNT'}) => ({
         url: `auth/otp_verification`,
         method: 'POST',
@@ -91,11 +94,11 @@ export const authApiSlice = apiSlice.injectEndpoints({
       })
     }),
 
-    generateOTP: builder.mutation<OTPResponseType, {email: string, length?: number, option: OptionType}>({
-      query: ({email, length, option}) => ({
+    generateOTP: builder.mutation<OTPResponseType, {email: string, length?: number, option: OptionType, purpose: Exclude<OTPPURPOSE, 'OTHERS'>}>({
+      query: ({email, length, option, purpose}) => ({
         url: `auth/otp_generator`,
         method: 'POST',
-        body: {email, length, option}
+        body: {email, length, option, purpose}
       })
     }),
 

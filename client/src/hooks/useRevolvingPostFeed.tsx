@@ -1,5 +1,5 @@
-import { PostFeedType, PostType } from "../posts";
 import { useEffect, useState } from "react";
+import { PostFeedType, PostType } from "../types/posts";
 
 
 const initFeeds = { filteredFeeds: [] as PostType[], isLoading: false }

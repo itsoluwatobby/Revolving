@@ -1,10 +1,10 @@
 import { BsSend } from 'react-icons/bs';
 import { Socket } from 'socket.io-client';
 import { ResponseBody } from './ResponseBody';
-import { GetConvoType, Theme } from '../../posts';
 import { useEffect, useState, useRef } from 'react';
+import { GetConvoType, Theme } from '../../types/posts';
 import { useDelayedInput } from '../../hooks/useDelayedInput';
-import { ErrorResponse, MessageModelType, UserProps } from '../../data';
+import { ErrorResponse, MessageModelType, UserProps } from '../../types/data';
 import { useCreateMessageMutation, useEditMessageMutation } from '../../app/api/messageApiSlice';
 
 type ChatBaseProp={

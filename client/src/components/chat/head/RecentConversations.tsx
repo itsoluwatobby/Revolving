@@ -1,11 +1,11 @@
 import { format } from 'timeago.js';
+import { Socket } from 'socket.io-client';
+import { UserProps } from '../../../types/data';
 import { reduceLength } from '../../../utils/navigator';
 import { IsLoadingSpinner } from '../../IsLoadingSpinner';
 import { useThemeContext } from '../../../hooks/useThemeContext';
-import { ChatOption, GetConvoType, ThemeContextType } from '../../../posts'
+import { ChatOption, GetConvoType, ThemeContextType } from '../../../types/posts'
 import { useGetCurrentConversationMutation } from '../../../app/api/messageApiSlice';
-import { UserProps } from '../../../data';
-import { Socket } from 'socket.io-client';
 
 type RecentConversationsProps = {
   socket: Socket,

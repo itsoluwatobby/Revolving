@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
 type TypewriterEffectProps = {
-  // text: string,
   delay?: number,
   start?: 'BEGIN' | 'END'
 }

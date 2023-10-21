@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
-import { CommentResponseProps, DeleteResponseByAdmin } from "../../data";
+import { CommentResponseProps, DeleteResponseByAdmin } from "../../types/data";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type ResponseArgs = {

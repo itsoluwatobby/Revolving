@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { reduceLength } from "../../utils/navigator";
-import { PostType, ThemeContextType } from "../../posts";
 import useRecentStories from "../../hooks/useRecentStories";
 import { useThemeContext } from "../../hooks/useThemeContext";
+import { PostType, ThemeContextType } from "../../types/posts";
 
 type AsideProps = {
   sidebar: boolean,

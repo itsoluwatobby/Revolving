@@ -1,19 +1,20 @@
 import { Post } from './Post';
 import { useSelector } from 'react-redux';
 import { BiErrorAlt } from 'react-icons/bi'
-import { ErrorResponse } from '../../data';
 import { useState, useEffect } from 'react';
-import { Components, REFRESH_RATE } from '../../utils/navigator';
+import { ErrorResponse } from '../../types/data';
+import { IsLoadingSpinner } from '../IsLoadingSpinner';
 import { RiSignalWifiErrorLine } from 'react-icons/ri';
 import { SkeletonBlog } from '../skeletons/SkeletonBlog';
 import { usePostContext } from '../../hooks/usePostContext';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import { Components, REFRESH_RATE } from '../../utils/navigator';
+import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 // import useRevolvingPostFeed from '../../hooks/useRevolvingPostFeed';
 import { getTabCategory } from '../../features/story/navigationSlice';
-import { PostContextType, PostType, ThemeContextType } from '../../posts'
 import { useGetStoriesByCategoryQuery } from '../../app/api/storyApiSlice';
+import { PostContextType, PostType, ThemeContextType } from '../../types/posts'
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
-import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 
 const initQuery = { page: 1, limit: 10 }
 export const Posts = () => {
@@ -130,7 +131,9 @@ export const Posts = () => {
           )
         )
       ) : content = (
+        search?.length ?
         <h3 className='m-auto text-2xl capitalize'>Story with name <span className='uppercase text-gray-600'>{search}</span> not found</h3>
+        : <IsLoadingSpinner page='POSTS' customSize='LARGE' />
       )
     )
 

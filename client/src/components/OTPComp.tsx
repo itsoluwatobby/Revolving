@@ -1,12 +1,12 @@
 import { toast } from 'react-hot-toast';
 import { BsCheck } from 'react-icons/bs';
 import { FaTimes } from 'react-icons/fa';
-import { ThemeContextType } from '../posts';
-import { DataType, ErrorResponse } from '../data';
+import { ThemeContextType } from '../types/posts';
 import { SuccessStyle } from '../utils/navigator';
 import { IsLoadingSpinner } from './IsLoadingSpinner';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { useGenerateOTPMutation } from '../app/api/authApiSlice';
+import { DataType, ErrorResponse, OTPPURPOSE } from '../types/data';
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 
 const initialState = { 
@@ -21,11 +21,12 @@ type OTPProps = {
   isLoading: boolean,
   isSuccess: boolean,
   isUninitialized: boolean,
-  email: string
+  email: string,
+  purpose: Exclude<OTPPURPOSE, 'OTHERS'>
 }
 type ModeType = 'EMAIL' | 'DIRECT'
 
-export default function OTPComp({ subject, otp, setOtp, accountAuthenticationPage, isLoading, isSuccess, isUninitialized, email }: OTPProps) {
+export default function OTPComp({ subject, otp, setOtp, accountAuthenticationPage, isLoading, isSuccess, isUninitialized, email, purpose }: OTPProps) {
   const { theme } = useThemeContext() as ThemeContextType
   const [mailMode, setMailMode] = useState<ModeType>('EMAIL')
   const [result, setResult] = useState<DataType | undefined>(undefined)
@@ -63,8 +64,9 @@ export default function OTPComp({ subject, otp, setOtp, accountAuthenticationPag
 
   const resendLink = async() => {
     try{
-      const res = await generateOTP({email, length: 6, option: mailMode }).unwrap()
+      const res = await generateOTP({email, length: 6, option: mailMode, purpose }).unwrap()
       setResult(res?.data)
+      if(mailMode === 'EMAIL') ref1?.current?.focus()
       toast.success(res?.meta?.message, SuccessStyle)
     }
     catch(err){
@@ -132,11 +134,11 @@ export default function OTPComp({ subject, otp, setOtp, accountAuthenticationPag
         }
       </div>
       <div className='flex justify-between items-center px-1'>
-        <div className={`w-10 h-4 flex items-center ${mailMode === 'EMAIL' ? 'justify-start' : 'justify-end'} transition-all p-0.5 shadow-inner shadow-slate-950 rounded-full`}>
+        <div className={`w-10 h-4 flex items-center transition-all p-0.5 ${mailMode === 'EMAIL' ? '' : 'bg-slate-900'} shadow-inner shadow-slate-950 rounded-full`}>
           <button 
             title={mailMode === 'EMAIL' ? 'Send to Email' : 'Insert Automatically'}
             onClick={() => setMailMode(prev => prev === 'EMAIL' ? prev = 'DIRECT' : prev = 'EMAIL')}
-            className={`focus:outline-none border-none shadow-lg rounded-full h-full ${mailMode === 'EMAIL' ? 'bg-slate-200' : 'bg-green-500'} w-1/2 hover:opacity-90 transitiion-all`} 
+            className={`focus:outline-none border-none shadow-lg ${mailMode === 'EMAIL' ? 'bg-slate-200 translate-x-0' : 'bg-green-500 translate-x-4'} duration-300 rounded-full h-full w-1/2 hover:opacity-90 transitiion-all`} 
           />
         </div>
         <button 

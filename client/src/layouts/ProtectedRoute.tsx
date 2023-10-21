@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { USERROLES } from "../data";
+import { USERROLES } from "../types/data";
 import { useDispatch, useSelector } from "react-redux";
 import { IsLayoutLoading } from "../components/IsLayoutLoading";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";

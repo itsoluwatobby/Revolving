@@ -5,11 +5,11 @@ import { ErrorStyle } from '../../utils/navigator';
 import { AiFillCloseSquare } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { PromptLiterals, ThemeContextType } from '../../posts';
+import { PromptLiterals, ThemeContextType } from '../../types/posts';
 import { useCreateResponseMutation } from '../../app/api/responseApiSlice';
 import { getEditComments, setEditComment } from '../../features/story/commentSlice';
 import { commentApiSlice, useUpdateCommentMutation } from '../../app/api/commentApiSlice';
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../data';
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../types/data';
 
 type WriteProp={
   writeReply: string,

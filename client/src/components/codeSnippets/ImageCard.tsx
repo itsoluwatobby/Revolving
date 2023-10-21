@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast"
 import { FaTimes } from "react-icons/fa"
 import { ErrorStyle } from "../../utils/navigator"
 import { useDispatch, useSelector } from "react-redux"
-import { Theme, ImageType, ImageUrlsType } from "../../posts"
+import { Theme, ImageType, ImageUrlsType } from "../../types/posts"
 import { useDeleteImageMutation } from "../../app/api/storyApiSlice"
 import { getUrl, resetUrl, setUrl } from "../../features/story/storySlice"
 

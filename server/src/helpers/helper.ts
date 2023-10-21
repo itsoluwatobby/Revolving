@@ -64,7 +64,7 @@ export async function verifyToken(token: string, secret: string): Promise<string
  */
 export const responseType = ({res, status=200, count=0, message='success', data={}, pages={}}): ResponseType => {
   return (
-    data ? 
+    data !== null ? 
         res.status(status).json({pages, meta:{status, count, message}, data})
             : res.status(status).json({meta:{status, message}})
   )

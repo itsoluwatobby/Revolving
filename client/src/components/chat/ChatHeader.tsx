@@ -5,9 +5,9 @@ import { CiSearch } from 'react-icons/ci';
 import { useDispatch } from 'react-redux';
 import { FriendsModal } from './head/FriendsModal';
 import { usePostContext } from '../../hooks/usePostContext';
+import { ChatOption, GetConvoType, PostContextType, Theme, } from '../../types/posts';
 import { messageApiSlice, useCloseConversationMutation } from '../../app/api/messageApiSlice';
-import { ChatOption, GetConvoType, PostContextType, Theme, } from '../../posts';
-import { ErrorResponse, SearchStateType, TypingObjType, UserFriends, UserProps } from '../../data';
+import { ErrorResponse, SearchStateType, TypingObjType, UserFriends, UserProps } from '../../types/data';
 
 type ChatHeaderProp={
   theme: Theme,

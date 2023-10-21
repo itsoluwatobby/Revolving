@@ -1,9 +1,8 @@
-import { ErrorResponse } from '../data';
 import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { ThemeContextType } from '../posts';
+import { ErrorResponse } from '../types/data';
+import { ThemeContextType } from '../types/posts';
 import { SuccessStyle } from '../utils/navigator';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { persistLogin } from '../features/auth/authSlice';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { setCredentials } from '../features/auth/authSlice';
 import { useSignInMutation } from '../app/api/authApiSlice';
 import ForgotPassword from '../components/modals/ForgotPassword';
 import LoginComponent from '../components/modals/LoginComponent';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 export default function Login() {

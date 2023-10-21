@@ -2,10 +2,10 @@ import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { ErrorStyle } from '../utils/navigator';
 import { Link, useParams } from 'react-router-dom';
-import { ErrorResponse, UserProps } from '../data';
+import { ErrorResponse, UserProps } from '../types/data';
 import { useThemeContext } from '../hooks/useThemeContext';
 import EditUserInputs from '../components/editProfile/EditUserInputs';
-import { ImageTypeProp, TargetImageType, ThemeContextType } from '../posts';
+import { ImageTypeProp, TargetImageType, ThemeContextType } from '../types/posts';
 import { useGetUserByIdQuery, useUpdateInfoMutation } from '../app/api/usersApiSlice';
 import { useDeleteImageMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
 

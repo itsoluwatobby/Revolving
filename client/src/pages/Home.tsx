@@ -1,9 +1,9 @@
-import { ThemeContextType } from "../posts";
 import { Posts } from "../components/home/Posts";
+import { ThemeContextType } from "../types/posts";
 // import RightSection from "../components/home/RightSection";
 import { TopHome } from "../components/home/TopHome";
-import { useThemeContext } from "../hooks/useThemeContext";
 import { LeftSection } from "../components/LeftSection";
+import { useThemeContext } from "../hooks/useThemeContext";
 
 export const Home = () => {
   const { setRollout } = useThemeContext() as ThemeContextType

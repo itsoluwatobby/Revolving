@@ -1,6 +1,6 @@
 import { format } from "timeago.js"
-import { MessageModelType } from "../../../data"
 import { BsCheck, BsCheckAll } from "react-icons/bs"
+import { MessageModelType } from "../../../types/data"
 import { reduceLength } from "../../../utils/navigator"
 
 type ResponseBodyType = {

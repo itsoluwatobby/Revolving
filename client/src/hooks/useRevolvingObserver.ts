@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react"
-import { IsIntersectingType } from "../posts"
+import { IsIntersectingType } from "../types/posts"
 
 type UseRevolvingObserverProps = {
   screenPosition: string,

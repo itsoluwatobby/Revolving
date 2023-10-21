@@ -5,10 +5,10 @@ import { ErrorStyle } from "../../utils/navigator";
 import { IoIosSend, IoMdAdd } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { ChatOption, Theme, ThemeContextType } from "../../posts";
-import { CreatePrompt, ErrorResponse, InputTaskProp, TaskProp } from "../../data";
+import { ChatOption, Theme, ThemeContextType } from "../../types/posts";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import { getTask, setTask, singleTask } from "../../features/story/taskManagerSlice";
+import { CreatePrompt, ErrorResponse, InputTaskProp, TaskProp } from "../../types/data";
 import { useCreateTaskMutation, useUpdateTaskMutation } from "../../app/api/taskApiSlice";
 import { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState  } from "react";
 

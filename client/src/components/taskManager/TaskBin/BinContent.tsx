@@ -1,6 +1,6 @@
-import { Theme } from '../../../posts';
+import { Theme } from '../../../types/posts';
 import { MdOutlineDeleteForever, MdOutlineRestore } from 'react-icons/md';
-import { FunctionOption, Position, TaskProp } from '../../../data';
+import { FunctionOption, Position, TaskProp } from '../../../types/data';
 
 type BinContentProps = {
   task: TaskProp,

@@ -1,10 +1,10 @@
 import CodeCard from "./CodeCard";
 import { useEffect } from 'react';
 import ImageCard from "./ImageCard";
-import { OpenSnippet } from "../../data"
+import { OpenSnippet } from "../../types/data"
 import { usePostContext } from "../../hooks/usePostContext"
-import { ConflictType, PostContextType, Theme, UpdateSuccess } from "../../posts";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { ConflictType, PostContextType, Theme, UpdateSuccess } from "../../types/posts";
 
 type CodeSnippetProps = {
   theme: Theme,

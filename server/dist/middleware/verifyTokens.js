@@ -7,9 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import dotenv from 'dotenv';
 import { UserService } from "../services/userService.js";
 import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
+dotenv.config();
 const redisClientServer = new KV_Redis_ClientService();
 const userService = new UserService();
 function activatedAccount(email) {
@@ -44,7 +46,7 @@ export function verifyAccessToken(req, res, next) {
                     return responseType({ res, status: 403, message: 'Account Locked, Please contact support' });
                 req.email = verify === null || verify === void 0 ? void 0 : verify.email;
                 req.roles = verify === null || verify === void 0 ? void 0 : verify.roles;
-                next();
+                return next();
             }).catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
         }
     });

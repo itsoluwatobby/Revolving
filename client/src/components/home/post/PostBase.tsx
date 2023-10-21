@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { ErrorResponse } from "../../../data";
+import { PostLikes } from './PostLikes.';
 import Comments from "../../comments/Comments";
 import { AiOutlineRetweet } from "react-icons/ai";
+import { ErrorResponse } from "../../../types/data";
 import { MdOutlineInsertComment } from "react-icons/md";
 import { useThemeContext } from "../../../hooks/useThemeContext";
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs";
 import { useLikeAndUnlikeStoryMutation } from "../../../app/api/storyApiSlice";
 import { ErrorStyle, SuccessStyle, checkCount } from "../../../utils/navigator";
-import { CommentOptionProp, MakeToButtom, ThemeContextType } from "../../../posts";
+import { ChatOption, CommentOptionProp, MakeToButtom, ThemeContextType } from "../../../types/posts";
 import { useLikeAndUnlikeSharedStoryMutation, useShareStoryMutation } from "../../../app/api/sharedStorySlice";
 
 type PostButtomProps = {
   story: MakeToButtom,
+  viewUsers: ChatOption,
   averageReadingTime: string,
+  setViewUsers: React.Dispatch<React.SetStateAction<ChatOption>>
 }
 
-export default function PostBase({ story, averageReadingTime }: PostButtomProps) {
+export default function PostBase({ viewUsers, setViewUsers, story, averageReadingTime }: PostButtomProps) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' })
@@ -51,9 +54,21 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
       isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
     }
   }
-// {(story?.likes?.includes(currentUserId) || story?.sharedLikes?.includes(currentUserId)) && 'text-red-500'}
+
   return (
-    <div className='relative mt-2 flex items-center gap-5 text-sm font-sans'>
+    <div className='relative mt-2 flex flex-col gap-1 text-sm font-sans'>
+      
+     {
+      story?.likes?.length ?
+        <p 
+          onClick={() => setViewUsers('Open')}
+          className='underline underline-offset-2 cursor-pointer hover:opacity-90 active:opacity-100 transition-all'>view likes</p>
+      : null
+     }
+
+     { viewUsers === 'Open' ? <PostLikes storyId={story?._id} setViewUsers={setViewUsers} /> : null }
+      
+      <div className='relative flex items-center gap-5'>
         <p className="text-green-600">{story?.body ? averageReadingTime + ' read' : ''}</p>
         <p 
           onClick={likeUnlikeStory}
@@ -106,5 +121,6 @@ export default function PostBase({ story, averageReadingTime }: PostButtomProps)
           
           <Comments openComment={openComment} setOpenComment={setOpenComment} />
       </div>
+    </div>
   )
 }

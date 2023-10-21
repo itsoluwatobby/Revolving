@@ -1,12 +1,12 @@
-import { useState, useCallback } from 'react';
 import { format } from 'timeago.js';
-import { Followers, Follows, UserProps } from '../../data';
 import { Link } from 'react-router-dom';
+import { useState, useCallback } from 'react';
 import { MdAttachEmail } from 'react-icons/md';
-import { ImageTypeProp, Theme } from '../../posts';
-import { FaFacebookSquare, FaGithub, FaInstagramSquare, FaLinkedin, FaTwitterSquare } from 'react-icons/fa';
-import { checkCount, reduceLength } from '../../utils/navigator';
+import { ImageTypeProp, Theme } from '../../types/posts';
 import FollowUnFollow from '../singlePost/FollowUnFollow';
+import { Followers, Follows, UserProps } from '../../types/data';
+import { checkCount, reduceLength } from '../../utils/navigator';
+import { FaFacebookSquare, FaGithub, FaInstagramSquare, FaLinkedin, FaTwitterSquare } from 'react-icons/fa';
 
 type Props = {
   theme: Theme,

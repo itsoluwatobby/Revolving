@@ -5,14 +5,14 @@ import TopLeft from './navModals/TopLeft.js';
 import Drawdown from './navModals/Drawdown.js';
 import TopRight from './navModals/TopRight.js';
 import MidModal from './navModals/MidModal.js';
-import { TypingEvent, UserProps } from '../data.js';
+import { TypingEvent, UserProps } from '../types/data.js';
 import { usePostContext } from '../hooks/usePostContext';
 import { useLocation, useParams } from 'react-router-dom';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { getCurrentUser } from '../features/auth/userSlice.js';
 import { getTabCategory } from '../features/story/navigationSlice.js';
-import { PostContextType, PostType, ThemeContextType } from '../posts';
 import { useGetStoriesByCategoryQuery } from '../app/api/storyApiSlice.js';
+import { PostContextType, PostType, ThemeContextType } from '../types/posts.js';
 
 const select_styles = 'border border-t-0 border-l-0 border-r-0 border-gray-300 border-b-1 cursor-pointer p-1.5 transition-all hover:pb-1.5 hover:bg-slate-200 hover:opacity-60 ease-in-out rounded-sm';
 export const Navbar = () => {
@@ -21,12 +21,12 @@ export const Navbar = () => {
   const getNavigation = useSelector(getTabCategory)
   const { typingEvent } = usePostContext() as PostContextType
   const {theme, rollout, notintersecting, setLoginPrompt, fontFamily, setFontFamily, fontOption} = useThemeContext() as ThemeContextType
-  const { storyId } = useParams()
+  const { storyId, storyUserId } = useParams()
   const {data} = useGetStoriesByCategoryQuery({category: getNavigation})
   const [targetStory, setTargetStory] = useState<PostType>()
   const [delayedSaving, setDelayedSaving] = useState<TypingEvent>('notTyping')
   const designatedPath =  `/story/${storyId}`
-  const address = ['/new_story', `/edit_story/${storyId}`, `/story/${storyId}`]
+  const address = ['/new_story', `/edit_story/${storyId}/${storyUserId}`, `/story/${storyId}`]
 
   useEffect(() => {
     let isMounted = true
@@ -70,10 +70,10 @@ export const Navbar = () => {
       
       <Drawdown 
         rollout={rollout} storyId={storyId as string} 
-        currentUser={currentUser as UserProps}
+        currentUser={currentUser as UserProps} id={storyUserId as string}
       />
       
-      <div className={`relative mobile:flex-none flex items-center justify-between p-1 mobile:p-0.5 z-30 ${pathname !== `/story/${storyId}` ? 'w-fit' : ''} ${pathname === `/edit_story/${storyId}` ? 'mobile:gap-x-2' : 'mobile:gap-x-1 gap-x-2'}`}>
+      <div className={`relative mobile:flex-none flex items-center justify-between p-1 mobile:p-0.5 z-30 ${pathname !== `/story/${storyId}` ? 'w-fit' : ''} ${pathname === `/edit_story/${storyId}/${storyUserId}` ? 'mobile:gap-x-2' : 'mobile:gap-x-1 gap-x-2'}`}>
         <TopRight currentUser={currentUser as UserProps} />
       </div>
      { 

@@ -8,9 +8,9 @@ import { useThemeContext } from "../../../hooks/useThemeContext";
 import { commentApiSlice } from "../../../app/api/commentApiSlice";
 import { ErrorStyle, reduceLength } from "../../../utils/navigator";
 import { setEditResponse } from "../../../features/story/commentSlice";
-import { PromptLiterals, Theme, ThemeContextType } from "../../../posts";
 import { useDeleteResponseMutation } from "../../../app/api/responseApiSlice";
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from "../../../data";
+import { PromptLiterals, Theme, ThemeContextType } from "../../../types/posts";
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from "../../../types/data";
 
 
 type ResponseBodyProps = {

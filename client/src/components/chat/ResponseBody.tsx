@@ -1,7 +1,7 @@
 import { format } from "timeago.js"
-import { MessageModelType } from "../../data"
-import { BsCheck, BsCheckAll } from "react-icons/bs"
 import { IoMdCloseCircle } from "react-icons/io"
+import { MessageModelType } from "../../types/data"
+import { BsCheck, BsCheckAll } from "react-icons/bs"
 import { reduceLength } from "../../utils/navigator"
 
 type ResponseBodyType = {

@@ -1,5 +1,5 @@
 import { RootState } from "../../app/store";
-import { ImageUrlsType, PostType } from "../../posts";
+import { ImageUrlsType, PostType } from "../../types/posts";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {

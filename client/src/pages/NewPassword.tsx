@@ -1,8 +1,8 @@
-import { ErrorResponse } from "../data";
 import { toast } from "react-hot-toast";
-import { ThemeContextType } from "../posts";
+import { ErrorResponse } from "../types/data";
+import { ThemeContextType } from "../types/posts";
 import { SuccessStyle } from "../utils/navigator";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useThemeContext } from "../hooks/useThemeContext";
 import { useNewPasswordMutation } from "../app/api/authApiSlice";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
@@ -16,6 +16,7 @@ export default function NewPassword() {
   const [confirmPassword, setConfirmPassword] = useState<string>('')
   const [match, setMatch] = useState<boolean>(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const [newPassword, {isLoading, isSuccess, isError
   }] = useNewPasswordMutation()
   const { theme } = useThemeContext() as ThemeContextType
@@ -37,6 +38,7 @@ export default function NewPassword() {
       setPassword('')
       setConfirmPassword('')
       !isLoading && toast.success('Password reset successful', SuccessStyle)
+      navigate('/signIn')
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
@@ -86,7 +88,7 @@ export default function NewPassword() {
           <button 
             type='submit'
             disabled={!canSubmit && !match && !isLoading}
-            className={`w-[95%] mx-auto mt-2 rounded-sm ${errorMsg ? 'bg-red-600' : ''}  ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            className={`w-[95%] mx-auto mt-2 rounded-sm ${errorMsg?.length ? 'bg-red-600' : ''}  ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
             {
               errorMsg ? errorMsg 

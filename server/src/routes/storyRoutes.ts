@@ -11,6 +11,8 @@ storyRouter.post('/:userId', verifyRoles([ROLES.USER]), (req: RequestStoryProp, 
 storyRouter.get('/user/:userId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => StoryController.getUserStory(req, res));
 storyRouter.put('/:userId/:storyId', verifyRoles([ROLES.USER]), (req: RequestStoryProp, res: Response) => StoryController.updateStory(req, res));
 
+storyRouter.get('/user/likesUsersInStory/:storyId', (req: RequestStoryProp, res: Response) => StoryController.getStoryLikes(req, res));
+
 storyRouter.patch('/:userId/:storyId', verifyRoles([ROLES.USER]), (req: Request, res: Response) => StoryController.like_Unlike_Story(req, res));
 storyRouter.delete('/:userId/:storyId', verifyRoles([ROLES.USER, ROLES.ADMIN]), (req: RequestStoryProp, res: Response) => StoryController.deleteStory(req, res));
 storyRouter.delete('/:adminId/:userId/:storyId', verifyRoles([ROLES.ADMIN]), (req: RequestStoryProp, res: Response) => StoryController.deleteStoryByAdmin(req, res));

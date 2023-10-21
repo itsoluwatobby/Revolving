@@ -1,7 +1,7 @@
 import { RootState } from '../store';
-import { ApiSliceType, AuthType, RefreshTokenType } from '../../data';
 import { BaseQueryFn } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import { setCredentials, signUserOut } from '../../features/auth/authSlice';
+import { ApiSliceType, AuthType, RefreshTokenType } from '../../types/data';
 import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react';
 
 const BASEPATH = process.env.NODE_ENV === 'production' ? 'https://revolving-api.vercel.app' : 'http://localhost:4000'
@@ -39,7 +39,7 @@ const baseQueryWithReAuth = async(args: string, api: BaseQueryApi, extraOptions:
 
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReAuth as unknown as BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, object, FetchBaseQueryMeta>,
-  tagTypes: ['USERS', 'STORY', 'SHAREDSTORY', 'COMMENT', 'RESPONSE', 'TASK', 'TASKBIN', 'SUBSCRIPTIONS', 'FOLLOWS', 'NOTIFICATION', 'FRIENDS', 'MESSAGES', 'CONVERSATIONS'],
+  tagTypes: ['USERS', 'STORY', 'SHAREDSTORY', 'COMMENT', 'RESPONSE', 'TASK', 'TASKBIN', 'SUBSCRIPTIONS', 'FOLLOWS', 'NOTIFICATION', 'FRIENDS', 'MESSAGES', 'CONVERSATIONS', 'USERLIKES'],
   endpoints: builder => ({})
 })
 

@@ -94,6 +94,7 @@ interface CommentProps{
 }
 
 type ConfirmationMethodType = 'LINK' | 'OTP'
+type OTPPURPOSE = 'ACCOUNT' | 'PASSWORD' | 'OTHERS'
 type Gender = "Female" | "Male" | "Others" | "Undecided"
 type CommentResponseProps = Omit<Emerge, 'commentDate' | 'comment' | 'commentResponse' | 'storyId'>
 

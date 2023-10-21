@@ -1,8 +1,8 @@
 import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { checkCount } from "../../utils/navigator";
-import { ErrorResponse, PositionType } from "../../data";
-import { PostType, ThemeContextType } from "../../posts";
+import { ErrorResponse, PositionType } from "../../types/data";
+import { PostType, ThemeContextType } from "../../types/posts";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from "react-icons/bs";
 import { storyApiSlice, useLikeAndUnlikeStoryMutation } from "../../app/api/storyApiSlice";
