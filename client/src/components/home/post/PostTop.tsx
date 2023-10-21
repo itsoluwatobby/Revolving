@@ -4,24 +4,25 @@ import UserCard from "../../UserCard";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { ErrorResponse } from "../../../data";
 import { FiMoreVertical } from "react-icons/fi";
+import { ErrorResponse } from "../../../types/data";
 import { useEffect, useState, useRef } from 'react';
 import { useThemeContext } from "../../../hooks/useThemeContext";
 import useRevolvingObserver from "../../../hooks/useRevolvingObserver";
-import { ChatOption, PostType, Theme, ThemeContextType } from "../../../posts";
 import { useDeleteSharedStoryMutation } from "../../../app/api/sharedStorySlice";
 import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { ChatOption, PostType, Theme, ThemeContextType } from "../../../types/posts";
 import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApiSlice";
 
 
 type PostTopProps = {
   story: PostType,
-  bodyContent: JSX.Element[] | "No content"
+  bodyContent: JSX.Element[] | "No content",
+  setViewUsers: React.Dispatch<React.SetStateAction<ChatOption>>,
 }
 
-export default function PostTop({ story, bodyContent }: PostTopProps) {
+export default function PostTop({ story, bodyContent, setViewUsers }: PostTopProps) {
   const [deleteSharedStory, { isLoading: isSharedDeleteLoading, isError: isSharedDeleteError }] = useDeleteSharedStoryMutation()
   const [deleteStory, { isLoading: isDeleteLoading, isError: isDeleteError }] = useDeleteStoryMutation()
   const { observerRef, isIntersecting } = useRevolvingObserver({screenPosition: '0px', threshold: 0.2})
@@ -78,6 +79,7 @@ export default function PostTop({ story, bodyContent }: PostTopProps) {
   return (
     <div 
       ref={observerRef as React.LegacyRef<HTMLDivElement>}
+      onClick={() => setViewUsers('Hide')}
       className={`maxmobile:text-base ${(isDeleteLoading || isSharedDeleteLoading) ? 'animate-pulse' : ''} ${isIntersecting === 'NOT_INTERSECTING' ? 'scale-75' : 'scale-100'} duration-200 transition-all`}>
       <div 
         className='relative flex items-center gap-3'
@@ -181,7 +183,7 @@ const ActionModal = ({ story, open, theme, buttonOptClass, deleted }: ActionModa
       <span 
       title='Edit post'
       className={buttonOptClass(theme)}>
-        <Link to={`/edit_story/${story?._id}`} >  
+        <Link to={`/edit_story/${story?._id}/${story?.userId}`} >  
           Edit
         </Link>
       </span>

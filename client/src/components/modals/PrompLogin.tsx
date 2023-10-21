@@ -1,5 +1,5 @@
 import useLogout from "../../hooks/useLogout";
-import { ThemeContextType } from "../../posts";
+import { ThemeContextType } from "../../types/posts";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../hooks/useThemeContext";
 

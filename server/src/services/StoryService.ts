@@ -4,7 +4,7 @@ import { StoryModel } from "../models/Story.js";
 import { CommentService } from './commentService.js';
 import { CommentModel } from "../models/CommentModel.js";
 import { SharedStoryService } from './SharedStoryService.js';
-import { LikeNotificationType, StoryProps } from "../../types.js";
+import { LikeNotificationType, StoryProps, SubUser } from "../../types.js";
 import NotificationController from '../controller/notificationController.js';
 
 export class StoryService {

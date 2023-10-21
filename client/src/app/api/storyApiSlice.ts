@@ -1,7 +1,7 @@
 import { apiSlice } from "./apiSlice";
-import { ImageRes, PostType } from "../../posts";
-import { Categories, UserProps } from "../../data";
 import { providesTag } from "../../utils/helperFunc";
+import { ImageRes, PostType } from "../../types/posts";
+import { Categories, UserProps } from "../../types/data";
 // import { EntityAdapter, createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 
 type StoryArgs = {
@@ -152,6 +152,7 @@ export const {
   useGetStoriesByCategoryQuery,
   useGetStoriesWithUserIdQuery,
   useLikeAndUnlikeStoryMutation,
+  useGetUsersThatLikedStoryQuery
 } = storyApiSlice
 
 // //returns query result object 

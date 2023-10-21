@@ -1,6 +1,6 @@
-import { ChatOption } from "../../../posts"
+import { ChatOption } from "../../../types/posts"
 import { AiFillCloseSquare } from "react-icons/ai"
-import { DeleteChatOption, MessageModelType, UserProps } from "../../../data"
+import { DeleteChatOption, MessageModelType, UserProps } from "../../../types/data"
 
 type DeleteOptionProp = {
   open: ChatOption,

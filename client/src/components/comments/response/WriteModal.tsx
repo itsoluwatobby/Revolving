@@ -5,10 +5,10 @@ import { AiFillCloseSquare } from 'react-icons/ai';
 import { ErrorStyle } from '../../../utils/navigator';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThemeContext } from '../../../hooks/useThemeContext';
-import { PromptLiterals, ThemeContextType } from '../../../posts';
 import { commentApiSlice } from '../../../app/api/commentApiSlice';
+import { PromptLiterals, ThemeContextType } from '../../../types/posts';
 import { getEditResponse, setEditResponse } from '../../../features/story/commentSlice';
-import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../../data';
+import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../../types/data';
 import { useCreateResponseMutation, useUpdateResponseMutation } from '../../../app/api/responseApiSlice';
 
 type WriteProp={

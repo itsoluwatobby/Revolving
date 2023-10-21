@@ -1,7 +1,8 @@
 import { toast } from "react-hot-toast";
 import { useParams } from 'react-router-dom';
 import { ErrorStyle } from "../utils/navigator";
-import { ErrorResponse, UserProps } from "../data";
+import { LeftSection } from "../components/LeftSection";
+import { ErrorResponse, UserProps } from "../types/data";
 import { ChangeEvent, useEffect, useState } from 'react';
 import ProfileMid from "../components/profile/ProfileMid";
 import ProfileTop from "../components/profile/ProfileTop";
@@ -9,9 +10,8 @@ import { useThemeContext } from "../hooks/useThemeContext";
 import ProfileBase from "../components/profile/ProfileBase";
 import SkeletonProfile from "../components/skeletons/SkeletonProfile";
 import { useGetUserByIdQuery, useUpdateInfoMutation } from "../app/api/usersApiSlice";
-import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../posts";
+import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../types/posts";
 import { useDeleteImageMutation, useGetStoriesWithUserIdQuery, useUploadImageMutation } from "../app/api/storyApiSlice";
-import { LeftSection } from "../components/LeftSection";
 
 const initialState = {name: null, data: null}
 

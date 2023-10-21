@@ -1,12 +1,12 @@
-import { TypingEvent } from "../../data";
 import { CiSearch } from 'react-icons/ci';
 import { useSelector } from "react-redux";
+import { TypingEvent } from "../../types/data";
 import WedgeLoad from '../../assets/Wedges-14.3s-44px.svg';
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { getStoryData } from "../../features/story/storySlice";
-import { PostContextType, ThemeContextType } from "../../posts";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { PostContextType, ThemeContextType } from "../../types/posts";
 
 type TopLeftProp={
   delayedSaving: TypingEvent
@@ -17,11 +17,10 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { search, setSearch} = usePostContext() as PostContextType
   const {theme, setFontOption, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
-  const { storyId } = useParams()
-  const { userId } = useParams()
+  const { storyId, storyUserId, userId } = useParams()
 
   const searchBar = ['/', `/taskManager/${userId}`]
-  const savedDraft = ['/new_story', `/edit_story/${storyId}`]
+  const savedDraft = ['/new_story', `/edit_story/${storyId}/${storyUserId}`]
   
   return (
     <div className={`flex-none ${pathname === '/' ? 'md:sticky md:top-0' : ''} flex items-center`}>

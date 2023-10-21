@@ -1,11 +1,11 @@
 import { toast } from "react-hot-toast";
 import BodyComponent from "./BodyComponent";
-import { ThemeContextType } from "../../posts";
 import { ErrorStyle } from "../../utils/navigator";
 import { useEffect, useRef, useState } from "react";
+import { ThemeContextType } from "../../types/posts";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
-import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../data";
+import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../types/data";
 
 type CommentType = {
   comment: CommentProps,

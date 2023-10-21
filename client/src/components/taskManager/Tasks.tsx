@@ -7,8 +7,8 @@ import React, { useCallback } from 'react';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { setTask } from '../../features/story/taskManagerSlice';
 import { ErrorStyle, reduceLength } from '../../utils/navigator';
-import { ChatOption, Theme, ThemeContextType } from '../../posts';
-import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../data';
+import { ChatOption, Theme, ThemeContextType } from '../../types/posts';
+import { ButtonType, EditTaskOption, ErrorResponse, TaskProp } from '../../types/data';
 import { useDeleteTaskMutation, useUpdateTaskMutation } from '../../app/api/taskApiSlice';
 
 type TaskProps = {

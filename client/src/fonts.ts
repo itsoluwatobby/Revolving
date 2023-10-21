@@ -1,4 +1,4 @@
-import { FontProp, TextProp } from "./data";
+import { FontProp, TextProp } from "./types/data";
 
 export const custom_fonts: FontProp = {
   'open_sans': 'Open sans', 

@@ -1,7 +1,7 @@
-import { LoginProps } from "../../data";
 import { Link } from "react-router-dom";
 import { useSelector } from 'react-redux';
-import { ThemeContextType } from "../../posts";
+import { LoginProps } from "../../types/data";
+import { ThemeContextType } from "../../types/posts";
 import { persisted } from "../../features/auth/authSlice";
 import { useThemeContext } from "../../hooks/useThemeContext";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
@@ -79,7 +79,7 @@ export default function LoginComponent({
             <button 
               type='submit'
               disabled={!canSubmit && !loading}
-              className={`w-[95%] self-center ${errorMsg ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center ${errorMsg?.length ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !loading) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
               {errorMsg ? errorMsg : (!loading ? 'Sign In' : 'Signing In...')}
             </button>

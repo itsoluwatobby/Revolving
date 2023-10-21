@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { providesTag } from "../../utils/helperFunc";
-import { CommentProps, DeleteCommentByAdmin } from "../../data";
+import { CommentProps, DeleteCommentByAdmin } from "../../types/data";
 
 type CommentArgs = {
   userId: string, 

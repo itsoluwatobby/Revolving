@@ -1,4 +1,5 @@
 import brcypt from 'bcrypt';
+import dotenv from 'dotenv';
 import { Document, Types } from "mongoose";
 import { Request, Response } from "express";
 import { UserModel } from "../models/User.js";
@@ -9,10 +10,19 @@ import { KV_Redis_ClientService } from '../helpers/redis.js';
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js'; 
 import { NotificationModel } from '../models/Notifications.js';
-import { ClaimProps, EmailProps, NewUserProp, QueryProps, UserProps } from "../../types.js";
+import { ClaimProps, EmailProps, NewUserProp, OTPPURPOSE, QueryProps, UserProps } from "../../types.js";
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 
+dotenv.config()
+
 type UserDocument = Document<unknown, {}, UserProps> & UserProps & {_id: Types.ObjectId;}
+
+type ExtraOTPRequestType = { 
+  email: string, 
+  length: number, 
+  option: 'EMAIL' | 'DIRECT', 
+  purpose: Exclude<OTPPURPOSE, 'OTHERS'> 
+}
 
 /**
  * @description Authentication controller
@@ -85,8 +95,8 @@ class AuthenticationController {
     
         transporter.sendMail(options, (err) => {
           if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
+          else return responseType({res, status: 201, message: 'Please check your email to activate your account'})
         })
-        return responseType({res, status: 201, message: 'Please check your email to activate your account'})
       }
       else if(type === 'OTP'){
         this.OTPGenerator(res, newUser)
@@ -124,11 +134,11 @@ class AuthenticationController {
 
    /**
    * @descriptionconfirms OTP sent by user
-   * @body body - email, otp, purpose='ACCOUNT' | 'OTHERS
+   * @body body - email, otp, purpose='ACCOUNT' | 'PASSWORD' | 'OTHERS
   */
   public confirmOTPToken(req: Request, res: Response){
     asyncFunc(res, async () => {
-      const { email, otp, purpose='ACCOUNT' }: {email: string, otp: string, purpose?: 'ACCOUNT' | 'OTHERS'} = req.body
+      const { email, otp, purpose='ACCOUNT' }: {email: string, otp: string, purpose?: OTPPURPOSE} = req.body
       if(!email || !otp) return responseType({res, status: 400, message: 'OTP or Email required'});
       const user = await this.userService.getUserByEmail(email)
       if(!user) return responseType({res, status: 404, message: 'You do not have an account'});
@@ -139,6 +149,16 @@ class AuthenticationController {
         if(!checksExpiration(user?.verificationToken?.createdAt)){
           await user.updateOne({$set: { isAccountActivated: true, verificationToken: { type: 'OTP', token: '', createdAt: '' }}})
           return responseType({res, status: 200, message: 'Welcome, account activated', data: { _id: user?._id, email: user?.email, roles: user?.roles }});
+        }
+        else return responseType({res, status: 403, message: 'OTP expired pls login to request for a new one'});
+      }
+      else if(purpose === 'PASSWORD'){
+        if(!user.isResetPassword) return responseType({res, status: 403, message: 'You need to request for a password reset'})
+        const OTPMatch = user?.verificationToken?.token === otp
+        if(!OTPMatch) return responseType({res, status: 403, message: 'Bad Token'})
+        if(!checksExpiration(user?.verificationToken?.createdAt)){
+          await user.updateOne({$set: { verificationToken: { type: 'OTP', token: '', createdAt: '' }}})
+          return responseType({res, status: 200, message: 'SUCCESSFUL', data: { _id: user?._id, email: user?.email, roles: user?.roles } });
         }
         else return responseType({res, status: 403, message: 'OTP expired pls login to request for a new one'});
       }
@@ -158,11 +178,16 @@ class AuthenticationController {
    * @description generates OTP and sends it to user email
    * @param req - response object, user, length(default - 6)
   */
-  public OTPGenerator(res: Response, user: UserDocument, length=6){
+  public OTPGenerator(res: Response, user: UserDocument, length=6, purpose: Exclude<OTPPURPOSE, 'OTHERS'>='ACCOUNT'){
     asyncFunc(res, async () => {
       const OTPToken = generateOTP(length)
       const options = mailOptions(user?.email, user?.username, OTPToken, 'account', 'OTP')
-      await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } }});
+      if(purpose === 'ACCOUNT'){
+        await user.updateOne({$set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } }});
+      }
+      else if(purpose === 'PASSWORD'){
+        await user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } }})
+      }
       transporter.sendMail(options, (err) => {
         if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
         else return responseType({res, status: 201, message: 'Please check your email, OTP sent'})
@@ -176,11 +201,11 @@ class AuthenticationController {
   */  
   public ExtraOTPGenerator(req: Request, res: Response){
     asyncFunc(res, async () => {
-      const {email, length, option}: { email: string, length: number, option: 'EMAIL' | 'DIRECT' } = req.body
+      const {email, length, option, purpose}: ExtraOTPRequestType = req.body
       if(!email) return responseType({res, status: 400, message: 'Email required'});
       const user = await this.userService.getUserByEmail(email)
       if(option === 'EMAIL'){
-        this.OTPGenerator(res, user, length)
+        return this.OTPGenerator(res, user, length, purpose)
       }
       else{
         const OTPToken = generateOTP(length)
@@ -224,12 +249,8 @@ class AuthenticationController {
           else if (verify?.email) return responseType({res, status: 406, message: 'Please check your email to activate your account'})
         }
         else{
-          if(checksExpiration(user?.verificationToken?.createdAt)){
-            this.OTPGenerator(res, user)
-          }
-          else{
-            return responseType({res, status: 406, message: 'Please check your email.'})
-          }
+          if(checksExpiration(user?.verificationToken?.createdAt)) this.OTPGenerator(res, user)
+          else return responseType({res, status: 406, message: 'Please check your email.'})
         }
       }
 
@@ -293,21 +314,26 @@ class AuthenticationController {
   */ 
   public forgetPassword(req: Request, res: Response){
     asyncFunc(res, async () => {
-      const { email } = req.query
+      const { email, type } = req.query
       if(!email) return res.sendStatus(400);
       const user = await this.userService.getUserByEmail(email as string);
       if(!user) return responseType({res, status: 401, message: 'You do not have an account'})
       if (user?.isAccountLocked) return responseType({res, status: 423, message: 'Account locked'})
 
-      const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
-      const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`
-      const options = mailOptions(email as string, user.username, verificationLink, 'password')
-      transporter.sendMail(options, (err) => {
-        if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
-      })
-      user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } }})
-      .then(() => responseType({res, status:201, message:'Please check your email'}))
-      .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
+      if(type === 'LINK'){
+        const passwordResetToken = await signToken({roles: user?.roles, email: user?.email}, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET)
+        const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`
+        const options = mailOptions(email as string, user.username, verificationLink, 'password')
+        transporter.sendMail(options, (err) => {
+          if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
+          else{
+            user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } }})
+            .then(() => responseType({res, status:201, message:'Please check your email'}))
+            .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
+          }
+        })
+      }
+      else if(type === 'OTP') this.OTPGenerator(res, user, 6, 'PASSWORD')
     })
   }
 

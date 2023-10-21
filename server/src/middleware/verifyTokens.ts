@@ -1,8 +1,11 @@
+import dotenv from 'dotenv'
 import { UserService } from "../services/userService.js";
 import { NextFunction, Request, Response } from "express";
 import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { ClaimProps, USERROLES, UserProps } from "../../types.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
+
+dotenv.config()
 
 interface TokenProp extends Request{
   email: string,
@@ -44,7 +47,7 @@ export async function verifyAccessToken(req: TokenProp, res: Response, next: Nex
       if(user.isAccountLocked) return responseType({res, status: 403, message: 'Account Locked, Please contact support'})
       req.email = verify?.email
       req.roles = verify?.roles
-      next()
+      return next()
     }).catch((error) => responseType({res, status: 404, message: `${error.message}`}))
   }
 }

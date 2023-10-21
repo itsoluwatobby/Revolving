@@ -3,24 +3,25 @@ import { BiCodeAlt } from 'react-icons/bi';
 import { FaRegImages } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePostContext } from '../hooks/usePostContext';
-import { useLocation, useParams } from 'react-router-dom';
 import { Components, NAVIGATE } from '../utils/navigator';
 import { useThemeContext } from '../hooks/useThemeContext';
 import CodeBlock from '../components/codeEditor/CodeEditor';
-import { Categories, ErrorResponse, OpenSnippet } from '../data';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
+import { Categories, ErrorResponse, OpenSnippet } from '../types/data';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
+import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
 import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
-import { CodeStoreType, ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../posts';
-import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
+import { CodeStoreType, ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../types/posts';
 
 let uploadedImageIds = [] as string[]
 let imagesNames = [] as string[]
 export const NewStory = () => {
   const MAX_SIZE = 800_000 as const // 800kb 
-  const { storyId } = useParams()
+  const { storyId, storyUserId } = useParams()
+  const navigate = useNavigate()
   const loading = useSelector(getLoading)
   const { imagesFiles, setImagesFiles, setTypingEvent, setCanPost, codeStore, setCodeStore } = usePostContext() as PostContextType;
   const [getStoryCond, { data: target, isLoading }] = useGetStoryCondMutation()
@@ -47,6 +48,17 @@ export const NewStory = () => {
     const files = (event.target as HTMLInputElement).files as FileList
     setFiles([...files])
   }
+
+  useEffect(() => {
+    let isMounted = true
+    if(isMounted && pathname === `/edit_story/${storyId}/${storyUserId}`){
+      if(storyUserId !== targetStory?.userId) navigate('/unauthorized')
+      else return
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [pathname, storyId, navigate, targetStory?.userId, storyUserId])
 
   useEffect(() => {
     let isMounted = true
@@ -77,7 +89,7 @@ export const NewStory = () => {
       })
       setFiles([])
     }
-    if(isMounted) checkSizeAndUpload()
+    if(isMounted && files.length) checkSizeAndUpload()
     return () => {
       isMounted = false
     }
@@ -104,7 +116,7 @@ export const NewStory = () => {
         imageData.append('image', image.image)
         await uploadToServer(imageData).unwrap()
         .then((data) => {
-          throw new Error('PRESENTLY GOING THROUGH TESTING')
+          // throw new Error('PRESENTLY GOING THROUGH TESTING')
           const res = data as unknown as { url: string }
           const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
           dispatch(setUrl(composed))
@@ -125,7 +137,7 @@ export const NewStory = () => {
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setInputValue(value);
-    pathname != `/edit_story/${storyId}` ? 
+    pathname != `/edit_story/${storyId}/${storyUserId}` ? 
       localStorage.setItem(`newTitle?id=${currentUserId}`, value) 
       : localStorage.setItem(`editTitle?id=${currentUserId}`, value)
   }
@@ -133,16 +145,14 @@ export const NewStory = () => {
   const handleBody = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value
     setTextareaValue(value);
-    pathname != `/edit_story/${storyId}` ? 
+    pathname != `/edit_story/${storyId}/${storyUserId}` ? 
       localStorage.setItem(`newBody?id=${currentUserId}`, value)
         : localStorage.setItem(`editBody?id=${currentUserId}`, value)
   }
 
   useEffect(() => {
     let isMounted = true
-    if(storyId){
-      isMounted ? setTargetStory(target as PostType) : null
-    }
+    if(isMounted && storyId && target) setTargetStory(target as PostType)
     return () => {
       isMounted = false
     }
@@ -151,8 +161,8 @@ export const NewStory = () => {
   useEffect(() => {
     let isMounted = true
     if(isMounted){
-      const savedTitle = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
-      const savedBody = (pathname !== `/edit_story/${storyId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : (localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body)
+      const savedTitle = (pathname !== `/edit_story/${storyId}/${storyUserId}` ? localStorage.getItem(`newTitle?id=${currentUserId}`) : (localStorage.getItem(`editTitle?id=${currentUserId}`)) || targetStory?.title)
+      const savedBody = (pathname !== `/edit_story/${storyId}/${storyUserId}` ? localStorage.getItem(`newBody?id=${currentUserId}`) : (localStorage.getItem(`editBody?id=${currentUserId}`)) || targetStory?.body)
       const getStore = JSON.parse(localStorage.getItem('revolving-codeStore') as string) as CodeStoreType[] ?? []
       if(targetStory?.code?.length || getStore?.length){ 
         const putInStore = targetStory?.code?.map(code => {
@@ -180,7 +190,7 @@ export const NewStory = () => {
     return () => {
       isMounted = false
     }
-  }, [setTypingEvent, debounceValue.typing, targetStory?.code, setCodeStore, targetStory?.title, targetStory?.body, currentUserId, storyId, pathname])
+  }, [setTypingEvent, debounceValue.typing, targetStory?.code, storyUserId, setCodeStore, targetStory?.title, targetStory?.body, currentUserId, storyId, pathname])
 
   useEffect(() => {
     if(inputRef.current) inputRef.current.focus()
@@ -188,13 +198,11 @@ export const NewStory = () => {
 
   useEffect(() => {
     let isMounted = true
-    if(isMounted){
-      targetStory && setPostCategory(targetStory?.category)
+    if(isMounted && targetStory?.category) setPostCategory(targetStory?.category)  
+    return () => {
+      isMounted = false
     }
-  return () => {
-    isMounted = false
-  }
-  }, [targetStory])
+  }, [targetStory?.category])
   
   useEffect(() => {
     let isMounted = true, timeoutId: TimeoutId;

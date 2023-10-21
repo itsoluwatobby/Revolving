@@ -1,11 +1,11 @@
-import { ThemeContextType } from "../posts";
 import { useEffect, useState } from 'react';
-import { ErrorResponse, GetSubscriptionType } from "../data";
+import { ThemeContextType } from "../types/posts";
+import { LeftSection } from "../components/LeftSection";
 import { useNavigate, useParams } from "react-router-dom";
 import { useThemeContext } from "../hooks/useThemeContext";
+import { ErrorResponse, GetSubscriptionType } from "../types/data";
 import { useGetSubscriptionsQuery } from "../app/api/usersApiSlice";
 import SubscriptionComp from "../components/subscription/SubscriptionComp";
-import { LeftSection } from "../components/LeftSection";
 
 export default function Subscriptions() {
   const { userId } = useParams()

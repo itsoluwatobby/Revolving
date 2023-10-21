@@ -1,4 +1,4 @@
-import { Theme } from "../../posts";
+import { Theme } from "../../types/posts";
 
 type SkeletonProfileType = {
   page: 'EDIT'

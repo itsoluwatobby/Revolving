@@ -1,0 +1,28 @@
+
+.animate-border{
+  animation: about 0.75s ease-in-out 0.1s infinite alternate forwards;
+}
+
+@keyframes about{
+  0%{
+    border-top-color: rgb(122, 95, 92);
+    border-bottom-color: rgb(102, 65, 92);
+    border-left-color: rgb(110, 95, 112);
+    border-right-color: rgb(100, 125, 102);
+  }
+  25%{
+    border-color: rgb(86, 115, 102)
+  }
+  50%{
+    border-top-color: rgb(56, 95, 142);
+    border-bottom-color: rgb(40, 65, 92);
+    border-left-color: rgb(10, 155, 112);
+    border-right-color: rgb(100, 125, 102);
+  }
+  75%{
+    border-color: rgb(50, 105, 92)
+  }
+  100%{
+    border-color: rgb(86, 85, 92)
+  }
+}

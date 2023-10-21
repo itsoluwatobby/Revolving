@@ -7,7 +7,7 @@ import { StoryService } from "../services/StoryService.js";
 import NotificationController from "./notificationController.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
 import { asyncFunc, autoDeleteOnExpire, pagination, responseType } from "../helpers/helper.js";
-import { NewStoryNotificationType, RequestStoryProp, StoryProps, UserProps } from "../../types.js";
+import { NewStoryNotificationType, RequestStoryProp, StoryProps, SubUser, UserFriends, UserProps } from "../../types.js";
 
 class StoryController {
 

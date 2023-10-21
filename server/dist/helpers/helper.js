@@ -59,7 +59,7 @@ export function verifyToken(token, secret) {
  * @returns
  */
 export const responseType = ({ res, status = 200, count = 0, message = 'success', data = {}, pages = {} }) => {
-    return (data ?
+    return (data !== null ?
         res.status(status).json({ pages, meta: { status, count, message }, data })
         : res.status(status).json({ meta: { status, message } }));
 };

@@ -1,12 +1,12 @@
+import { useCallback } from 'react';
 import CommentBody from "./CommentBody";
 import { useSelector } from "react-redux";
-import { useCallback } from 'react';
 import EnlargeComment from "./EnlargeComment";
-import { checkCount } from "../../utils/navigator";
 import { useLocation } from "react-router-dom";
+import { checkCount } from "../../utils/navigator";
 import { useThemeContext } from "../../hooks/useThemeContext"
 import { getComments } from "../../features/story/commentSlice";
-import { CommentOptionProp, ThemeContextType } from "../../posts";
+import { CommentOptionProp, ThemeContextType } from "../../types/posts";
 
 type CommentProps={
   openComment: CommentOptionProp,

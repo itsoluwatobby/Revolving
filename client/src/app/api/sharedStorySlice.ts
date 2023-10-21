@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-import { SharedProps } from "../../data";
+import { SharedProps } from "../../types/data";
 import { providesTag } from "../../utils/helperFunc";
 
 type SharedStoryArgs = {

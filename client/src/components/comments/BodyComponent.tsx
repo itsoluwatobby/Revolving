@@ -5,9 +5,9 @@ import { MdOutlineExpandMore } from 'react-icons/md';
 import React, { useState, useCallback } from 'react';
 import { reduceLength } from '../../utils/navigator';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { CommentProps, OpenReply, Prompted } from '../../data';
 import { setEditComment } from '../../features/story/commentSlice';
-import { PromptLiterals, Theme, ThemeContextType } from '../../posts';
+import { CommentProps, OpenReply, Prompted } from '../../types/data';
+import { PromptLiterals, Theme, ThemeContextType } from '../../types/posts';
 
 type BodyComponentProps = {
   reveal: boolean,

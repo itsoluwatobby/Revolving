@@ -2,11 +2,11 @@ import BinTop from "./BinTop";
 import BinContent from "./BinContent";
 import { toast } from "react-hot-toast";
 import { useState, useEffect, useCallback } from "react";
-import { Theme, ThemeContextType } from "../../../posts";
+import { Theme, ThemeContextType } from "../../../types/posts";
 import { useThemeContext } from "../../../hooks/useThemeContext";
 import { ErrorStyle, REFRESH_RATE } from "../../../utils/navigator";
-import { ErrorResponse, FunctionOption, Position, TaskBin } from "../../../data";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { ErrorResponse, FunctionOption, Position, TaskBin } from "../../../types/data";
 import { useClearTaskBinMutation, useGetTaskBinQuery, usePermanentlyDeleteTasksMutation, useRestoreTasksMutation } from "../../../app/api/taskApiSlice";
 
 type TaskBinProp = {

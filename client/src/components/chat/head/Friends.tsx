@@ -1,13 +1,13 @@
 import { format } from 'timeago.js';
+import { Socket } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { ErrorContent } from '../../ErrorContent';
-import { IsLoadingSpinner } from '../../IsLoadingSpinner';
-import { ChatOption, ThemeContextType } from '../../../posts'
-import { useThemeContext } from '../../../hooks/useThemeContext';
-import { ErrorResponse, UserFriends, UserProps } from '../../../data'
-import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
-import { Socket } from 'socket.io-client';
 import { reduceLength } from '../../../utils/navigator';
+import { IsLoadingSpinner } from '../../IsLoadingSpinner';
+import { useThemeContext } from '../../../hooks/useThemeContext';
+import { ChatOption, ThemeContextType } from '../../../types/posts'
+import { ErrorResponse, UserFriends, UserProps } from '../../../types/data'
+import { useCreateConversationMutation } from '../../../app/api/messageApiSlice';
 
 type FriendsProps = {
   socket: Socket,

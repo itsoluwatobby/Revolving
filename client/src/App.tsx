@@ -1,13 +1,12 @@
-import About from "./pages/About";
-import { USERROLES } from "./data";
 import { Home } from "./pages/Home";
+import About from "./pages/about/About";
 import Welcome from "./layouts/Welcome";
 import NotFound from "./pages/NotFound";
+import { USERROLES } from "./types/data";
 import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/AdminPage";
 import Followers from "./pages/Followers";
-import { ThemeContextType } from "./posts";
 import { OTPEntry } from "./pages/OTPEntry";
 import { NewStory } from "./pages/NewStory";
 import LoginModal from "./pages/LoginModal";
@@ -16,6 +15,8 @@ import ProfilePage from "./pages/ProfilePage";
 import NewPassword from "./pages/NewPassword";
 import TaskManager from "./pages/TaskManager";
 import { BsChatTextFill } from 'react-icons/bs';
+import UnAuthorized from "./pages/UnAuthorized";
+import { ThemeContextType } from "./types/posts";
 import RegisterModal from "./pages/RegisterModel";
 import Subscriptions from "./pages/Subscriptions";
 import { BlogLayout } from "./layouts/BlogLayout";
@@ -33,7 +34,7 @@ import { PersistedLogin } from "./layouts/PersistedLogin";
 import TypewriterEffect from './components/TypewriterEffect';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { selectCurrentRoles } from "./features/auth/authSlice";
-// import { GiStarShuriken, GiStarSwirl, GiStarsStack } from 'react-icons/gi';
+
 
 let socket: Socket
 export const App = () => {
@@ -43,14 +44,18 @@ export const App = () => {
   const userId = localStorage.getItem('revolving_userId') as string
   const [startTypewriting, setStartTypewriting] = useState<'BEGIN' | 'END'>('END')
 
-  // const designClass = useCallback((theme: Theme, index: number) => {
-  //   const FIRST=[1,2,3,4], SECOND=[5,6,7,8,9], THIRD=[10,11,12,13]
-  //   return (`
-  //     absolute opacity-50 ${FIRST.includes(index) ? `top-${index*20} right-${index*16}` : THIRD.includes(index) ? `bottom-${index*4} left-${index*4}` : SECOND.includes(index) && ''} text-sm
-  //   `)
-  // }, [])
-
   const exclude = ['/signIn', '/signUp', '/new_password', '/otp']
+
+  useEffect(() => {
+    let isMounted = true, prevPathname = '';
+    if(isMounted && prevPathname !== pathname){
+      setOpenChat('Hide')
+      prevPathname = pathname
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [pathname, setOpenChat])
   
   useEffect(() => {
     let isMounted = true
@@ -94,7 +99,7 @@ export const App = () => {
             <Route index element={<Home />} />
             <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="new_story" element={<NewStory />} />
-            <Route path="edit_story/:storyId" element={<NewStory />} />
+              <Route path="edit_story/:storyId/:storyUserId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="follows/:userId" element={<Followers />} />
             {/* <Route path="notifications/:userId" element={<Notifications />} /> */}
@@ -115,6 +120,8 @@ export const App = () => {
         
         </Route>
       
+        <Route path="/unauthorized" element={<UnAuthorized />} />
+
         <Route path="*" element={<NotFound />} />
       
       </Routes>
@@ -122,9 +129,6 @@ export const App = () => {
       <Notifications />
 
       <Toaster />
-      {/* {[...Array(4).keys()].map((index) => <GiStarsStack className={designClass(theme, index)} />)}
-      {[...Array(5).keys()].map((index) => <GiStarShuriken className={designClass(theme, index+4)} />)}
-      {[...Array(4).keys()].map((index) => <GiStarSwirl className={designClass(theme, index+9)} />)} */}
       {
         openChat === 'Open' ?
           // userId ?
@@ -142,7 +146,7 @@ export const App = () => {
       }
       <div 
         onClick={() => setStartTypewriting('END')}
-        className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] mobile:w-[18rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
+        className={`fixed bottom-4 right-3 text-3xl bg-slate-800 rounded-md p-1 w-[17rem] mobile:w-[19.5rem] font-medium ${(startTypewriting === 'BEGIN') ? 'scale-100' : 'scale-0'} transition-all`}>
           <TypewriterEffect delay={0.25} start={startTypewriting} />
       </div>
       {loginPrompt?.opened == 'Open' ? <PrompLogin /> : null}

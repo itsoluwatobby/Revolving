@@ -1,12 +1,12 @@
-import { ThemeContextType } from "../posts";
 import { useEffect, useState } from 'react';
 import { FaTrashAlt } from "react-icons/fa";
 import { ErrorContent } from "./ErrorContent";
+import { ThemeContextType } from "../types/posts";
 import { useThemeContext } from "../hooks/useThemeContext";
 import NotificationComp from "./notifications/NotificationComp";
 import useRevolvingObserver from "../hooks/useRevolvingObserver";
 import SkeletonNotification from "./skeletons/SkeletonNotification";
-import { ErrorResponse, NotificationBody, NotificationModelType } from "../data";
+import { ErrorResponse, NotificationBody, NotificationModelType } from "../types/data";
 import { useDeleteNotificationMutation, useGetNotificationQuery } from "../app/api/noficationSlice";
 
 export default function Notifications() {

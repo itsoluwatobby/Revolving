@@ -1,11 +1,11 @@
-import { Followers, Follows, UserProps } from "../data";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
-import { ChatOption, ThemeContextType } from "../posts";
 import { SkeletonUser } from "./skeletons/SkeletonUser";
 import FollowUnFollow from "./singlePost/FollowUnFollow";
 import { useThemeContext } from "../hooks/useThemeContext";
 import { MdOutlineRunningWithErrors } from 'react-icons/md';
+import { ChatOption, ThemeContextType } from "../types/posts";
+import { Followers, Follows, UserProps } from "../types/data";
 import { checkCount, reduceLength } from "../utils/navigator";
 import { useGetUserByIdQuery } from "../app/api/usersApiSlice";
 

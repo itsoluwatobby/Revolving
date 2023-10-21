@@ -1,12 +1,12 @@
 import { toast } from 'react-hot-toast';
-import { ThemeContextType } from '../posts';
 import { useNavigate } from 'react-router-dom';
+import { ThemeContextType } from '../types/posts';
 import { useThemeContext } from '../hooks/useThemeContext';
 import { useSignUpMutation } from '../app/api/authApiSlice';
 import { ErrorStyle, SuccessStyle } from '../utils/navigator';
-import { ConfirmationMethodType, ErrorResponse } from '../data';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import RegistrationForm from '../components/modals/RegistrationForm';
+import { ConfirmationMethodType, ErrorResponse } from '../types/data';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 
 export default function RegisterModal() {
@@ -55,11 +55,11 @@ export default function RegisterModal() {
     try{
       const res = await signUp({username, email, password, type: confirmationBy}).unwrap() as unknown as { data: { meta: { message: string } } };
       !isLoading && toast.success(res?.data?.meta?.message, SuccessStyle)
-      confirmationBy === 'OTP' ? navigate(`/otp?email=${email}`) : null
       setEmail('')
       setUsername('')
       setPassword('')
       setConfirmPassword('')
+      confirmationBy === 'OTP' ? navigate(`/otp?email=${email}&type=ACCOUNT`) : null
       setConfirmationBy('LINK')
     }
     catch(err: unknown){

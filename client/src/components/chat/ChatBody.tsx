@@ -3,10 +3,10 @@ import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import ChatBodyComp from './body/ChatBodyComp';
 import { ErrorContent } from '../ErrorContent';
-import { ChatOption, ThemeContextType } from '../../posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import { ChatOption, ThemeContextType } from '../../types/posts';
 import { messageApiSlice, useGetAllMessagesQuery } from '../../app/api/messageApiSlice';
-import { ErrorResponse, MessageModelType, MessageStatusType, SearchStateType, UserProps } from '../../data';
+import { ErrorResponse, MessageModelType, MessageStatusType, SearchStateType, UserProps } from '../../types/data';
 
 
 type ChatBodyProp={

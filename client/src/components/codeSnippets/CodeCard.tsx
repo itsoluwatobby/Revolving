@@ -1,10 +1,10 @@
 import CodeBody from './CodeBody';
+import { useCallback } from 'react';
 import { CiEdit } from 'react-icons/ci';
-import { useCallback, useState } from 'react';
-import { ButtonType, CodeProps } from '../../data';
 import { BsCheckSquare, BsTrash } from 'react-icons/bs';
+import { ButtonType, CodeProps } from '../../types/data';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { CodeStoreType, Theme, ThemeContextType } from '../../posts';
+import { CodeStoreType, Theme, ThemeContextType } from '../../types/posts';
 
 type CodeCardProps = {
   count: number,

@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import brcypt from 'bcrypt';
+import dotenv from 'dotenv';
 import { UserModel } from "../models/User.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { transporter } from '../config/mailConfig.js';
@@ -17,6 +18,7 @@ import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js';
 import { NotificationModel } from '../models/Notifications.js';
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
+dotenv.config();
 /**
  * @description Authentication controller
  */
@@ -85,8 +87,9 @@ class AuthenticationController {
                 transporter.sendMail(options, (err) => {
                     if (err)
                         return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
+                    else
+                        return responseType({ res, status: 201, message: 'Please check your email to activate your account' });
                 });
-                return responseType({ res, status: 201, message: 'Please check your email to activate your account' });
             }
             else if (type === 'OTP') {
                 this.OTPGenerator(res, newUser);
@@ -128,11 +131,11 @@ class AuthenticationController {
     }
     /**
     * @descriptionconfirms OTP sent by user
-    * @body body - email, otp, purpose='ACCOUNT' | 'OTHERS
+    * @body body - email, otp, purpose='ACCOUNT' | 'PASSWORD' | 'OTHERS
    */
     confirmOTPToken(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e, _f;
             const { email, otp, purpose = 'ACCOUNT' } = req.body;
             if (!email || !otp)
                 return responseType({ res, status: 400, message: 'OTP or Email required' });
@@ -152,11 +155,24 @@ class AuthenticationController {
                 else
                     return responseType({ res, status: 403, message: 'OTP expired pls login to request for a new one' });
             }
-            else {
+            else if (purpose === 'PASSWORD') {
+                if (!user.isResetPassword)
+                    return responseType({ res, status: 403, message: 'You need to request for a password reset' });
                 const OTPMatch = ((_c = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _c === void 0 ? void 0 : _c.token) === otp;
                 if (!OTPMatch)
                     return responseType({ res, status: 403, message: 'Bad Token' });
                 if (!checksExpiration((_d = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _d === void 0 ? void 0 : _d.createdAt)) {
+                    yield user.updateOne({ $set: { verificationToken: { type: 'OTP', token: '', createdAt: '' } } });
+                    return responseType({ res, status: 200, message: 'SUCCESSFUL', data: { _id: user === null || user === void 0 ? void 0 : user._id, email: user === null || user === void 0 ? void 0 : user.email, roles: user === null || user === void 0 ? void 0 : user.roles } });
+                }
+                else
+                    return responseType({ res, status: 403, message: 'OTP expired pls login to request for a new one' });
+            }
+            else {
+                const OTPMatch = ((_e = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _e === void 0 ? void 0 : _e.token) === otp;
+                if (!OTPMatch)
+                    return responseType({ res, status: 403, message: 'Bad Token' });
+                if (!checksExpiration((_f = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _f === void 0 ? void 0 : _f.createdAt)) {
                     yield user.updateOne({ $set: { verificationToken: { type: 'OTP', token: '', createdAt: '' } } });
                     return responseType({ res, status: 200, message: 'Token verified', data: { _id: user === null || user === void 0 ? void 0 : user._id, email: user === null || user === void 0 ? void 0 : user.email, roles: user === null || user === void 0 ? void 0 : user.roles } });
                 }
@@ -169,11 +185,16 @@ class AuthenticationController {
     * @description generates OTP and sends it to user email
     * @param req - response object, user, length(default - 6)
    */
-    OTPGenerator(res, user, length = 6) {
+    OTPGenerator(res, user, length = 6, purpose = 'ACCOUNT') {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
             const OTPToken = generateOTP(length);
             const options = mailOptions(user === null || user === void 0 ? void 0 : user.email, user === null || user === void 0 ? void 0 : user.username, OTPToken, 'account', 'OTP');
-            yield user.updateOne({ $set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } } });
+            if (purpose === 'ACCOUNT') {
+                yield user.updateOne({ $set: { verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } } });
+            }
+            else if (purpose === 'PASSWORD') {
+                yield user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } } });
+            }
             transporter.sendMail(options, (err) => {
                 if (err)
                     return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
@@ -188,12 +209,12 @@ class AuthenticationController {
     */
     ExtraOTPGenerator(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
-            const { email, length, option } = req.body;
+            const { email, length, option, purpose } = req.body;
             if (!email)
                 return responseType({ res, status: 400, message: 'Email required' });
             const user = yield this.userService.getUserByEmail(email);
             if (option === 'EMAIL') {
-                this.OTPGenerator(res, user, length);
+                return this.OTPGenerator(res, user, length, purpose);
             }
             else {
                 const OTPToken = generateOTP(length);
@@ -238,12 +259,10 @@ class AuthenticationController {
                         return responseType({ res, status: 406, message: 'Please check your email to activate your account' });
                 }
                 else {
-                    if (checksExpiration((_c = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _c === void 0 ? void 0 : _c.createdAt)) {
+                    if (checksExpiration((_c = user === null || user === void 0 ? void 0 : user.verificationToken) === null || _c === void 0 ? void 0 : _c.createdAt))
                         this.OTPGenerator(res, user);
-                    }
-                    else {
+                    else
                         return responseType({ res, status: 406, message: 'Please check your email.' });
-                    }
                 }
             }
             const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
@@ -304,7 +323,7 @@ class AuthenticationController {
    */
     forgetPassword(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
-            const { email } = req.query;
+            const { email, type } = req.query;
             if (!email)
                 return res.sendStatus(400);
             const user = yield this.userService.getUserByEmail(email);
@@ -312,16 +331,22 @@ class AuthenticationController {
                 return responseType({ res, status: 401, message: 'You do not have an account' });
             if (user === null || user === void 0 ? void 0 : user.isAccountLocked)
                 return responseType({ res, status: 423, message: 'Account locked' });
-            const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
-            const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`;
-            const options = mailOptions(email, user.username, verificationLink, 'password');
-            transporter.sendMail(options, (err) => {
-                if (err)
-                    return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
-            });
-            user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } } })
-                .then(() => responseType({ res, status: 201, message: 'Please check your email' }))
-                .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
+            if (type === 'LINK') {
+                const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
+                const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`;
+                const options = mailOptions(email, user.username, verificationLink, 'password');
+                transporter.sendMail(options, (err) => {
+                    if (err)
+                        return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
+                    else {
+                        user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } } })
+                            .then(() => responseType({ res, status: 201, message: 'Please check your email' }))
+                            .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
+                    }
+                });
+            }
+            else if (type === 'OTP')
+                this.OTPGenerator(res, user, 6, 'PASSWORD');
         }));
     }
     /**

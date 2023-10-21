@@ -1,8 +1,8 @@
 import { toast } from 'react-hot-toast';
-import { Theme, ThemeContextType } from '../../posts';
 import { useState, useCallback, useEffect } from 'react';
+import { Theme, ThemeContextType } from '../../types/posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { ErrorResponse, HoverType, PositionType } from '../../data';
+import { ErrorResponse, HoverType, PositionType } from '../../types/data';
 import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from '../../app/api/usersApiSlice';
 
 type FollowUnFollowProps = {

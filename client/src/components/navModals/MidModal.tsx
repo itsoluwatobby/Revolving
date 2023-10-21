@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import LikeStory from '../singlePost/LikeStory';
 import { reduceLength } from '../../utils/navigator';
 import FollowUnFollow from '../singlePost/FollowUnFollow';
-import { IsIntersectingType, PostType, Theme } from '../../posts';
+import { IsIntersectingType, PostType, Theme } from '../../types/posts';
 
 type Props = {
   theme: Theme,

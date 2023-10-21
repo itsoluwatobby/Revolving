@@ -1,10 +1,10 @@
-import { Theme } from '../../posts';
 import { format } from 'timeago.js';
 import { Link } from 'react-router-dom';
+import { Theme } from '../../types/posts';
 import { ErrorContent } from '../ErrorContent';
-import { ErrorResponse, Followers, Follows, GetSubscriptionType } from '../../data';
 import { checkCount, reduceLength } from '../../utils/navigator';
 import SkeletonSubscription from '../skeletons/SkeletonSubscription';
+import { ErrorResponse, Followers, Follows, GetSubscriptionType } from '../../types/data';
 
 type SubscriptionCompProps = { 
   theme: Theme,

@@ -1,4 +1,4 @@
-import { ThemeContextType } from '../posts';
+import { ThemeContextType } from '../types/posts';
 import darkBGloader from '../assets/darkLoader.svg';
 import whiteBGloader from '../assets/whiteloader.svg';
 import { useThemeContext } from '../hooks/useThemeContext';

@@ -1,6 +1,6 @@
-import { NotificationBody, NotificationModelType, NotificationStatus } from "../../data";
-import { providesTag } from "../../utils/helperFunc";
 import { apiSlice } from "./apiSlice";
+import { providesTag } from "../../utils/helperFunc";
+import { NotificationBody, NotificationModelType, NotificationStatus } from "../../types/data";
 
 type NotificationArgs = {
   isOpen?: boolean,

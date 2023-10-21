@@ -1,4 +1,4 @@
-import { ObjectUnknown, UserProps } from "../data";
+import { ObjectUnknown, UserProps } from "../types/data";
 
 export const userOfPost = (users: UserProps[], userId: string): string => {
   const result = users?.find(user => user?._id === userId) as UserProps

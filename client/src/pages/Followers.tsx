@@ -1,10 +1,10 @@
-import { ThemeContextType } from "../posts";
 import { useEffect, useState } from 'react';
-import { ErrorResponse, GetFollowsType } from "../data";
+import { ThemeContextType } from "../types/posts";
 import { LeftSection } from "../components/LeftSection";
 import { useNavigate, useParams } from "react-router-dom";
 import { useThemeContext } from "../hooks/useThemeContext";
 import FollowsComp from "../components/follows/FollowsComp";
+import { ErrorResponse, GetFollowsType } from "../types/data";
 import { useGetUserFollowsQuery } from "../app/api/usersApiSlice";
 
 export default function Followers() {

@@ -1,4 +1,4 @@
-import { TypingEvent } from "../data";
+import { TypingEvent } from "../types/data";
 import { useEffect, useState } from "react";
 
 export type DelayedInputProps = { input: string, typing: TypingEvent }

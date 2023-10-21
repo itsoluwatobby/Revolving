@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { ErrorResponse } from '../data';
-import { ThemeContextType } from '../posts';
+import { ErrorResponse } from '../types/data';
+import { ThemeContextType } from '../types/posts';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useThemeContext } from '../hooks/useThemeContext';

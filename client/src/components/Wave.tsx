@@ -1,4 +1,4 @@
-import { ThemeContextType } from "../posts";
+import { ThemeContextType } from "../types/posts";
 import { useThemeContext } from "../hooks/useThemeContext"
 
 export default function Wave() {

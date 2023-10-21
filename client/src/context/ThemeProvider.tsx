@@ -1,6 +1,6 @@
-import { EnlargeCompo, Status } from '../data';
 import { createContext, useState } from 'react';
-import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp, GetConvoType, InitConversationType, LoginPromptType } from '../posts';
+import { EnlargeCompo, Status } from '../types/data';
+import { ChatOption, ChildrenProp, ConflictType, FontStyle, EditingProp, Theme, ThemeContextType, UpdateSuccess, IsIntersectingType, ImageTypeProp, GetConvoType, InitConversationType, LoginPromptType } from '../types/posts';
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 

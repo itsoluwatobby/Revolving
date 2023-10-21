@@ -1,5 +1,5 @@
 import { RootState } from "../../app/store";
-import { EditTaskOption, TaskProp } from "../../data";
+import { EditTaskOption, TaskProp } from "../../types/data";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type TaskEntry = {

@@ -1,5 +1,5 @@
-import { DeleteStatusType, MessageModelType, UserProps } from "../../../data";
-import { ChatOption } from "../../../posts";
+import { ChatOption } from "../../../types/posts";
+import { DeleteStatusType, MessageModelType, UserProps } from "../../../types/data";
 
 type OptionButtonsType = {
   open: ChatOption,

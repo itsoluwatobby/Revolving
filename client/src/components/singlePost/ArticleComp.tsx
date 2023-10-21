@@ -14,7 +14,7 @@ import useRevolvingObserver from '../../hooks/useRevolvingObserver';
 import { SkeletonSinglePage } from '../skeletons/SkeletonSinglePage';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { CommentOptionProp, PostType, ThemeContextType } from '../../posts';
+import { CommentOptionProp, PostType, ThemeContextType } from '../../types/posts';
 
 type ArticleProps = {
   story: PostType,

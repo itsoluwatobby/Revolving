@@ -1,8 +1,8 @@
 import { ChangeEvent } from "react";
-import { Theme } from "../../posts";
+import { Theme } from "../../types/posts";
 import { InputField } from "./InputField";
 import { FaTimes, FaTimesCircle } from "react-icons/fa";
-import { Entries, InitEntriesType, InitPrevEntriesType, SocialMediaAccoutProp, UserProps, ValueType } from "../../data";
+import { Entries, InitEntriesType, InitPrevEntriesType, SocialMediaAccoutProp, UserProps, ValueType } from "../../types/data";
 
 type ArrayFieldType = {
   max: number,

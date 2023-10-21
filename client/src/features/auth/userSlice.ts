@@ -1,4 +1,4 @@
-import { UserProps } from '../../data';
+import { UserProps } from '../../types/data';
 import { RootState } from '../../app/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 

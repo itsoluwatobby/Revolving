@@ -53,7 +53,6 @@ export class RevolvingApplication{
 
   //public routes
     this.app.get('/revolving/story', (req: RequestStoryProp, res: Response) => StoryController.getStories(req, res));
-    this.app.get('/revolving/story/user/likesUsersInStory/:userId', (req: RequestStoryProp, res: Response) => StoryController.getStoryLikes(req, res));
     this.app.get('/revolving/story/user/storyWithUserId/:userId', (req: RequestStoryProp, res: Response) => StoryController.getStoriesWithUserId(req, res));
   
   // comments

@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 import RevolvingEditor from 'react-monaco-editor';
 import { usePostContext } from "../../hooks/usePostContext";
 import { useThemeContext } from "../../hooks/useThemeContext";
-import { PostContextType, ThemeContextType } from "../../posts";
 import { setPresentLanguage } from "../../features/story/codeSlice";
+import { PostContextType, ThemeContextType } from "../../types/posts";
 
 type CodeType = {
   name: string,

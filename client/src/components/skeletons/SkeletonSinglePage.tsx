@@ -1,5 +1,5 @@
 import { useThemeContext } from '../../hooks/useThemeContext';
-import { ThemeContextType } from '../../posts';
+import { ThemeContextType } from '../../types/posts';
 import SkeletonLoading from './SkeletonLoading'
 
 export const SkeletonSinglePage = () => {

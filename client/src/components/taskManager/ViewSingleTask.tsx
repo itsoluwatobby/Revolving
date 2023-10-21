@@ -1,7 +1,7 @@
 import SubTasksAct from "./SubTasksAct";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { ChatOption, Theme } from "../../posts";
+import { ChatOption, Theme } from "../../types/posts";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import { getTask, singleTask } from "../../features/story/taskManagerSlice";
 

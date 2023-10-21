@@ -7,9 +7,9 @@ import { useThemeContext } from '../../../hooks/useThemeContext';
 import { ErrorStyle, checkCount } from '../../../utils/navigator';
 import { setEditResponse } from '../../../features/story/commentSlice';
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs';
-import { PromptLiterals, Theme, ThemeContextType } from '../../../posts';
+import { PromptLiterals, Theme, ThemeContextType } from '../../../types/posts';
 import { useLikeAndUnlikeResponseMutation } from '../../../app/api/responseApiSlice';
-import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../../data';
+import { CommentProps, CommentResponseProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../../types/data';
 
 type BaseProps = {
   theme: Theme,

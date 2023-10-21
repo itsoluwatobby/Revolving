@@ -5,9 +5,9 @@ import { ErrorContent } from "../../ErrorContent"
 import { useState, useEffect, useRef } from "react"
 import SkeletonChats from "../../skeletons/SkeletonChats"
 import { RecentConversations } from "./RecentConversations"
-import { ChatOption, GetConvoType, Theme } from "../../../posts"
+import { ChatOption, GetConvoType, Theme } from "../../../types/posts"
 import { useGetConversationsQuery } from "../../../app/api/messageApiSlice"
-import { ErrorResponse, TypingObjType, UserFriends, UserProps } from "../../../data"
+import { ErrorResponse, TypingObjType, UserFriends, UserProps } from "../../../types/data"
 
 type FriendsModalType = {
   theme: Theme,

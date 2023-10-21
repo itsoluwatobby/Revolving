@@ -1,10 +1,10 @@
 import EditModal from './EditModal';
 import { ChangeEvent } from 'react';
-import { UserProps } from '../../data';
+import { UserProps } from '../../types/data';
 import { BsFillPersonFill } from 'react-icons/bs';
 import { IsLoadingSpinner } from '../IsLoadingSpinner';
-import { ImageTypeProp, ThemeContextType } from '../../posts';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import { ImageTypeProp, ThemeContextType } from '../../types/posts';
 
 type Props = {
   page?: 'EDIT',
