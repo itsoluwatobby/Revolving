@@ -66,7 +66,7 @@ class CommentController {
     }
     deleteComment(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
-            const { userId, commentId } = req.params;
+            const { userId, commentId, authorId } = req.params;
             if (!userId || !commentId)
                 return res.sendStatus(400);
             const user = yield this.userService.getUserById(userId);
@@ -80,8 +80,9 @@ class CommentController {
                     .then(() => res.sendStatus(204))
                     .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
             }
-            if ((comment === null || comment === void 0 ? void 0 : comment.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
-                return res.sendStatus(401);
+            if ((comment === null || comment === void 0 ? void 0 : comment.userId.toString()) !== userId)
+                return res.sendStatus(403);
+            // || userId !== authorId
             this.commentService.deleteSingleComment(commentId)
                 .then(() => __awaiter(this, void 0, void 0, function* () {
                 const { firstName, lastName, _id, displayPicture: { photo }, email } = user;

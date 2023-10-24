@@ -9,11 +9,12 @@ import { getComments } from "../../features/story/commentSlice";
 import { CommentOptionProp, ThemeContextType } from "../../types/posts";
 
 type CommentProps={
+  authorId: string,
   openComment: CommentOptionProp,
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>
 } 
 
-export default function Comments({ openComment, setOpenComment }: CommentProps) {
+export default function Comments({ authorId, openComment, setOpenComment }: CommentProps) {
   const {theme, enlarge } = useThemeContext() as ThemeContextType;
   const { pathname } = useLocation()
   const comments = useSelector(getComments)
@@ -48,7 +49,15 @@ export default function Comments({ openComment, setOpenComment }: CommentProps) 
             )
           )
         }
-        {enlarge?.assert ? <EnlargeComment /> : <CommentBody openComment={openComment} setOpenComment={setOpenComment} />}
+        {
+          enlarge?.assert ? 
+            <EnlargeComment authorId={authorId} /> 
+            : <CommentBody 
+                openComment={openComment} 
+                setOpenComment={setOpenComment} 
+                authorId={authorId} 
+              />
+        }
       </article>
     </section>
   )

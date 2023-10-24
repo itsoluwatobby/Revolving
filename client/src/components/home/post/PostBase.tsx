@@ -119,7 +119,7 @@ export default function PostBase({ viewUsers, setViewUsers, story, averageReadin
             </span>
           </p>
           
-          <Comments openComment={openComment} setOpenComment={setOpenComment} />
+          <Comments openComment={openComment} setOpenComment={setOpenComment} authorId={story?.userId} />
       </div>
     </div>
   )

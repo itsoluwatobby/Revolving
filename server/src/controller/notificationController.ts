@@ -48,7 +48,9 @@ export class NotificationController {
   }
  
   public async removeSingleNotification<T>(userId: string, obj: T, notificationType: NotificationType){
-    if(userId.toString() === (obj as AllNotificationModelType)?.userId.toString()) return 'duplicate'
+    if((obj as AllNotificationModelType)?.userId){
+      if(userId === (obj as AllNotificationModelType)?.userId.toString()) return 'duplicate'
+    }
     else if(this.Notification_To_Others.includes(notificationType)){
       return (
         UserService.getUserById(userId)

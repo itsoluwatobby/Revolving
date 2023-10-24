@@ -8,12 +8,13 @@ import { useDeleteCommentMutation } from "../../app/api/commentApiSlice";
 import { CommentProps, ErrorResponse, OpenReply, Prompted } from "../../types/data";
 
 type CommentType = {
+  authorId: string,
   comment: CommentProps,
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
   setDeactivateInputBox: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox }: CommentType) {
+export default function CommentCompo({ authorId, comment, setPrompt, setDeactivateInputBox }: CommentType) {
   const currentUserId = localStorage.getItem('revolving_userId') as string
   const [openReply, setOpenReply] = useState<OpenReply>({type: 'nil', assert: false})
   const { setLoginPrompt } = useThemeContext() as ThemeContextType
@@ -30,7 +31,7 @@ export default function CommentCompo({ comment, setPrompt, setDeactivateInputBox
 
   const deleteSingleComment = async() => {
     try{
-      await deleteComment({userId: currentUserId, commentId: comment?._id}).unwrap()
+      await deleteComment({userId: currentUserId, commentId: comment?._id, authorId}).unwrap()
       //await storyApiSlice.useGetStoriesByCategoryQuery(getNavigation).refetch()
     }
     catch(err: unknown){

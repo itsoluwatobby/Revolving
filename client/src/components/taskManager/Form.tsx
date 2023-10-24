@@ -131,12 +131,12 @@ export default function Form({ currentUserId }: FormProps) {
           {
             userId: currentUserId,
             completed: false,
-            task: debouncedInput.value
+            task: debouncedInput.value.trim()
           } as Partial<TaskProp> 
           :
           {
             ...task,
-            task: debouncedInput.value,
+            task: debouncedInput.value.trim(),
             completed: task?.completed
           }
     try{

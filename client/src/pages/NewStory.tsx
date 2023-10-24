@@ -183,8 +183,8 @@ export const NewStory = () => {
         // localStorage.setItem('revolving-codeStore', JSON.stringify([...getStore]))
         setCodeStore([])
       }
-      setInputValue(savedTitle || '')
-      setTextareaValue(savedBody || '')
+      setInputValue(savedTitle?.trim() || '')
+      setTextareaValue(savedBody?.trim() || '')
       setTypingEvent(debounceValue?.typing)
     }
     return () => {
@@ -228,10 +228,10 @@ export const NewStory = () => {
   useEffect(() => {
     if(debounceValue?.typing == 'notTyping'){
       const storyData = targetStory ? {
-        ...targetStory, title: inputValue, code: [], fontFamily,
-        body: textareaValue, category: postCategory
+        ...targetStory, title: inputValue.trim(), code: [], fontFamily,
+        body: textareaValue.trim(), category: postCategory
       } : {
-        title: inputValue, body: textareaValue, fontFamily,
+        title: inputValue.trim(), body: textareaValue.trim(), fontFamily,
         category: postCategory, userId: currentUserId
       }
     dispatch(setStoryData(storyData))

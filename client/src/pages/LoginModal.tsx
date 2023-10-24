@@ -36,7 +36,9 @@ export default function Login() {
   const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
-      const userAuth = await signIn({ email, password }).unwrap();
+      const userAuth = await signIn({ 
+        email: email.trim(), password: password.trim() 
+      }).unwrap();
       localStorage.setItem('revolving_userId', userAuth?.data?._id)
       dispatch(setCredentials({...userAuth?.data}))
       if(!localStorage.getItem('revolving_login_time')){

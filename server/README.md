@@ -7,6 +7,7 @@
 ```
 ---
 > **Tech stack**
+* Typescript
 * Nodejs
 * socket.io
 * express.js
@@ -33,10 +34,6 @@ RefressToken is used to issue a new accessToken if a user's accesstoken expires 
 
 ---
 
-> ~~SessionID~~ 
-
----
-
 > Data Caching
 
 Redis is used for data caching which makes the api 10x faster in responding to user requests 
@@ -53,4 +50,34 @@ _AFTER REDIS_
 ---
 > OTP and Link
 
-Signing up has two account confirmation options, either by link or OTP, choosen option is being to sent to user email for proper verification
+Signing up an account and forgot password has two account confirmation options, either by a verification link or through a One Time Password (OTP), chosen option is being to sent to user email for proper verification. 
+
+---
+
+> **AUTHENTICATION**
+---
+
+Newly registered users are will be required to go through an email verification process. The email verification link/OTP can only be used once and only lasts for 15 minutes after which it expires.
+
+_**incase of expired email verification link:**_ The user will be required to login with the registered credentials then a new email verification link will be sent to the user and this link will only last for 25 minutes before it expires.
+
+Unverified users will not be granted access to perform CREATE, UPDATE or DELETE (_**CUD**_) operations until the account is verified but will have access to perform READ operation.
+
+---
+> **AUTHORIZATION**
+---
+
+Upon user login, every user is granted an access token which lasts for only 4 hours and a refresh token which lasts for a day. This token authorizes a user's access to the site's available resource. 
+
+Upon registration, each user is given the role of a USER which is the default role assigned to all registered users. And after the access token expiration, a refresh token is used to get a new access token.
+
+---
+> Refresh token rotation
+---
+Also, the refresh token can only be used once then it becomes useless, a new refresh token is generated whenever it is used to get a new access token
+
+**Granting of Roles**
+---
+Admin role has the ability of granting additional roles to specific users
+
+---

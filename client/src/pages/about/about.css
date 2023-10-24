@@ -26,3 +26,20 @@
     border-color: rgb(86, 85, 92)
   }
 }
+
+.scroll_effect{
+  text-shadow: 2px 4px 12px rgba(25, 255, 115, 0.3), 10px 14px 24px rgba(250, 6, 83, 0.5);
+  animation: scroller 10s linear infinite forwards;
+}
+
+@keyframes scroller {
+  0%{
+    transform: translateX(100%);
+  }
+  50%{
+    transform: rotateY(65deg);
+  }
+  100%{
+    transform: translateX(-100%);
+  }
+}

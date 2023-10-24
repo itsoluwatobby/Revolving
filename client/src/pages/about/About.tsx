@@ -58,21 +58,25 @@ export default function About() {
         Hello World!!
       </h1>
 
-      <div className="flex gap-2">
+      <div className='w-full midscreen:block hidden'>
+        <p className='scroll_effect text-center overflow-hidden capitalize first-letter:text-3xl text-2xl tracking-widest font-[900]'>Built with Typescript</p>
+      </div>
+
+      <div className="flex gap-1">
         
-        <figure className="flex-none animate-border rounded-full shadow-lg border-4 border-slate-400 w-32 h-48">
+        <figure className="flex-none animate-border rounded-full shadow-lg border-4 border-slate-400 w-28 h-48">
           <img src={ProfilePicture} alt="Profile picture" 
             className="w-full h-full rounded-full object-cover"
           />
         </figure>
 
-        <div className={`flex flex-col gap-3 ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-950'} transition-all p-1.5 rounded-md`}>
+        <div className={`flex-auto flex flex-col gap-2 ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-950'} transition-all p-1.5 rounded-md`}>
           
-          <p className="first-letter:text-2xl indent-3 text-base">
-            I'm <span className="capitalize">Oluwatobi Akinola samuel, A MERN stack developer who loves turning complex problems into simple solutions</span>
+          <p className="first-letter:text-2xl indent-3 text-base whitespace-pre-wrap break-before-all">
+            I'm Oluwatobi Akinola samuel, A MERN stack developer who loves turning complex problems into simple solutions
           </p>
           
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-2 flex-wrap'>
             {
               skills?.map(skill => (
                 <p className={`capitalize ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-900'} rounded-sm transition-colors p-1 shadow-sm`}>{skill}</p>
@@ -105,7 +109,7 @@ export default function About() {
 
       <div className='flex flex-col'>
         <p className="first-letter:text-2xl indent-3 p-1">
-          Welcome, Are you interested in web development content or you also wish to share your knowledge with others? Then, you presently in the right place
+          Welcome, Are you interested in web development content or you also wish to share your knowledge with others? Then, you presently in the right place.
         </p>
         <p className="first-letter:text-xl indent-2 p-1">
           You also get a top notch Task manager which comes with a recycle bin and also have the chance to chat with fellow developers in order to share knowledge and network with one another

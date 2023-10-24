@@ -55,13 +55,13 @@ export default function ChatBody({ currentUser, messages, messageState, editMess
 
   useEffect(() => {
     let isMounted = true
-    if(isMounted && message?.conversationId === currentChat?._id ) {
+    if(isMounted && message?.conversationId === currentChat?._id && message?.senderId !== currentUser?._id) {
       setMessages(prev => ([...prev, message as MessageModelType]));
     }
     return () => {
       isMounted = false
     }
-  }, [message, currentChat?._id, setMessages])
+  }, [message, currentChat?._id, setMessages, currentUser?._id])
 
   useEffect(() => {
     let isMounted = true

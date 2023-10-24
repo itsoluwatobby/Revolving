@@ -8,7 +8,7 @@ commentRouter.get('/admin/:adminId/:userId', verifyRoles([ROLES.ADMIN]), (req, r
 commentRouter.put('/:userId/:commentId', verifyRoles([ROLES.USER]), (req, res) => CommentController.updateComment(req, res));
 commentRouter.patch('/:userId/:commentId', verifyRoles([ROLES.USER]), (req, res) => CommentController.like_Unlike_Comment(req, res));
 commentRouter.get('/user/:userId/:storyId', verifyRoles([ROLES.USER]), (req, res) => CommentController.getUserCommentStory(req, res));
-commentRouter.delete('/:userId/:commentId', verifyRoles([ROLES.USER, ROLES.ADMIN]), (req, res) => CommentController.deleteComment(req, res));
+commentRouter.delete('/:userId/:commentId/:authorId', verifyRoles([ROLES.USER, ROLES.ADMIN]), (req, res) => CommentController.deleteComment(req, res));
 commentRouter.delete('/admin/:adminId/:userId/:commentId', verifyRoles([ROLES.ADMIN]), (req, res) => CommentController.deleteUserComments(req, res));
 export default commentRouter;
 //# sourceMappingURL=commentRoutes.js.map

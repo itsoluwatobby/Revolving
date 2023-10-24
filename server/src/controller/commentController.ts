@@ -59,7 +59,7 @@ class CommentController{
 
   public deleteComment(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
-      const { userId, commentId } = req.params;
+      const { userId, commentId, authorId } = req.params;
       if(!userId || !commentId) return res.sendStatus(400)
       const user = await this.userService.getUserById(userId)
       await autoDeleteOnExpire(userId)
@@ -72,7 +72,8 @@ class CommentController{
         .then(() => res.sendStatus(204))
         .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }
-      if(comment?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
+      if(comment?.userId.toString() !== userId) return res.sendStatus(403)
+      // || userId !== authorId
       this.commentService.deleteSingleComment(commentId)
       .then(async() => {
         const { firstName, lastName, _id, displayPicture: { photo }, email } = user

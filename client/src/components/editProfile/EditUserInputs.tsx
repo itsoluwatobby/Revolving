@@ -78,7 +78,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     const name = event.target.name
     const value = event.target.value
     if(NameValues?.includes(name as (Entries | ValueType))){
-      setArrayEntry(prev => ({...prev, [name]: value}))
+      setArrayEntry(prev => ({...prev, [name]: value.trim()}))
     }
     else if(stringVals.includes(name)){
       setUserDetails(prev => ({...prev, [name]: value}))
@@ -88,16 +88,15 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
   const addToArray = (type: Entries) => {
     if(type === 'hobbiesEntry'){
       if(!hobbiesEntry || (hobbies as string[])?.length >= 5) return
-      const filteredHobbies = hobbies?.filter(hobby => hobby?.toLowerCase() !== hobbiesEntry?.toLowerCase())?.filter(hobby => hobby?.toLowerCase() !== prevEntries?.prevHobby?.toLowerCase()) as string[]
-      console.log(filteredHobbies)
-      setUserDetails(prev => ({...prev, hobbies: [...filteredHobbies, hobbiesEntry]}))
+      const filteredHobbies = hobbies?.filter(hobby => hobby?.toLowerCase() !== hobbiesEntry.trim()?.toLowerCase())?.filter(hobby => hobby?.toLowerCase() !== prevEntries?.prevHobby?.toLowerCase()) as string[]
+      setUserDetails(prev => ({...prev, hobbies: [...filteredHobbies, hobbiesEntry.trim()]}))
       setArrayEntry(prev => ({...prev, [type]: ''}))
       if(inputRef1?.current) inputRef1.current.focus()
     }
     else if(type === 'stackEntry'){
       if(!stackEntry || (stack as string[])?.length >= 10) return
-      const filteredStacks = stack?.filter(stk => stk?.toLowerCase() !== stackEntry.toLowerCase())?.filter(stack => stack?.toLowerCase() !== prevEntries?.prevStack?.toLowerCase()) as string[]
-      setUserDetails(prev => ({...prev, stack: [...filteredStacks, stackEntry]}))
+      const filteredStacks = stack?.filter(stk => stk?.toLowerCase() !== stackEntry.trim()?.toLowerCase())?.filter(stack => stack?.toLowerCase() !== prevEntries?.prevStack?.toLowerCase()) as string[]
+      setUserDetails(prev => ({...prev, stack: [...filteredStacks, stackEntry.trim()]}))
       setArrayEntry(prev => ({...prev, [type]: ''}))
       if(inputRef2?.current) inputRef2.current.focus()
     }
@@ -106,7 +105,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
       if(!socialMediaName) inputRef01.current ? inputRef01.current.focus() : null
       else if(!socialMediaEntry) inputRef0.current ? inputRef0.current.focus() : null
       else{
-        const newMedia: SocialMediaAccoutProp = { name: socialMediaName, link: socialMediaEntry }
+        const newMedia: SocialMediaAccoutProp = { name: socialMediaName.trim(), link: socialMediaEntry.trim() }
         const filteredAccounts = socialMediaAccounts?.filter(media => media?.name?.toLowerCase() !== socialMediaName.toLowerCase() || media?.link?.toLowerCase() !== socialMediaEntry.toLowerCase())?.filter(media => media?.name?.toLowerCase() !== prevEntries?.prevSocialName?.toLowerCase()) as SocialMediaAccoutProp[]
         setUserDetails(prev => ({...prev, socialMediaAccounts: [...filteredAccounts, newMedia]}))
         setArrayEntry(prev => ({...prev, socialMediaEntry: '', socialMediaName: ''}))
@@ -177,7 +176,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
 
   const getConfirmation = async() => {
     try{
-      await confirmCurrentPassword({email: userProfile?.email, password: currentPassword}).unwrap()
+      await confirmCurrentPassword({email: userProfile?.email, password: currentPassword.trim()}).unwrap()
     }
     catch(error){
       const errors = error as ErrorResponse;
@@ -189,7 +188,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
 
   const updateInfo = async() => {
     try{
-      if(password) await upDateUserInfo({...userDetails, password} as UserProps).unwrap()
+      if(password) await upDateUserInfo({...userDetails, password: password.trim()} as UserProps).unwrap()
       else await upDateUserInfo(userDetails as UserProps).unwrap()
       toast.success('Successfully updated', SuccessStyle)
       setPasswordConfig(initPasswordConfig)

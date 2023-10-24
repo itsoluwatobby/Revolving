@@ -14,11 +14,12 @@ import { ChatOption, CommentOptionProp, ThemeContextType } from '../../types/pos
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../app/api/commentApiSlice';
 
 type CommentBodyProps={
+  authorId: string,
   openComment: CommentOptionProp,
   setOpenComment: React.Dispatch<React.SetStateAction<CommentOptionProp>>
 } 
 
-export default function CommentBody({ openComment, setOpenComment }: CommentBodyProps) {
+export default function CommentBody({ authorId, openComment, setOpenComment }: CommentBodyProps) {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType;
   const [deactivateInputBox, setDeactivateInputBox] = useState<boolean>(false);
   const currentUserId = localStorage.getItem('revolving_userId') as string;
@@ -39,7 +40,7 @@ export default function CommentBody({ openComment, setOpenComment }: CommentBody
     const newComment = {
       userId: currentUserId,
       storyId: openComment?.storyId,
-      comment
+      comment: comment.trim()
     } as Partial<CommentProps>
     try{
       await createComment({ userId: currentUserId, 
@@ -140,7 +141,7 @@ export default function CommentBody({ openComment, setOpenComment }: CommentBody
         (
           comments.map(comment => (
             <CommentCompo 
-              key={comment?._id} comment={comment as CommentProps}  
+              key={comment?._id} comment={comment as CommentProps} authorId={authorId}
               setDeactivateInputBox={setDeactivateInputBox} setPrompt={setPrompt}
             />
           ))
