@@ -4,14 +4,14 @@ type ErrorProp = {
   message: string,
   contentLength: number,
   errorMsg: ErrorResponse
-  position?: 'CHAT' | 'MESSAGE' | 'NOTIFICATION'
+  position?: 'CHAT' | 'MESSAGE' | 'NOTIFICATION' | 'POST'
 }
 
 export const ErrorContent = ({ message, contentLength, errorMsg, position }: ErrorProp) => {
   
   return (
     errorMsg?.status ?
-      <p className={`${(position === 'MESSAGE' || position === 'NOTIFICATION') ? 'm-auto' : 'text-red-500 uppercase absolute bg-gray-50 font-extrabold top-2'} tracking-wide bg-opacity-80 w-56 rounded-sm font-mono transition-all text-center py-6 ${position === 'CHAT' ? 'text-[11px]' : position === 'MESSAGE' ? 'mt-8 text-gray-200' : 'text-sm'}`}>
+      <p className={`${position === 'POST' ? 'mt-2' : ''} ${(position === 'MESSAGE' || position === 'NOTIFICATION') ? 'm-auto' : 'text-red-500 uppercase absolute bg-gray-50 font-extrabold top-2'} tracking-wide bg-opacity-80 w-56 rounded-sm font-mono transition-all text-center py-6 ${(position === 'CHAT' || position === 'POST') ? 'text-[11px]' : position === 'MESSAGE' ? 'mt-8 text-gray-200' : 'text-sm'}`}>
         {
           errorMsg.status === 'FETCH_ERROR' ? 
             <span className={`${position === 'MESSAGE' ? 'italic' : ''}`}>SERVER ERROR</span>

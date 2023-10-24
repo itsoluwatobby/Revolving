@@ -144,7 +144,7 @@ export default function ArticleComp({
     <article 
       className={`app mt-2 flex-grow flex flex-col gap-3 ${isBarOpen ? '' : 'px-32 midscreen:px-6 mobile:px-4'} overflow-y-scroll ${story?.fontFamily} p-2 px-6 text-sm sm:w-full ${sidebar ? 'min-w-[58%]' : 'w-full'}`}>
         {content}
-        <Comments openComment={openComment} setOpenComment={setOpenComment} />
+        <Comments openComment={openComment} setOpenComment={setOpenComment} authorId={story?.userId} />
       </article>
   )
 }

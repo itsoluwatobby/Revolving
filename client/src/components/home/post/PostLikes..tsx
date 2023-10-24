@@ -81,7 +81,7 @@ export const PostLikes = ({ storyId, setViewUsers }: RecentConversationsProps) =
 
       {isLoading ? <IsLoadingSpinner page='CHAT' customSize='LARGE' /> : null}
       {isError ? <ErrorContent 
-        message={(error as ErrorResponse)?.originalStatus === 401 ? 'Session Ended' : 'An Error occured'} position='CHAT' 
+        message={(error as ErrorResponse)?.originalStatus === 401 ? 'Session Ended' : 'An Error occured'} position='POST' 
         errorMsg={error as ErrorResponse} contentLength={userLikes?.length } 
       /> : null}
     </div>
