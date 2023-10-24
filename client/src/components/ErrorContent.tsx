@@ -11,7 +11,7 @@ export const ErrorContent = ({ message, contentLength, errorMsg, position }: Err
   
   return (
     errorMsg?.status ?
-      <p className={`${position === 'POST' ? 'mt-2' : ''} ${(position === 'MESSAGE' || position === 'NOTIFICATION') ? 'm-auto' : 'text-red-500 uppercase absolute bg-gray-50 font-extrabold top-2'} tracking-wide bg-opacity-80 w-56 rounded-sm font-mono transition-all text-center py-6 ${(position === 'CHAT' || position === 'POST') ? 'text-[11px]' : position === 'MESSAGE' ? 'mt-8 text-gray-200' : 'text-sm'}`}>
+      <p className={`${position === 'POST' ? 'mt-4 mx-1' : ''} ${(position === 'MESSAGE' || position === 'NOTIFICATION') ? 'm-auto' : 'text-red-500 uppercase absolute bg-gray-50 font-extrabold top-2'} tracking-wide bg-opacity-80 w-56 rounded-sm font-mono transition-all text-center py-6 ${(position === 'CHAT' || position === 'POST') ? 'text-[11px]' : position === 'MESSAGE' ? 'mt-8 text-gray-200' : 'text-sm'}`}>
         {
           errorMsg.status === 'FETCH_ERROR' ? 
             <span className={`${position === 'MESSAGE' ? 'italic' : ''}`}>SERVER ERROR</span>
