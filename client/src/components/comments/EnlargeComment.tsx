@@ -11,7 +11,10 @@ import { PromptLiterals, ThemeContextType } from '../../types/posts';
 import { useGetResponsesQuery } from '../../app/api/responseApiSlice';
 import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted } from '../../types/data';
 
-export default function EnlargeComment() {
+type EnlargeCommentType={
+  authorId: string
+}
+export default function EnlargeComment({ authorId }: EnlargeCommentType) {
   const { theme, parseId, enlarge, setEnlarge } = useThemeContext() as ThemeContextType
   const [targetComment, setTargetComment] = useState<CommentProps | null>(null);
   const userId = localStorage.getItem('revolving_userId') as string
@@ -107,7 +110,7 @@ export default function EnlargeComment() {
                     responses?.map(response => (
                       <ResponseBody 
                         // prompt={prompt}  
-                        key={response._id} 
+                        key={response._id} authorId={authorId}
                         userId={userId} response={response} setPrompt={setPrompt} 
                         targetComment={targetComment as CommentProps} isLoadingResponses={isLoadingResponses}
                       />

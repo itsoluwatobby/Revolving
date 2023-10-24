@@ -55,7 +55,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
     if(!writeReply.length) return
     const updatedResponse = {
       ...getResponseEdit,
-      response: writeReply
+      response: writeReply.trim()
     }
     try{
       await updateResponse({ userId: currentUserId, 
@@ -79,7 +79,7 @@ export default function WriteModal({ keepPrompt, setKeepPrompt, comment, respons
       userId: currentUserId,
       commentId: comment?._id,
       responseId: response?._id,
-      response: writeReply
+      response: writeReply.trim()
     } as Partial<CommentResponseProps>
     try{
       await createResponse({ userId: currentUserId, 

@@ -29,7 +29,7 @@ export const PostLikes = ({ storyId, setViewUsers }: RecentConversationsProps) =
   }, [data])
 
   return (
-    <div className={`absolute flex flex-col p-1 gap-0.5 z-10 rounded-md w-60 min-h-[7rem] max-h-80 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-900'}`}>
+    <div className={`absolute flex flex-col p-1 gap-0.5 z-10 rounded-md w-60 min-h-[6rem] max-h-80 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-900'}`}>
 
       <div className={`flex items-center justify-between text-white ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-900'} p-0.5 transition-colors`}>
         <p className='underline underline-offset-2'>Likes</p>

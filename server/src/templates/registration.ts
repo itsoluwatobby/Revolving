@@ -8,10 +8,11 @@ type OptionsType = 'account' | 'password'
  * @param username sender name
  * @param verificationLink 
  * @param option mail type (account | password)
- * @param  type (LINK | OTP)
+ * @param type (LINK | OTP)
+ * @param ttl - time to live
  * @returns 
  */
-export function mailOptions(receiver: string, username: string, verificationLink: string, option: OptionsType = 'account', type: ConfirmationMethodType='LINK') {
+export function mailOptions(receiver: string, username: string, verificationLink: string, option: OptionsType = 'account', type: ConfirmationMethodType='LINK', ttl: string='30') {
   const messageHeader = `${type == 'OTP' ? 'Action Required: One Time Activation Code' : `Tap the Link below To ${option == 'account' ?  'Activate Your Account' : 'Reset Your Password'}`}`
   const year = new Date().getFullYear()
   return {
@@ -20,9 +21,9 @@ export function mailOptions(receiver: string, username: string, verificationLink
     subject: `ACCOUNT CONFIRMATION FOR ${username}`,
     html: `<div style='background-color: rgba(0,0,0,0.9); color: white; border-radius: 5px; border: 2px dashed gray; box-shadow: 2px 4px 16px rgba(0,0,0,0.4);'>
             <div style="padding: 2px 10px 5px 10px;">
-                <h2 style='text-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center;'>REVOLVING IS ALL ABOUT YOU</h2>
+                <h2 style='text-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center;'>REVOLVING IS ALL ABOUT YOU</h2>expires
                 <h3 style='text-decoration: underline; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);'>${messageHeader}</h3>
-                    <p>${type === 'LINK' ? 'Link expires in 30 minutes, please confirm now!!' : 'OTP expires in 30 minutes'}</p>
+                    <p>${type === 'LINK' ? `Link  in ${ttl} minutes, please confirm now!!` : `OTP expires in ${ttl} minutes`}</p>
                       ${
                         type === 'LINK' ?
                         `<a href=${verificationLink} target=_blank style='text-decoration:none;'>

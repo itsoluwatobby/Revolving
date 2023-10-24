@@ -8,7 +8,8 @@ type CommentArgs = {
   command: DeleteCommentByAdmin, 
   commentId?: string,
   comment: Partial<CommentProps>, 
-  storyId: string
+  storyId: string,
+  authorId?: string
 }
 
 type ResponseType = { data: CommentProps[] }
@@ -43,9 +44,9 @@ export const commentApiSlice = apiSlice.injectEndpoints({
     }),
     
     // Also works for admin deleting a user comment
-    deleteComment: builder.mutation<void, Pick<CommentArgs, 'userId' | 'commentId'>>({
-      query: ({userId, commentId}) => ({
-        url: `comments/${userId}/${commentId}`,
+    deleteComment: builder.mutation<void, Pick<CommentArgs, 'userId' | 'commentId' | 'authorId'>>({
+      query: ({userId, commentId, authorId}) => ({
+        url: `comments/${userId}/${commentId}/${authorId}`,
         method: 'DELETE',
         body: userId
       }),

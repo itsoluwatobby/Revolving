@@ -53,7 +53,10 @@ export default function RegisterModal() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
-      const res = await signUp({username, email, password, type: confirmationBy}).unwrap() as unknown as { data: { meta: { message: string } } };
+      const res = await signUp({
+        username: username.trim(), email: email.trim(), 
+        password: password.trim(), type: confirmationBy 
+      }).unwrap() as unknown as { data: { meta: { message: string } } };
       !isLoading && toast.success(res?.data?.meta?.message, SuccessStyle)
       setEmail('')
       setUsername('')

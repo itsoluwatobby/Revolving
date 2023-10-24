@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
 import WriteModal from './WriteModal';
 import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
+import { useEffect, useCallback } from 'react';
 import { MdOutlineInsertComment } from 'react-icons/md';
 import { useThemeContext } from '../../hooks/useThemeContext';
 import { ErrorStyle, checkCount } from '../../utils/navigator';
 import { setEditComment } from '../../features/story/commentSlice';
 import { BsFillHandThumbsUpFill, BsHandThumbsUp } from 'react-icons/bs';
 import { PromptLiterals, Theme, ThemeContextType } from '../../types/posts';
-import { CommentProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../types/data';
 import { commentApiSlice, useLikeAndUnlikeCommentMutation } from '../../app/api/commentApiSlice';
+import { CommentProps, EnlargeCompo, ErrorResponse, OpenReply, Prompted } from '../../types/data';
 
 type BaseProps = {
   theme: Theme,
@@ -26,10 +26,6 @@ type BaseProps = {
   setWriteReply: React.Dispatch<React.SetStateAction<string>>,
   setOpenReply: React.Dispatch<React.SetStateAction<OpenReply>>,
   setKeepPrompt: React.Dispatch<React.SetStateAction<PromptLiterals>>,
-}
-
-function modalButton(theme: Theme){ 
-  return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
 }
 
 export default function CommentBase({ responseRef, enlarged, reveal, setPrompt, keepPrompt, setKeepPrompt, writeReply, setWriteReply, openReply, setOpenReply, mini, userId, theme, comment}: BaseProps) {
@@ -154,6 +150,10 @@ type PopType={
 }
 
 export function PopUpPrompt({ enlarge, responseRef, setKeepPrompt, theme }: PopType){
+
+  const modalButton = useCallback((theme: Theme) => { 
+    return `cursor-pointer border ${theme == 'light' ? 'border-gray-400 bg-slate-600 text-gray-50' : 'border-gray-500'} p-1 text-[11px] rounded-md hover:opacity-80 transition-all`;
+  }, [])
 
   const keepFocus = () => {
     setKeepPrompt('Retain')

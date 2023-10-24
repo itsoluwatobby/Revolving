@@ -15,12 +15,12 @@ type ChatBaseProp={
   editMessage: MessageModelType,
   currentUser: Partial<UserProps>,
   messageResponse: MessageModelType,
-  // setMessages: React.Dispatch<React.SetStateAction<MessageModelType[]>>
+  setMessages: React.Dispatch<React.SetStateAction<MessageModelType[]>>
   setEditMessage: React.Dispatch<React.SetStateAction<MessageModelType | null>>
   setMessageResponse: React.Dispatch<React.SetStateAction<MessageModelType | null>>
 }
 
-export default function ChatBase({ theme, socket, currentChat, messages, editMessage, currentUser, messageResponse, setMessageResponse, setEditMessage }: ChatBaseProp) {
+export default function ChatBase({ theme, socket, currentChat, messages, editMessage, currentUser, messageResponse, setMessages, setMessageResponse, setEditMessage }: ChatBaseProp) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [input, setInput] = useState<string>('')
   const currentUserId = localStorage.getItem('revolving_userId') as string
@@ -77,19 +77,20 @@ export default function ChatBase({ theme, socket, currentChat, messages, editMes
       }
       if(!editMessage?._id){
         const newMessage = { 
-          message: input, senderId: currentUserId, receiverId: currentChat?.userId,  
+          message: input.trim(), senderId: currentUserId, receiverId: currentChat?.userId,  
           conversationId: currentChat?._id, referencedMessage: messageReply
         } as Partial<MessageModelType>
         const res = await createMessage(newMessage).unwrap() as unknown as { data: MessageModelType}
         setInput('')
         setMessageResponse(null)
+        setMessages(prev => ([...prev, res?.data]))
         socket.emit('create_message', res?.data, async(acknowledgement: object) => {
           console.log(acknowledgement)
         })
       }
       else{
         const edittedMessage: MessageModelType = { 
-          ...editMessage, message: input, edited: true, 
+          ...editMessage, message: input.trim(), edited: true, 
           referencedMessage: messageReply
         };
         setInput('')
@@ -97,7 +98,6 @@ export default function ChatBase({ theme, socket, currentChat, messages, editMes
         setEditMessage(null)
         socket.emit('edit_message', {isEdited: true, conversationId: currentChat?._id})
       }
-      // setMessages(prev => ([...prev, res?.data]))
     }
     catch(err){
       const errors = err as ErrorResponse

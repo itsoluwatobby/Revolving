@@ -1,22 +1,28 @@
 # REVOLVING
 
 > Description **Let your world always be about you. A web app that's definetely about all you will ever wish for. You are your world and you define what you want in it**
+Build with React Typescript using redux-toolkit 
 ---
 
 > Tech stack
 * ReactJS
+* Typescript
 * socket.io/client
 * redux-toolkit
 * Tailwindcss
+* React Monaco - Code Editor
 
 
 #### _**FEATURES**_
 ---
-* Mini page with diffrent Utilites (i.e; Todolist, text editor, Games etc)
-* Blog site
-* A mini tweeter page to view your tweets and probably make a post, view followers count
-* CV creation and free pdf format download
-* Text editor - [**react-monaco-editor**]
+* Registration and login page
+* Password reset page
+* Mini page with diffrent Utilites (i.e; Todolist, text editor, Chat section etc)
+* Creating comments, view followers and subscriptions
+* User Profile page
+* Profile update page
+* Chat section
+* Code editor - [**react-monaco-editor**]
 * Programming contents
 * Responsive pages
 * Feature to download any post in pdf format

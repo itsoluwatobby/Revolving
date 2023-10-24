@@ -34,7 +34,7 @@ export default function NewPassword() {
   const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
-      await newPassword({ email, resetPass: password }).unwrap();
+      await newPassword({ email, resetPass: password.trim() }).unwrap();
       setPassword('')
       setConfirmPassword('')
       !isLoading && toast.success('Password reset successful', SuccessStyle)

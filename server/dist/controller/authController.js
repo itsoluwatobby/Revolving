@@ -13,9 +13,9 @@ import { UserModel } from "../models/User.js";
 import { ROLES } from "../config/allowedRoles.js";
 import { transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
-import { KV_Redis_ClientService } from '../helpers/redis.js';
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js';
+import { KV_Redis_ClientService } from '../helpers/redis.js';
 import { NotificationModel } from '../models/Notifications.js';
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 dotenv.config();
@@ -266,7 +266,7 @@ class AuthenticationController {
                 }
             }
             const roles = Object.values(user === null || user === void 0 ? void 0 : user.roles);
-            const accessToken = yield signToken({ roles, email }, '2h', process.env.ACCESSTOKEN_STORY_SECRET);
+            const accessToken = yield signToken({ roles, email }, '4h', process.env.ACCESSTOKEN_STORY_SECRET);
             const refreshToken = yield signToken({ roles, email }, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
             // create taskBin for user
             if (!Boolean(yield TaskBinModel.exists({ userId: user === null || user === void 0 ? void 0 : user._id }))) {

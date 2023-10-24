@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { ROLES } from "../config/allowedRoles.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { UserService } from "../services/userService.js";
 import { StoryService } from "../services/StoryService.js";
-import { CommentNotificationType, CommentProps, RequestProp } from "../../types.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { CommentService } from "../services/commentService.js";
 import { NotificationController } from "./notificationController.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
+import { CommentNotificationType, CommentProps, RequestProp } from "../../types.js";
 
 class CommentController{
 
@@ -59,7 +59,7 @@ class CommentController{
 
   public deleteComment(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
-      const { userId, commentId } = req.params;
+      const { userId, commentId, authorId } = req.params;
       if(!userId || !commentId) return res.sendStatus(400)
       const user = await this.userService.getUserById(userId)
       await autoDeleteOnExpire(userId)
@@ -72,7 +72,8 @@ class CommentController{
         .then(() => res.sendStatus(204))
         .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
       }
-      if(comment?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
+      if(comment?.userId.toString() !== userId) return res.sendStatus(403)
+      // || userId !== authorId
       this.commentService.deleteSingleComment(commentId)
       .then(async() => {
         const { firstName, lastName, _id, displayPicture: { photo }, email } = user

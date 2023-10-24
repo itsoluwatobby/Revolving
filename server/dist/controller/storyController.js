@@ -121,7 +121,7 @@ class StoryController {
                     .then(() => res.sendStatus(204))
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
-            else if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
+            if (!(story === null || story === void 0 ? void 0 : story.userId.equals(user === null || user === void 0 ? void 0 : user._id)))
                 return res.sendStatus(401);
             this.storyService.deleteUserStory(storyId)
                 .then(() => __awaiter(this, void 0, void 0, function* () {
@@ -133,7 +133,10 @@ class StoryController {
                 yield NotificationController.removeSingleNotification(userId, notiStory, 'NewStory');
                 return res.sendStatus(204);
             }))
-                .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
+                .catch((error) => {
+                console.log(error);
+                responseType({ res, status: 404, message: `${error.message}` });
+            });
         }));
     }
     // Delete user story by admin

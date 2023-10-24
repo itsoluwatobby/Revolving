@@ -15,6 +15,7 @@ import { CommentProps, CommentResponseProps, ErrorResponse, OpenReply, Prompted 
 
 type ResponseBodyProps = {
   userId: string,
+  authorId: string,
   // prompt: Prompted,
   isLoadingResponses: boolean,
   targetComment: CommentProps,
@@ -22,7 +23,7 @@ type ResponseBodyProps = {
   setPrompt: React.Dispatch<React.SetStateAction<Prompted>>,
 }
 
-export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
+export const ResponseBody = ({ response, setPrompt, authorId, userId, targetComment, isLoadingResponses }: ResponseBodyProps) => {
   const [reveal, setReveal] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(false);
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
@@ -51,7 +52,7 @@ export const ResponseBody = ({ response, setPrompt, userId, targetComment, isLoa
 
   const deleteSingleResponse = async() => {
     try{
-      await deleteResponse({ userId, responseId: response?._id}).unwrap()
+      await deleteResponse({ userId, responseId: response?._id, authorId}).unwrap()
       dispatch(commentApiSlice.util.invalidateTags(['COMMENT']))
     }
     catch(err: unknown){

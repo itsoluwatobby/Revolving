@@ -59,7 +59,7 @@ class ResponseController {
     }
     deleteResponse(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
-            const { userId, responseId } = req.params;
+            const { userId, responseId, authorId } = req.params;
             if (!userId || !responseId)
                 return res.sendStatus(400);
             const user = yield this.userService.getUserById(userId);
@@ -73,8 +73,8 @@ class ResponseController {
                     .then(() => res.sendStatus(204))
                     .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));
             }
-            if ((response === null || response === void 0 ? void 0 : response.userId.toString()) != (user === null || user === void 0 ? void 0 : user._id.toString()))
-                return res.sendStatus(401);
+            if ((response === null || response === void 0 ? void 0 : response.userId.toString()) !== userId)
+                return res.sendStatus(403);
             this.responseService.deleteSingleResponse(responseId)
                 .then(() => res.sendStatus(204))
                 .catch((error) => responseType({ res, status: 404, message: `${error.message}` }));

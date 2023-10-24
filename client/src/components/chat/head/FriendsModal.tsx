@@ -42,10 +42,10 @@ export const FriendsModal = ({ theme, socket, showFriends, friends, isLoading, e
     let isMounted = true
     if(isMounted) {
       if(toggleView === 'Friends'){
-        setFilteredFriends(friends?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
+        setFilteredFriends(friends?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search.trim()?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
       }
       else if(toggleView === 'Recents'){
-        setFilteredFriends((recentConversations as GetConvoType[])?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
+        setFilteredFriends((recentConversations as GetConvoType[])?.filter(friend => friend?.firstName?.toLowerCase()?.includes(search.trim()?.toLowerCase()) || friend?.lastName?.toLowerCase()?.includes(search?.toLowerCase())))
       }
     }
     return () => {

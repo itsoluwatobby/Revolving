@@ -85,7 +85,7 @@ class StoryController {
         .then(() => res.sendStatus(204))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
-      else if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
+      if(!story?.userId.equals(user?._id)) return res.sendStatus(401)
       this.storyService.deleteUserStory(storyId)
       .then(async() => {
         const { _id, title, body, picture, category, commentIds, likes, author } = story as StoryProps
@@ -96,7 +96,9 @@ class StoryController {
         await NotificationController.removeSingleNotification(userId, notiStory, 'NewStory')  
         return res.sendStatus(204)
       })
-      .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
+      .catch((error) => {
+        console.log(error)
+        responseType({res, status: 404, message: `${error.message}`})})
     })
   }
 

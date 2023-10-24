@@ -22,7 +22,7 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
   const handleResetRequest = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try{
-      const res = await forgotPassword({ email, type: confirmationBy }).unwrap() as unknown as { meta: { message: string } };
+      const res = await forgotPassword({ email: email.trim(), type: confirmationBy }).unwrap() as unknown as { meta: { message: string } };
 
       !isLoading && toast.success(res?.meta?.message, {
                       duration: 10000, icon: '🔥', 

@@ -139,7 +139,7 @@ export default function ChatModal({ socket }: ChatModalProp) {
           socket={socket} currentUser={currentUser as Partial<UserProps>} editMessage={editMessage as MessageModelType} 
           />
         <ChatBase 
-          // setMessages={setMessages}
+          setMessages={setMessages}
           messageResponse={messageResponse as MessageModelType} 
           currentUser={currentUser as Partial<UserProps>} messages={messages}
           theme={theme} currentChat={currentChat} socket={socket} editMessage={editMessage as MessageModelType}

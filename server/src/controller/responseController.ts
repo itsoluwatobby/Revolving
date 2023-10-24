@@ -52,7 +52,7 @@ class ResponseController {
 
   public deleteResponse(req: RequestProp, res: Response){
     asyncFunc(res, async () => {
-      const { userId, responseId } = req.params;
+      const { userId, responseId, authorId } = req.params;
       if(!userId || !responseId) return res.sendStatus(400)
       const user = await this.userService.getUserById(userId)
       await autoDeleteOnExpire(userId)
@@ -64,7 +64,7 @@ class ResponseController {
         .then(() => res.sendStatus(204))
         .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
       }
-      if(response?.userId.toString() != user?._id.toString()) return res.sendStatus(401)
+      if(response?.userId.toString() !== userId) return res.sendStatus(403)
       this.responseService.deleteSingleResponse(responseId)
       .then(() => res.sendStatus(204))
       .catch((error) => responseType({res, status: 404, message: `${error.message}`}))
