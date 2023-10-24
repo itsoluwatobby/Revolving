@@ -1,7 +1,7 @@
 import { toast } from "react-hot-toast";
 import { ErrorResponse } from "../types/data";
 import { ThemeContextType } from "../types/posts";
-import { SuccessStyle } from "../utils/navigator";
+import { ErrorStyle, SuccessStyle } from "../utils/navigator";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useThemeContext } from "../hooks/useThemeContext";
 import { useNewPasswordMutation } from "../app/api/authApiSlice";
@@ -45,11 +45,7 @@ export default function NewPassword() {
       const msg = errors?.status === 'FETCH_ERROR' ?
       'SERVER ERROR' : (errors?.data ? errors?.data?.meta?.message : 'No Network')
       setErrorMsg(msg)
-      isError && toast.error(`${msg}`, {
-        duration: 10000, icon: '💀', style: {
-          background: errors?.status == 403 ? 'A6BCE2' : '#FF0000'
-        }
-      })
+      isError && toast.error(`${msg}`, ErrorStyle)
     }
   }
 
@@ -88,7 +84,7 @@ export default function NewPassword() {
           <button 
             type='submit'
             disabled={!canSubmit && !match && !isLoading}
-            className={`w-[95%] mx-auto mt-2 rounded-sm ${errorMsg?.length ? 'bg-red-600' : ''}  ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+            className={`w-[95%] mx-auto mt-2 rounded-sm ${errorMsg?.length ? 'bg-red-600' : ''}  ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && match && !errorMsg?.length) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
           >
             {
               errorMsg ? errorMsg 
@@ -99,6 +95,7 @@ export default function NewPassword() {
                     )
             }
           </button>
+
           <div className='flex flex-col text-sm gap-2'>
             <Link to={'/signIn'}>
               <p className='cursor-pointer duration-150 hover:opacity-70 hover:underline hover:underline-offset-2 w-fit'
@@ -111,6 +108,7 @@ export default function NewPassword() {
             </p>
           </div>
         </form>
+
       </article>
     </section>
   )

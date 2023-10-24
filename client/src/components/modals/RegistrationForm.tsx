@@ -86,7 +86,7 @@ export default function RegistrationForm({
             <button 
               type='submit'
               disabled={!canSubmit && !loading && !match && !validEmail}
-              className={`w-[95%] self-center mt-2 rounded-sm ${errorMsg?.length ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && !loading && validEmail && match) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+              className={`w-[95%] self-center mt-2 rounded-sm ${errorMsg?.length ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} p-2 focus:outline-none border-none ${(canSubmit && !loading && validEmail && match && !errorMsg?.length) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
               {errorMsg ? errorMsg : (!loading ? 'Sign Up' : 'Signing Up...')}
             </button>
