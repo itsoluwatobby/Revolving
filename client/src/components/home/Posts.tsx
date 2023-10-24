@@ -23,8 +23,9 @@ export const Posts = () => {
   const {
     data, isLoading, isError, error, refetch
   } = useGetStoriesByCategoryQuery({
-    category: getNavigation, ...pageQuery
+    category: getNavigation
   })
+  // ...pageQuery
   const [reloadCount, setReloadCount] = useState<number>(0)
   const { filteredStories, setNavPosts, search } = usePostContext() as PostContextType
   const { setOpenChat, loginPrompt, setLoginPrompt } = useThemeContext() as ThemeContextType
@@ -33,6 +34,8 @@ export const Posts = () => {
   const { isIntersecting, observerRef } = useRevolvingObserver({screenPosition: '0px', threshold: 0.5})
   const { isIntersecting: isIntersecting1, observerRef: observerRef1 } = useRevolvingObserver({screenPosition: '0px', threshold: 0})
   const totalPages = 6 as const
+
+  void(pageQuery)
 
   useEffect(() => {
     let isMounted = true
