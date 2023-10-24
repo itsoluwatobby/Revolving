@@ -95,7 +95,7 @@ export default function ForgotPassword({ setForgot }: ForgotProps) {
         <button 
           type='submit'
           disabled={!canSubmit && !isLoading}
-          className={`w-[95%] self-center ${errorMsg?.length ? 'bg-red-600' : ''} ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}  rounded-sm p-2 focus:outline-none border-none ${canSubmit ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
+          className={`w-[95%] self-center ${errorMsg?.length ? 'bg-red-600' : ''} ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !errorMsg?.length) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
         >
           {
             errorMsg ? errorMsg 

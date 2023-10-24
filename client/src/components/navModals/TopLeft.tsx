@@ -17,9 +17,10 @@ export default function TopLeft({ delayedSaving }: TopLeftProp) {
   const { search, setSearch} = usePostContext() as PostContextType
   const {theme, setFontOption, setRollout} = useThemeContext() as ThemeContextType
   const { pathname } = useLocation();
-  const { storyId, storyUserId, userId } = useParams()
+  const { storyId, storyUserId } = useParams()
 
-  const searchBar = ['/', `/taskManager/${userId}`]
+  // , `/taskManager/${userId}`
+  const searchBar = ['/']
   const savedDraft = ['/new_story', `/edit_story/${storyId}/${storyUserId}`]
   
   return (

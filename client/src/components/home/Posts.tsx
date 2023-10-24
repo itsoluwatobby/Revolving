@@ -54,8 +54,8 @@ export const Posts = () => {
     }
   }, [isIntersecting, isIntersecting1])
 
-  console.log(pageQuery)
-  console.log(isLoading)
+  // console.log(pageQuery)
+  // console.log(isLoading)
 
   useEffect(() => {
     let isMounted = true
