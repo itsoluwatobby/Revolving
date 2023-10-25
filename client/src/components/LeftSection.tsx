@@ -79,7 +79,7 @@ export const LeftSection = () => {
                 <Link to={conditionalRouting(values) ? '' : values.link}
                   key={values.name}
                   onClick={() => conditionalRouting(values) ? setLoginPrompt({opened: 'Open'}) : null}
-                  className={`p-3 lg:py-3 ${values.link == pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1 transition-all`}
+                  className={`p-3 lg:py-3 ${!currentUserId && values.name === 'Logout' ? 'hidden' : 'block'} ${values.link === pathname ? 'bg-slate-400 shadow-slate-400 shadow-sm text-white' : ''} cursor-pointer hover:bg-slate-500 hover:rounded-md rounded-md text-center border border-r-0 border-l-0 border-slate-500 border-t-0 border-b-1 transition-all`}
                 >
                   {values.name}
                 </Link>
@@ -89,7 +89,7 @@ export const LeftSection = () => {
         
         </div>
         
-        <Link to={`/profile/${currentUser?._id}`} className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full ${currentUser?._id ? 'flex' : 'scale-0'} transition-all items-center gap-2 rounded-md`}>
+        <Link to={`/profile/${currentUser?._id}`} className={`flex-none self-end bottom-2 p-2 cursor-pointer bg-slate-500 w-full ${currentUser?._id ? 'flex' : 'hidden'} transition-all items-center gap-2 rounded-md`}>
           <figure className="rounded-full border-2 shadow-2xl h-10 w-10">
             {
               currentUser?.displayPicture?.photo ?
