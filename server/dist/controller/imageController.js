@@ -7,9 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import dotenv from 'dotenv';
 import { v4 as uuidV4 } from 'uuid';
 import fsPromises from 'fs/promises';
 import { asyncFunc, responseType } from "../helpers/helper.js";
+dotenv.config();
 class ImageController {
     constructor() { }
     uploadImages(req, res) {

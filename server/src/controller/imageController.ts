@@ -1,9 +1,10 @@
+import dotenv from 'dotenv';
 import { v4 as uuidV4 } from 'uuid';
 import fsPromises from 'fs/promises';
 import { Request, Response } from "express";
 import { asyncFunc, responseType } from "../helpers/helper.js";
 
-
+dotenv.config()
 class ImageController {
 
   constructor(){}
