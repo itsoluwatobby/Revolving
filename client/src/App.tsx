@@ -59,7 +59,7 @@ export const App = () => {
   
   useEffect(() => {
     let isMounted = true
-    if(isMounted && userId){
+    if(isMounted && userId && openChat === 'Open' && !socket.connected){
       socket = connect(SOCKET_BASE_URL)
       socket.on('connect', () => {
         socket.emit('revolving', 'REVOLVING_APP_ID')
@@ -68,7 +68,7 @@ export const App = () => {
     return () => {
       isMounted = false
     }
-  }, [userId])
+  }, [userId, openChat])
 
   const openChatModal = () => {
     if(!userId) setStartTypewriting(prev => (prev === 'END' ? 'BEGIN' : 'END'))
