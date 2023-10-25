@@ -71,19 +71,23 @@ export async function getNewTokens(req: CookieProp, res: Response) {
     else if(verify == 'Expired Token') {
       res.clearCookie('revolving', { httpOnly: true, sameSite: 'none', secure: true })// secure: true
       user.updateOne({$set: { refreshToken: '', userSession: '' }})
-      .then(() => responseType({res, status: 403, message: 'Expired Token'}))
+      .then(() => {
+        return responseType({res, status: 403, message: 'Expired Token'})
+      })
       .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
     }
   }
-  const roles = Object.values(user?.roles);
-  const newAccessToken = await signToken({roles, email: user?.email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
-  const newRefreshToken = await signToken({roles, email: user?.email}, '12h', process.env.REFRESHTOKEN_STORY_SECRET);
-
-  //userSession: sessionID: req?.sessionID,
-  user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
-  .then(() => {
-    res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
-    return responseType({res, status: 200, data:{_id: user?._id, roles, accessToken: newAccessToken}})
-  }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
+  else {
+    const roles = Object.values(user?.roles);
+    const newAccessToken = await signToken({roles, email: user?.email}, '1h', process.env.ACCESSTOKEN_STORY_SECRET);
+    const newRefreshToken = await signToken({roles, email: user?.email}, '12h', process.env.REFRESHTOKEN_STORY_SECRET);
+    
+    //userSession: sessionID: req?.sessionID,
+    user.updateOne({$set: {status: 'online', refreshToken: newRefreshToken }})
+    .then(() => {
+      res.cookie('revolving', newRefreshToken, { httpOnly: true, sameSite: "none", secure: true, maxAge: 24 * 60 * 60 * 1000 })//secure: true
+      return responseType({res, status: 200, data:{_id: user?._id, roles, accessToken: newAccessToken}})
+    }).catch((error) => responseType({res, status: 400, message: `${error.message}`}))
+  }
 }
 // TODO: add secure option to cookies
