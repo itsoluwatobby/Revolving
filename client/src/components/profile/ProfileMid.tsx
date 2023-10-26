@@ -47,7 +47,7 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
                
                 <div className='flex items-center gap-2'>
                   <p className={`${theme === 'light' ? 'text-gray-900' : 'text-gray-300'}`}>Name:</p>
-                  <p className="font-medium capitalize cursor-pointer whitespace-pre-wrap tracking-wide">
+                  <p className={`font-medium capitalize cursor-pointer ${userProfile?.firstName ? 'block' : 'hidden'} whitespace-pre-wrap tracking-wide`}>
                     {reduceLength(userProfile?.firstName as string, 20, 'letter')}&nbsp;
                     {reduceLength(userProfile?.lastName as string, 20, 'letter')}
                   </p>

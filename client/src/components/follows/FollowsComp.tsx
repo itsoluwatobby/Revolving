@@ -71,7 +71,12 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
 
                   </div>
                 ))
-              : <ErrorContent message='You have no followers' errorMsg={errorMsg} contentLength={yourFollowers?.followers?.length } />
+              : 
+              <ErrorContent 
+                message='You have no followers' 
+                position='PROFILE' errorMsg={errorMsg} 
+                contentLength={yourFollowers?.followers?.length } 
+              />
           }
         </article>
       </div>
@@ -126,7 +131,12 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
 {/* FOLLOW BACK BUTTON */}
                   </div>
                 ))
-              : <ErrorContent message='You are following no one' errorMsg={errorMsg} contentLength={yourFollowers?.follows?.length } />
+              : 
+              <ErrorContent 
+                message='You are following no one' 
+                position='PROFILE' errorMsg={errorMsg} 
+                contentLength={yourFollowers?.follows?.length} 
+              />
           }
         </article>
       </div>
