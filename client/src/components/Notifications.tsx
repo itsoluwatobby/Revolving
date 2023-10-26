@@ -75,7 +75,7 @@ export default function Notifications() {
     setNotificationIds([])
     setOpenNotification('Hide')
   }
-
+ 
   return (
     <div
       ref={observerRef as React.LegacyRef<HTMLDivElement>}
@@ -118,7 +118,7 @@ export default function Notifications() {
             : 
               <ErrorContent message='You have no notifications' 
                 errorMsg={errorMsg as ErrorResponse} position="NOTIFICATION" 
-                contentLength={(notifications?.notification as NotificationBody[])?.length } 
+                contentLength={(notifications?.notification as NotificationBody[])?.length} 
               />
           }
           <div className={`absolute ${isError ? 'scale-100' : 'scale-0'} transition-all top-6 left-8 w-[80%] rounded-md p-2 shadow-md bg-slate-500 text-center whitespace-pre-wrap text-white py-4 capitalize`}>

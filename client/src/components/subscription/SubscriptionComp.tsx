@@ -60,7 +60,12 @@ export default function SubscriptionComp({ yourSubscriptions, isLoading, theme, 
 
                   </div>
                 ))
-              : <ErrorContent message='You have no subscriptions' errorMsg={errorMsg} contentLength={yourSubscriptions?.subscriptions?.length } />
+              : 
+              <ErrorContent 
+                message='You have no subscriptions' 
+                errorMsg={errorMsg} position='PROFILE'
+                contentLength={yourSubscriptions?.subscriptions?.length } 
+              />
           }
         </article>
       </div>
@@ -105,7 +110,12 @@ export default function SubscriptionComp({ yourSubscriptions, isLoading, theme, 
 
                   </div>
                 ))
-              : <ErrorContent message='You subscribed to no one' errorMsg={errorMsg} contentLength={yourSubscriptions?.subscribed?.length } />
+              : 
+              <ErrorContent 
+                message='You subscribed to no one' 
+                position='PROFILE' errorMsg={errorMsg} 
+                contentLength={yourSubscriptions?.subscribed?.length } 
+              />
           }
         </article>
       </div>
