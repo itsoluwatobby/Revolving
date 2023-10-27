@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { ErrorStyle } from '../utils/navigator';
 import { Link, useParams } from 'react-router-dom';
 import { useThemeContext } from '../hooks/useThemeContext';
-import { useDeleteImageMutation } from '../app/api/storyApiSlice';
 import { deleteSingleImage, imageUpload } from '../utils/helperFunc';
 import EditUserInputs from '../components/editProfile/EditUserInputs';
 import { ErrorResponse, ImageReturnType, UserProps } from '../types/data';
