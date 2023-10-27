@@ -10,6 +10,7 @@ import { dbConfig } from './mongoConfig.js';
 import { corsOptions } from "./corsOption.js";
 import express, { Application } from "express";
 import { SocketServer } from './socketsServer.js';
+import { revolvingErrorLogs } from '../middleware/logger.js';
 import { RevolvingApplication } from './RevolvingApplication.js';
 import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
 
@@ -29,7 +30,7 @@ export class ServerMiddlewares{
     app.use(express.static(this.staticPath))
     app.use(express.urlencoded({ extended: false }));
     app.use(morgan('common'))
-    // app.use(eventLogger)
+    app.use(revolvingErrorLogs)
     app.use(helmet())
     app.use(cookieParser())
 

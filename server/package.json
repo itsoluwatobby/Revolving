@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/itsoluwatobby/Revolving#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "@vercel/kv": "^0.2.3",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",

@@ -115,7 +115,7 @@ class UserController {
     getUser(req, res) {
         asyncFunc(res, () => {
             const { userId } = req.params;
-            if (!userId || userId == null || userId == undefined)
+            if (!userId || userId === 'null')
                 return res.sendStatus(400);
             this.redisClientService.getCachedResponse({ key: `user:${userId}`, cb: () => __awaiter(this, void 0, void 0, function* () {
                     const current = yield this.userService.getUserById(userId);

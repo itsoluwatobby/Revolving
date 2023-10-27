@@ -252,9 +252,3 @@ export default function Form({ currentUserId }: FormProps) {
     </div>
   )
 }
-
-// function taskButton(theme: Theme){
-//   return `
-//     rounded-md cursor-pointer p-1 hover:opacity-50 transition-all, w-14 text-center active:opacity-100 ${theme === 'light' ? 'bg-slate-500' : 'bg-slate-600'}
-//   `
-// }

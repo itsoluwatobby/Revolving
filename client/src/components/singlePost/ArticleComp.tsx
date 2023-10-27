@@ -115,7 +115,7 @@ export default function ArticleComp({
         }
       </div>
 
-      <div className={`sticky z-50 bottom-3 ${reveal ? 'hidden' : 'flex'} shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && isIntersecting === 'INTERSECTING') ? 'scale-100' : 'scale-0'}`}> 
+      <div className={`sticky z-50 bottom-5 ${reveal ? 'hidden' : 'flex'} shadow-2xl shadow-gray-600 ${theme == 'light' ? 'bg-slate-600' : 'bg-slate-800'} m-auto rounded-md p-2 w-3/5 mt-2 opacity-95 items-center gap-4 text-green-600 text-sm font-sans transition-all ${(story?.body && isIntersecting === 'INTERSECTING') ? 'scale-100' : 'scale-0'}`}> 
         <div className={`flex flex-wrap items-center justify-between w-full text-gray-300 text-xs`}>
           <p>{averageReadingTime} read</p>
 
@@ -135,6 +135,7 @@ export default function ArticleComp({
           />
           {story?.edited && <p className='text-center text-xs'>edited {format(story?.updatedAt)}</p>}
         </div>
+        
       </div>
 
     </div>

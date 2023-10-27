@@ -43,7 +43,7 @@ class UserController{
   public getUser(req: Request, res: Response){
     asyncFunc(res, () => { 
       const {userId} = req.params
-      if(!userId || userId == null || userId == undefined) return res.sendStatus(400)
+      if(!userId || userId === 'null') return res.sendStatus(400)
       this.redisClientService.getCachedResponse({key: `user:${userId}`, cb: async() => {
         const current = await this.userService.getUserById(userId)
         await autoDeleteOnExpire(userId)
