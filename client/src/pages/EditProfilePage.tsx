@@ -2,12 +2,12 @@ import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { ErrorStyle } from '../utils/navigator';
 import { Link, useParams } from 'react-router-dom';
-import { ErrorResponse, UserProps } from '../types/data';
 import { useThemeContext } from '../hooks/useThemeContext';
+import { deleteSingleImage, imageUpload } from '../utils/helperFunc';
 import EditUserInputs from '../components/editProfile/EditUserInputs';
+import { ErrorResponse, ImageReturnType, UserProps } from '../types/data';
 import { ImageTypeProp, TargetImageType, ThemeContextType } from '../types/posts';
 import { useGetUserByIdQuery, useUpdateInfoMutation } from '../app/api/usersApiSlice';
-import { useDeleteImageMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
 
 const initialState = {name: null, data: null}
 export default function EditProfilePage() {
@@ -18,9 +18,9 @@ export default function EditProfilePage() {
   const [userProfile, setUserProfile] = useState<UserProps>()
   const [imageType, setImageType] = useState<ImageTypeProp>('NIL')
   const [image, setImage] = useState<TargetImageType>(initialState)
-  const [uploadToServer, { isLoading }] = useUploadImageMutation()
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
 
-  const [deleteImage, { isLoading: isLoadingDelete }] = useDeleteImageMutation()
+  const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [upDateUserInfo, { isLoading: isLoadingUpdate }] = useUpdateInfoMutation()
   const { theme, setRevealEditModal, setLoginPrompt } = useThemeContext() as ThemeContextType
  
@@ -34,18 +34,13 @@ export default function EditProfilePage() {
       }
       else{
         if(!userProfile) return
-        const imageData = new FormData()
-        imageData.append('image', image?.data)
-        await uploadToServer(imageData).unwrap()
-        .then(async(data) => {
-          const res = data as unknown as { url: string }
+        setLoadingImage(true)
+        imageUpload(image?.data, 'profile')
+        .then(async(data: ImageReturnType) => {
           if(image?.name === 'photo'){
             setImageType('DP')
-            if(userProfile?.displayPicture?.photo){
-              const imageName = userProfile?.displayPicture?.photo.substring(userProfile?.displayPicture?.photo?.lastIndexOf('/')+1)
-              await deleteImage(imageName)
-            }
-            const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: res?.url } }
+            if(userProfile?.displayPicture?.photo) await deleteSingleImage(userProfile?.displayPicture?.photo, 'profile')
+            const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: data?.url } }
             await upDateUserInfo(user)
             .then(() => {
               setImage(initialState)
@@ -67,6 +62,7 @@ export default function EditProfilePage() {
           toast.error(errors?.status === 'FETCH_ERROR' ?
           'SERVER ERROR' : errors?.message as string, ErrorStyle)
         })
+        .finally(() => setLoadingImage(false))
       }
     }
     (isMounted && image?.data) ? checkSizeAndUpload() : null
@@ -74,7 +70,7 @@ export default function EditProfilePage() {
     return () => {
       isMounted = false
     }
-  }, [image?.data, image?.name, setLoginPrompt, deleteImage, setRevealEditModal, uploadToServer, upDateUserInfo, userProfile])
+  }, [image?.data, image?.name, setLoginPrompt, setRevealEditModal, upDateUserInfo, userProfile])
 
   useEffect(() => {
     let isMounted = true
@@ -90,18 +86,19 @@ export default function EditProfilePage() {
     if(!userProfile) return
     let user: UserProps;
     let imageName: string;
+    setIsLoadingDelete(true)
     setImageType(type)
     if(type === 'DP'){
-      imageName = userProfile?.displayPicture?.photo.substring(userProfile?.displayPicture?.photo?.lastIndexOf('/')+1)
+      imageName = userProfile?.displayPicture?.photo
       user = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: '' } }
     }
     else if(type === 'COVER'){
-      imageName = userProfile?.displayPicture?.coverPhoto.substring(userProfile?.displayPicture?.coverPhoto?.lastIndexOf('/')+1)
+      imageName = userProfile?.displayPicture?.coverPhoto
       user = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, coverPhoto: '' } }
     }
     else return
     await upDateUserInfo(user)
-    await deleteImage(imageName)
+    await deleteSingleImage(imageName, 'profile')
     .then(() => {
       setImage(initialState)
       setRevealEditModal('NIL')
@@ -113,6 +110,7 @@ export default function EditProfilePage() {
       setImageType('NIL')
       toast.error('Error deleting image', ErrorStyle)
     })
+    .finally(() => setIsLoadingDelete(false))
   }
 
   
@@ -137,7 +135,7 @@ export default function EditProfilePage() {
       </div>
 
       <EditUserInputs 
-        isLoading={isLoading} setLoginPrompt={setLoginPrompt}
+        isLoading={loadingImage} setLoginPrompt={setLoginPrompt}
         imageType={imageType} theme={theme} setImage={setImage} 
         clearPhoto={clearPhoto} userProfile={userProfile as UserProps}
         isLoadingDelete={isLoadingDelete} isLoadingUpdate={isLoadingUpdate}

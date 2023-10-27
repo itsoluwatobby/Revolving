@@ -2,16 +2,17 @@ import { toast } from "react-hot-toast";
 import { useParams } from 'react-router-dom';
 import { ErrorStyle } from "../utils/navigator";
 import { LeftSection } from "../components/LeftSection";
-import { ErrorResponse, UserProps } from "../types/data";
 import { ChangeEvent, useEffect, useState } from 'react';
 import ProfileMid from "../components/profile/ProfileMid";
 import ProfileTop from "../components/profile/ProfileTop";
 import { useThemeContext } from "../hooks/useThemeContext";
 import ProfileBase from "../components/profile/ProfileBase";
+import { deleteSingleImage, imageUpload } from "../utils/helperFunc";
 import SkeletonProfile from "../components/skeletons/SkeletonProfile";
+import { useGetStoriesWithUserIdQuery } from "../app/api/storyApiSlice";
+import { ErrorResponse, ImageReturnType, UserProps } from "../types/data";
 import { useGetUserByIdQuery, useUpdateInfoMutation } from "../app/api/usersApiSlice";
 import { ImageTypeProp, NameType, PostType, TargetImageType, ThemeContextType } from "../types/posts";
-import { useDeleteImageMutation, useGetStoriesWithUserIdQuery, useUploadImageMutation } from "../app/api/storyApiSlice";
 
 const initialState = {name: null, data: null}
 
@@ -20,10 +21,10 @@ export default function ProfilePage() {
   const MAX_SIZE = 1_000_000 as const // 1mb
   const [userProfile, setUserProfile] = useState<UserProps>()
   const [imageType, setImageType] = useState<ImageTypeProp>('NIL')
-  const [uploadToServer, { isLoading }] = useUploadImageMutation()
   const [image, setImage] = useState<TargetImageType>(initialState)
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [userStories, setUserStories] = useState<Partial<PostType[]>>()
-  const [deleteImage, { isLoading: isLoadingDelete }] = useDeleteImageMutation()
   const [upDateUserInfo, { isLoading: isLoadingUpdate }] = useUpdateInfoMutation()
   const { theme, setOpenChat, setLoginPrompt, setRevealEditModal } = useThemeContext() as ThemeContextType
   const { data: userData, isLoading: isLoadingUserInfo } = useGetUserByIdQuery(userId as string)
@@ -66,18 +67,13 @@ export default function ProfilePage() {
       }
       else{
         if(!userProfile) return
-        const imageData = new FormData()
-        imageData.append('image', image?.data)
-        await uploadToServer(imageData).unwrap()
-        .then(async(data) => {
-          const res = data as unknown as { url: string }
+        setLoadingImage(true)
+        imageUpload(image?.data, 'profile')
+        .then(async(data: ImageReturnType) => {
           if(image?.name === 'photo'){
             setImageType('DP')
-            if(userProfile?.displayPicture?.photo){
-              const imageName = userProfile?.displayPicture?.photo.substring(userProfile?.displayPicture?.photo?.lastIndexOf('/')+1)
-              await deleteImage(imageName)
-            }
-            const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: res?.url } }
+            if(userProfile?.displayPicture?.photo) await deleteSingleImage(userProfile?.displayPicture?.photo, 'profile')
+            const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: data?.url } }
             await upDateUserInfo(user)
             .then(() => {
               setImage(initialState)
@@ -92,11 +88,8 @@ export default function ProfilePage() {
           }
           else if(image?.name === 'coverPhoto'){
             setImageType('COVER')
-            if(userProfile?.displayPicture?.coverPhoto){
-              const imageName = userProfile?.displayPicture?.coverPhoto.substring(userProfile?.displayPicture?.coverPhoto?.lastIndexOf('/')+1)
-              await deleteImage(imageName)
-            }
-            const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, coverPhoto: res?.url } }
+            if(userProfile?.displayPicture?.coverPhoto) await deleteSingleImage(userProfile?.displayPicture?.coverPhoto, 'profile')
+            const user: UserProps = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, coverPhoto: data?.url } }
             await upDateUserInfo(user)
             .then(() => {
               setImage(initialState)
@@ -116,6 +109,7 @@ export default function ProfilePage() {
           toast.error(errors?.status === 'FETCH_ERROR' ?
           'SERVER ERROR' : errors?.message as string, ErrorStyle)
         })
+        .finally(() => setLoadingImage(false))
       }
     }
     (isMounted && image?.data) ? checkSizeAndUpload() : null
@@ -123,24 +117,25 @@ export default function ProfilePage() {
     return () => {
       isMounted = false
     }
-  }, [image?.data, image?.name, setLoginPrompt, deleteImage, setRevealEditModal, uploadToServer, upDateUserInfo, userProfile])
+  }, [image?.data, image?.name, setLoginPrompt, setRevealEditModal, upDateUserInfo, userProfile])
 
   const clearPhoto = async(type: ImageTypeProp) => {
     if(!userProfile) return
     let user: UserProps;
     let imageName: string;
+    setIsLoadingDelete(true)
     setImageType(type)
     if(type === 'DP'){
-      imageName = userProfile?.displayPicture?.photo.substring(userProfile?.displayPicture?.photo?.lastIndexOf('/')+1)
+      imageName = userProfile?.displayPicture?.photo
       user = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, photo: '' } }
     }
     else if(type === 'COVER'){
-      imageName = userProfile?.displayPicture?.coverPhoto.substring(userProfile?.displayPicture?.coverPhoto?.lastIndexOf('/')+1)
+      imageName = userProfile?.displayPicture?.coverPhoto
       user = { ...userProfile, displayPicture: { ...userProfile?.displayPicture, coverPhoto: '' } }
     }
     else return
     await upDateUserInfo(user)
-    await deleteImage(imageName)
+    await deleteSingleImage(imageName, 'profile')
     .then(() => {
       setImage(initialState)
       setRevealEditModal('NIL')
@@ -152,6 +147,7 @@ export default function ProfilePage() {
       setImageType('NIL')
       toast.error('Error deleting image', ErrorStyle)
     })
+    .finally(() => setIsLoadingDelete(false))
   }
 
   const closeSetups = () => {
@@ -175,7 +171,7 @@ export default function ProfilePage() {
             :
             <>
               <ProfileTop 
-                isLoading={isLoading} isLoadingUpdate={isLoadingUpdate}
+                isLoading={loadingImage} isLoadingUpdate={isLoadingUpdate}
                 clearPhoto={clearPhoto} isLoadingDelete={isLoadingDelete} 
                 handleImage={handleImage} imageType={imageType} userId={userId as string}
                 userProfile={userProfile as UserProps} setLoginPrompt={setLoginPrompt}

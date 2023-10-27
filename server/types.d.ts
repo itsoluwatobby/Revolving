@@ -27,6 +27,13 @@ interface ClaimProps extends JwtPayload{
   roles: USERROLES[],
 }
 
+type EmailResponse = {
+  to: string;
+  from: string;
+  subject: string;
+  html: string;
+}
+
 type Categories = 'General' | 'Entertainment' | 'Web Development' | 'React' | 'Node' | 'Bash scripting'
 
 type SharedInfo = {

@@ -1,19 +1,20 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { BiCodeAlt } from 'react-icons/bi';
 import { FaRegImages } from 'react-icons/fa';
+import { imageUpload } from '../utils/helperFunc';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePostContext } from '../hooks/usePostContext';
 import { Components, NAVIGATE } from '../utils/navigator';
 import { useThemeContext } from '../hooks/useThemeContext';
 import CodeBlock from '../components/codeEditor/CodeEditor';
 import { useState, useEffect, ChangeEvent, useRef } from 'react';
+import { useGetStoryCondMutation } from '../app/api/storyApiSlice';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CodeSnippets } from '../components/codeSnippets/CodeSnippets';
-import { Categories, ErrorResponse, OpenSnippet } from '../types/data';
+import { Categories, ImageReturnType, OpenSnippet } from '../types/data';
 import { DebounceProps, useDebounceHook } from '../hooks/useDebounceHook';
 import { TimeoutId } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/types';
 import { getLoading, getUrl, setStoryData, setUrl } from '../features/story/storySlice';
-import { useGetStoryCondMutation, useUploadImageMutation } from '../app/api/storyApiSlice';
 import { CodeStoreType, ImageType, ImageUrlsType, PostContextType, PostType, ThemeContextType } from '../types/posts';
 
 let uploadedImageIds = [] as string[]
@@ -32,11 +33,11 @@ export const NewStory = () => {
   const [snippet, setSnippet] = useState<OpenSnippet>('Nil');
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null)
-  const [uploadToServer] = useUploadImageMutation()
   const [targetStory, setTargetStory] = useState<PostType>()
   const [postCategory, setPostCategory] = useState<Components[]>(['General']);
   const [includesId, setIncludesId] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState<boolean>(false);
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
   const debounceValue = useDebounceHook(
     {savedTitle: inputValue, savedBody: textareaValue, savedFontFamily: fontFamily}, 
     1000) as DebounceProps;
@@ -108,31 +109,28 @@ export const NewStory = () => {
   }, [url])
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
     const uploadImages = async() => {
       await Promise.all(imagesFiles.map(async(image) => {
         if(uploadedImageIds.includes(image.imageId)) return
-        const imageData = new FormData()
-        imageData.append('image', image.image)
-        await uploadToServer(imageData).unwrap()
-        .then((data) => {
-          // throw new Error('PRESENTLY GOING THROUGH TESTING')
-          const res = data as unknown as { url: string }
-          const composed = {imageId: image.imageId, url: res.url} as ImageUrlsType
+        setLoadingImage(true)
+        imageUpload(image.image, 'story')   
+        .then((data: ImageReturnType) => {
+          const composed = {imageId: image.imageId, url: data.url} as ImageUrlsType
           dispatch(setUrl(composed))
-          uploadedImageIds.push(image.imageId)
+          uploadedImageIds.push(composed.imageId)
         }).catch((error: unknown) => {
-          const errors = error as ErrorResponse
-          errors?.originalStatus == 401 && setLoginPrompt({opened: 'Open'})
+          void(error)
           setErrorMsg(true)
         })
+        .finally(() => setLoadingImage(false))
       }))
     }
     if(isMounted && imagesFiles.length >= 1) uploadImages()
     return () => {
       isMounted = false
     }
-  }, [imagesFiles, dispatch, setLoginPrompt, uploadToServer])
+  }, [imagesFiles, dispatch, setLoginPrompt])
 
   const handleTitle = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -259,7 +257,7 @@ export const NewStory = () => {
         : imagesFiles.length !== 0 
           ? setSnippet(type) : setSnippet('Nil')
   }
-  
+
   return (
     <section className={`hidebars relative ${fontFamily} ${loading ? 'cursor-none' : ''} p-3 h-full text-sm flex flex-col overflow-y-scroll gap-2 sm:items-center mt-2 ${theme == 'light' ? 'bg-gray-100' : ''}`}>
       {
@@ -342,7 +340,7 @@ export const NewStory = () => {
       </div>
 
       <CodeSnippets 
-        errorMsg={errorMsg}
+        errorMsg={errorMsg} loadingImage={loadingImage}
         setIsPresent={setIsPresent} setSnippet={setSnippet} success={success}
         theme={theme} snippet={snippet} isPresent={isPresent} codeEditor={codeEditor} 
         setSuccess={setSuccess} includesId={includesId} setIncludesId={setIncludesId}

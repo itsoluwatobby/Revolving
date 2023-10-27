@@ -7,6 +7,7 @@ Build with React Typescript using redux-toolkit
 > Tech stack
 * ReactJS
 * Typescript
+* firebase (for image upload)
 * socket.io/client
 * redux-toolkit
 * Tailwindcss
