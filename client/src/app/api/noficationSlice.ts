@@ -33,7 +33,7 @@ export const notificationSlice = apiSlice.injectEndpoints({
       query: (userId) => `/notification/get_notification/${userId}`,
       transformResponse(baseQueryReturnValue: {data: NotificationModelType}) {
         const response = baseQueryReturnValue.data?.notification?.sort((prev, next) => next?.createdAt.localeCompare(prev?.createdAt))
-        return {...baseQueryReturnValue.data, notification: [...response]}
+        return {...baseQueryReturnValue.data, notification: response}
       },
       providesTags:(result) => providesTag(result?.notification as NotificationBody[], 'NOTIFICATION')
     }),

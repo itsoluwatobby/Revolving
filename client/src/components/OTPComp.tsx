@@ -133,14 +133,17 @@ export default function OTPComp({ subject, otp, setOtp, accountAuthenticationPag
           </div>
         }
       </div>
-      <div className='flex justify-between items-center px-1'>
-        <div className={`w-10 h-4 flex items-center transition-all p-0.5 ${mailMode === 'EMAIL' ? '' : 'bg-slate-900'} shadow-inner shadow-slate-950 rounded-full`}>
+      <div className='relative flex justify-between items-center px-1'>
+        <div className={`w-12 h-6 mobile:h-6 mobile:w-16 flex items-center transition-all p-0.5 ${mailMode === 'EMAIL' ? '' : 'bg-slate-900'} shadow-inner shadow-slate-950 rounded-full`}>
           <button 
             title={mailMode === 'EMAIL' ? 'Send to Email' : 'Insert Automatically'}
             onClick={() => setMailMode(prev => prev === 'EMAIL' ? prev = 'DIRECT' : prev = 'EMAIL')}
-            className={`focus:outline-none border-none shadow-lg ${mailMode === 'EMAIL' ? 'bg-slate-200 translate-x-0' : 'bg-green-500 translate-x-4'} duration-300 rounded-full h-full w-1/2 hover:opacity-90 transitiion-all`} 
+            className={`focus:outline-none border-none shadow-lg ${mailMode === 'EMAIL' ? 'bg-slate-200 translate-x-0' : 'bg-green-500 translate-x-6 mobile:translate-x-8'} duration-300 rounded-full h-full w-1/2 hover:opacity-90 transition-all`} 
           />
         </div>
+        
+        <span className={`absolute ${mailMode === 'DIRECT' ? 'scale-100' : 'scale-0'} italic font-medium font-mono transition-all left-[4rem] mobile:left-[5rem] text-[13px] underline underline-offset-2`}>insert</span>
+        
         <button 
           disabled={isGenerateLoading}
           onClick={resendLink}

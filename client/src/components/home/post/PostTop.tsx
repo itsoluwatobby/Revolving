@@ -14,6 +14,7 @@ import { ErrorStyle, SuccessStyle, reduceLength } from "../../../utils/navigator
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import { ChatOption, PostType, Theme, ThemeContextType } from "../../../types/posts";
 import { storyApiSlice, useDeleteStoryMutation } from "../../../app/api/storyApiSlice";
+import { deleteSingleImage } from "../../../utils/helperFunc";
 
 
 type PostTopProps = {
@@ -40,9 +41,15 @@ export default function PostTop({ story, bodyContent, setViewUsers }: PostTopPro
 
   const deleted = async(id: string) => {
     try{
-      story?.sharedId 
-          ? await deleteSharedStory({userId, sharedId: story?.sharedId}).unwrap() 
-              : await deleteStory({userId, storyId: id}).unwrap()
+      if(story?.sharedId) await deleteSharedStory({userId, sharedId: story?.sharedId}).unwrap() 
+      else {
+        if(story.picture?.length){
+          await Promise.all(story.picture?.map(async(pic) => {
+            await deleteSingleImage(pic, 'story')
+          }))
+        }
+        await deleteStory({userId, storyId: id}).unwrap()
+      } 
       story?.sharedId && dispatch(storyApiSlice.util.invalidateTags(['STORY']))
       const promptMessage = story?.sharedId ? 'Success!! Story unshared' : 'Success!! Post deleted'
       toast.success(promptMessage, SuccessStyle)

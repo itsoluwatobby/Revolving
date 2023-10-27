@@ -14,6 +14,7 @@ type FunctionOption = {
 type Entries = 'socialMediaEntry' | 'hobbiesEntry' | 'stackEntry'
 type ValueType = 'socialMediaName'
 
+type ImageReturnType = { status: string, url: string }
 
 type InitPrevEntriesType = {
   prevHobby: string,

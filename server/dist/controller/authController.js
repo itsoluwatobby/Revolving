@@ -11,7 +11,7 @@ import brcypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { UserModel } from "../models/User.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { transporter } from '../config/mailConfig.js';
+import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js';
@@ -84,12 +84,13 @@ class AuthenticationController {
                 const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`;
                 const options = mailOptions(email, username, verificationLink);
                 yield newUser.updateOne({ $set: { verificationToken: { type: 'LINK', token: verificationLink, createdAt: this.dateTime } } });
-                transporter.sendMail(options, (err) => {
-                    if (err)
-                        return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
-                    else
-                        return responseType({ res, status: 201, message: 'Please check your email to activate your account' });
-                });
+                // await new Promise((resolve, reject) => {
+                //   transporter.sendMail(options, (err) => {
+                //     if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
+                //     else return responseType({res, status: 201, message: 'Please check your email to activate your account'})
+                //   })
+                // })
+                return yield sendMailMessage(res, options, 'one');
             }
             else if (type === 'OTP') {
                 this.OTPGenerator(res, newUser);
@@ -195,12 +196,11 @@ class AuthenticationController {
             else if (purpose === 'PASSWORD') {
                 yield user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } } });
             }
-            transporter.sendMail(options, (err) => {
-                if (err)
-                    return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
-                else
-                    return responseType({ res, status: 201, message: 'Please check your email, OTP sent' });
-            });
+            // transporter.sendMail(options, (err) => {
+            //   if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
+            //   else return responseType({res, status: 201, message: 'Please check your email, OTP sent'})
+            // })
+            return yield sendMailMessage(res, options, 'two');
         }));
     }
     /**
@@ -249,11 +249,11 @@ class AuthenticationController {
                         const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`;
                         const options = mailOptions(email, user === null || user === void 0 ? void 0 : user.username, verificationLink);
                         yield user.updateOne({ $set: { verificationToken: { type: 'LINK', token, createdAt: this.dateTime } } });
-                        transporter.sendMail(options, (err) => {
-                            if (err)
-                                return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
-                        });
-                        return responseType({ res, status: 405, message: 'Please check your email' });
+                        // transporter.sendMail(options, (err) => {
+                        //   if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
+                        //   return responseType({res, status: 405, message: 'Please check your email'})
+                        // })
+                        return yield sendMailMessage(res, options, 'three');
                     }
                     else if (verify === null || verify === void 0 ? void 0 : verify.email)
                         return responseType({ res, status: 406, message: 'Please check your email to activate your account' });
@@ -335,14 +335,16 @@ class AuthenticationController {
                 const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
                 const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`;
                 const options = mailOptions(email, user.username, verificationLink, 'password');
-                transporter.sendMail(options, (err) => {
-                    if (err)
-                        return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
-                    else {
-                        user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } } })
-                            .then(() => responseType({ res, status: 201, message: 'Please check your email' }))
-                            .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
-                    }
+                yield new Promise((resolve, reject) => {
+                    transporter.sendMail(options, (err) => {
+                        if (err)
+                            reject(responseType({ res, status: 400, message: 'unable to send mail, please retry' }));
+                        else {
+                            user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } } })
+                                .then(() => resolve(responseType({ res, status: 201, message: 'Please check your email' })))
+                                .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
+                        }
+                    });
                 });
             }
             else if (type === 'OTP')

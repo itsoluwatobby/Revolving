@@ -1,4 +1,54 @@
-import { ObjectUnknown, UserProps } from "../types/data";
+import { imageStorage } from './firebase'
+import { nanoid } from '@reduxjs/toolkit'; 
+import { ImageReturnType, UserProps } from "../types/data";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
+
+type PathType = 'profile' | 'story'
+
+/**
+ * @desc imageUpload: function to upload images to firebase
+ * @param image image file 
+ * @param storePath firebase path to tore image (chatImages | apartmentImages | profileImage)
+ * @Return returns an object. onSuccess {status: "success", url: string}
+ *                            onError {status: "failed", url: ''}
+ * @desc storePath: image storage container. The store container for this project
+ * includes: chatImages | apartmentImages | profileImage
+ * The format given above is the exact format of the container names in firestore
+ */
+export const imageUpload = (image: File, storePath: PathType): Promise<ImageReturnType> => {
+  return new Promise((resolve, reject) => {
+    const photoName = `${image.name}-${nanoid(5)}`
+    const storageRef = ref(imageStorage, `images/${storePath}/${photoName}`)
+    const uploadTask = uploadBytesResumable(storageRef, image)
+    uploadTask.on('state_changed', (snap: any) => {
+      void(snap)
+    },(error: any) => {
+        void(error)
+        reject({status: "failed", url: ''})
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref)
+        .then((downloadUrl: string) => {
+          return resolve({status: 'success', url: downloadUrl})
+        })
+        .catch((error: any) => {
+          void(error)
+          return reject({status: 'failed', url: ''})
+        })
+      }
+    )
+  })
+}
+
+export const deleteSingleImage = (image: string, storePath: PathType) => {
+  const imageName = image?.split('?alt=')[0]?.split(`images%2F${storePath}%2F`)[1]
+  return new Promise((resolve, reject) => {
+    const deleteRef = ref(imageStorage, `images/${storePath}/${imageName}`)
+    deleteObject(deleteRef)
+    .then(() => resolve('successful'))
+    .catch(() => reject('An Error occurred'))
+  })
+}
 
 export const userOfPost = (users: UserProps[], userId: string): string => {
   const result = users?.find(user => user?._id === userId) as UserProps
@@ -31,34 +81,4 @@ export const dateFormat = (dateTime: string) => {
     dateStyle: 'medium'
   }).format(constructDate)
   return date
-}
-
-export async function contentFeedAlgorithm<T>(entry: ObjectUnknown<T>[], numLikes=50){
-  const mostLikedPosts = entry?.filter(post => Number(post?.likes) >= numLikes) ?? []
-  const otherLikedPosts = entry?.filter(post => Number(post?.likes) < numLikes) ?? []
-
-  shufflePosts(mostLikedPosts)
-  shufflePosts(otherLikedPosts)
-
-  sortByTime(mostLikedPosts)
-  sortByTime(otherLikedPosts)
-  const combinedPosts = [...mostLikedPosts, ...otherLikedPosts];
-  // return new Promise(resolve => {
-  //   combinedPosts = [...mostLikedPosts, ...otherLikedPosts]
-  //   resolve(combinedPosts)
-  // })
-  return combinedPosts
-}
-
-function shufflePosts<K>(content: ObjectUnknown<K>[]){
-  for(let i = content?.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1))
-    const temp = content[i]
-    content[i] = content[j]
-    content[j] = temp
-  }
-}
-
-function sortByTime<K>(content: ObjectUnknown<K>[]){
-  content?.sort((a, b) => b?.createdAt.localeCompare(a?.createdAt))
 }

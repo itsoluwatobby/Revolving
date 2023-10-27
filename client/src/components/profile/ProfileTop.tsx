@@ -103,7 +103,7 @@ export default function ProfileTop({ userId, userProfile, imageType, handleImage
 
       </div>
 
-      <div className={`absolute right-2 top-32 md:top-40 lg:right-0 lg:top-36 flex flex-row gap-8 md:z-10`}>
+      <div className={`absolute right-2 top-32 md:top-[7rem] transition-all lg:right-0 lg:top-16 flex flex-row gap-8 md:z-10`}>
         {
           userId === currentUserId ?
             <Link to={`/edit_profile/${userProfile?._id}`} >

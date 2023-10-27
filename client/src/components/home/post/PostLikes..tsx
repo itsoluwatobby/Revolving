@@ -40,12 +40,12 @@ export const PostLikes = ({ storyId, setViewUsers }: RecentConversationsProps) =
         </button>
       </div>
 
-      <div className='hidebars mt-1 flex flex-col w-full h-full transition-all overflow-y-scroll'>
+      <div className='hidebars mt-1 flex flex-col w-full h-full transition-all overflow-y-scroll gap-0.5'>
       { 
         userLikes?.map(user => (
           <article 
             key={user?._id}
-            className={`p-1 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100 hover:bg-gray-200 text-black' : 'bg-slate-700 hover:bg-gray-600'} gap-x-2 rounded-md cursor-pointer transition-all`}
+            className={`p-1 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100 hover:bg-gray-200 text-black' : 'bg-slate-700 hover:bg-gray-600'} gap-x-2 rounded-[4px] cursor-pointer transition-all`}
           >
 
             <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-8 h-8">
@@ -68,7 +68,7 @@ export const PostLikes = ({ storyId, setViewUsers }: RecentConversationsProps) =
               <div className='flex items-center gap-1.5'>
                 <p 
                   className={`text-[11px] ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>
-                  <span className='text-[11px] opacity-90'>{format(user?.lastSeen)}</span>
+                  <span className='text-[11px]'>Last seen: <span className='opacity-90'>{format(user?.lastSeen)}</span></span>
                 </p>
               </div>
       

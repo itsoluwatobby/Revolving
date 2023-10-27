@@ -101,7 +101,6 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
               </div>
             </div>
 
-    
             <div className={`lg:mt-0 md:mt-4 flex flex-col md:items-start lg:items-center items-center gap-3 p-0.5`}>
               <Link to={`/subscriptions/${userProfile?._id}`} 
                 className={`${userId === currentUserId ? 'block' : 'hidden'}`}>
@@ -116,34 +115,49 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
 
                 <FollowUnFollow userId={userProfile?._id} position={['profile']} />
 
-                <div className={`${userProfile?.stack?.length ? 'flex' : 'hidden'} flex-col`}>
+                {/* <div className={`${userProfile?.stack?.length ? 'flex' : 'hidden'} flex-col`}>
                   <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
                   <div className={`stackflow overflow-y-scroll h-12 p-1 py-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
                     {
                       userProfile?.stack?.map(skill => (
                         <p 
                           key={skill}
-                          className="rounded-md hover:opacity-80 tracking-wide capitalize transition-all cursor-default">
+                          className="rounded-md hover:opacity-80 py-0.5 tracking-wide capitalize transition-all cursor-default">
                             {skill}
                         </p>
                       ))
                     }
                   </div>
-                </div>
+                </div> */}
 
               </div>
             </div>
          
           </article>
           
-          <div className={`${userProfile?.hobbies?.length ? 'flex' : 'hidden'} py-2 flex-col`}>
+          <div className={`${userProfile?.hobbies?.length ? 'flex' : 'hidden'} py-1 flex-col`}>
+            <p>Skills:</p>
+            <div className='hidebars overflow-x-scroll flex items-center gap-2 flex-wrap'>
+              {
+                userProfile?.stack?.map(skill => (
+                  <p 
+                    key={skill}
+                    className={`rounded-[3px] hover:opacity-90 tracking-wide capitalize transition-all ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-500'} px-1 cursor-default`}>
+                      {skill}
+                  </p>
+                ))
+              }
+            </div>
+          </div>
+          
+          <div className={`${userProfile?.hobbies?.length ? 'flex' : 'hidden'} py-1 flex-col`}>
             <p>Hobbies:</p>
-            <div className='flex items-center gap-2 flex-wrap'>
+            <div className='hidebars overflow-x-scroll flex items-center gap-2 flex-wrap'>
               {
                 userProfile?.hobbies?.map(hobby => (
                   <p 
                     key={hobby}
-                    className={`hidebars rounded-md hover:opacity-90 tracking-wide capitalize transition-all ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-500'} overflow-x-scroll px-2 cursor-default`}>
+                    className={`rounded-[3px] hover:opacity-90 tracking-wide capitalize transition-all ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-500'} px-1 cursor-default`}>
                       {hobby}
                   </p>
                 ))

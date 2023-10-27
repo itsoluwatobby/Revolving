@@ -12,6 +12,7 @@ type CodeSnippetProps = {
   codeEditor: boolean,
   includesId: string[],
   snippet: OpenSnippet,
+  loadingImage: boolean,
   success: UpdateSuccess,
   isPresent: ConflictType,
   setIncludesId: React.Dispatch<React.SetStateAction<string[]>>
@@ -22,7 +23,7 @@ type CodeSnippetProps = {
 
 let prevCodeLength = 0
 let prevImageLength = 0
-export const CodeSnippets = ({ theme, isPresent, errorMsg, success, includesId, setIncludesId, setSnippet, setSuccess, snippet, setIsPresent, codeEditor }: CodeSnippetProps) => {
+export const CodeSnippets = ({ theme, isPresent, loadingImage, errorMsg, success, includesId, setIncludesId, setSnippet, setSuccess, snippet, setIsPresent, codeEditor }: CodeSnippetProps) => {
   const { codeStore, imagesFiles, submitToSend, setImagesFiles, setCodeStore, setInputValue, setSubmitToSend } = usePostContext() as PostContextType;
 
   const sortedStoreCode = codeStore.slice().sort((a, b) => b.date.localeCompare(a.date))
@@ -76,7 +77,7 @@ export const CodeSnippets = ({ theme, isPresent, errorMsg, success, includesId, 
         ) : ( 
           imagesFiles?.map((image, index) => (
             <ImageCard key={image.imageId} 
-              image={image} theme={theme} count={index}
+              image={image} theme={theme} count={index} loadingImage={loadingImage}
               imagesFiles={imagesFiles} setImagesFiles={setImagesFiles}
             />
           ))
