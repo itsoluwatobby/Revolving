@@ -78,7 +78,7 @@ export default function Tasks({ task, theme, setViewSingle }: TaskProps) {
       <p className="relative flex-auto flex items-center gap-3 p-0.5 pt-0 self-start max-h-14">
         <label 
           htmlFor={`${task?._id}`}
-          className={`${task.completed && 'text-gray-400 line-through'} leading-tight pl-5`}
+          className={`${task.completed && 'text-gray-400 line-through'} leading-tight pl-5 pt-0.5`}
         >
           {reduceLength(task.task, 20, 'word')}
         </label>

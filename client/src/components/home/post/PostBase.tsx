@@ -37,8 +37,9 @@ export default function PostBase({ viewUsers, setViewUsers, story, averageReadin
     }
     catch(err: unknown){
       const errors = err as ErrorResponse
+      const errorMessage = errors?.data?.meta?.message ? errors?.data?.meta?.message : 'An error occurred';
       (!currentUserId || !errors || errors?.originalStatus == 401) ? setLoginPrompt({opened: 'Open'}) : null;
-      (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`,ErrorStyle)
+      (isLikeError || isSharedLikeError) && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errorMessage}`,ErrorStyle)
     }
   }
 
@@ -50,8 +51,9 @@ export default function PostBase({ viewUsers, setViewUsers, story, averageReadin
     }
     catch(err: unknown){
       const errors = sharedError as Partial<ErrorResponse>
+      const errorMessage = errors?.data?.meta?.message ? errors?.data?.meta?.message : 'An error occurred';
       (!currentUserId || !errors || errors?.originalStatus == 401) && setLoginPrompt({opened: 'Open'})
-      isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errors?.data?.meta?.message}`, ErrorStyle)
+      isSharedError && toast.error(`${errors?.originalStatus == 401 ? 'Please sign in' : errorMessage}`, ErrorStyle)
     }
   }
 

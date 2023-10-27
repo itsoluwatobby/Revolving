@@ -95,15 +95,15 @@ export const App = () => {
           
           <Route element={<PersistedLogin />}>
             
-            {/* PROTECTED */}
             <Route index element={<Home />} />
             <Route path="story/:storyId" element={<SingleStoryPage />} />
             <Route path="new_story" element={<NewStory />} />
-              <Route path="edit_story/:storyId/:storyUserId" element={<NewStory />} />
+            <Route path="edit_story/:storyId/:storyUserId" element={<NewStory />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="follows/:userId" element={<Followers />} />
             {/* <Route path="notifications/:userId" element={<Notifications />} /> */}
 
+            {/* PROTECTED */}
             <Route element={<ProtectedRoute roles={user_roles}/>}>
 
               <Route path="adminPage/:userId" element={<AdminPage />} />

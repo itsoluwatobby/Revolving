@@ -1,11 +1,14 @@
 import dotenv from 'dotenv'
 import { Response } from 'express'
+import sgMail from '@sendgrid/mail';
+import { EmailResponse } from '../../types.js';
 import { responseType } from '../helpers/helper.js';
 import { Transporter, createTransport } from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
-import { EmailResponse } from '../../types.js';
 
 dotenv.config()
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTransport({
   service: 'gmail',
@@ -16,6 +19,7 @@ export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTra
     pass: process.env.REVOLVING_PASS,
   }
 })
+
 
 type MsgType = 'one' | 'two' | 'three' | 'four'
 

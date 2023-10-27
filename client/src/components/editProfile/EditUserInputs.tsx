@@ -33,17 +33,21 @@ const initUserState = { username: '', firstName: '', lastName: '', country: '', 
 const initEntries = { hobbiesEntry: '', stackEntry: '', socialMediaEntry: '', socialMediaName: '' }
 const initPasswordConfig = { match: false, validPassword: false, password: '', confirmPassword: '' }
 export default function EditUserInputs({ theme, userProfile, imageType, setImage, clearPhoto, isLoading, isLoadingDelete, isLoadingUpdate, setLoginPrompt }: UserInputsProps) {
+  const MAX_DESCRIPTION_LENGTH = 250 as const
   const [errorMsg, setErrorMsg] = useState<string>('')
   const [checked, setChecked] = useState<boolean>(false)
   const [reveal, setReveal] = useState<ChatOption>('Hide')
   const [hoverDp, setHoverDp] = useState<ImageTypeProp>('NIL')
+
   const RequiredGenders = ['Male', 'Female', 'Others', 'Undecided']
   const [currentPassword, setCurrentPassword] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [arrayEntry, setArrayEntry] = useState<InitEntriesType>(initEntries)
+
   const [userDetails, setUserDetails] = useState<Partial<UserProps>>(initUserState)
   const [inputRef0, inputRef01, inputRef1, inputRef2] = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
   const [passwordConfig, setPasswordConfig] = useState<typeof initPasswordConfig>(initPasswordConfig)
+
   const [upDateUserInfo, { isLoading: isLoadingUserInfo, isError: isErrorUserInfo }] = useUpdateInfoMutation()
   const [confirmCurrentPassword, { isLoading: isLoadingConfirmation, isError, isSuccess }] = useConfirmPasswordMutation()
   const [prevEntries, setPrevEntries] = useState<InitPrevEntriesType>(initPrevEntries)
@@ -78,7 +82,7 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
     const name = event.target.name
     const value = event.target.value
     if(NameValues?.includes(name as (Entries | ValueType))){
-      setArrayEntry(prev => ({...prev, [name]: value.trim()}))
+      setArrayEntry(prev => ({...prev, [name]: value}))
     }
     else if(stringVals.includes(name)){
       setUserDetails(prev => ({...prev, [name]: value}))
@@ -189,7 +193,13 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
   const updateInfo = async() => {
     try{
       if(password) await upDateUserInfo({...userDetails, password: password.trim()} as UserProps).unwrap()
-      else await upDateUserInfo(userDetails as UserProps).unwrap()
+      else {
+        const details = { 
+          ...userDetails, firstName: firstName?.trim(), lastName: lastName?.trim(),
+          username: username?.trim(), description: description?.trim(), country: country?.trim()
+        }
+        await upDateUserInfo(details as UserProps).unwrap()
+      }
       toast.success('Successfully updated', SuccessStyle)
       setPasswordConfig(initPasswordConfig)
       setChecked(false)
@@ -271,13 +281,13 @@ export default function EditUserInputs({ theme, userProfile, imageType, setImage
               name='description'
               value={description || ''}
               placeholder='About me'
-              maxLength={150}
+              maxLength={MAX_DESCRIPTION_LENGTH}
               rows={14}
               onChange={event => setUserDetails(prev => ({...prev, description: event?.target.value}))}
               className={`w-full text-black px-2 py-1 h-full border-none focus:outline-none placeholder:text-gray-600 rounded-sm`}
             />
           </div>
-          <span className='self-end font-medium'>{150 - (description as string)?.length || 0}</span>
+          <span className='self-end font-medium'>{MAX_DESCRIPTION_LENGTH - (description as string)?.length || 0}</span>
         </div>
 
         <div className='flex flex-col mobile:w-full w-7/12 md:w-4/6 px-2 gap-y-2 gap-x-2'>

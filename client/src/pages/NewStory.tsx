@@ -49,17 +49,19 @@ export const NewStory = () => {
     const files = (event.target as HTMLInputElement).files as FileList
     setFiles([...files])
   }
+  console.log(storyUserId)
+  console.log(currentUserId)
 
   useEffect(() => {
     let isMounted = true
     if(isMounted && pathname === `/edit_story/${storyId}/${storyUserId}`){
-      if(storyUserId !== targetStory?.userId) navigate('/unauthorized')
+      if(storyUserId !== currentUserId) navigate('/unauthorized')
       else return
     }
     return () => {
       isMounted = false
     }
-  }, [pathname, storyId, navigate, targetStory?.userId, storyUserId])
+  }, [pathname, storyId, navigate, currentUserId, storyUserId])
 
   useEffect(() => {
     let isMounted = true
@@ -181,8 +183,8 @@ export const NewStory = () => {
         // localStorage.setItem('revolving-codeStore', JSON.stringify([...getStore]))
         setCodeStore([])
       }
-      setInputValue(savedTitle?.trim() || '')
-      setTextareaValue(savedBody?.trim() || '')
+      setInputValue(savedTitle || '')
+      setTextareaValue(savedBody || '')
       setTypingEvent(debounceValue?.typing)
     }
     return () => {
