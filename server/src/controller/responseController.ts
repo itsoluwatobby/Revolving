@@ -4,14 +4,14 @@ import { CommentResponseProps, RequestProp } from "../../types.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { UserService } from "../services/userService.js";
 import { CommentService } from "../services/commentService.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
+import { RedisClientService } from "../helpers/redis.js";
 
 
 class ResponseController {
 
   private userService = new UserService()
   private responseService = new CommentService()
-  private redisClientService = new KV_Redis_ClientService()
+  private redisClientService = new RedisClientService()
 
   constructor(){}
 

@@ -4,7 +4,7 @@ import { MessageService } from "../services/messageService.js"
 import { asyncFunc, responseType } from "../helpers/helper.js";
 import { ConversationService } from "../services/ConversationService.js"
 import { DeleteChatOption, GetConvoType, MessageModelType, MessageStatus, UserFriends } from "../../types.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
+import { RedisClientService } from "../helpers/redis.js";
 
 interface MessageRequest extends Request{
   messageId: string,
@@ -15,7 +15,7 @@ class MessageConversationController {
 
   private messageService: MessageService = new MessageService();
   private conversationService: ConversationService = new ConversationService()
-  private redisClientService: KV_Redis_ClientService = new KV_Redis_ClientService()
+  private redisClientService: RedisClientService = new RedisClientService()
 
   constructor() {}
 

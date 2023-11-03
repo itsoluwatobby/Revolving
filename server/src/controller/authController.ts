@@ -8,11 +8,10 @@ import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js'; 
-import { KV_Redis_ClientService } from '../helpers/redis.js';
+import { RedisClientService } from '../helpers/redis.js';
 import { NotificationModel } from '../models/Notifications.js';
 import { ClaimProps, EmailProps, NewUserProp, OTPPURPOSE, QueryProps, UserProps } from "../../types.js";
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
-import { rejects } from 'assert';
 
 dotenv.config()
 
@@ -38,8 +37,8 @@ class AuthenticationController {
   private clientUrl = process.env.NODE_ENV === 'production' 
         ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK
   private userService = new UserService()
-  private redisClientService = new KV_Redis_ClientService()
-  // private redisClientService = new RedisClientService()
+  // private redisClientService = new KV_Redis_ClientService()
+  private redisClientService = new RedisClientService()
 
   constructor(){
     this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
@@ -243,7 +242,6 @@ class AuthenticationController {
           else return responseType({res, status: 406, message: 'Please check your email.'})
         }
       }
-
       const roles = Object.values(user?.roles);
       const accessToken = await signToken({roles, email}, '4h', process.env.ACCESSTOKEN_STORY_SECRET);
       const refreshToken = await signToken({roles, email}, '1d', process.env.REFRESHTOKEN_STORY_SECRET);
@@ -319,7 +317,7 @@ class AuthenticationController {
           if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
           else{
             user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } }})
-            .then(() => return responseType({res, status:201, message:'Please check your email'}))
+            .then(() => responseType({res, status:201, message:'Please check your email'}))
             .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
           }
         })
@@ -426,7 +424,7 @@ class AuthenticationController {
   */ 
   public async redisFunc(){
     objInstance.reset();
-    await this.redisClientService.redisClient.flushall();
+    await this.redisClientService.redisClient.flushAll();
   }
 }
 export default new AuthenticationController()

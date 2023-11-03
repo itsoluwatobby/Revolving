@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { UserModel } from '../models/User.js';
 import { ROLES } from "../config/allowedRoles.js";
 import { UserService } from '../services/userService.js';
-import { KV_Redis_ClientService } from '../helpers/redis.js';
+import { RedisClientService } from '../helpers/redis.js';
 import NotificationController from './notificationController.js';
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { EachSubs, GetFollowsType, GetSubscriptionType, SubscribeNotificationType, SubscriptionTo, UserFriends, UserProps } from "../../types.js";
@@ -13,7 +13,7 @@ class UserController{
 
   public dateTime: string
   private userService: UserService = new UserService()
-  private redisClientService: KV_Redis_ClientService = new KV_Redis_ClientService()
+  private redisClientService: RedisClientService = new RedisClientService()
 
   constructor(){
     this.dateTime = new Date().toString()
