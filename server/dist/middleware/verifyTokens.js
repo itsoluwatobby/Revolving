@@ -9,14 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import dotenv from 'dotenv';
 import { UserService } from "../services/userService.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
+import { RedisClientService } from "../helpers/redis.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 dotenv.config();
-const redisClientServer = new KV_Redis_ClientService();
+const redisClientService = new RedisClientService();
 const userService = new UserService();
 function activatedAccount(email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userData = yield redisClientServer.getCachedResponse({ key: `user:${email}`, cb: () => __awaiter(this, void 0, void 0, function* () {
+        const userData = yield redisClientService.getCachedResponse({ key: `user:${email}`, cb: () => __awaiter(this, void 0, void 0, function* () {
                 const user = yield userService.getUserByEmail(email);
                 return user;
             }), reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] });

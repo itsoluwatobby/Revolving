@@ -1,7 +1,7 @@
 import userService from "./userService.js";
 import { UserModel } from "../models/User.js";
 import messageService from "./messageService.js";
-import { Document, ObjectId, Schema, Types } from "mongoose";
+import { Document, Schema, Types } from "mongoose";
 import { conversationModel } from "../models/Conversations.js";
 import { ConversationModelType, GetConvoType } from "../../types.js";
 

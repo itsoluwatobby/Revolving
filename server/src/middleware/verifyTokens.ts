@@ -18,11 +18,11 @@ interface CookieProp extends Request{
   }
 }
 
-const redisClientServer = new KV_Redis_ClientService();
+const redisClientService = new KV_Redis_ClientService();
 const userService = new UserService()
 
 async function activatedAccount(email: string): Promise<UserProps> {
-  const userData = await redisClientServer.getCachedResponse({key: `user:${email}`, cb: async () => {
+  const userData = await redisClientService.getCachedResponse({key: `user:${email}`, cb: async () => {
     const user = await userService.getUserByEmail(email)
     return user
   }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE']}) as UserProps

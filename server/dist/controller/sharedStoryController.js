@@ -8,14 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { UserService } from "../services/userService.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
+import { RedisClientService } from "../helpers/redis.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 class SharedStoryController {
     constructor() {
         this.userService = new UserService();
         this.sharedStoryService = new SharedStoryService();
-        this.redisClientService = new KV_Redis_ClientService();
+        this.redisClientService = new RedisClientService();
     }
     // Only for admin page
     /**
