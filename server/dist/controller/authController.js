@@ -15,7 +15,7 @@ import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js';
-import { KV_Redis_ClientService } from '../helpers/redis.js';
+import { RedisClientService } from '../helpers/redis.js';
 import { NotificationModel } from '../models/Notifications.js';
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 dotenv.config();
@@ -23,14 +23,14 @@ dotenv.config();
  * @description Authentication controller
  */
 class AuthenticationController {
-    // private redisClientService = new RedisClientService()
     constructor() {
         this.serverUrl = process.env.NODE_ENV === 'production'
             ? process.env.PRODUCTIONLINK : process.env.DEVELOPMENTLINK;
         this.clientUrl = process.env.NODE_ENV === 'production'
             ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK;
         this.userService = new UserService();
-        this.redisClientService = new KV_Redis_ClientService();
+        // private redisClientService = new KV_Redis_ClientService()
+        this.redisClientService = new RedisClientService();
         this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
         this.passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
         this.dateTime = new Date().toString();
@@ -84,12 +84,6 @@ class AuthenticationController {
                 const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`;
                 const options = mailOptions(email, username, verificationLink);
                 yield newUser.updateOne({ $set: { verificationToken: { type: 'LINK', token: verificationLink, createdAt: this.dateTime } } });
-                // await new Promise((resolve, reject) => {
-                //   transporter.sendMail(options, (err) => {
-                //     if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
-                //     else return responseType({res, status: 201, message: 'Please check your email to activate your account'})
-                //   })
-                // })
                 return yield sendMailMessage(res, options, 'one');
             }
             else if (type === 'OTP') {
@@ -196,10 +190,6 @@ class AuthenticationController {
             else if (purpose === 'PASSWORD') {
                 yield user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } } });
             }
-            // transporter.sendMail(options, (err) => {
-            //   if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
-            //   else return responseType({res, status: 201, message: 'Please check your email, OTP sent'})
-            // })
             return yield sendMailMessage(res, options, 'two');
         }));
     }
@@ -249,10 +239,6 @@ class AuthenticationController {
                         const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`;
                         const options = mailOptions(email, user === null || user === void 0 ? void 0 : user.username, verificationLink);
                         yield user.updateOne({ $set: { verificationToken: { type: 'LINK', token, createdAt: this.dateTime } } });
-                        // transporter.sendMail(options, (err) => {
-                        //   if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
-                        //   return responseType({res, status: 405, message: 'Please check your email'})
-                        // })
                         return yield sendMailMessage(res, options, 'three');
                     }
                     else if (verify === null || verify === void 0 ? void 0 : verify.email)
@@ -335,16 +321,14 @@ class AuthenticationController {
                 const passwordResetToken = yield signToken({ roles: user === null || user === void 0 ? void 0 : user.roles, email: user === null || user === void 0 ? void 0 : user.email }, '25m', process.env.PASSWORD_RESET_TOKEN_SECRET);
                 const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`;
                 const options = mailOptions(email, user.username, verificationLink, 'password');
-                yield new Promise((resolve, reject) => {
-                    transporter.sendMail(options, (err) => {
-                        if (err)
-                            reject(responseType({ res, status: 400, message: 'unable to send mail, please retry' }));
-                        else {
-                            user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } } })
-                                .then(() => resolve(responseType({ res, status: 201, message: 'Please check your email' })))
-                                .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
-                        }
-                    });
+                transporter.sendMail(options, (err) => {
+                    if (err)
+                        return responseType({ res, status: 400, message: 'unable to send mail, please retry' });
+                    else {
+                        user.updateOne({ $set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } } })
+                            .then(() => responseType({ res, status: 201, message: 'Please check your email' }))
+                            .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
+                    }
                 });
             }
             else if (type === 'OTP')
@@ -457,7 +441,7 @@ class AuthenticationController {
     redisFunc() {
         return __awaiter(this, void 0, void 0, function* () {
             objInstance.reset();
-            yield this.redisClientService.redisClient.flushall();
+            yield this.redisClientService.redisClient.flushAll();
         });
     }
 }

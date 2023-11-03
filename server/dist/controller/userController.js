@@ -11,13 +11,13 @@ import bcrypt from 'bcrypt';
 import { UserModel } from '../models/User.js';
 import { ROLES } from "../config/allowedRoles.js";
 import { UserService } from '../services/userService.js';
-import { KV_Redis_ClientService } from '../helpers/redis.js';
+import { RedisClientService } from '../helpers/redis.js';
 import NotificationController from './notificationController.js';
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 class UserController {
     constructor() {
         this.userService = new UserService();
-        this.redisClientService = new KV_Redis_ClientService();
+        this.redisClientService = new RedisClientService();
         /**
          * @description fetches user subscriptions
          * @param req - userid

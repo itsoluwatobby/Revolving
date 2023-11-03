@@ -8,14 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { UserService } from "../services/userService.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
+import { RedisClientService } from "../helpers/redis.js";
 import { TaskManagerService } from "../services/TaskManagerService.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 class TaskManagerController {
     constructor() {
         this.userService = new UserService();
         this.taskManagerService = new TaskManagerService();
-        this.redisClientService = new KV_Redis_ClientService();
+        this.redisClientService = new RedisClientService();
     }
     createTask(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {

@@ -11,12 +11,12 @@ import { ROLES } from "../config/allowedRoles.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
 import { UserService } from "../services/userService.js";
 import { CommentService } from "../services/commentService.js";
-import { KV_Redis_ClientService } from "../helpers/redis.js";
+import { RedisClientService } from "../helpers/redis.js";
 class ResponseController {
     constructor() {
         this.userService = new UserService();
         this.responseService = new CommentService();
-        this.redisClientService = new KV_Redis_ClientService();
+        this.redisClientService = new RedisClientService();
     }
     createNewResponse(req, res) {
         asyncFunc(res, () => __awaiter(this, void 0, void 0, function* () {
