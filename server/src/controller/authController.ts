@@ -22,7 +22,7 @@ type ExtraOTPRequestType = {
   email: string, 
   length: number, 
   option: 'EMAIL' | 'DIRECT', 
-  purpose: Exclude<OTPPURPOSE, 'OTHERS'> 
+  purpose: Exclude<OTPPURPOSE, 'OTHERS'>
 }
 
 /**
@@ -93,13 +93,6 @@ class AuthenticationController {
         const verificationLink = `${this.serverUrl}/revolving/auth/verify_account?token=${token}`
         const options = mailOptions(email, username, verificationLink)
         await newUser.updateOne({$set: {verificationToken: { type: 'LINK', token: verificationLink, createdAt: this.dateTime }}});
-    
-        // await new Promise((resolve, reject) => {
-        //   transporter.sendMail(options, (err) => {
-        //     if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
-        //     else return responseType({res, status: 201, message: 'Please check your email to activate your account'})
-        //   })
-        // })
         return await sendMailMessage(res, options, 'one')
       }
       else if(type === 'OTP'){
@@ -192,10 +185,6 @@ class AuthenticationController {
       else if(purpose === 'PASSWORD'){
         await user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'OTP', token: OTPToken, createdAt: this.dateTime } }})
       }
-      // transporter.sendMail(options, (err) => {
-      //   if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
-      //   else return responseType({res, status: 201, message: 'Please check your email, OTP sent'})
-      // })
       return await sendMailMessage(res, options, 'two')
     })
   }
@@ -245,11 +234,6 @@ class AuthenticationController {
     
             const options = mailOptions(email, user?.username, verificationLink)
             await user.updateOne({$set: {verificationToken: { type: 'LINK', token, createdAt: this.dateTime }}});
-    
-            // transporter.sendMail(options, (err) => {
-            //   if (err) return responseType({res, status: 400, message: 'unable to send mail, please retry'})
-            //   return responseType({res, status: 405, message: 'Please check your email'})
-            // })
             return await sendMailMessage(res, options, 'three')
           }
           else if (verify?.email) return responseType({res, status: 406, message: 'Please check your email to activate your account'})
@@ -331,15 +315,13 @@ class AuthenticationController {
         const verificationLink = `${this.serverUrl}/revolving/auth/password_reset?token=${passwordResetToken}`
         const options = mailOptions(email as string, user.username, verificationLink, 'password')
         
-        await new Promise((resolve, reject) => {
-          transporter.sendMail(options, (err) => {
-            if (err) reject(responseType({res, status: 400, message:'unable to send mail, please retry'}))
-            else{
-              user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } }})
-              .then(() => resolve(responseType({res, status:201, message:'Please check your email'})))
-              .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
-            }
-          })
+        transporter.sendMail(options, (err) => {
+          if (err) return responseType({res, status: 400, message:'unable to send mail, please retry'})
+          else{
+            user.updateOne({$set: { isResetPassword: true, verificationToken: { type: 'LINK', token: passwordResetToken, createdAt: this.dateTime } }})
+            .then(() => return responseType({res, status:201, message:'Please check your email'}))
+            .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
+          }
         })
       }
       else if(type === 'OTP') this.OTPGenerator(res, user, 6, 'PASSWORD')
