@@ -7,10 +7,11 @@ import SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 dotenv.config()
 
+// host: process.env.NODE_ENV === 'development' ? 'smtp.gmail.com' : 'smtp.vercel.app',
+// port: 587,
 export const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTransport({
   service: 'gmail',
-  host: process.env.NODE_ENV === 'development' ? 'smtp.gmail.com' : 'smtp.vercel.app',
-  port: 587,
+  host: 'smtp.gmail.com',
   secure: true,
   auth: {
     user: process.env.REVOLVING_MAIL,
