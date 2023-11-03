@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/userService.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
 import { RequestStoryProp, SharedProps } from "../../types.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
@@ -10,7 +10,7 @@ class SharedStoryController {
 
   private userService = new UserService()
   private sharedStoryService = new SharedStoryService()
-  private redisClientService = new RedisClientService()
+  private redisClientService = new KV_Redis_ClientService()
 
   constructor(){}
 

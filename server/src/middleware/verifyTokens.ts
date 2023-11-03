@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import { UserService } from "../services/userService.js";
 import { NextFunction, Request, Response } from "express";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { ClaimProps, USERROLES, UserProps } from "../../types.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 
@@ -18,7 +18,7 @@ interface CookieProp extends Request{
   }
 }
 
-const redisClientService = new RedisClientService();
+const redisClientService = new KV_Redis_ClientService();
 const userService = new UserService()
 
 async function activatedAccount(email: string): Promise<UserProps> {

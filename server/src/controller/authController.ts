@@ -4,12 +4,12 @@ import { Document, Types } from "mongoose";
 import { Request, Response } from "express";
 import { UserModel } from "../models/User.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js'; 
-import { RedisClientService } from '../helpers/redis.js';
+import { KV_Redis_ClientService } from '../helpers/redis.js';
 import { NotificationModel } from '../models/Notifications.js';
+import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { ClaimProps, EmailProps, NewUserProp, OTPPURPOSE, QueryProps, UserProps } from "../../types.js";
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 
@@ -37,8 +37,8 @@ class AuthenticationController {
   private clientUrl = process.env.NODE_ENV === 'production' 
         ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK
   private userService = new UserService()
-  // private redisClientService = new KV_Redis_ClientService()
-  private redisClientService = new RedisClientService()
+  private redisClientService = new KV_Redis_ClientService()
+  // private redisClientService = new RedisClientService()
 
   constructor(){
     this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/
@@ -424,7 +424,7 @@ class AuthenticationController {
   */ 
   public async redisFunc(){
     objInstance.reset();
-    await this.redisClientService.redisClient.flushAll();
+    await this.redisClientService.redisClient.flushall();
   }
 }
 export default new AuthenticationController()

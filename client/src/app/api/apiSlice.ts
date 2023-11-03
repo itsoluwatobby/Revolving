@@ -5,7 +5,7 @@ import { ApiSliceType, AuthType, RefreshTokenType } from '../../types/data';
 import { createApi, fetchBaseQuery, BaseQueryApi, FetchBaseQueryError, FetchBaseQueryMeta, FetchArgs } from '@reduxjs/toolkit/query/react';
 
 // https://revolving-api.vercel.app
-const BASEPATH = process.env.NODE_ENV === 'production' ? 'https://revolving-api.onrender.com' : 'http://localhost:4000'
+const BASEPATH = process.env.NODE_ENV === 'production' ? 'https://revolving-api.vercel.app' : 'http://localhost:4000'
 export const BASEURL = `${BASEPATH}/revolving`
 export const SOCKET_BASE_URL = BASEPATH
 
