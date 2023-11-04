@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import dotenv from 'dotenv';
 import { UserService } from "../services/userService.js";
-import { RedisClientService } from "../helpers/redis.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { responseType, signToken, verifyToken } from "../helpers/helper.js";
 dotenv.config();
-const redisClientService = new RedisClientService();
+const redisClientService = new KV_Redis_ClientService();
 const userService = new UserService();
 function activatedAccount(email) {
     return __awaiter(this, void 0, void 0, function* () {

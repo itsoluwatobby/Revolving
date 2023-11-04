@@ -123,6 +123,7 @@ export default function PostTop({ story, bodyContent, setViewUsers }: PostTopPro
         }
        
         <UserCard 
+          currentUserId={userId}
           userId={story?.sharedId ? (story?.sharerId as string) : story.userId}
           revealCard={revealCard} closeUserCard={closeUserCard} setOnCard={setOnCard}
           cardRef={cardRef as React.LegacyRef<HTMLElement>} setRevealCard={setRevealCard}
@@ -150,7 +151,7 @@ export default function PostTop({ story, bodyContent, setViewUsers }: PostTopPro
         
           {!story?.sharedAuthor ?
             <UserCard 
-              closeUserCard={closeUserCard}
+              closeUserCard={closeUserCard} currentUserId={userId}
               userId={story.userId} cardRef={cardRef as React.LegacyRef<HTMLElement>}
               setRevealCard={setRevealCard} revealCard={revealCard} setOnCard={setOnCard}
             /> 

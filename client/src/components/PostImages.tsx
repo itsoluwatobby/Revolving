@@ -19,7 +19,7 @@ export default function PostImage({ story, position, page }: ImageProp) {
     <>
       {
         story?.picture?.length ?  (
-          <div className={`mt-4 ${preview?.view === 'Hide' ? 'scale-100' : 'scale-0 hidden'} transition-all p-0.5 flex items-center ${page === 'PROFILE' ? 'h-32 flex-row maxmobile:h-32' : ''} ${position === 'single' ? 'px-2 mobile:flex-co mobile:h-96' : 'h-64'} gap-1 w-full`}>
+          <div className={`mt-3 ${preview?.view === 'Hide' ? 'scale-100' : 'scale-0 hidden'} transition-all p-0.5 flex items-center ${page === 'PROFILE' ? 'h-32 flex-row maxmobile:h-32' : ''} ${position === 'single' ? 'px-2 mobile:flex-co mobile:h-96' : 'h-64'} gap-1 w-full`}>
             {
               story?.picture?.map(pic => (
                 <figure

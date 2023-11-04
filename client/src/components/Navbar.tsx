@@ -57,7 +57,7 @@ export const Navbar = () => {
   return(
     <nav 
       onClick={() => setLoginPrompt({opened: 'Hide'})}
-      className={`${address.includes(pathname) ? `sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16 ${theme == 'light' ? '' : 'bg-inherit'}` : ''} z-30 p-4 w-full h-16 flex items-center justify-between mobile:justify-between mobile:pl-2.5 mobile:pr-1.5 minmobile:pr-0 minmobile:pl-2
+      className={`${address.includes(pathname) ? 'sticky top-0 pr-2 pl-4 md:pl-16 md:pr-16' : ''} z-30 ${theme === 'light' ? 'bg-white' : 'bg-slate-950'} transition-colors p-4 w-full h-16 flex items-center justify-between mobile:justify-between mobile:pl-2.5 mobile:pr-1.5 minmobile:pr-0 minmobile:pl-2
      `}>
       
       <TopLeft delayedSaving={delayedSaving} />

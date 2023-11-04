@@ -8,17 +8,19 @@ import { ChatOption, ThemeContextType } from "../types/posts";
 import { Followers, Follows, UserProps } from "../types/data";
 import { checkCount, reduceLength } from "../utils/navigator";
 import { useGetUserByIdQuery } from "../app/api/usersApiSlice";
+import { SocialMediaAccounts } from "./SocialMediaAccounts";
 
 type UserCardProps = {
   userId: string,
-  cardRef: React.LegacyRef<HTMLElement>,
+  currentUserId: string,
   revealCard: ChatOption,
+  cardRef: React.LegacyRef<HTMLElement>,
   setRevealCard: React.Dispatch<React.SetStateAction<ChatOption>>,
   setOnCard: React.Dispatch<React.SetStateAction<boolean>>,
   closeUserCard: () => void
 }
 
-export default function UserCard({ userId, closeUserCard, cardRef, revealCard, setRevealCard, setOnCard }: UserCardProps) {
+export default function UserCard({ userId, closeUserCard, currentUserId, cardRef, revealCard, setRevealCard, setOnCard }: UserCardProps) {
   const {theme } = useThemeContext() as ThemeContextType
   const { data, isLoading, isError } = useGetUserByIdQuery(userId)
   const [user, setUser] = useState<UserProps>();
@@ -71,14 +73,10 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
               <span className="text-xs font-normal">{reduceLength(user?.description as string, 25, 'letter')}</span>
             </p>
           </div>
-          <FollowUnFollow position={["others"]} userId={user?._id as string} />
+          <FollowUnFollow position={["usercard"]} userId={user?._id as string} currentUserId={currentUserId} />
         </div>
         
-        <div>
-          <p>
-            social media links          
-          </p>
-        </div>
+        <SocialMediaAccounts theme={theme} userProfile={user as UserProps} page="HOME" />
 
         <div className='flex items-center gap-4'>
           <Link to={`/follows/${userId}`}>
@@ -105,7 +103,7 @@ export default function UserCard({ userId, closeUserCard, cardRef, revealCard, s
         setOnCard(false)
         setRevealCard('Hide')
       }}
-      className={`absolute bg-slate-100 font-sans ${revealCard == 'Open' ? 'scale-100' : 'scale-0 hidden'} transition-all rounded p-2.5 z-10 top-5 max-h-40 shadow-2xl w-fit ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
+      className={`absolute bg-slate-100 font-sans ${revealCard == 'Open' ? 'scale-100' : 'scale-0 hidden'} transition-all rounded p-2.5 z-50 top-5 max-h-40 shadow-2xl w-fit ${theme == 'light' ? 'bg-white' : 'bg-slate-800'}`}>
       {content}
     </article>
   )

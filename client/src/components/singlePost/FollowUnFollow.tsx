@@ -7,13 +7,13 @@ import { useFollowUnfollowUserMutation, useGetUserByIdQuery } from '../../app/ap
 
 type FollowUnFollowProps = {
   userId: string,
+  currentUserId: string,
   position: PositionType
 }
 
 const initFollowOption = { isFollowing: false, isFollowed: false }
 
-export default function FollowUnFollow({ userId, position }: FollowUnFollowProps) {
-  const currentUserId = localStorage.getItem('revolving_userId') as string
+export default function FollowUnFollow({ userId, position, currentUserId }: FollowUnFollowProps) {
   const { theme, setLoginPrompt } = useThemeContext() as ThemeContextType
   const {data: user} = useGetUserByIdQuery(currentUserId)
   const [isFollowOption, setIsFollowOption] = useState<typeof initFollowOption>(initFollowOption)
@@ -25,7 +25,7 @@ export default function FollowUnFollow({ userId, position }: FollowUnFollowProps
   const [hoverThis, setHoverThis] = useState<HoverType>('following');
   const buttonClass = useCallback((isMutating: boolean, theme?: Theme, position?: PositionType) => {
     return `
-    ${position?.includes('profile') ? 'rounded-sm p-2 px-0 text-sm' : 'rounded-md p-1 px-1.5'} ${position?.includes('others') ? 'text-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
+    ${position?.includes('profile') ? 'rounded-sm py-1.5 px-1 text-sm' : 'rounded-md p-1 px-1.5'} ${position?.includes('usercard') ? 'text-xs rounded-sm' : 'text-xs'} shadow-lg bg-slate-500 capitalize hover:opacity-90 transition-shadow transition-all active:opacity-100 ${isMutating && 'animate-pulse'} ${theme == 'light' ? 'text-white' : ''}
     `
   }, [])
 

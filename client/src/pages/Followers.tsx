@@ -42,7 +42,7 @@ export default function Followers() {
           className={`self-start ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-700'} p-2 py-1 rounded-sm`}
           >Return</button>
         <FollowsComp 
-          yourFollowers={yourFollowers as GetFollowsType} 
+          yourFollowers={yourFollowers as GetFollowsType} currentUserId={userId as string}
           theme={theme} isLoading={isLoading} errorMsg={errorMsg as ErrorResponse}
         />
       </div>
