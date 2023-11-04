@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { StoryModel } from "../models/Story.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { RedisClientService } from "../helpers/redis.js";
 import { UserService } from "../services/userService.js";
 import { StoryService } from "../services/StoryService.js";
+import { KV_Redis_ClientService } from "../helpers/redis.js";
 import NotificationController from "./notificationController.js";
 import { SharedStoryService } from "../services/SharedStoryService.js";
 import { asyncFunc, autoDeleteOnExpire, responseType } from "../helpers/helper.js";
@@ -20,7 +20,7 @@ class StoryController {
         this.userService = new UserService();
         this.storyService = new StoryService();
         this.sharedStoryService = new SharedStoryService();
-        this.redisClientService = new RedisClientService();
+        this.redisClientService = new KV_Redis_ClientService();
         /**
          * @description fetches users that likes a story
          * @param req - story id

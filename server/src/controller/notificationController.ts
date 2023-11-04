@@ -78,7 +78,7 @@ export class NotificationController {
 
   openOrCloseNotification(req: Request, res: Response){
     const { notificationId, isOpen, stats } = req.query
-    if(!notificationId) return responseType({res, status: 406, message: statuses['406']})
+    if(!notificationId || notificationId == undefined) return responseType({res, status: 406, message: statuses['406']})
     const opened = isOpen === 'true' ? true : false
     const status = stats as unknown as NotificationStatus
     NotificationModel.findByIdAndUpdate({_id: notificationId}, { $set: {isNotificationOpen: opened} }, { new: true })
@@ -128,7 +128,7 @@ export class NotificationController {
 
   public async getNotification(req: Request, res: Response){
     const { userId } = req.params
-    if(!userId || userId === undefined) return responseType({res, status: 406, message: statuses['406']})
+    if(!userId || userId == undefined) return responseType({res, status: 406, message: statuses['406']})
     this.redisClientService.getCachedResponse({key: `userNotification:${userId}`, timeTaken: 1800, cb: async() => {
       return await NotificationModel.findOne({userId}).exec()
     }, reqMtd: ['POST', 'PATCH', 'PUT', 'DELETE'] })

@@ -402,16 +402,16 @@ class AuthenticationController {
       if(admin?.roles.includes(ROLES.ADMIN)) {
         if(!user?.roles.includes(ROLES.ADMIN)) {
           user.roles = [...user.roles, ROLES.ADMIN]
-          await user.save()
-          this.userService.getUserById(userId)
-          .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role assigned', data: userAd}))
+          user.save()
+          // this.userService.getUserById(userId)
+          .then(() => responseType({res, status:201, count: 1, message: 'admin role assigned', data: user}))
           .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
         }
         else{
           user.roles = [ROLES.USER]
-          await user.save()
-          this.userService.getUserById(userId)
-          .then((userAd) => responseType({res, status:201, count: 1, message: 'admin role removed', data: userAd}))
+          user.save()
+          // this.userService.getUserById(userId)
+          .then(() => responseType({res, status:201, count: 1, message: 'admin role removed', data: user}))
           .catch((error) => responseType({res, status: 400, message: `${error.message}`}))
         }
       }

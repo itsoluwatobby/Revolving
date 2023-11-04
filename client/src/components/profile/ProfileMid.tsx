@@ -1,12 +1,11 @@
+import { useState } from 'react';
 import { format } from 'timeago.js';
 import { Link } from 'react-router-dom';
-import { useState, useCallback } from 'react';
-import { MdAttachEmail } from 'react-icons/md';
 import { ImageTypeProp, Theme } from '../../types/posts';
 import FollowUnFollow from '../singlePost/FollowUnFollow';
+import { SocialMediaAccounts } from '../SocialMediaAccounts';
 import { Followers, Follows, UserProps } from '../../types/data';
 import { checkCount, reduceLength } from '../../utils/navigator';
-import { FaFacebookSquare, FaGithub, FaInstagramSquare, FaLinkedin, FaTwitterSquare } from 'react-icons/fa';
 
 type Props = {
   theme: Theme,
@@ -18,19 +17,6 @@ type Props = {
 export default function ProfileMid({ userId, userProfile, setRevealEditModal, theme }: Props) {
   const [showAll, setShowAll] = useState<boolean>(false)
   const currentUserId = localStorage.getItem('revolving_userId') as string
-  const ICONS = useCallback((classNames?: string): {[index: string]: JSX.Element} => {
-    return (
-      {
-        "x": <FaTwitterSquare className={classNames}/>, 
-        "github": <FaGithub className={classNames}/>, 
-        "email": <MdAttachEmail className={classNames}/>,
-        "linkedin": <FaLinkedin className={classNames}/>,
-        "facebook": <FaFacebookSquare className={classNames}/>,
-        "instagram": <FaInstagramSquare className={classNames}/>,
-        "twitter": <FaTwitterSquare className={classNames}/>, 
-      }
-    )
-  }, [])
 
   return (
     <div 
@@ -39,7 +25,6 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
       className="relative flex py-2 pt-3 md:mt-0 mt-16 flex-col w-full">
       {
         <>
-     
           <article className="flex justify-between w-full md:flex-wrap lg:flex-nowrap">
            
             <div className="flex-auto flex flex-col gap-1 w-full">
@@ -85,20 +70,8 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
 
               </div>
 
-              <div className={`${userProfile?.socialMediaAccounts?.length ? 'flex' : 'hidden'} flex-col w-fit gap-1`}>
-                {
-                  userProfile?.socialMediaAccounts?.map(socialMedia => (
-                    <a 
-                      href={socialMedia?.name === 'email' ? "mailto:email" : `${socialMedia?.link}`} target='_blank'
-                      key={socialMedia?.name}
-                      className={`flex items-center gap-1.5 text-blue-600 hover:underline w-fit`}
-                    >
-                      {ICONS(`${theme === 'light' ? 'text-gray-800' : 'text-gray-400'} text-lg`)[socialMedia?.name?.toLowerCase()]}
-                      {socialMedia?.link}
-                    </a>
-                  ))
-                }
-              </div>
+              <SocialMediaAccounts theme={theme} userProfile={userProfile} page='PROFILE' />
+            
             </div>
 
             <div className={`lg:mt-0 md:mt-4 flex flex-col md:items-start lg:items-center items-center gap-3 p-0.5`}>
@@ -112,24 +85,7 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
               </Link>
 
               <div className={`${userProfile?._id ? 'flex' : 'hidden'} flex-col justify-between gap-4 h-full`}>
-
-                <FollowUnFollow userId={userProfile?._id} position={['profile']} />
-
-                {/* <div className={`${userProfile?.stack?.length ? 'flex' : 'hidden'} flex-col`}>
-                  <p className={`uppercase text-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-semibold font-mono`}>Skills</p>
-                  <div className={`stackflow overflow-y-scroll h-12 p-1 py-1.5 px-2 w-fit text-sm overflow-x-scroll max-w-[120px] last:border-b-0 text-white whitespace-nowrap font-serif font-light ${theme === 'light' ? 'bg-slate-600' : 'bg-slate-900'} rounded-md`}>
-                    {
-                      userProfile?.stack?.map(skill => (
-                        <p 
-                          key={skill}
-                          className="rounded-md hover:opacity-80 py-0.5 tracking-wide capitalize transition-all cursor-default">
-                            {skill}
-                        </p>
-                      ))
-                    }
-                  </div>
-                </div> */}
-
+                <FollowUnFollow userId={userProfile?._id} position={['profile']} currentUserId={currentUserId} />
               </div>
             </div>
          
@@ -175,19 +131,6 @@ export default function ProfileMid({ userId, userProfile, setRevealEditModal, th
               {showAll ? userProfile?.description : reduceLength(userProfile?.description, 50, 'word')}
             </p>
           </div>
-      {/* 
-          <div className="absolute h-full w-68 bg-white bottom-0 rounded-lg">
-            <iframe 
-              title="output"
-              src="https://www.google.com"
-              sandbox="allow-scripts"
-              allow-origin="*"
-              frameBorder={0}
-              width='100%'
-              height='100%'
-              className="rounded-lg"
-            />
-          </div>  */}
         </>
       }
     </div>

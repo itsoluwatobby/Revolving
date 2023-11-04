@@ -31,6 +31,7 @@ type ArticleProps = {
 export default function ArticleComp({ 
   isError, story, storyRef, isBarOpen, bodyContent, sidebar, averageReadingTime, isLoading, triggerPrint 
 }: ArticleProps) {
+  const currentUserId = localStorage.getItem('revolving_userId') as string
   const [openComment, setOpenComment] = useState<CommentOptionProp>({ option: 'Hide', storyId: '' })
   const { isIntersecting, observerRef } = useRevolvingObserver({ screenPosition: '-180px' })
   const { theme, setNotIntersecting } = useThemeContext() as ThemeContextType
@@ -72,7 +73,7 @@ export default function ArticleComp({
           <span>.</span>
           <p>{format(story?.createdAt, 'en-US')}</p>
 
-          <FollowUnFollow userId={story?.userId} position={['others']} />
+          <FollowUnFollow userId={story?.userId} position={['others']} currentUserId={currentUserId} />
         </div>
 
         <BsFillFileEarmarkPdfFill 

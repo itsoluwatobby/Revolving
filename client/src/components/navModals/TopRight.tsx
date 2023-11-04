@@ -50,7 +50,7 @@ export default function TopRight({ currentUser }: TopRightProps) {
     let isMounted = true
     if(isMounted && data) {
       const unread = data?.notification?.filter(notification => notification?.status === 'unread')
-      setUnreadNotifications([...unread])
+      setUnreadNotifications(unread)
     }
     return () => {
       isMounted = false

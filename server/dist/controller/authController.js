@@ -11,26 +11,26 @@ import brcypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { UserModel } from "../models/User.js";
 import { ROLES } from "../config/allowedRoles.js";
-import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { TaskBinModel } from "../models/TaskManager.js";
 import { UserService } from '../services/userService.js';
 import { mailOptions } from '../templates/registration.js';
-import { RedisClientService } from '../helpers/redis.js';
+import { KV_Redis_ClientService } from '../helpers/redis.js';
 import { NotificationModel } from '../models/Notifications.js';
+import { sendMailMessage, transporter } from '../config/mailConfig.js';
 import { asyncFunc, responseType, signToken, objInstance, verifyToken, autoDeleteOnExpire, generateOTP, checksExpiration } from "../helpers/helper.js";
 dotenv.config();
 /**
  * @description Authentication controller
  */
 class AuthenticationController {
+    // private redisClientService = new RedisClientService()
     constructor() {
         this.serverUrl = process.env.NODE_ENV === 'production'
             ? process.env.PRODUCTIONLINK : process.env.DEVELOPMENTLINK;
         this.clientUrl = process.env.NODE_ENV === 'production'
             ? process.env.PUBLISHEDREDIRECTLINK : process.env.REDIRECTLINK;
         this.userService = new UserService();
-        // private redisClientService = new KV_Redis_ClientService()
-        this.redisClientService = new RedisClientService();
+        this.redisClientService = new KV_Redis_ClientService();
         this.emailRegex = /^[a-zA-Z\d]+[@][a-zA-Z\d]{2,}\.[a-z]{2,4}$/;
         this.passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!£%*?&])[A-Za-z\d@£$!%*?&]{9,}$/;
         this.dateTime = new Date().toString();
@@ -441,7 +441,7 @@ class AuthenticationController {
     redisFunc() {
         return __awaiter(this, void 0, void 0, function* () {
             objInstance.reset();
-            yield this.redisClientService.redisClient.flushAll();
+            yield this.redisClientService.redisClient.flushall();
         });
     }
 }

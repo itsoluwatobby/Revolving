@@ -166,7 +166,7 @@ interface TaskProp{
   updatedAt?: string,
 }
 
-type Positions = 'navbar' | 'profile' | 'followPage' | 'others'
+type Positions = 'navbar' | 'profile' | 'followPage' | 'others' | 'usercard'
 
 type HoverType = 'unfollow' | 'following'
 type PositionType = Positions[]

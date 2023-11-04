@@ -10,13 +10,17 @@ import { ErrorResponse, Followers, Follows, GetFollowsType } from '../../types/d
 type FollowsCompProps = { 
   theme: Theme,
   isLoading: boolean,
+  currentUserId: string,
   errorMsg: ErrorResponse,
   yourFollowers: GetFollowsType
  }
 
-export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg }: FollowsCompProps) {
+export default function FollowsComp({ yourFollowers, currentUserId, isLoading, theme, errorMsg }: FollowsCompProps) {
+  const LoggedInUserId = localStorage.getItem('revolving_userId') as string
   const sortedFollowers = yourFollowers?.followers ? [...yourFollowers.followers]?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate)) : []
   const sortedFollows = yourFollowers?.follows ? [...yourFollowers.follows]?.sort((a, b) => b?.subDate?.localeCompare(a?.subDate)) : []
+  console.log(LoggedInUserId)
+  console.log(currentUserId)
   
   return (
     <section className='flex justify-between maxscreen:flex-col p-1 h-full w-full transition-all'>
@@ -32,7 +36,7 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                 sortedFollowers?.map(follower => (
                  <div 
                     key={follower?._id}
-                    className={`p-1.5 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-700'} gap-x-2 rounded-md`}
+                    className={`p-1.5 shadow-md flex w-full ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-700'} gap-x-1.5 rounded-md`}
                   >
 
                     <figure className="bg-slate-300 rounded-full border-2 border-slate-400 w-10 h-10">
@@ -46,7 +50,7 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                     </figure>
 
                     <div className='flex-auto flex flex-col'>
-                      <Link to={`/profile/${follower?._id}`}>
+                      <Link to={`/profile/${follower?._id}`} className='w-fit'>
                         {
                           (follower?.firstName || follower?.lastName) ?
                             <p className='hover:underline underline-offset-2 cursor-pointer'>{follower?.firstName} {follower?.lastName}
@@ -66,7 +70,7 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
 
                     <div className='flex flex-col justify-between'>
                       <p className={`pb-1.5 text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follower?.subDate)}</p>
-                      <FollowUnFollow userId={follower?._id} position={['followPage']} />
+                      {LoggedInUserId === currentUserId ? <FollowUnFollow userId={follower?._id} position={['followPage']} currentUserId={currentUserId} /> : null}
                     </div>
 
                   </div>
@@ -106,10 +110,10 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
                     </figure>
 
                     <div className='flex-auto flex flex-col'>
-                      <Link to={`/profile/${follow?._id}`}>
+                      <Link to={`/profile/${follow?._id}`} className='w-fit'>
                         {
                           (follow?.firstName || follow?.lastName) ?
-                            <p className='hover:underline underline-offset-2 cursor-pointer'>{follow?.firstName} {follow?.lastName}
+                            <p className='hover:underline underline-offset-2 cursor-pointer w-fit'>{follow?.firstName} {follow?.lastName}
                             </p>
                           :
                             <p className='hover:underline underline-offset-2 cursor-pointer'>
@@ -126,7 +130,7 @@ export default function FollowsComp({ yourFollowers, isLoading, theme, errorMsg 
 
                       <div className='flex flex-col justify-between'>
                         <p className={`text-xs ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}`}>{format(follow?.subDate)}</p>
-                        <FollowUnFollow userId={follow?._id} position={['followPage']} />
+                        {LoggedInUserId === currentUserId ? <FollowUnFollow userId={follow?._id} position={['followPage']} currentUserId={currentUserId} /> : null}
                       </div>
 {/* FOLLOW BACK BUTTON */}
                   </div>
