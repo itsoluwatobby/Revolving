@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
+import { Document, Schema } from "mongoose";
+import { statuses } from "../helpers/responses.js";
 import { responseType } from "../helpers/helper.js";
 import UserService from "../services/userService.js";
 import { KV_Redis_ClientService } from "../helpers/redis.js";
 import { NotificationModel } from "../models/Notifications.js";
 import { AllNotificationModelType, NotificationBody, NotificationModelType, NotificationStatus, NotificationType, UserProps } from "../../types.js";
-import { Document, Schema } from "mongoose";
-import { statuses } from "../helpers/responses.js";
 
 type NotificationDocument = Document<unknown, {}, NotificationModelType> & NotificationModelType & Required<{ _id: string | Schema.Types.ObjectId; }>
 
@@ -78,7 +78,7 @@ export class NotificationController {
 
   openOrCloseNotification(req: Request, res: Response){
     const { notificationId, isOpen, stats } = req.query
-    if(!notificationId || notificationId == undefined) return responseType({res, status: 406, message: statuses['406']})
+    if(!notificationId || notificationId == undefined || notificationId === 'undefined') return responseType({res, status: 406, message: statuses['406']})
     const opened = isOpen === 'true' ? true : false
     const status = stats as unknown as NotificationStatus
     NotificationModel.findByIdAndUpdate({_id: notificationId}, { $set: {isNotificationOpen: opened} }, { new: true })

@@ -18,6 +18,7 @@ export default function About() {
     'User authentication',
     'Account verification by either a Link or OTP',
     'Post creation, editing, deleting and updating',
+    'Comment creation, editing, deleting and updating',
     'Code editor',
     'Printing of post in PDF format',
     'Follow and Unfollowing users',

@@ -418,16 +418,16 @@ class AuthenticationController {
             if (admin === null || admin === void 0 ? void 0 : admin.roles.includes(ROLES.ADMIN)) {
                 if (!(user === null || user === void 0 ? void 0 : user.roles.includes(ROLES.ADMIN))) {
                     user.roles = [...user.roles, ROLES.ADMIN];
-                    yield user.save();
-                    this.userService.getUserById(userId)
-                        .then((userAd) => responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: userAd }))
+                    user.save()
+                        // this.userService.getUserById(userId)
+                        .then(() => responseType({ res, status: 201, count: 1, message: 'admin role assigned', data: user }))
                         .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
                 }
                 else {
                     user.roles = [ROLES.USER];
-                    yield user.save();
-                    this.userService.getUserById(userId)
-                        .then((userAd) => responseType({ res, status: 201, count: 1, message: 'admin role removed', data: userAd }))
+                    user.save()
+                        // this.userService.getUserById(userId)
+                        .then(() => responseType({ res, status: 201, count: 1, message: 'admin role removed', data: user }))
                         .catch((error) => responseType({ res, status: 400, message: `${error.message}` }));
                 }
             }
