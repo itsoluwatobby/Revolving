@@ -79,7 +79,7 @@ export const App = () => {
   }
 
   return (
-    <main className={`app scroll_behavior relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-950 text-white'} h-screen mobile:h-[100svh] w-full transition-all font-sans overflow-x-hidden`}>
+    <main className={`app scroll_behavior max-w-[1440px] mx-auto relative ${theme == 'light' ? 'bg-white' : 'dark:bg-slate-950 text-white'} h-screen mobile:h-[100svh] w-full transition-all font-sans overflow-x-hidden`}>
       <Routes>
 
         <Route path='/' element={<BlogLayout />}>
