@@ -145,6 +145,7 @@ type PageRequest<T, K> = {
   limit: number,
 }
 
+// not so correct version --- CORRECT VERSION BELOW
 export const pagination = async<T, K>({page, limit, Models, callback, query='nil'}: PageRequest<T, K>) => {
   
   const count = limit
@@ -170,8 +171,35 @@ export const pagination = async<T, K>({page, limit, Models, callback, query='nil
   // return { message: currentPage < 1 ? 'Pages starts from 1' : 'Pages exceeded', pageable }
   return { pageable, data };
 }
-
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
+
+// correct pagination version
+const pagination = async ({
+  pageNumber, limit, Model, userId = '',
+}) => {
+  const currentPage = pageNumber;
+  const startIndex = (currentPage * limit) - limit;
+  const resultLength = await Model.find(userId ? { userId } : {}).count();
+  const data = await Model.find(userId ? { userId } : {}).skip(startIndex).limit(limit);
+  //--------- sample for plain arrays ---------------
+  // const resultLength = Model.length;
+  // const data = Model.slice(startIndex, limit + startIndex);
+
+  const total = Math.ceil(resultLength / limit);
+  const returnedVal = (currentPage > total) || (currentPage < 1);
+  const pageable = {
+    pages: {
+      previous: (currentPage === 1 || returnedVal) ? 'Nil' : currentPage - 1,
+      currentPage,
+      next: (currentPage === total || returnedVal) ? 'Nil' : currentPage + 1,
+    },
+    dataCount: data?.length,
+    pagesLeft: total - currentPage,
+    numberOfPages: total,
+  };
+// pagesLeft: returnedVal ? 'Nil' : total - currentPage,
+  return { pageable, data };
+};
 
 function timeConverterInMillis() {
   const minute = 60 * 1000
