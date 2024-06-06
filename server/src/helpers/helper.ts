@@ -174,30 +174,29 @@ export const pagination = async<T, K>({page, limit, Models, callback, query='nil
 export type PagedTypeResponse = Awaited<ReturnType<typeof pagination>>
 
 // correct pagination version
-const pagination = async ({
-  pageNumber, limit, Model, userId = '',
-}) => {
-  const currentPage = pageNumber;
-  const startIndex = (currentPage * limit) - limit;
-  const resultLength = await Model.find(userId ? { userId } : {}).count();
-  const data = await Model.find(userId ? { userId } : {}).skip(startIndex).limit(limit);
+const pagination = async (pageNumber, limit, Model, queryObj = {}, selections = '') => {
+  const dataLength = +limit;
+  const currentPage = +pageNumber;
+  const startIndex = (currentPage * dataLength) - dataLength;
+  const resultLength = await Model.find(queryObj).countDocuments();
+  const data = await Model.find(queryObj).select(selections).skip(startIndex).limit(dataLength);
   //--------- sample for plain arrays ---------------
   // const resultLength = Model.length;
   // const data = Model.slice(startIndex, limit + startIndex);
 
-  const total = Math.ceil(resultLength / limit);
+  const total = Math.ceil(resultLength / dataLength);
+  const pagesLeft = total - currentPage;
   const returnedVal = (currentPage > total) || (currentPage < 1);
   const pageable = {
     pages: {
-      previous: (currentPage === 1 || returnedVal) ? 'Nil' : currentPage - 1,
-      currentPage,
-      next: (currentPage === total || returnedVal) ? 'Nil' : currentPage + 1,
+      previous: (currentPage === 1 || returnedVal) ? null : currentPage - 1,
+      current: currentPage,
+      next: (currentPage === total || returnedVal) ? null : currentPage + 1,
     },
-    dataCount: data?.length,
-    pagesLeft: total - currentPage,
+    length: data?.length,
+    pagesLeft: pagesLeft >= 0 ? pagesLeft : 0,
     numberOfPages: total,
   };
-// pagesLeft: returnedVal ? 'Nil' : total - currentPage,
   return { pageable, data };
 };
 
