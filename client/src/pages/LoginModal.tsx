@@ -20,6 +20,9 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState<string>('')
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [forgot, setForgot] = useState<boolean>(false)
+  const [testCredentials] = useState<{email: string; password: string}>(
+    { email: 'testaccount@gmail.com', password: 'Testaccount123$*' }
+  );
   const [signIn, { isLoading, isError }] = useSignInMutation()
   const { theme } = useThemeContext() as ThemeContextType;
   const location = useLocation()
@@ -32,6 +35,11 @@ export default function Login() {
     const value = event.target.checked
     dispatch(persistLogin(value))
   }
+
+  const useTestCredentials = () => {
+    setEmail(testCredentials.email);
+    setPassword(testCredentials.password);
+  };
 
   const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -86,7 +94,8 @@ export default function Login() {
 
   return (
     <section className={`welcome w-full flex justify-center ${theme == 'light' ? 'bg-slate-100' : ''}`}>
-      {forgot ? 
+      {
+        forgot ? 
           <ForgotPassword setForgot={setForgot}/>
           : 
           <LoginComponent 
@@ -94,8 +103,9 @@ export default function Login() {
             setForgot={setForgot} handlePassword={handlePassword} handleChecked={handleChecked} 
             password={password} revealPassword={revealPassword} setRevealPassword={setRevealPassword} 
             loading={isLoading} errorMsg={errorMsg}
+            useTestCredentials={useTestCredentials}
           />
-          }
+      }
     </section>
   )
 }

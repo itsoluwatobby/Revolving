@@ -342,21 +342,22 @@ type ApiSliceType = {
 }
 
 type OTPPURPOSE = 'ACCOUNT' | 'PASSWORD' | 'OTHERS'
+type StatusError =  number | 'FETCH_ERROR' | 'PARSING_ERROR' | 'TIMEOUT_ERROR' | 'CUSTOM_ERROR'
 
 type RefreshTokenType = {
   data: {
-    data: AuthType
-  }, 
-  status: number | 'FETCH_ERROR' | 'PARSING_ERROR' | 'TIMEOUT_ERROR' | 'CUSTOM_ERROR', 
-  error?: string,
-  originalStatus?: number
+    data: AuthType;
+  };
+  status: StatusError; 
+  error?: string;
+  originalStatus?: number;
 }
 
 type RefreshType = {
-  data: AuthType, 
-  status: number | 'FETCH_ERROR' | 'PARSING_ERROR' | 'TIMEOUT_ERROR' | 'CUSTOM_ERROR', 
-  error?: string,
-  originalStatus?: number
+  data: AuthType; 
+  status: StatusError;
+  error?: string;
+  originalStatus?: number;
 }
 
 type AuthenticationContextType={
@@ -380,6 +381,7 @@ interface UserInfoProps{
 interface LoginProps extends UserInfoProps{
   handleChecked: (event: ChangeEvent<HTMLInputElement>) => void,
   setForgot: React.Dispatch<React.SetStateAction<boolean>>,
+  useTestCredentials: () => void;
 }
 
 interface RegistrationProps extends UserInfoProps{
