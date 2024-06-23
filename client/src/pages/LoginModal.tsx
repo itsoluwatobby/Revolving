@@ -21,7 +21,7 @@ export default function Login() {
   const [revealPassword, setRevealPassword] = useState<boolean>(false)
   const [forgot, setForgot] = useState<boolean>(false)
   const [testCredentials] = useState<{email: string; password: string}>(
-    { email: 'testaccount@gmail.com', password: 'Testaccount123$*' }
+    { email: 'testaccount@gmail.com', password: 'Testaccount123$' }
   );
   const [signIn, { isLoading, isError }] = useSignInMutation()
   const { theme } = useThemeContext() as ThemeContextType;
