@@ -7,7 +7,9 @@ import { useThemeContext } from "../../hooks/useThemeContext";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 
 export default function LoginComponent({ 
-  handleSubmit, handleEmail, loading, errorMsg, handlePassword, handleChecked, email, password, revealPassword, setRevealPassword, setForgot
+  handleSubmit, handleEmail, loading, errorMsg, handlePassword, 
+  handleChecked, email, password, revealPassword, setRevealPassword,
+  setForgot, useTestCredentials,
  }: LoginProps) {
   const {theme} = useThemeContext() as ThemeContextType
   const persistLogin = useSelector(persisted)
@@ -82,6 +84,13 @@ export default function LoginComponent({
               className={`w-[95%] self-center ${errorMsg?.length ? 'bg-red-600' : ''} ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-sm p-2 focus:outline-none border-none ${(canSubmit && !loading && !errorMsg?.length) ? 'bg-green-400 hover:bg-green-500 duration-150' : 'bg-gray-400'}`}
             >
               {errorMsg ? errorMsg : (!loading ? 'Sign In' : 'Signing In...')}
+            </button>
+            <button 
+              type='button'
+              onClick={useTestCredentials}
+              className={`w-fit self-start ml-2.5 rounded-sm p-2 focus:outline-none border-none bg-green-500 hover:bg-green-600 focus:bg-green-700 text-sm duration-150`}
+            >
+              Use Test Credentials
             </button>
 
             <div className='flex flex-col text-sm gap-2'>
